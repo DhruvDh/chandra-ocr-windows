@@ -3,6 +3,7 @@ import asyncio
 import contextlib
 import json
 import logging
+import math
 import traceback
 import queue
 import threading
@@ -49,8 +50,8 @@ class Worker:
     def __init__(self, backend, queue_limit, inference_seconds=1800):
         if type(queue_limit) is not int or queue_limit < 0:
             raise ValueError("queue_limit must be a nonnegative integer")
-        if inference_seconds <= 0:
-            raise ValueError("inference_seconds must be positive")
+        if isinstance(inference_seconds, bool) or not isinstance(inference_seconds, (int, float)) or not math.isfinite(inference_seconds) or inference_seconds <= 0:
+            raise ValueError("inference_seconds must be positive and finite")
         self.inference_seconds = inference_seconds
         self.backend, self.limit = backend, queue_limit + 1
         self.lock = asyncio.Lock()
@@ -151,8 +152,8 @@ async def deltas(job, request):
 
 def create_app(backend, queue_limit=2, inference_seconds=1800, idle_seconds=300):
     worker = Worker(backend, queue_limit, inference_seconds)
-    if idle_seconds <= 0:
-        raise ValueError("idle_seconds must be positive")
+    if isinstance(idle_seconds, bool) or not isinstance(idle_seconds, (int, float)) or not math.isfinite(idle_seconds) or idle_seconds <= 0:
+        raise ValueError("idle_seconds must be positive and finite")
     @asynccontextmanager
     async def lifespan(app):
         idle = asyncio.create_task(worker.idle(idle_seconds))

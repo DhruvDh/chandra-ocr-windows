@@ -1,5 +1,6 @@
 """Run the shared numerical exporter with the verified Windows XPU loader."""
 import hashlib
+import contextlib
 import json
 import runpy
 import sys
@@ -16,9 +17,15 @@ warmup = modeling_utils.caching_allocator_warmup
 modeling_utils.caching_allocator_warmup = lambda *args, **kwargs: None
 try:
     sys.argv = [str(script), *args]
-    runpy.run_path(str(script), run_name="__main__")
+    attention_context = contextlib.nullcontext()
+    attention = args[args.index("--attention") + 1] if "--attention" in args else "eager"
+    if attention in {"sdpa", "hybrid"}:
+        from torch.nn.attention import SDPBackend, sdpa_kernel
+        attention_context = sdpa_kernel([SDPBackend.FLASH_ATTENTION, SDPBackend.EFFICIENT_ATTENTION, SDPBackend.OVERRIDEABLE])
+    with attention_context:
+        runpy.run_path(str(script), run_name="__main__")
 finally:
     modeling_utils.caching_allocator_warmup = warmup
-record = {"torch": torch.__version__, "device": torch.xpu.get_device_name(0), "precision": "bfloat16", "allocator_warmup": "disabled_scoped", "bootstrap_sha256": hashlib.file_digest((Path(__file__).resolve().parents[2] / "runtime/waystone/bootstrap.py").open("rb"), "sha256").hexdigest(), "wrapper_sha256": hashlib.file_digest(Path(__file__).open("rb"), "sha256").hexdigest(), "memory": {"allocated": torch.xpu.memory_allocated(), "reserved": torch.xpu.memory_reserved(), "peak": torch.xpu.max_memory_allocated()}}
+record = {"torch": torch.__version__, "device": torch.xpu.get_device_name(0), "precision": "bfloat16", "attention": attention, "sdpa_math": "disabled" if attention in {"sdpa", "hybrid"} else "not_applicable", "allocator_warmup": "disabled_scoped", "bootstrap_sha256": hashlib.file_digest((Path(__file__).resolve().parents[2] / "runtime/waystone/bootstrap.py").open("rb"), "sha256").hexdigest(), "wrapper_sha256": hashlib.file_digest(Path(__file__).open("rb"), "sha256").hexdigest(), "memory": {"allocated": torch.xpu.memory_allocated(), "reserved": torch.xpu.memory_reserved(), "peak": torch.xpu.max_memory_allocated()}}
 (output / "windows-runtime.json").write_text(json.dumps(record, indent=2), encoding="utf-8")
 print(json.dumps(record), flush=True)

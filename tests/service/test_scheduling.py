@@ -14,7 +14,7 @@ def request_payload():
 
 
 class SchedulingTests(unittest.IsolatedAsyncioTestCase):
-    async def route(self, costs, requests=1, occupancy=None, selection=None):
+    async def route(self, costs, requests=1, occupancy=None, selection=None, queue_limit=0):
         occupancy = occupancy or {}
         def handle(request):
             if request.url.path == '/health':
@@ -22,7 +22,7 @@ class SchedulingTests(unittest.IsolatedAsyncioTestCase):
             return httpx.Response(200, json={"choices": []})
         config = {"backends": {
             "northstone": {"url": "http://127.0.0.1", "expected_page_seconds": costs[0]},
-            "waystone": {"url": "http://127.0.0.2", "expected_page_seconds": costs[1]},
+            "waystone": {"url": "http://127.0.0.2", "expected_page_seconds": costs[1], "queue_limit": queue_limit},
         }}
         async with httpx.AsyncClient(transport=httpx.MockTransport(handle)) as upstream:
             app = create_router(config, upstream)
@@ -53,11 +53,24 @@ class SchedulingTests(unittest.IsolatedAsyncioTestCase):
         results, _ = await self.route((7.6, 27.6), selection='waystone')
         self.assertEqual(results, ['waystone'])
 
+    async def test_explicit_backend_can_queue_without_changing_execution_capacity(self):
+        results, health = await self.route((7.6, 83), selection='waystone', occupancy={'127.0.0.2': 1}, queue_limit=2)
+        self.assertEqual(results, ['waystone'])
+        self.assertEqual(health['backends']['waystone']['capacity'], 1)
+        self.assertEqual(health['backends']['waystone']['queue_limit'], 2)
+
+    async def test_auto_uses_free_execution_capacity_before_an_explicit_queue(self):
+        results, _ = await self.route((83, 7.6), occupancy={'127.0.0.2': 1}, queue_limit=2)
+        self.assertEqual(results, ['northstone'])
+
     def test_cost_validation_and_compatible_default(self):
         self.assertEqual(Endpoint('northstone', 'http://127.0.0.1').expected_page_seconds, 1)
         for cost in [0, -1, float('nan'), float('inf'), float('-inf'), True, '1', None]:
             with self.subTest(cost=cost), self.assertRaises(ValueError):
                 Endpoint('northstone', 'http://127.0.0.1', expected_page_seconds=cost)
+        for limit in [-1, True, 1.5, None]:
+            with self.subTest(queue_limit=limit), self.assertRaises(ValueError):
+                Endpoint('waystone', 'http://127.0.0.1', queue_limit=limit)
 
 
 if __name__ == '__main__':

@@ -1,0 +1,244 @@
+{
+  "recorded_at_utc": "2026-10-03T21:48:21.048710+00:00",
+  "scope": "Trained first-linear-attention recurrence primitive only; not a whole layer or complete model",
+  "gpu_run_exit_code": 0,
+  "gpu_run": [
+    {
+      "adapter_identity": {
+        "dedicated_bytes": 17047748608,
+        "description": "Intel(R) Arc(TM) A770 Graphics",
+        "device_id": 22176,
+        "dxgi_index": 1,
+        "luid": "00000000:000102d9",
+        "pci_bdf": "0c:00.0",
+        "pci_bus": 12,
+        "pci_device": 0,
+        "pci_function": 0,
+        "revision": 8,
+        "subsystem_id": 948441125,
+        "vendor_id": 32902
+      },
+      "backend": "D3D11 cs_5_0 FP32",
+      "full_chandra_graph": false
+    },
+    {
+      "atol": 2e-05,
+      "decode_gpu_ms": 42.42270833333333,
+      "decode_wall_ms": 56.0628,
+      "errors": {
+        "cpu_double_output_reference": {
+          "max_abs": 2.6396037455800325e-07,
+          "max_tolerance_ratio": 0.013198018727900161,
+          "passed": true,
+          "rms": 2.0891548174066042e-09
+        },
+        "cpu_double_state_reference": {
+          "max_abs": 6.928039593678825e-07,
+          "max_tolerance_ratio": 0.034640197968394126,
+          "passed": true,
+          "rms": 5.328353977449715e-09
+        },
+        "cpu_fp32_output_reference": {
+          "max_abs": 5.364418029785156e-07,
+          "max_tolerance_ratio": 0.026822090148925778,
+          "passed": true,
+          "rms": 5.239097040736507e-09
+        },
+        "cpu_fp32_state_reference": {
+          "max_abs": 3.814697265625e-06,
+          "max_tolerance_ratio": 0.19073486328124997,
+          "passed": true,
+          "rms": 2.016795809235893e-08
+        },
+        "decode_output_prefill": {
+          "max_abs": 0.0,
+          "max_tolerance_ratio": 0.0,
+          "passed": true,
+          "rms": 0.0
+        },
+        "decode_state_prefill": {
+          "max_abs": 0.0,
+          "max_tolerance_ratio": 0.0,
+          "passed": true,
+          "rms": 0.0
+        },
+        "prefill_output_cpu_double": {
+          "max_abs": 1.9202474052515406e-06,
+          "max_tolerance_ratio": 0.09601237026257702,
+          "passed": true,
+          "rms": 2.1418195070346655e-08
+        },
+        "prefill_output_cpu_fp32": {
+          "max_abs": 2.205371856689453e-06,
+          "max_tolerance_ratio": 0.11026859283447264,
+          "passed": true,
+          "rms": 2.3347485894679755e-08
+        },
+        "prefill_output_reference": {
+          "max_abs": 1.9073486328125e-06,
+          "max_tolerance_ratio": 0.09536743164062499,
+          "passed": true,
+          "rms": 2.1581627310183354e-08
+        },
+        "prefill_state_cpu_double": {
+          "max_abs": 1.7230181753369322e-05,
+          "max_tolerance_ratio": 0.861509087668466,
+          "passed": true,
+          "rms": 8.366221371274826e-08
+        },
+        "prefill_state_cpu_fp32": {
+          "max_abs": 1.6450881958007812e-05,
+          "max_tolerance_ratio": 0.8225440979003905,
+          "passed": true,
+          "rms": 8.577640301745717e-08
+        },
+        "prefill_state_reference": {
+          "max_abs": 1.728534698486328e-05,
+          "max_tolerance_ratio": 0.864267349243164,
+          "passed": true,
+          "rms": 8.360474780833105e-08
+        },
+        "reset_output_prefill": {
+          "max_abs": 0.0,
+          "max_tolerance_ratio": 0.0,
+          "passed": true,
+          "rms": 0.0
+        },
+        "reset_state_prefill": {
+          "max_abs": 0.0,
+          "max_tolerance_ratio": 0.0,
+          "passed": true,
+          "rms": 0.0
+        }
+      },
+      "heads": 32,
+      "keys": 128,
+      "metadata_sha256": "284255aa6a24509992b3e5b6eb3ec378004055f8cf0f462bb43afaf75b5b2c49",
+      "passed": true,
+      "payload_sha256": "87f4ae0280142ec3509b50065b03da6a8ab5d2a8f70637ac20b2ae07287538fd",
+      "prefill_gpu_ms": 57.7459375,
+      "rtol": 0,
+      "test": "trained_activation_recurrence",
+      "tokens": 801,
+      "values": 128
+    }
+  ],
+  "fixture": {
+    "model_revision": "af93b47dba1b47b6640c86ccf487ed2260ab9a09",
+    "source": {
+      "layer": 0,
+      "function": "torch_chunk_gated_delta_rule",
+      "model_source_sha256": "d0c8561d91e31e50d9a57b74196c5a7ad023e42ebe9f84004d0a535310879939"
+    },
+    "payload_bytes": 54796544,
+    "tensor_shapes": {
+      "q": [
+        801,
+        32,
+        128
+      ],
+      "k": [
+        801,
+        32,
+        128
+      ],
+      "v": [
+        801,
+        32,
+        128
+      ],
+      "g": [
+        801,
+        32
+      ],
+      "beta": [
+        801,
+        32
+      ],
+      "expected_output": [
+        801,
+        32,
+        128
+      ],
+      "expected_state": [
+        32,
+        128,
+        128
+      ]
+    },
+    "semantics": {
+      "q": "l2_normalized_scaled_sqrt_keydim",
+      "k": "l2_normalized",
+      "g": "negative_log_decay",
+      "beta": "post_sigmoid",
+      "heads": "expanded_value_heads",
+      "initial_state": "zeros",
+      "layout": "THD"
+    },
+    "context_hashes": {
+      "tokenizer_sha256": "87a7830d63fcf43bf241c3c5242e96e62dd3fdc29224ca26fed8ea333db72de4",
+      "config_sha256": "e26f17b70463de21fd68f1ef6d8f67f8e33e65d55a7a6895242130a18db60587",
+      "image_sha256": "c30916f2dbba48b58e588de752371ac81155edb21f553588ec756cf649c268e9",
+      "prompt_sha256": "025935f3e1de1acdfadd4c7d581ab17eb82e8caaffef7b64962621c80b7ca9a8"
+    },
+    "processor_profile": {
+      "size": {
+        "shortest_edge": 3136,
+        "longest_edge": 3145728
+      }
+    }
+  },
+  "cpu_reference": {
+    "metadata_sha256": "284255aa6a24509992b3e5b6eb3ec378004055f8cf0f462bb43afaf75b5b2c49",
+    "output_double_max_abs": 2.6396037455800325e-07,
+    "output_fp32_max_abs": 5.364418029785156e-07,
+    "passed": true,
+    "payload_sha256": "87f4ae0280142ec3509b50065b03da6a8ab5d2a8f70637ac20b2ae07287538fd",
+    "state_double_max_abs": 6.928039593678825e-07,
+    "state_fp32_max_abs": 3.814697265625e-06,
+    "test": "external_fixture_cpu_reference",
+    "tokens": 801
+  },
+  "native_format_tests": {
+    "test": "native_fixture_format",
+    "cases": 18,
+    "passed": true,
+    "failures": []
+  },
+  "gpu_sources_sha256": {
+    "main.cpp": "bedf921c2a77843c866ef87b7081a279f76e6e77e5a9052c98f21bb51bd95e1b",
+    "shaders/delta.hlsl": "82abfe4bdb13a3fd28fee3ba67b3a7b73c8b311badfd91b59ed3bf9b5d33578e",
+    "vendor/nlohmann/json.hpp": "aaf127c04cb31c406e5b04a63f1ae89369fccde6d8fa7cdda1ed4f32dfc5de63",
+    "fixture.h": "849116d3714b154ae3108a2a50b3cad483bb9ff5a59b3e2ccc8f89bec7565536",
+    "oracle.h": "5582023f5018ca15246d132a63f1c3c27e05a2105f60fb6c56caa5f088f8e3da",
+    "adapter_identity.h": "d58e398bc0d8011a2158321872165fcfea35df0ac321556bf35ad8e5acc1f62f",
+    "build.cmd": "40486964eb35f6f52bb442e197977ba73227b775862f7477438118c9560ee4fd"
+  },
+  "current_source_changes_since_gpu_run": {
+    "fixture.h": "Added upper Q/K normalization-envelope guard; verified on trained fixture and18 CPU format cases, including Windows positive validation; GPU arithmetic unchanged"
+  },
+  "current_sources_sha256": {
+    "validate_transformers.py": "c52d88585aaff4013740521440e325a057f04c831331f5cddc41819e69c3c550",
+    "fixture_dump.cpp": "c85570acb20cd546790518b54b3985a9d9b5d6c449f426d3550673d170a0028c",
+    "main.cpp": "bedf921c2a77843c866ef87b7081a279f76e6e77e5a9052c98f21bb51bd95e1b",
+    "fixture_check.cpp": "8205340a4ad281b29c1cda600a350fda2dbfb73c2d2b99452650720f30f5fcdb",
+    "shadercheck.cpp": "73b731f47caf4c10f4e5a8371f262aa22817677db73474513c1948fb8bf09a54",
+    "adapter_identity.h": "d58e398bc0d8011a2158321872165fcfea35df0ac321556bf35ad8e5acc1f62f",
+    "test_fixture_format.py": "161c5d658541ffd1d7c3fb46cb297dab12811a483745011d348ba541572d2aa7",
+    "oracle_test.cpp": "80d35337006f680a0c20f6b4da4f587fd80f824198a72a429d523f2caf994a58",
+    "build.cmd": "40486964eb35f6f52bb442e197977ba73227b775862f7477438118c9560ee4fd",
+    "oracle.h": "5582023f5018ca15246d132a63f1c3c27e05a2105f60fb6c56caa5f088f8e3da",
+    "fixture.h": "108545e8c6e8e0f666bd4b4d31ff315d93722716ef1094289d84f2c1450cf46c",
+    "shaders/delta.hlsl": "82abfe4bdb13a3fd28fee3ba67b3a7b73c8b311badfd91b59ed3bf9b5d33578e",
+    "shaders/rmsnorm.hlsl": "5e25e3c3be7eee394b38902a15f9f7e6cd45dc31424453862223fb354dc3fc46",
+    "shaders/bf16.hlsl": "d57927d52042c4e5d272e1cca12bcec16a254e33aeba409cf811c3981f7a05bc"
+  },
+  "limits": [
+    "Single trained fixture from layer0 on tiny synthetic image and controlled processor override",
+    "One GPU timing observation, not a benchmark distribution",
+    "Final-state error uses86.4 percent of unchanged2e-5 absolute gate",
+    "Normalization/projections/convolution/gates were executed by CPU source; only recurrence executes in nativeHLSL",
+    "No quantization drift study",
+    "Prior synthetic DXGIindex0 run lacks verifiedphysicalPCIbinding; current trained run bindsPCI0c:00.0/DXGI1/LUID00000000:000102d9"
+  ]
+}

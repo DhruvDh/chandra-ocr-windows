@@ -1,0 +1,33 @@
+{
+  "model_revision": "af93b47dba1b47b6640c86ccf487ed2260ab9a09",
+  "torch": "2.14.1+xpu",
+  "transformers": "5.18.0",
+  "device": "Intel Arc A770",
+  "precision": "bfloat16",
+  "attention": "eager",
+  "processor_size": {
+    "shortest_edge": 3136,
+    "longest_edge": 3145728
+  },
+  "image_sha256": "460a12b56c7674276938ebc3f10bcf0a57451fe94fe32daa32b4be1bbc42fadc",
+  "raw_evidence_sha256": "cce89e08269c63e4cce5557a4b23d7f31cb15f5d298d73d7e35df6e1827a3981",
+  "load_seconds": 13.602924499999062,
+  "generate_seconds": 27.606173299998773,
+  "usage": {
+    "prompt_tokens": 721,
+    "completion_tokens": 116,
+    "total_tokens": 837
+  },
+  "finish_reason": "stop",
+  "memory": {
+    "allocated": 9180273152,
+    "reserved": 11140071424,
+    "peak": 9453229056
+  },
+  "asserted_text": [
+    "CHANDRA TEST",
+    "Total: 123.45",
+    "Alpha beta 2026"
+  ],
+  "qualification": "bounded synthetic smoke only; numerical/corpus gates separate"
+}

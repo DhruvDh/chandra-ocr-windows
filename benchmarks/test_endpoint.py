@@ -17,6 +17,11 @@ class EndpointGates(unittest.TestCase):
         self.assertTrue(validate(e, r)['passed'])
         r['content'] = r['content'].replace('y = 22', 'y = 220')
         self.assertFalse(validate(e, r)['passed'])
+    def test_terminal_error_cannot_masquerade_as_stop(self):
+        e, r = self.fixture()
+        raw=b'data: '+json.dumps({'choices':[{'delta':{'content':r['content']},'finish_reason':'stop'}],'usage':r['usage']}).encode()+b'\n\n'
+        raw+=b'data: {"error":{"type":"backend_failure"}}\n\ndata: [DONE]\n\n'
+        self.assertIn('stream_error', validate(e, parse_sse(raw))['failures'])
     def test_stream_usage_done(self):
         events=[{'choices':[{'index':0,'delta':{'content':'hello'},'finish_reason':None}]},{'choices':[{'index':0,'delta':{},'finish_reason':'stop'}]},{'choices':[],'usage':{'prompt_tokens':2,'completion_tokens':3,'total_tokens':5}}]
         raw=b''.join(b'data: '+json.dumps(e).encode()+b'\n\n' for e in events)

@@ -79,6 +79,7 @@ inline ExternalFixture loadFixture(const std::filesystem::path& metadataPath) {
     auto q=tensor("q"),k=tensor("k"),v=tensor("v"),g=tensor("g"),beta=tensor("beta"),out=tensor("expected_output"),state=tensor("expected_state");fixtureRequire(consumed==bytes.size(),"unaccounted payload bytes");
     fixtureRequire(q.first.size()==3 && v.first.size()==3,"q/v rank mismatch");unsigned t=q.first[0],h=q.first[1],keys=q.first[2],values=v.first[2];fixtureRequire(h<=32 && keys<=128 && values<=128,"unsupported kernel dimensions");
     fixtureRequire(k.first==q.first && v.first==std::vector<unsigned>{t,h,values} && out.first==v.first && g.first==std::vector<unsigned>{t,h} && beta.first==g.first && state.first==std::vector<unsigned>{h,keys,values},"incompatible tensor shapes");
+    for(size_t n=0;n<size_t(t)*h;++n){double qNorm=0,kNorm=0;for(unsigned i=0;i<keys;++i){qNorm+=double(q.second[n*keys+i])*q.second[n*keys+i];kNorm+=double(k.second[n*keys+i])*k.second[n*keys+i];}fixtureRequire(qNorm<=1.0/keys+1e-4 && kNorm<=1.0001,"q/k normalization envelope mismatch");}
     for(float x:g.second)fixtureRequire(x<=0,"positive log decay");
     for(float x:beta.second)fixtureRequire(x>=0 && x<=1,"beta outside [0,1]");
     result.inputs={t,h,keys,values,std::move(q.second),std::move(k.second),std::move(v.second),std::move(g.second),std::move(beta.second)};result.expectedOutput=std::move(out.second);result.expectedState=std::move(state.second);return result;

@@ -78,11 +78,12 @@ def main():
     p.add_argument("--output", required=True)
     p.add_argument("--device", choices=["cpu", "xpu"], default="cpu")
     p.add_argument("--steps", type=int, default=8)
-    p.add_argument("--no-cache-check", action="store_true")
+    p.add_argument("--check-cache-equivalence", "--no-cache-check", dest="no_cache_check", action="store_true",help="Compare final cached logits with a complete uncached forward")
     p.add_argument("--activation-fixture", action="store_true", help="Export first trained linear-attention prefill inputs/output/state")
     p.add_argument("--full-teacher", action="store_true", help="One full-response forward, selected full-vocabulary rows across response")
     p.add_argument("--all-teacher", action="store_true", help="Every full-response conditional vocabulary row")
-    p.add_argument("--attention", choices=["eager","sdpa"],default="eager")
+    p.add_argument("--attention", choices=["eager","sdpa","hybrid"],default="eager")
+    p.add_argument("--greedy-max-tokens", type=int, help="Independent complete greedy response, explicit bounded output allowance")
     p.add_argument("--precision", choices=["float32","bfloat16"], help="Explicit precision; defaults CPU FP32 / XPU BF16")
     a = p.parse_args()
     torch.set_num_threads(8)
@@ -110,7 +111,12 @@ def main():
     start = time.monotonic()
     if a.device == "cpu":
         meta["memory_admission"] = cpu_memory(admission=True)
-    model = Qwen3_5ForConditionalGeneration.from_pretrained(modeldir, dtype=dtype, device_map=a.device, local_files_only=True, attn_implementation=a.attention).eval()
+    attention = {"vision_config":"sdpa","text_config":"eager"} if a.attention=="hybrid" else a.attention
+    model = Qwen3_5ForConditionalGeneration.from_pretrained(modeldir, dtype=dtype, device_map=a.device, local_files_only=True, attn_implementation=attention).eval()
+    meta["runtime"]["attention_config"] = {"vision":model.config.vision_config._attn_implementation,"text":model.config.text_config._attn_implementation}
+    expected_attention = {"vision":"sdpa","text":"eager"} if a.attention=="hybrid" else {"vision":a.attention,"text":a.attention}
+    if meta["runtime"]["attention_config"] != expected_attention:
+        raise RuntimeError("Attention configuration does not match explicit requested graph")
     if a.device == "cpu":
         meta["memory_after_load"] = cpu_memory()
     if model.lm_head.weight.data_ptr() != model.model.language_model.embed_tokens.weight.data_ptr():
@@ -118,6 +124,39 @@ def main():
     inputs = {k:v.to(a.device) for k,v in inputs.items()}
     if "pixel_values" in inputs:
         inputs["pixel_values"] = inputs["pixel_values"].to(dtype)
+    if a.greedy_max_tokens:
+        stop_ids = sorted({model.generation_config.eos_token_id,processor.tokenizer.convert_tokens_to_ids("<|im_end|>")})
+        class Receipt:
+            def __init__(self):
+                self.ids=[]
+                self.first=True
+            def put(self,value):
+                if self.first:
+                    self.first=False
+                    return
+                self.ids.extend(value.detach().cpu().reshape(-1).tolist())
+                if len(self.ids)%32==0:
+                    self.save()
+                    if a.device=="cpu":cpu_memory()
+                    print(json.dumps({"phase":"greedy_progress","tokens":len(self.ids),"elapsed_seconds":time.monotonic()-start}),flush=True)
+            def save(self):
+                (outdir/"greedy.partial.txt").write_text(processor.tokenizer.decode(self.ids,skip_special_tokens=False,clean_up_tokenization_spaces=False))
+                (outdir/"greedy.partial.ids.json").write_text(json.dumps(self.ids))
+            def end(self):
+                self.save()
+        with torch.inference_mode():
+            generated = model.generate(**inputs, max_new_tokens=a.greedy_max_tokens, do_sample=False, use_cache=True,eos_token_id=stop_ids,streamer=Receipt())
+        generated_ids = generated[0,len(prefix):].cpu().tolist()
+        text = processor.tokenizer.decode(generated_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)
+        (outdir / "greedy.txt").write_text(text)
+        meta["greedy"] = {"token_ids":generated_ids,"max_new_tokens":a.greedy_max_tokens,"checkpoint_eos_token_id":model.generation_config.eos_token_id,"stop_token_ids":stop_ids,"ended_with_eos":bool(generated_ids and generated_ids[-1] in stop_ids),"text_sha256":sha(outdir / "greedy.txt")}
+        meta["elapsed_seconds"] = time.monotonic()-start
+        meta["peak_rss_kib"] = peak_rss_kib()
+        if a.device == "cpu":
+            meta["memory_completion"] = cpu_memory()
+        (outdir / "metadata.json").write_text(json.dumps(meta,indent=2))
+        print(json.dumps({"phase":"complete_greedy","elapsed_seconds":meta["elapsed_seconds"],"generated_tokens":len(generated_ids),"ended_with_eos":meta["greedy"]["ended_with_eos"]}),flush=True)
+        return
     if a.full_teacher or a.all_teacher:
         teacher = processor.tokenizer.encode(response, add_special_tokens=False)
         offsets = list(range(len(teacher))) if a.all_teacher else sorted({i for i in [0,7,31,63,127,191,255,319,len(teacher)-1] if i < len(teacher)})

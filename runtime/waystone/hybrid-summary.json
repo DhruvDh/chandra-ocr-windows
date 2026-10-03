@@ -1,0 +1,106 @@
+{
+  "schema": "chandra-xpu-hybrid-reference-v1",
+  "model": "datalab-to/chandra-ocr-2",
+  "revision": "af93b47dba1b47b6640c86ccf487ed2260ab9a09",
+  "torch": "2.14.1+xpu",
+  "precision": "bfloat16",
+  "attention": {
+    "vision": "sdpa",
+    "text": "eager",
+    "sdpa_math": "disabled"
+  },
+  "prefill_limit": 4096,
+  "tiny": {
+    "case": "tiny",
+    "image_sha256": "c30916f2dbba48b58e588de752371ac81155edb21f553588ec756cf649c268e9",
+    "prompt_sha256": "025935f3e1de1acdfadd4c7d581ab17eb82e8caaffef7b64962621c80b7ca9a8",
+    "ttft_seconds": 3.8437386000005063,
+    "elapsed_seconds": 82.17571769999631,
+    "usage": {
+      "prompt_tokens": 801,
+      "completion_tokens": 395,
+      "total_tokens": 1196
+    },
+    "finish_reason": "stop",
+    "memory": {
+      "allocated": 9180273152,
+      "reserved": 11137974272,
+      "peak": 9477144064
+    }
+  },
+  "tiny_correctness": {
+    "passed": true,
+    "failures": []
+  },
+  "source_sha256": {
+    "scripts\\waystone\\corpus_reference.py": "41327eb3839867b2999352734ecd0e7d645d5ce398f59e13eb3a54a1e38659e3",
+    "runtime\\waystone\\backend.py": "7631b049583b356d60b39ee535ab0585c69349ebc9c0b20fd78c12175337ae4c",
+    "runtime\\waystone\\bootstrap.py": "156392a1b7165a9c1f6f27f3011ecb5abb6b926a33784d66aaa2fe56eda48ec5"
+  },
+  "raw_summary_sha256": "b5529b4dfda924b0a35f88b648dd761943aed59d699be53460f8c0a33963cf1f",
+  "qualification": "all three frozen direct-backend OCR gates passed once; service transport and sustained performance pending",
+  "numerics": {
+    "teacher_argmax_agreement": "391/394 vs CPU FP32",
+    "max_kl": 0.145344,
+    "target_logprob_max_abs": 0.613627,
+    "cached_full_max_abs": 0.0625,
+    "cached_full_rms": 0.00966185238212347,
+    "exact_numerical_equivalence": false
+  },
+  "geometry_vs_cpu_fp32_tiny": {
+    "max_bbox_delta_per_1000": 2,
+    "max_x_delta_pixels": 0.816,
+    "max_y_delta_pixels": 0.528,
+    "minimum_bbox_iou": 0.954545,
+    "text_table_equations_labels_identical": true
+  },
+  "larger": [
+    {
+      "case": "small",
+      "image_sha256": "a87ffb5825a7d9b1663db873e2c7cbf45562bc9f366c69fcea1d4bf0745f565c",
+      "prompt_sha256": "025935f3e1de1acdfadd4c7d581ab17eb82e8caaffef7b64962621c80b7ca9a8",
+      "ttft_seconds": 4.091755900000862,
+      "elapsed_seconds": 83.19114380000246,
+      "usage": {
+        "prompt_tokens": 1451,
+        "completion_tokens": 395,
+        "total_tokens": 1846
+      },
+      "finish_reason": "stop",
+      "memory": {
+        "allocated": 9180273152,
+        "reserved": 11137974272,
+        "peak": 9722535424
+      }
+    },
+    {
+      "case": "representative",
+      "image_sha256": "33200ca28abaa9f131675f6c82f009386c2e9fb22d67de3f358d2e06fc90a68a",
+      "prompt_sha256": "025935f3e1de1acdfadd4c7d581ab17eb82e8caaffef7b64962621c80b7ca9a8",
+      "ttft_seconds": 3.8921379999956116,
+      "elapsed_seconds": 86.69265119999909,
+      "usage": {
+        "prompt_tokens": 3617,
+        "completion_tokens": 397,
+        "total_tokens": 4014
+      },
+      "finish_reason": "stop",
+      "memory": {
+        "allocated": 9180273152,
+        "reserved": 12817793024,
+        "peak": 11739283968
+      }
+    }
+  ],
+  "larger_correctness": {
+    "small": {
+      "passed": true,
+      "failures": []
+    },
+    "representative": {
+      "passed": true,
+      "failures": []
+    }
+  },
+  "larger_raw_summary_sha256": "27e6c7a4e3bc7a9a14885e6d9e2f83d037d55a941a422f62c1d191b13ecabdc2"
+}

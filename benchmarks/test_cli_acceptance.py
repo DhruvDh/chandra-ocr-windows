@@ -39,10 +39,12 @@ class CLIGates(unittest.TestCase):
             self.assertEqual(command[-5:], ['--method','vllm','--batch-size','2','--no-html'])
             self.assertNotEqual(kwargs['env']['HOME'], str(Path.home()))
             self.assertEqual(kwargs['env']['VLLM_API_BASE'], 'http://mock.invalid/v1')
+            self.assertEqual(kwargs['env']['MAX_VLLM_RETRIES'], '0')
             return subprocess.CompletedProcess(command,0,b'CLI completed',b'')
         with tempfile.TemporaryDirectory() as tmp, patch.object(sys,'argv',['cli_acceptance','--base-url','http://mock.invalid/v1','--corpus',str(corpus),'--output',str(Path(tmp)/'run')]), patch('cli_acceptance.subprocess.run',side_effect=process):
             self.assertEqual(cli_acceptance.main(),0)
             reports=json.loads((Path(tmp)/'run/runs.json').read_text())
             self.assertEqual(len(reports),2)
+            self.assertTrue(all(r['environment']['MAX_VLLM_RETRIES']=='0' for r in reports))
             self.assertTrue(all(r['finish_reasons'] is None and not r['provenance_verified'] for r in reports))
 if __name__=='__main__':unittest.main()

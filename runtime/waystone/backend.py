@@ -1,6 +1,7 @@
 """Explicit Intel XPU reference backend; model files are supplied by the operator."""
 from __future__ import annotations
 import base64
+import contextlib
 import io
 import queue
 import threading
@@ -10,24 +11,33 @@ from typing import Iterator
 
 class XPUBackend:
     def __init__(self, model_path: str | Path, *, max_pixels: int = 4_000_000, max_input_tokens: int = 16384, max_output_tokens: int = 12384, attention_backend: str = "eager"):
-        if attention_backend not in {"eager", "sdpa"}:
-            raise ValueError("Attention backend must be eager or sdpa")
+        if attention_backend not in {"eager", "sdpa", "hybrid"}:
+            raise ValueError("Attention backend must be eager, sdpa or hybrid")
         self.attention_backend = attention_backend
         self.model_path = Path(model_path)
         self.max_pixels = max_pixels
         self.max_input_tokens = max_input_tokens
+        self.max_prefill_tokens = 4096
         self.max_output_tokens = max_output_tokens
         self.model = None
         self.processor = None
         self._runtime_prepared = False
         self._device_identity = None
+        self._model_verification = None
 
     def health(self) -> dict:
-        return {"backend": "transformers-xpu", "loaded": self.model is not None, "state": "ready" if self.model is not None else "cold", "model": "datalab-to/chandra-ocr-2", "revision": "af93b47dba1b47b6640c86ccf487ed2260ab9a09", "attention_backend": self.attention_backend, "processor_size": {"shortest_edge": 3136, "longest_edge": 3145728}, "device": "xpu:0", "dtype": "bfloat16", "device_identity": self._device_identity}
+        memory = None
+        if self._runtime_prepared:
+            import torch
+            if torch.xpu.is_initialized():
+                memory = {"allocated_bytes": torch.xpu.memory_allocated(), "reserved_bytes": torch.xpu.memory_reserved(), "peak_allocated_bytes": torch.xpu.max_memory_allocated()}
+        return {"backend": "transformers-xpu", "loaded": self.model is not None, "state": "ready" if self.model is not None else "cold", "model": "datalab-to/chandra-ocr-2", "revision": "af93b47dba1b47b6640c86ccf487ed2260ab9a09", "attention_backend": self.attention_backend, "max_prefill_tokens": self.max_prefill_tokens, "processor_size": {"shortest_edge": 3136, "longest_edge": 3145728}, "device": "xpu:0", "dtype": "bfloat16", "device_identity": self._device_identity, "model_verification": self._model_verification, "torch_xpu_memory": memory}
 
     def load(self) -> None:
         if self.model is not None:
             return
+        from .model_identity import verify
+        self._model_verification = verify(self.model_path)
         from .bootstrap import prepare_runtime
         prepare_runtime()
         self._runtime_prepared = True
@@ -38,8 +48,8 @@ class XPUBackend:
         if torch.xpu.device_count() != 1:
             raise RuntimeError("Expected one unambiguous Level Zero GPU")
         properties = torch.xpu.get_device_properties(0)
-        if properties.device_id != 0x56A0 or properties.is_integrated_gpu:
-            raise RuntimeError("Selected XPU is not the expected discrete Arc A770")
+        if properties.device_id != 0x56A0 or properties.is_integrated_gpu or "Level-Zero" not in properties.platform_name:
+            raise RuntimeError("Selected XPU is not the qualified discrete Arc A770 via Level Zero")
         self._device_identity = {"name": properties.name, "device_id": properties.device_id, "uuid": str(properties.uuid), "platform": properties.platform_name}
         processor = AutoProcessor.from_pretrained(self.model_path, local_files_only=True)
         processor.tokenizer.padding_side = "left"
@@ -50,9 +60,12 @@ class XPUBackend:
         warmup = modeling_utils.caching_allocator_warmup
         modeling_utils.caching_allocator_warmup = lambda *args, **kwargs: None
         try:
-            model = AutoModelForImageTextToText.from_pretrained(self.model_path, local_files_only=True, dtype=torch.bfloat16, device_map={"": "xpu:0"}, attn_implementation=self.attention_backend)
+            model = AutoModelForImageTextToText.from_pretrained(self.model_path, local_files_only=True, dtype=torch.bfloat16, device_map={"": "xpu:0"}, attn_implementation={"vision_config": "sdpa", "text_config": "eager"} if self.attention_backend == "hybrid" else self.attention_backend)
         finally:
             modeling_utils.caching_allocator_warmup = warmup
+        if self.attention_backend == "hybrid":
+            if model.config.vision_config._attn_implementation != "sdpa" or model.config.text_config._attn_implementation != "eager":
+                raise RuntimeError("Hybrid attention configuration was not applied")
         model.eval()
         wrong = {str(p.device) for p in model.parameters() if p.device.type != "xpu"}
         if wrong:
@@ -95,18 +108,19 @@ class XPUBackend:
             return
         self.load()
         import torch
-        from transformers import StoppingCriteria, StoppingCriteriaList, TextIteratorStreamer
-        class Cancel(StoppingCriteria):
-            def __call__(self, input_ids, scores, **kwargs):
-                return cancel.is_set()
+        from transformers import TextIteratorStreamer
         conversation = {"role": "user", "content": [{"type": "image", "image": rgb}, {"type": "text", "text": text}]}
-        inputs = self.processor.apply_chat_template([[conversation]], tokenize=True, add_generation_prompt=True, return_dict=True, return_tensors="pt", padding=True)
+        inputs = self.processor.apply_chat_template([conversation], tokenize=True, add_generation_prompt=True, return_dict=True, return_tensors="pt")
         if self.attention_backend == "eager" and "image_grid_thw" in inputs and int(inputs.image_grid_thw.prod(-1).sum()) > 4096:
             raise ValueError("Vision input exceeds eager attention memory allowance; qualified SDPA is required")
         prompt_tokens = inputs.input_ids.shape[-1]
+        if prompt_tokens > self.max_prefill_tokens:
+            raise ValueError("Processed prompt exceeds 4096-token prefill allowance; use a shorter prompt or smaller image")
         if prompt_tokens + tokens > self.max_input_tokens:
             raise ValueError("Input plus requested output exceeds configured context limit")
         inputs = inputs.to("xpu:0")
+        if "pixel_values" in inputs:
+            inputs["pixel_values"] = inputs["pixel_values"].to(torch.bfloat16)
         eos = self.model.generation_config.eos_token_id
         eos = [eos] if isinstance(eos, int) else list(eos)
         end = self.processor.tokenizer.convert_tokens_to_ids("<|im_end|>")
@@ -116,8 +130,16 @@ class XPUBackend:
         result = {}
         def run():
             try:
-                with torch.inference_mode():
-                    result["ids"] = self.model.generate(**inputs, max_new_tokens=tokens, eos_token_id=eos, do_sample=False, stopping_criteria=StoppingCriteriaList([Cancel()]), streamer=streamer)
+                attention_context = contextlib.nullcontext()
+                if self.attention_backend in {"sdpa", "hybrid"}:
+                    from torch.nn.attention import SDPBackend, sdpa_kernel
+                    attention_context = sdpa_kernel([SDPBackend.FLASH_ATTENTION, SDPBackend.EFFICIENT_ATTENTION, SDPBackend.OVERRIDEABLE])
+                with torch.inference_mode(), attention_context:
+                    from transformers import StoppingCriteria, StoppingCriteriaList
+                    class Cancelled(StoppingCriteria):
+                        def __call__(self, input_ids, scores, **kwargs):
+                            return cancel.is_set()
+                    result["ids"] = self.model.generate(**inputs, max_new_tokens=tokens, do_sample=False, eos_token_id=eos, streamer=streamer, stopping_criteria=StoppingCriteriaList([Cancelled()]))
                 torch.xpu.synchronize()
             except BaseException as error:
                 result["error"] = error

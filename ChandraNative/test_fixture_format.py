@@ -43,7 +43,7 @@ def main():
     mutated("unknown_root_field", lambda m: m.update(unrecognized=True))
     mutated("truncated_payload", lambda m: None, payload[:-1])
     cases.append(("duplicate_json_key", json.dumps(metadata)[:-1] + ',"dtype":"float32"}', payload, False))
-    for name, index, value in [("nonfinite", 0, float("nan")), ("positive_decay", 3, 0.1), ("invalid_beta", 4, 1.1)]:
+    for name, index, value in [("normalized_q_bound", 0, 2), ("normalized_k_bound", 1, 2), ("nonfinite", 0, float("nan")), ("positive_decay", 3, 0.1), ("invalid_beta", 4, 1.1)]:
         updated = values.copy(); updated[index] = value
         data = struct.pack("<7f", *updated)
 

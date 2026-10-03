@@ -2,7 +2,7 @@
 
 A public derivative of [Const-me/Whisper](https://github.com/Const-me/Whisper), preserving its history and MPL-2.0 source, with a correctness-first workflow for Chandra OCR 2 and an endpoint router for Windows Intel and Linux ROCm machines. The original project documentation is retained in [WHISPER-README.md](WHISPER-README.md).
 
-Full-model Intel validation is in progress. The repository contains a synthetic OCR benchmark, numerical comparison tools, a Transformers XPU adapter, an OpenAI-compatible worker/router and native DirectCompute primitive tests. The native primitives are a foundation for Chandra's Qwen3.5 graph; they do not yet implement the complete model. See the [current work record](docs/work-record.md) for the tested boundary.
+The pinned BF16 model runs on an Intel Arc A770 through PyTorch XPU and has passed all three frozen synthetic OCR pages. Endpoint deployment acceptance is in progress. The repository contains a synthetic OCR benchmark, numerical comparison tools, an OpenAI-compatible worker/router and native DirectCompute primitive tests. The native primitives are a foundation for Chandra's Qwen3.5 graph; they do not yet implement the complete model. See the [current work record](docs/work-record.md) for the tested boundary.
 
 | Work | Start here |
 | --- | --- |
@@ -24,13 +24,15 @@ uv run --no-sync pytest
 python scripts/model_inventory.py /path/to/pinned/model --output .runtime/model-inventory.json
 ```
 
-The model verifier checks every download hash, tensor shape and byte range, then verifies the supposedly tied embedding and output head by hashing their actual bytes. Model weights stay outside Git. The exact checkpoint and upstream commits are recorded under [provenance](provenance).
+Download the public checkpoint with `python scripts/download_model.py /path/to/model` if it is not already present. The downloader checks pinned file sizes and hashes, refuses to replace existing mismatches, and keeps partial downloads out of accepted filenames. The model verifier checks every download hash, tensor shape and byte range, then verifies the supposedly tied embedding and output head by hashing their actual bytes. Model weights stay outside Git. The exact checkpoint and upstream commits are recorded under [provenance](provenance).
 
 Benchmark timing is meaningful only alongside verified inputs, complete output and numerical acceptance. The checked-in corpus is synthetic development data, not a hidden quality benchmark. The workflow preserves raw failures and partial output, separates cold and warm measurements, and refuses to promote timing results with incomplete provenance.
 
 ## Use the endpoint contract
 
 Both workers use model alias `chandra` and `/v1/chat/completions`; model listings and health checks do not load the model. The router accepts `X-Chandra-Backend: northstone`, `waystone` or `auto`. Automatic routing estimates finish time from available capacity and configured page timings, rotating equal-cost choices. It does not replay an already submitted request after a failure.
+
+Clients that configure only a base URL can select `/backends/waystone/v1` or `/backends/northstone/v1` instead of `/v1`. These prefixes expose only the same model-listing and completion routes. A conflicting backend header is rejected before inference.
 
 The existing Chandra CLI contract is:
 

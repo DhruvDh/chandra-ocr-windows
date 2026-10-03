@@ -1,0 +1,9 @@
+{
+  "main.cpp": "bedf921c2a77843c866ef87b7081a279f76e6e77e5a9052c98f21bb51bd95e1b",
+  "shaders/delta.hlsl": "82abfe4bdb13a3fd28fee3ba67b3a7b73c8b311badfd91b59ed3bf9b5d33578e",
+  "vendor/nlohmann/json.hpp": "aaf127c04cb31c406e5b04a63f1ae89369fccde6d8fa7cdda1ed4f32dfc5de63",
+  "fixture.h": "849116d3714b154ae3108a2a50b3cad483bb9ff5a59b3e2ccc8f89bec7565536",
+  "oracle.h": "5582023f5018ca15246d132a63f1c3c27e05a2105f60fb6c56caa5f088f8e3da",
+  "adapter_identity.h": "d58e398bc0d8011a2158321872165fcfea35df0ac321556bf35ad8e5acc1f62f",
+  "build.cmd": "40486964eb35f6f52bb442e197977ba73227b775862f7477438118c9560ee4fd"
+}

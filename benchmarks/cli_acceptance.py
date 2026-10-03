@@ -55,7 +55,7 @@ def main():
         if not pdf.is_relative_to(corpus) or sha(pdf.read_bytes())!=f['pdf_sha256']:raise ValueError('PDF commitment mismatch')
         run=output/f['id'];run.mkdir();state=run/'state';state.mkdir();ocr=run/'ocr'
         env={k:os.environ[k] for k in ('PATH','LANG','LC_ALL','SYSTEMROOT') if k in os.environ}
-        env.update(HOME=str(state),XDG_CONFIG_HOME=str(state/'config'),XDG_DATA_HOME=str(state/'data'),XDG_CACHE_HOME=str(state/'cache'),HF_HOME=str(state/'huggingface'),UV_CACHE_DIR=str(state/'uv'),UV_PROJECT_ENVIRONMENT=str(root/'.venv'),VLLM_API_BASE=a.base_url,VLLM_MODEL_NAME=a.model)
+        env.update(HOME=str(state),XDG_CONFIG_HOME=str(state/'config'),XDG_DATA_HOME=str(state/'data'),XDG_CACHE_HOME=str(state/'cache'),HF_HOME=str(state/'huggingface'),UV_CACHE_DIR=str(state/'uv'),UV_PROJECT_ENVIRONMENT=str(root/'.venv'),VLLM_API_BASE=a.base_url,VLLM_MODEL_NAME=a.model,MAX_VLLM_RETRIES="0")
         command=['uv','run','--no-sync','chandra',str(pdf),str(ocr),'--method','vllm','--batch-size','2','--no-html']
         started=time.perf_counter();error=None;returncode=None
         try:
@@ -72,7 +72,7 @@ def main():
         correctness=validate_cli(f['expected'],text,metadata,list(ocr.rglob('*.html')) if ocr.exists() else [])
         if returncode!=0 or error:correctness['passed']=False;correctness['failures'].append('cli_process_failure')
         outputs=[dict(path=str(x.relative_to(run)),sha256=sha(x.read_bytes())) for x in ocr.rglob('*') if x.is_file()] if ocr.exists() else []
-        report=dict(schema='chandra-cli-acceptance-v1',fixture_id=f['id'],command=command,environment={k:env[k] for k in ('VLLM_API_BASE','VLLM_MODEL_NAME')},corpus_sha256=sha(manifest_path.read_bytes()),pdf_sha256=sha((corpus/f['pdf']).read_bytes()),elapsed_seconds=elapsed,returncode=returncode,error=error,metadata=metadata,correctness=correctness,provenance_verified=False,output_files=outputs,stdout_sha256=sha(stdout),stderr_sha256=sha(stderr),finish_reasons=None,raw_endpoint_responses_available=False)
+        report=dict(schema='chandra-cli-acceptance-v1',fixture_id=f['id'],command=command,environment={k:env[k] for k in ('VLLM_API_BASE','VLLM_MODEL_NAME','MAX_VLLM_RETRIES')},corpus_sha256=sha(manifest_path.read_bytes()),pdf_sha256=sha((corpus/f['pdf']).read_bytes()),elapsed_seconds=elapsed,returncode=returncode,error=error,metadata=metadata,correctness=correctness,provenance_verified=False,output_files=outputs,stdout_sha256=sha(stdout),stderr_sha256=sha(stderr),finish_reasons=None,raw_endpoint_responses_available=False)
         (run/'run.json').write_text(json.dumps(report,indent=2)+'\n');reports.append(report)
     (output/'runs.json').write_text(json.dumps(reports,indent=2)+'\n');return 0 if all(r['correctness']['passed'] for r in reports) else 1
 if __name__=='__main__':raise SystemExit(main())

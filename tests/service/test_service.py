@@ -31,6 +31,14 @@ class Fake:
         yield {"usage": {"prompt_tokens": 2, "completion_tokens": 1, "total_tokens": 3}, "finish_reason": "stop"}
 
 class ServiceTests(unittest.IsolatedAsyncioTestCase):
+    def test_worker_deadlines_are_bounded(self):
+        for value in (0, -1, float('nan'), float('inf'), True, None, '1'):
+            with self.subTest(value=value):
+                with self.assertRaises(ValueError):
+                    Worker(Fake(), 0, inference_seconds=value)
+                with self.assertRaises(ValueError):
+                    create_app(Fake(), idle_seconds=value)
+
     async def test_health_models_do_not_load(self):
         backend = Fake()
         async with httpx.AsyncClient(transport=httpx.ASGITransport(app=create_app(backend)), base_url="http://test") as client:

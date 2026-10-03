@@ -20,15 +20,23 @@ class Endpoint:
     name: str
     url: str
     capacity: int = 1
+    queue_limit: int = 0
     expected_page_seconds: float = 1
     active: int = 0
     state: str = "unverified"
     retry_at: float = 0
     uncertain: bool = False
     remote_active: int = 0
+    health_epoch: int = 0
 
     def __post_init__(self):
         parsed = urlsplit(self.url)
+        try:
+            port = parsed.port
+        except ValueError:
+            raise ValueError("Backend origin port must be between 1 and 65535") from None
+        if parsed.netloc.endswith(":") or (port is not None and not 1 <= port <= 65535):
+            raise ValueError("Backend origin port must be between 1 and 65535")
         if parsed.scheme not in {"http", "https"} or parsed.username or parsed.password or parsed.path not in {"", "/"} or parsed.query or parsed.fragment:
             raise ValueError("Backend URL must be a private HTTP(S) origin without credentials or path")
         try:
@@ -41,6 +49,8 @@ class Endpoint:
                 raise ValueError("Backend address must be loopback or private")
         if type(self.capacity) is not int or self.capacity < 1:
             raise ValueError("Backend capacity must be positive")
+        if type(self.queue_limit) is not int or self.queue_limit < 0:
+            raise ValueError("Backend queue_limit must be a nonnegative integer")
         if (isinstance(self.expected_page_seconds, bool) or not isinstance(self.expected_page_seconds, (int, float))
                 or not math.isfinite(self.expected_page_seconds) or self.expected_page_seconds <= 0):
             raise ValueError("expected_page_seconds must be a positive finite number")
@@ -53,24 +63,37 @@ def create_router(config, client=None):
     if not endpoints or any(e.name not in {"northstone", "waystone"} for e in endpoints):
         raise ValueError("Configure northstone and/or waystone backends")
     cooldown = config.get("cooldown_seconds", 15)
-    if cooldown < 0:
-        raise ValueError("cooldown_seconds must be nonnegative")
+    if (isinstance(cooldown, bool) or not isinstance(cooldown, (int, float))
+            or not math.isfinite(cooldown) or cooldown < 0):
+        raise ValueError("cooldown_seconds must be a finite nonnegative number")
+    inference_seconds = config.get("inference_seconds", 1800)
+    if (isinstance(inference_seconds, bool) or not isinstance(inference_seconds, (int, float))
+            or not math.isfinite(inference_seconds) or inference_seconds <= 0):
+        raise ValueError("inference_seconds must be a positive finite number")
     owned = client is None
     client = client or httpx.AsyncClient(trust_env=False, follow_redirects=False, timeout=httpx.Timeout(1800, connect=5))
-    inference_seconds = config.get("inference_seconds", 1800)
-    if inference_seconds <= 0:
-        raise ValueError("inference_seconds must be positive")
     tasks = set()
     selection_counter = 0
     lock = asyncio.Lock()
 
+    def quarantine(endpoint, state="degraded", uncertain=False):
+        # Invalidate health observations already in flight when ownership becomes
+        # uncertain. A later response cannot undo this failure or its cooldown.
+        endpoint.health_epoch += 1
+        endpoint.state = state
+        endpoint.uncertain = endpoint.uncertain or uncertain
+        endpoint.retry_at = time.monotonic() + cooldown
+
     async def probe(endpoint):
         if time.monotonic() < endpoint.retry_at:
             return
+        epoch = endpoint.health_epoch
         try:
             response = await client.get(endpoint.url + "/health", timeout=3)
             response.raise_for_status()
             info = response.json()
+            if epoch != endpoint.health_epoch or time.monotonic() < endpoint.retry_at:
+                return
             state = info.get("state", "unverified")
             if info.get("accepting") is False:
                 endpoint.state = "degraded"
@@ -93,8 +116,8 @@ def create_router(config, client=None):
             endpoint.uncertain = False
             endpoint.state = state
         except (httpx.HTTPError, ValueError, TypeError, AttributeError):
-            endpoint.state = "offline"
-            endpoint.retry_at = time.monotonic() + cooldown
+            if epoch == endpoint.health_epoch and time.monotonic() >= endpoint.retry_at:
+                quarantine(endpoint, "offline")
 
     @asynccontextmanager
     async def lifespan(app):
@@ -115,16 +138,20 @@ def create_router(config, client=None):
     async def health():
         await asyncio.gather(*(probe(e) for e in endpoints))
         statuses = {e.name: {"state": e.state, "active": e.active, "remote_active": e.remote_active,
-                               "capacity": e.capacity, "expected_page_seconds": e.expected_page_seconds, "uncertain": e.uncertain} for e in endpoints}
+                               "capacity": e.capacity, "queue_limit": e.queue_limit, "expected_page_seconds": e.expected_page_seconds, "uncertain": e.uncertain} for e in endpoints}
         good = [e for e in endpoints if e.state not in {"unverified", "offline", "failed", "degraded"}]
         return {"state": "ready" if len(good) == len(endpoints) else "degraded" if good else "offline", "backends": statuses}
 
     @app.get("/v1/models")
-    async def models():
+    @app.get("/backends/{backend}/v1/models")
+    async def models(backend: str | None = None):
+        if backend is not None and backend not in {e.name for e in endpoints}:
+            return error("Unknown or unconfigured backend.", 404, "invalid_request_error")
         return {"object": "list", "data": [{"id": "chandra", "object": "model", "created": 0, "owned_by": "local"}]}
 
     @app.post("/v1/chat/completions")
-    async def completions(request: Request):
+    @app.post("/backends/{backend}/v1/chat/completions")
+    async def completions(request: Request, backend: str | None = None):
         nonlocal selection_counter
         try:
             payload = await read_payload(request)
@@ -132,14 +159,19 @@ def create_router(config, client=None):
             return error(str(exc), 413, "invalid_request_error")
         except ValueError as exc:
             return error(str(exc), 400, "invalid_request_error")
-        selection = request.headers.get("x-chandra-backend", "auto")
+        if backend is not None and backend not in {e.name for e in endpoints}:
+            return error("Unknown or unconfigured backend.", 404, "invalid_request_error")
+        header_selection = request.headers.get("x-chandra-backend")
+        if backend is not None and header_selection not in {None, backend}:
+            return error("Backend path and X-Chandra-Backend disagree.", 400, "invalid_request_error")
+        selection = backend or header_selection or "auto"
         if selection not in {"auto", "northstone", "waystone"}:
             return error("X-Chandra-Backend must be auto, northstone, or waystone.", 400, "invalid_request_error")
         candidates = [e for e in endpoints if selection == "auto" or e.name == selection]
         await asyncio.gather(*(probe(e) for e in candidates))
         async with lock:
             ready = [e for e in candidates if e.state not in {"offline", "failed", "degraded", "unverified"}
-                     and max(e.active, e.remote_active) < e.capacity]
+                     and max(e.active, e.remote_active) < e.capacity + (e.queue_limit if selection != "auto" else 0)]
             if not ready:
                 return error("Selected OCR backend is unavailable or at capacity; inspect /health and retry later.")
             # Static estimated finish cost: ((observed occupancy + 1) / capacity)
@@ -165,8 +197,7 @@ def create_router(config, client=None):
                 async with asyncio.timeout(inference_seconds), client.stream("POST", endpoint.url + "/v1/chat/completions", json=payload) as response:
                     result.update(status=response.status_code, content_type=response.headers.get("content-type", "application/json"))
                     if response.status_code >= 500:
-                        endpoint.state = "degraded"
-                        endpoint.retry_at = time.monotonic() + cooldown
+                        quarantine(endpoint)
                     async for chunk in response.aiter_bytes():
                         if abandoned.is_set():
                             continue
@@ -178,9 +209,7 @@ def create_router(config, client=None):
                                 pass
             except (Exception, asyncio.CancelledError):
                 result["failure"] = True
-                endpoint.state = "degraded"
-                endpoint.uncertain = True
-                endpoint.retry_at = time.monotonic() + cooldown
+                quarantine(endpoint, uncertain=True)
             finally:
                 endpoint.active -= 1
                 done.set()

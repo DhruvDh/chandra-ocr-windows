@@ -1,0 +1,14 @@
+[project]
+name = "chandra-cpu-numerical-oracle"
+version = "0.1.0"
+requires-python = ">=3.12,<3.13"
+dependencies = ["torch==2.14.1", "torchvision==0.29.1", "transformers==5.18.0", "accelerate", "pillow", "numpy", "safetensors"]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
+torchvision = { index = "pytorch-cpu" }

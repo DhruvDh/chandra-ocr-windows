@@ -21,6 +21,7 @@ def validate(expected, result, max_tokens=12384):
     failures=[]; text=result.get('content')
     if not isinstance(text,str) or not text.strip(): return dict(passed=False,failures=['missing_content'])
     if result.get('finish_reason')!='stop': failures.append('finish_reason')
+    if result.get('stream_errors'): failures.append('stream_error')
     usage=result.get('usage')
     if not isinstance(usage,dict): failures.append('missing_usage')
     else:
@@ -48,13 +49,14 @@ def validate(expected, result, max_tokens=12384):
     return dict(passed=not failures,failures=failures)
 
 def parse_sse(raw):
-    content=[]; finish=None; usage=None; done=False
+    content=[]; finish=None; usage=None; done=False; errors=[]
     for block in raw.replace(b'\r\n',b'\n').split(b'\n\n'):
         lines=[line[5:].lstrip() for line in block.splitlines() if line.startswith(b'data:')]
         if not lines: continue
         value=b'\n'.join(lines)
         if value==b'[DONE]': done=True; continue
         event=json.loads(value)
+        if event.get('error') is not None: errors.append(event['error'])
         if event.get('usage') is not None: usage=event['usage']
         for choice in event.get('choices',[]):
             if choice.get('index',0)!=0: continue
@@ -62,7 +64,7 @@ def parse_sse(raw):
             if delta: content.append(delta)
             if choice.get('finish_reason') is not None: finish=choice['finish_reason']
     if not done: finish=None
-    return dict(content=''.join(content),finish_reason=finish,usage=usage)
+    return dict(content=''.join(content),finish_reason=finish,usage=usage,stream_errors=errors)
 
 def main():
     p=argparse.ArgumentParser(); p.add_argument('--base-url',required=True); p.add_argument('--corpus',required=True); p.add_argument('--output',required=True); p.add_argument('--provenance',required=True); p.add_argument('--repeat',type=int,default=5); p.add_argument('--phase',choices=['warm','process-cold','compile-cold','recreated'],default='warm'); p.add_argument('--stream',action='store_true'); p.add_argument('--timeout',type=float,default=900); a=p.parse_args()
