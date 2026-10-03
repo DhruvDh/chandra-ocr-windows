@@ -10,7 +10,7 @@ The pinned BF16 model runs on an Intel Arc A770 through PyTorch XPU and has pass
 | Reproduce inputs and evaluate results | [Benchmark workflow](benchmarks/README.md) |
 | Inspect the checkpoint | [Download manifest](provenance/model.json), [inventory verifier](scripts/model_inventory.py) |
 | Run native operator checks | [DirectCompute guide](ChandraNative/README.md) |
-| Inspect the Intel reference | [Runtime project](runtime/waystone/pyproject.toml), [adapter](runtime/waystone/backend.py) |
+| Install the Intel reference | [Runtime guide](runtime/waystone/README.md), [adapter](runtime/waystone/backend.py) |
 | Serve or route OCR | [Service package](chandra_service), [operations](docs/operations.md) |
 | Resume implementation | [Work record](docs/work-record.md), [agent guidance](AGENTS.md) |
 
