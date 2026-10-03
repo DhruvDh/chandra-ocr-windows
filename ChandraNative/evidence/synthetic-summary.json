@@ -1,0 +1,179 @@
+{
+  "recorded_at_utc": "2026-10-03T21:31:28.156126+00:00",
+  "scope": "Synthetic isolated native primitives; not full Chandra graph or OCR validation",
+  "gpu_run_exit_code": 0,
+  "build": {
+    "compiler": "MSVC 14.44.35207",
+    "visual_studio": "2022 Community 17.14.41",
+    "windows_sdk": "10.0.26100.0",
+    "hlsl_target": "cs_5_0",
+    "flags": [
+      "/O2",
+      "/fp:strict",
+      "D3DCOMPILE_IEEE_STRICTNESS"
+    ],
+    "offline_shader_compile_passed": true
+  },
+  "adapter_selection": {
+    "vendor_id": "0x8086",
+    "description_substring": "A770",
+    "explicit_dxgi_index": 0,
+    "matching_dxgi_entries": 2,
+    "ambiguity_default_rejected": true
+  },
+  "gpu_run": [
+    {
+      "adapter": "Intel(R) Arc(TM) A770 Graphics",
+      "dedicated_bytes": 17047748608,
+      "backend": "D3D11 cs_5_0 FP32",
+      "full_chandra_graph": false
+    },
+    {
+      "test": "bf16_all_patterns",
+      "passed": true,
+      "checked": 65536,
+      "gpu_ms": 0.009635416667
+    },
+    {
+      "test": "rmsnorm",
+      "passed": true,
+      "width": 2560,
+      "gpu_ms": 0.02135416667,
+      "double_oracle": {
+        "max_abs": 2.436843494e-07,
+        "rms": 5.189021215e-08
+      }
+    },
+    {
+      "test": "gated_rmsnorm",
+      "passed": true,
+      "width": 2560,
+      "gpu_ms": 0.02609375,
+      "double_oracle": {
+        "max_abs": 7.003178739e-07,
+        "rms": 5.171655095e-08
+      }
+    },
+    {
+      "test": "gated_rmsnorm",
+      "passed": true,
+      "width": 128,
+      "gpu_ms": 0.0115625,
+      "double_oracle": {
+        "max_abs": 3.337823848e-07,
+        "rms": 4.566623286e-08
+      }
+    },
+    {
+      "test": "gated_delta_recurrence",
+      "passed": true,
+      "tokens": 32,
+      "heads": 2,
+      "keys": 8,
+      "values": 8,
+      "prefill_gpu_ms": 0.4073958333,
+      "decode_gpu_ms": 0.4527083333,
+      "decode_wall_ms": 15.3924,
+      "cpu_oracles_ms": 0.0207,
+      "state_double": {
+        "max_abs": 1.419059419e-07,
+        "rms": 4.298967003e-08
+      },
+      "output_double": {
+        "max_abs": 5.094319221e-08,
+        "rms": 1.128480453e-08
+      },
+      "state_fp32": {
+        "max_abs": 1.490116119e-07,
+        "rms": 4.798670067e-08
+      },
+      "decode_state": {
+        "max_abs": 0,
+        "rms": 0
+      },
+      "decode_output": {
+        "max_abs": 0,
+        "rms": 0
+      },
+      "reset_state": {
+        "max_abs": 0,
+        "rms": 0
+      },
+      "reset_output": {
+        "max_abs": 0,
+        "rms": 0
+      }
+    },
+    {
+      "test": "gated_delta_recurrence",
+      "passed": true,
+      "tokens": 1000,
+      "heads": 32,
+      "keys": 128,
+      "values": 128,
+      "prefill_gpu_ms": 78.44229167,
+      "decode_gpu_ms": 52.8271875,
+      "decode_wall_ms": 57.2573,
+      "cpu_oracles_ms": 2556.7901,
+      "state_double": {
+        "max_abs": 2.167286224e-07,
+        "rms": 3.65828258e-08
+      },
+      "output_double": {
+        "max_abs": 2.448993262e-08,
+        "rms": 3.247275103e-09
+      },
+      "state_fp32": {
+        "max_abs": 2.458691597e-07,
+        "rms": 3.694785728e-08
+      },
+      "decode_state": {
+        "max_abs": 0,
+        "rms": 0
+      },
+      "decode_output": {
+        "max_abs": 0,
+        "rms": 0
+      },
+      "reset_state": {
+        "max_abs": 0,
+        "rms": 0
+      },
+      "reset_output": {
+        "max_abs": 0,
+        "rms": 0
+      }
+    }
+  ],
+  "installed_transformers_cpu_reference": {
+    "test": "installed_transformers_cpu_reference",
+    "passed": true,
+    "tokens": 1000,
+    "heads": 2,
+    "keys": 8,
+    "values": 8,
+    "torch": "2.13.0+rocm10.0.0",
+    "source_sha256": "d0c8561d91e31e50d9a57b74196c5a7ad023e42ebe9f84004d0a535310879939",
+    "fixture_sha256": "2a5db55bf3470828b3e0a9408b2f23392416e538e734c19c358683a6ec7b8d7e",
+    "state_max_abs": 2.9802322387695312e-08,
+    "output_max_abs": 2.2351741790771484e-08
+  },
+  "sources_sha256": {
+    "validate_transformers.py": "c52d88585aaff4013740521440e325a057f04c831331f5cddc41819e69c3c550",
+    "fixture_dump.cpp": "c85570acb20cd546790518b54b3985a9d9b5d6c449f426d3550673d170a0028c",
+    "main.cpp": "0c346f53cf6742442a5673520810b0acd01eb85d3a04b277c9c592cf14a21297",
+    "shadercheck.cpp": "73b731f47caf4c10f4e5a8371f262aa22817677db73474513c1948fb8bf09a54",
+    "oracle_test.cpp": "80d35337006f680a0c20f6b4da4f587fd80f824198a72a429d523f2caf994a58",
+    "build.cmd": "e509990b6421e020a70a25cdcb5a6c69b0ccaf05ff8923aa15db5b3f285bcf4a",
+    "oracle.h": "5582023f5018ca15246d132a63f1c3c27e05a2105f60fb6c56caa5f088f8e3da",
+    "shaders/delta.hlsl": "82abfe4bdb13a3fd28fee3ba67b3a7b73c8b311badfd91b59ed3bf9b5d33578e",
+    "shaders/rmsnorm.hlsl": "5e25e3c3be7eee394b38902a15f9f7e6cd45dc31424453862223fb354dc3fc46",
+    "shaders/bf16.hlsl": "d57927d52042c4e5d272e1cca12bcec16a254e33aeba409cf811c3981f7a05bc"
+  },
+  "limits": [
+    "One synthetic GPU run, no benchmark distribution",
+    "Sequential prefill correctness kernel only",
+    "No trained weights, whole recurrent layer, vision, generation or OCR accuracy validated",
+    "No peak DXGI budget measurement"
+  ]
+}

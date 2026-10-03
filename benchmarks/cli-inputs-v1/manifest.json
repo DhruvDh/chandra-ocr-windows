@@ -1,0 +1,297 @@
+{
+  "schema": "chandra-cli-corpus-v1",
+  "split": "development",
+  "license": "CC0-1.0 (synthetic content)",
+  "generator_sha256": "ce2c186b8f74acea4a53e8c87c24b84c08102be482b8b9c6d89dcc4694a239fa",
+  "font_name": "DejaVuSans.ttf",
+  "font_sha256": "6038a160b491e121c1f12c7bccb4a9c8730296e3adc1086a059404ed84b7451c",
+  "runtime": {
+    "pillow": "12.3.0",
+    "reportlab": "5.0.1",
+    "pypdfium2": "5.13.0"
+  },
+  "pdfium_version": "153.0.7999.0",
+  "render_dpi": 192,
+  "files": [
+    {
+      "path": "native-page-1.png",
+      "sha256": "2d68ac7294143a31a1f983fc47900c71d8e86533f5d70cbc5c778ea36ac23102"
+    },
+    {
+      "path": "native-page-2.png",
+      "sha256": "59c3791c772462291b23f71f3d82d9c788b4d5a413475c8f1f7e610249ae27b6"
+    },
+    {
+      "path": "native.pdf",
+      "sha256": "e3fd9ef629c64059ec4c9fc4b9979be36761b7dbafe3fa7430678be8a9792d6e"
+    },
+    {
+      "path": "scanned-page-1.png",
+      "sha256": "9cd4fc06715d95f6a2f81baa27d013377fbba93fc8768e829ef8cf196b43ba0e"
+    },
+    {
+      "path": "scanned-page-2.png",
+      "sha256": "3f2b31044725a91587524700d767c291b60da7e355d7a25969c4e13cbdfd882f"
+    },
+    {
+      "path": "scanned.pdf",
+      "sha256": "c21793fbab0ba6fa5f23e16c4ad485cad0ec4d779a43a9238b07f19446f79a06"
+    }
+  ],
+  "fixtures": [
+    {
+      "id": "native",
+      "pdf": "native.pdf",
+      "pdf_sha256": "e3fd9ef629c64059ec4c9fc4b9979be36761b7dbafe3fa7430678be8a9792d6e",
+      "rendered_pages": [
+        {
+          "page_num": 0,
+          "width": 1632,
+          "height": 2112,
+          "mode": "RGB",
+          "pixels_sha256": "01c9de0950d6b97eaccaa80ea563caab87c2acb4afc2c0c51836d3d2b7643edb",
+          "image": "native-page-1.png",
+          "image_sha256": "2d68ac7294143a31a1f983fc47900c71d8e86533f5d70cbc5c778ea36ac23102",
+          "native_text_characters": 525
+        },
+        {
+          "page_num": 1,
+          "width": 1632,
+          "height": 2112,
+          "mode": "RGB",
+          "pixels_sha256": "3dfd5f6c4f17499dff31d8323907c43fb20d254d66f053e766d3c5ee3a5f36f2",
+          "image": "native-page-2.png",
+          "image_sha256": "59c3791c772462291b23f71f3d82d9c788b4d5a413475c8f1f7e610249ae27b6",
+          "native_text_characters": 528
+        }
+      ],
+      "expected": {
+        "file_name": "native.pdf",
+        "pages": 2,
+        "table": [
+          [
+            "Sample",
+            "Mass (g)",
+            "Count",
+            "Value"
+          ],
+          [
+            "Alpha",
+            "12.50",
+            "17",
+            "203.25"
+          ],
+          [
+            "Beta",
+            "7.25",
+            "29",
+            "118.75"
+          ],
+          [
+            "Total",
+            "19.75",
+            "46",
+            "322.00"
+          ],
+          [
+            "Trial",
+            "Offset",
+            "Rate",
+            "Result"
+          ],
+          [
+            "Gamma",
+            "-2.50",
+            "0.125",
+            "16.00"
+          ],
+          [
+            "Delta",
+            "+3.75",
+            "1.250",
+            "27.50"
+          ],
+          [
+            "Total",
+            "1.25",
+            "1.375",
+            "43.50"
+          ]
+        ],
+        "text": [
+          "This public fixture tests complete scientific transcription across two pages.",
+          "This public fixture tests complete scientific transcription across two pages."
+        ],
+        "numbers": [
+          "12.50",
+          "17",
+          "203.25",
+          "7.25",
+          "29",
+          "118.75",
+          "19.75",
+          "46",
+          "322.00",
+          "-2.50",
+          "0.125",
+          "16.00",
+          "+3.75",
+          "1.250",
+          "27.50",
+          "1.25",
+          "1.375",
+          "43.50"
+        ],
+        "equations": [
+          "y = 3x + 7",
+          "x = 5",
+          "y = 22",
+          "z = 2a - 1",
+          "a = 4",
+          "z = 7"
+        ],
+        "end_markers": [
+          "END-CLI-PAGE-1-COMPLETE",
+          "END-CLI-PAGE-2-COMPLETE"
+        ],
+        "ordered_text": [
+          "Synthetic measurement - page 1",
+          "COLUMN 1A",
+          "COLUMN 1B",
+          "END-CLI-PAGE-1-COMPLETE",
+          "Synthetic measurement - page 2",
+          "COLUMN 2A",
+          "COLUMN 2B",
+          "END-CLI-PAGE-2-COMPLETE"
+        ]
+      }
+    },
+    {
+      "id": "scanned",
+      "pdf": "scanned.pdf",
+      "pdf_sha256": "c21793fbab0ba6fa5f23e16c4ad485cad0ec4d779a43a9238b07f19446f79a06",
+      "rendered_pages": [
+        {
+          "page_num": 0,
+          "width": 1632,
+          "height": 2112,
+          "mode": "RGB",
+          "pixels_sha256": "712710e5ab1e29d4ab5c38b5d8c19102a576c12729771280ee3bce0d6d91c7f2",
+          "image": "scanned-page-1.png",
+          "image_sha256": "9cd4fc06715d95f6a2f81baa27d013377fbba93fc8768e829ef8cf196b43ba0e",
+          "native_text_characters": 0
+        },
+        {
+          "page_num": 1,
+          "width": 1632,
+          "height": 2112,
+          "mode": "RGB",
+          "pixels_sha256": "9cc932f3aaa0e0fdceda3d5d3ebb97035743826102c950b6e3cfa70ac28f5ce2",
+          "image": "scanned-page-2.png",
+          "image_sha256": "3f2b31044725a91587524700d767c291b60da7e355d7a25969c4e13cbdfd882f",
+          "native_text_characters": 0
+        }
+      ],
+      "expected": {
+        "file_name": "scanned.pdf",
+        "pages": 2,
+        "table": [
+          [
+            "Sample",
+            "Mass (g)",
+            "Count",
+            "Value"
+          ],
+          [
+            "Alpha",
+            "12.50",
+            "17",
+            "203.25"
+          ],
+          [
+            "Beta",
+            "7.25",
+            "29",
+            "118.75"
+          ],
+          [
+            "Total",
+            "19.75",
+            "46",
+            "322.00"
+          ],
+          [
+            "Trial",
+            "Offset",
+            "Rate",
+            "Result"
+          ],
+          [
+            "Gamma",
+            "-2.50",
+            "0.125",
+            "16.00"
+          ],
+          [
+            "Delta",
+            "+3.75",
+            "1.250",
+            "27.50"
+          ],
+          [
+            "Total",
+            "1.25",
+            "1.375",
+            "43.50"
+          ]
+        ],
+        "text": [
+          "This public fixture tests complete scientific transcription across two pages.",
+          "This public fixture tests complete scientific transcription across two pages."
+        ],
+        "numbers": [
+          "12.50",
+          "17",
+          "203.25",
+          "7.25",
+          "29",
+          "118.75",
+          "19.75",
+          "46",
+          "322.00",
+          "-2.50",
+          "0.125",
+          "16.00",
+          "+3.75",
+          "1.250",
+          "27.50",
+          "1.25",
+          "1.375",
+          "43.50"
+        ],
+        "equations": [
+          "y = 3x + 7",
+          "x = 5",
+          "y = 22",
+          "z = 2a - 1",
+          "a = 4",
+          "z = 7"
+        ],
+        "end_markers": [
+          "END-CLI-PAGE-1-COMPLETE",
+          "END-CLI-PAGE-2-COMPLETE"
+        ],
+        "ordered_text": [
+          "Synthetic measurement - page 1",
+          "COLUMN 1A",
+          "COLUMN 1B",
+          "END-CLI-PAGE-1-COMPLETE",
+          "Synthetic measurement - page 2",
+          "COLUMN 2A",
+          "COLUMN 2B",
+          "END-CLI-PAGE-2-COMPLETE"
+        ]
+      }
+    }
+  ]
+}

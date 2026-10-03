@@ -1,0 +1,211 @@
+{
+  "schema": "chandra-synthetic-corpus-v1",
+  "split": "development",
+  "generator_sha256": "ee80de3922881059314a26f4eb0f8b3608052901e2e6a252c46b08b88eb6b965",
+  "font_sha256": "6038a160b491e121c1f12c7bccb4a9c8730296e3adc1086a059404ed84b7451c",
+  "font_name": "DejaVuSans.ttf",
+  "pillow_version": "12.3.0",
+  "fixtures": [
+    {
+      "id": "tiny",
+      "image": "tiny.png",
+      "width": 408,
+      "height": 528,
+      "mode": "RGB",
+      "image_sha256": "c30916f2dbba48b58e588de752371ac81155edb21f553588ec756cf649c268e9",
+      "pixels_sha256": "6b2583894bcde7745f785fe341add84d72d7051f1a7516db5c9b9fd0506f8cec",
+      "expected": {
+        "equations": [
+          "y = 3x + 7",
+          "x = 5",
+          "y = 22"
+        ],
+        "table": [
+          [
+            "Sample",
+            "Mass (g)",
+            "Count",
+            "Value"
+          ],
+          [
+            "Alpha",
+            "12.50",
+            "17",
+            "203.25"
+          ],
+          [
+            "Beta",
+            "7.25",
+            "29",
+            "118.75"
+          ],
+          [
+            "Total",
+            "19.75",
+            "46",
+            "322.00"
+          ]
+        ],
+        "numbers": [
+          "12.50",
+          "17",
+          "203.25",
+          "7.25",
+          "29",
+          "118.75",
+          "19.75",
+          "46",
+          "322.00"
+        ],
+        "text": [
+          "REFERENCE TINY"
+        ],
+        "end_markers": [
+          "END-TINY-COMPLETE"
+        ],
+        "ordered_text": [
+          "Synthetic OCR measurement",
+          "REFERENCE TINY",
+          "END-TINY-COMPLETE"
+        ],
+        "required_labels": [
+          "Table"
+        ]
+      }
+    },
+    {
+      "id": "small",
+      "image": "small.png",
+      "width": 816,
+      "height": 1056,
+      "mode": "RGB",
+      "image_sha256": "a87ffb5825a7d9b1663db873e2c7cbf45562bc9f366c69fcea1d4bf0745f565c",
+      "pixels_sha256": "7ef78097d0382fe248b4ea5ec0907a36c14359d927803afabc745763ce5fd3bd",
+      "expected": {
+        "equations": [
+          "y = 3x + 7",
+          "x = 5",
+          "y = 22"
+        ],
+        "table": [
+          [
+            "Sample",
+            "Mass (g)",
+            "Count",
+            "Value"
+          ],
+          [
+            "Alpha",
+            "12.50",
+            "17",
+            "203.25"
+          ],
+          [
+            "Beta",
+            "7.25",
+            "29",
+            "118.75"
+          ],
+          [
+            "Total",
+            "19.75",
+            "46",
+            "322.00"
+          ]
+        ],
+        "numbers": [
+          "12.50",
+          "17",
+          "203.25",
+          "7.25",
+          "29",
+          "118.75",
+          "19.75",
+          "46",
+          "322.00"
+        ],
+        "text": [
+          "REFERENCE SMALL"
+        ],
+        "end_markers": [
+          "END-SMALL-COMPLETE"
+        ],
+        "ordered_text": [
+          "Synthetic OCR measurement",
+          "REFERENCE SMALL",
+          "END-SMALL-COMPLETE"
+        ],
+        "required_labels": [
+          "Table"
+        ]
+      }
+    },
+    {
+      "id": "representative",
+      "image": "representative.png",
+      "width": 1632,
+      "height": 2112,
+      "mode": "RGB",
+      "image_sha256": "33200ca28abaa9f131675f6c82f009386c2e9fb22d67de3f358d2e06fc90a68a",
+      "pixels_sha256": "f7507fe77a6d415c73d5f5039c4f86ddf1f73edaf39a0681cc0dae223e3bafe4",
+      "expected": {
+        "equations": [
+          "y = 3x + 7",
+          "x = 5",
+          "y = 22"
+        ],
+        "table": [
+          [
+            "Sample",
+            "Mass (g)",
+            "Count",
+            "Value"
+          ],
+          [
+            "Alpha",
+            "12.50",
+            "17",
+            "203.25"
+          ],
+          [
+            "Beta",
+            "7.25",
+            "29",
+            "118.75"
+          ],
+          [
+            "Total",
+            "19.75",
+            "46",
+            "322.00"
+          ]
+        ],
+        "numbers": [
+          "12.50",
+          "17",
+          "203.25",
+          "7.25",
+          "29",
+          "118.75",
+          "19.75",
+          "46",
+          "322.00"
+        ],
+        "text": [
+          "REFERENCE REPRESENTATIVE"
+        ],
+        "end_markers": [
+          "END-REPRESENTATIVE-COMPLETE"
+        ],
+        "ordered_text": [
+          "Synthetic OCR measurement",
+          "REFERENCE REPRESENTATIVE",
+          "END-REPRESENTATIVE-COMPLETE"
+        ],
+        "required_labels": [
+          "Table"
+        ]
+      }
+    }
+  ]
+}

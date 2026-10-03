@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "upstream": {
+    "repository": "https://github.com/Const-me/Whisper",
+    "commit": "1ce7399704d8bea92429fc429819d32991fe9152",
+    "license": "MPL-2.0",
+    "original_readme": "WHISPER-README.md"
+  },
+  "derivative": {
+    "repository": "https://github.com/DhruvDh/chandra-ocr-windows",
+    "visibility": "public",
+    "github_fork_network_member": false,
+    "full_upstream_history_retained": true
+  },
+  "checkpoint": {
+    "repository": "https://huggingface.co/datalab-to/chandra-ocr-2",
+    "revision": "af93b47dba1b47b6640c86ccf487ed2260ab9a09",
+    "architecture": "Qwen3_5ForConditionalGeneration",
+    "files": "model.json",
+    "license": "OpenRAIL, as supplied with the checkpoint"
+  }
+}

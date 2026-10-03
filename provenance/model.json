@@ -1,0 +1,91 @@
+{
+  "model": "datalab-to/chandra-ocr-2",
+  "revision": "af93b47dba1b47b6640c86ccf487ed2260ab9a09",
+  "files": [
+    {
+      "file": ".eval_results/olmocrbench.yaml",
+      "size": 1773,
+      "sha256": "2c45de050fa308e65715ba4cb8506ba67ecad777d000b540efc6606199a7dadf"
+    },
+    {
+      "file": ".gitattributes",
+      "size": 1627,
+      "sha256": "9881c556f439d717ed2ed4f345a4a061b2429b004d53b7c6a09bda939c10f407"
+    },
+    {
+      "file": "LICENSE",
+      "size": 14742,
+      "sha256": "126948ded70d791f4223175a8867cb64bd09bf8aeb7084b812393c876fdc6e1c"
+    },
+    {
+      "file": "README.md",
+      "size": 11186,
+      "sha256": "5eedfd77eb548b023400175628f98146414d2551aedfe3060c09d3e499f7368f"
+    },
+    {
+      "file": "bench.png",
+      "size": 96397,
+      "sha256": "db254cf4a26a63303892c90888317f3aca55d69361bf52bfeeb920ad087cf05d"
+    },
+    {
+      "file": "chat_template.jinja",
+      "size": 7622,
+      "sha256": "0d158f349ca965f7eea9db0eb45cd177b85bb0e4ae05dcdd0f060da8f7d41812"
+    },
+    {
+      "file": "config.json",
+      "size": 2773,
+      "sha256": "e26f17b70463de21fd68f1ef6d8f67f8e33e65d55a7a6895242130a18db60587"
+    },
+    {
+      "file": "datalab-logo.png",
+      "size": 6169,
+      "sha256": "88495c25bbbc90107354acd71f7d1a47023ebbe3cc98d22eb20fbd1f31d25753"
+    },
+    {
+      "file": "generation_config.json",
+      "size": 115,
+      "sha256": "0c35bb39fbaed1ac0656baabc4f4e9bda20214e12336d0e4e8755aac1f487c2e"
+    },
+    {
+      "file": "handwritten_form.png",
+      "size": 523521,
+      "sha256": "5915e7608cf8a857b5b846d56673e62164ba17c106917480e09703a0b5a189ce"
+    },
+    {
+      "file": "model.safetensors",
+      "size": 10591220088,
+      "sha256": "0804568be9f099d6479fad9ed77a4da4611f3c1e7bc6e009af7dce45e8aa3847"
+    },
+    {
+      "file": "multilingual.png",
+      "size": 51566,
+      "sha256": "b3404423e5b9ef1be10fdbc1d4d55d17accb353ca000e59b934a8d3bc5fc41f5"
+    },
+    {
+      "file": "preprocessor_config.json",
+      "size": 482,
+      "sha256": "957eb01d1ea45341a92d543daec95857a7cbeff5803834bc0603b27ba7b41b3f"
+    },
+    {
+      "file": "processor_config.json",
+      "size": 1300,
+      "sha256": "14932921ca485d458a04dafd8069fbb0a4505622a48208d19ed247115801385b"
+    },
+    {
+      "file": "tokenizer.json",
+      "size": 19989343,
+      "sha256": "87a7830d63fcf43bf241c3c5242e96e62dd3fdc29224ca26fed8ea333db72de4"
+    },
+    {
+      "file": "tokenizer_config.json",
+      "size": 16710,
+      "sha256": "316230d6a809701f4db5ea8f8fc862bc3a6f3229c937c174e674ff3ca0a64ac8"
+    },
+    {
+      "file": "video_preprocessor_config.json",
+      "size": 614,
+      "sha256": "de7ba2c4528aa3c92754dc61ae83f1871369cbf7ab4298dcaa99c2f5a7c80848"
+    }
+  ]
+}

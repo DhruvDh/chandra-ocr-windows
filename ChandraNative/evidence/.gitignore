@@ -1,0 +1,3 @@
+# Local raw execution output. Publish only curated synthetic summaries.
+*.txt
+*.jsonl

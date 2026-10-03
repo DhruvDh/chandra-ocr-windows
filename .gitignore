@@ -11,7 +11,6 @@ WhisperNet/obj/
 Examples/TranscribeCS/bin/
 Examples/TranscribeCS/obj/
 *.aps
-*.json
 *.user
 Examples/MicrophoneCS/obj/
 Examples/MicrophoneCS/bin/
@@ -22,3 +21,22 @@ WhisperPS/obj/
 WhisperPS/bin/
 Tools/CompressTables/bin/
 Tools/CompressTables/obj/
+
+# Project-local runtimes, credentials, downloaded models, builds and raw runs.
+.venv/
+.runtime/
+.local/
+__pycache__/
+.pytest_cache/
+*.pyc
+build/
+results/
+*.safetensors
+*.gguf
+*.onnx
+*.bin
+*.obj
+*.exe
+*.dll
+*.pdb
+*.cso

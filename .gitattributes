@@ -1,0 +1,6 @@
+*.pdf binary
+*.png binary
+# Preserve upstream documentation and third-party notices byte-for-byte.
+WHISPER-README.md -whitespace
+ChandraNative/vendor/** -whitespace
+benchmarks/DejaVu-LICENSE.txt -whitespace

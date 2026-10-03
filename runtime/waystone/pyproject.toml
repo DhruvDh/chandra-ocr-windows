@@ -1,0 +1,19 @@
+[project]
+name = "chandra-waystone-reference"
+version = "0.1.0"
+requires-python = "==3.12.*"
+dependencies = ["torch==2.14.1+xpu", "triton-xpu==3.8.0", "torchvision==0.29.1+xpu", "transformers==5.18.0", "chandra-ocr==0.2.0", "accelerate", "pillow"]
+
+[[tool.uv.index]]
+name = "pytorch-xpu"
+url = "https://download.pytorch.org/whl/xpu"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-xpu" }
+torchvision = { index = "pytorch-xpu" }
+triton-xpu = { index = "pytorch-xpu" }
+pytorch-triton-xpu = { index = "pytorch-xpu" }
+
+[tool.uv]
+environments = ["sys_platform == 'win32'"]
