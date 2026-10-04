@@ -1772,5 +1772,73 @@
         "sha256": "1ad31cf144c812b50afd8a534a911add59dccb6089d118d8200fc36734e11681"
       }
     ]
+  },
+  "north_diverse_pages_smoke_2026_10_04": {
+    "status": "Independent bounded smoke passed; observation only, with no new speed or product-assembly claim.",
+    "scope": "One excluded warmup and three distinct retained synthetic PDF-rendered pages (Tiny, Routes, Small), sent in one North-only burst under capacity 2/queue 1. Independent acceptance passed complete text/table/order, usage and stop checks; the Small page had one normalized bbox-unit change within the prospective smoke gate. Root directly reviewed all three visual overlays.",
+    "observation": {
+      "candidate_burst_makespan_seconds": 17.919462714002293,
+      "measured_pages": 3,
+      "excluded_warmups": 1,
+      "interpretation": "A single mixed-page makespan observation only; no speedup, CLI product assembly, general-geometry, Intel, or heterogeneous two-host conclusion."
+    },
+    "resource_and_terminal": "Across 36 samples, minimum sampled free VRAM was 4,509,794,304 bytes (about 4.20007 GiB), and minimum available RAM was 34,498,879,488 bytes (about 32.1296 GiB). Drain and owned-process closure passed; NorthStone returned asleep, Waystone cold, and router ready.",
+    "private_receipt_commitments": [
+      {
+        "receipt": "optimization/north-diverse-pages-smoke-v1-live-01/independent-smoke-acceptance.json",
+        "bytes": 5093,
+        "sha256": "0265905d4eaf754b696fa13da63052e566f17b63220b89a6d69fe6367abed30f"
+      },
+      {
+        "receipt": "optimization/north-diverse-pages-smoke-v1-live-01/01-candidate/batch.json",
+        "bytes": 2572,
+        "sha256": "5c519cdd6610e8f53a5d4ad7e39714df80bc07ed7385e20e28f6ce7a69d193af"
+      },
+      {
+        "receipt": "optimization/north-diverse-pages-smoke-v1-live-01/root-visual-assessment.json",
+        "bytes": 1323,
+        "sha256": "da5fdc8035c240cf6846182d571cb72066fdb83252998e78c910be4bc20f911c"
+      },
+      {
+        "receipt": "optimization/north-diverse-pages-smoke-v1-live-01/owned-process-closure.json",
+        "bytes": 166,
+        "sha256": "a9f7cce40ff4d7887e0dc7e43c083ca0a325f5a4d7770043825ae5c8a7fd6cfa"
+      },
+      {
+        "receipt": "optimization/north-diverse-pages-smoke-v1-live-01/service-restoration.json",
+        "bytes": 1813,
+        "sha256": "414b4dd6c616c66cb659535da16f192989984ce81c5662e2929a48b163855f0e"
+      }
+    ]
+  },
+  "vision_language_prefill_trim_diagnostic_feasibility_2026_10_04": {
+    "status": "Allocator-boundary feasibility only; no OCR, numerical, or speed qualification.",
+    "observation": {
+      "driver_local_usage_released_bytes": 429916160,
+      "torch_reserved_released_bytes": 432013312,
+      "torch_allocated_change_bytes": 0,
+      "embeddings_and_argument_identities_unchanged": true,
+      "text_body_entered": false,
+      "unload_allocated_reserved_zero": true,
+      "owned_processes_absent": true
+    },
+    "interpretation": "A single prefill-boundary diagnostic observed release of unused pooled memory while preserving the live embeddings and argument identities. CPU byte readback and synchronized instrumentation perturb timing and reclamation; this does not establish an uninstrumented peak bound, since later text allocations can refill the pool and the process budget can change. No OCR, numerical equivalence, performance, or full-page qualification follows.",
+    "private_receipt_commitments": [
+      {
+        "receipt": "optimization/vision-language-prefill-trim-v1-diagnostic-01/diagnostic-summary.json",
+        "bytes": 31451,
+        "sha256": "6fac57a7e477c56104f20ce5f45539578f7ec56ddcc5b0ba3f1a257720045ecb"
+      },
+      {
+        "receipt": "optimization/vision-language-prefill-trim-v1-diagnostic-01/independent-resource-closure-assessment.json",
+        "bytes": 7309,
+        "sha256": "cf7a3b4c0afc1b33e0ee02bcb910b635452a788403b0060d98f01d190fc11dc1"
+      },
+      {
+        "receipt": "optimization/vision-language-prefill-trim-v1-diagnostic-01-independent-diagnostic-assessment.json",
+        "bytes": 3315,
+        "sha256": "0026765cba513d1a17eec4f252db450fa23df02186cf495201460b23061ffed4"
+      }
+    ]
   }
 }
