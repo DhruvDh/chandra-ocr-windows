@@ -1840,5 +1840,89 @@
         "sha256": "0026765cba513d1a17eec4f252db450fa23df02186cf495201460b23061ffed4"
       }
     ]
+  },
+  "vision_boundary_trim_softmax_postload_gain_numerical_2026_10_04": {
+    "status": "Independent numerical qualification PASS for the fresh composed trajectory. Resource/ownership closure also passed; full OCR, throughput/timing and serving qualification remain unrun.",
+    "numerical_result": {
+      "logit_rows": 395,
+      "columns_per_row": 248320,
+      "payload_bytes": 392345600,
+      "candidate_payload_sha256": "7bde48e35783277d07ef878e8f001484ac3828bfdda6218eeb96ce5a8c9ba00b",
+      "ordered_finite_cache_digest_records": 25280,
+      "exact_verification_passed": true,
+      "boundary_trims": 2,
+      "image_prefill_lengths": [
+        801,
+        1195
+      ],
+      "postload_trims": 1,
+      "cached_text_calls_after_first_image": 394,
+      "text_softmax_calls": 3168,
+      "text_forwarded_calls": 0,
+      "norm_modules": 81,
+      "calls_per_norm_module": 396,
+      "arguments_unchanged": true,
+      "restoration_checks_passed": true
+    },
+    "resource_and_closure": {
+      "resource_gates_passed": true,
+      "ownership_closed": true,
+      "owned_process_count": 5,
+      "all_owned_processes_absent": true,
+      "waystone_restored_cold": true,
+      "northstone_gateway_actions": [],
+      "headroom_scope": "Across 158 periodic samples alone, minimum process-local DXGI headroom was 5,843,976,192 B (about 5.443 GiB). Including the two aligned trim snapshots, the minimum of 160 observations was 5,057,347,584 B (about 4.710 GiB) at cold_load_before_trim; combined resource floors passed. These are process-local budget measurements, not global free VRAM.",
+      "host_available_ram_minimum_bytes": 16676466688,
+      "host_available_ram_minimum_gib": 15.531169891357422,
+      "controller_cgroup": {
+        "configured_memory_max_bytes": 268435456,
+        "configured_swap_max_bytes": 0,
+        "systemd_final_reported_peak": "256.1M (swap: 0B)",
+        "interpretation": "The final systemd value is cgroup accounting, not RSS, and is not claimed to be at or below 256 MiB. No OOM/error was reported; unit memory.events was not retained."
+      }
+    },
+    "qualification_limits": "Numerical equality does not establish OCR acceptance, performance gain, sustained throughput, or deployment. Full OCR and timing have not run. No AMD model or gateway actions were taken.",
+    "throughput_preparation_reference": {
+      "path": "benchmarks/evidence/throughput-preparation-2026-10-04.json",
+      "commit": "8265aead1be0dc1e01ca41c5f81885927bc2b77d",
+      "scope": "Offline preparation only; it is not new timing or throughput evidence."
+    },
+    "private_receipt_commitments": [
+      {
+        "receipt": "optimization/vision-boundary-trim-softmax-postload-production-gain-v1-numerical-01-independent-exact-verification.json",
+        "bytes": 1552,
+        "sha256": "4ac4d3661534399add4be19aa5d9e06bb65c01083268ed6f55291ac3e3a317b6"
+      },
+      {
+        "receipt": "optimization/vision-boundary-trim-softmax-postload-production-gain-v1-numerical-01-independent-numerical-assessment.json",
+        "bytes": 4580,
+        "sha256": "2d11f29f734c3e981a5528715f59bf5d32968836f4babba216e834b6fb8b66b2"
+      },
+      {
+        "receipt": "optimization/vision-boundary-trim-softmax-postload-production-gain-v1-numerical-01-independent-resource-ownership-audit.json",
+        "bytes": 7998,
+        "sha256": "f5499e8e74818ecc0f862344248cc6e7af15959edc9c5c35763027917859b523"
+      },
+      {
+        "receipt": "optimization/vision-boundary-trim-softmax-postload-production-gain-v1-numerical-01-aligned-snapshot-resource-addendum.json",
+        "bytes": 3024,
+        "sha256": "93675f59bdbe3dcd7752bb90abe1a633074da291924e34deaabbedd58a0da620"
+      },
+      {
+        "receipt": "optimization/vision-boundary-trim-softmax-postload-production-gain-v1-numerical-01-service-restoration.json",
+        "bytes": 585,
+        "sha256": "b8b187b06c4d0a231941a164bbf0d4bf3fe8dbcf4804af4a0632806f44ca97e5"
+      },
+      {
+        "receipt": "optimization/vision-boundary-trim-softmax-postload-production-gain-v1-numerical-01-client-cgroup-during-run.json",
+        "bytes": 505,
+        "sha256": "4e6c99daedbdaefab5475360c839b0f58d46c4db54710379b66d19504806fff3"
+      },
+      {
+        "receipt": "optimization/vision-boundary-trim-softmax-postload-production-gain-v1-numerical-01-composition.json",
+        "bytes": 3101,
+        "sha256": "a2f36150b6af21e8886ba3bcfc20f1e732ab28370074329b97cb8ae8145447e3"
+      }
+    ]
   }
 }
