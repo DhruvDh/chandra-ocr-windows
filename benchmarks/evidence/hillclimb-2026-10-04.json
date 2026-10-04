@@ -51,7 +51,7 @@
   },
   "evidence_boundary": "Commitments hash private receipts only; they do not attest remote process identity or substitute for access to underlying evidence. Raw traces, tensors, private paths, and credentials are excluded. Numerical policy v2 was frozen before full candidate runs; capability receipts are not acceptance decisions.",
   "cpu_cached_calibration": {
-    "scope": "Matched CPU FP32 cached teacher against full uncached teacher at 394 identical conditioned positions; cached exporter retained 395 rows at positions 800–1194; no fresh greedy run.",
+    "scope": "Matched CPU FP32 cached teacher against full uncached teacher at 394 identical conditioned positions; cached exporter retained 395 rows at positions 800\u20131194; no fresh greedy run.",
     "identity_equal": true,
     "rows_compared": 394,
     "argmax_agreement_count": 394,
@@ -981,6 +981,110 @@
         "receipt": "optimization/amd-client-products-v1-live-01/final-passive-state.json",
         "bytes": 431,
         "sha256": "047c8e8f2af13dbabf8243cd74dcd8a9ee6639ceec728f2f8731660ce700a5a5"
+      }
+    ]
+  },
+  "dxgi_calibration_and_production_gain_numerical_2026_10_04": {
+    "calibration": {
+      "result": "The first calibration attempt failed during prebuffer in the Windows ctypes wrapper. A second calibration passed: two 32 MiB process-local DXGI allocation/cleanup cycles were observed, with independent terminal review passing and all five owned PIDs absent. This measures selected-process budget/usage only; it is not global free-VRAM evidence.",
+      "passed": true,
+      "allocation_cycles": 2,
+      "bytes_per_cycle": 33554432,
+      "independent_terminal_review_passed": true
+    },
+    "numerical_run": {
+      "result": "Exact numerical/exporter checks passed for 395 logit rows and 25,280 cache-state records; full candidate payload SHA-256 is recorded as 7bde48e35783277d07ef878e8f001484ac3828bfdda6218eeb96ce5a8c9ba00b. The 81 installed gains added exactly 681,984 synchronized allocated bytes and closing them released exactly 681,984 bytes; allowance was zero. Minimum process-local headroom was 3,851,550,720 bytes and minimum available host RAM was 17,359,556,608 bytes. All five owned PIDs were absent at collection; the worker was restored cold.",
+      "logit_rows": 395,
+      "cache_state_records": 25280,
+      "candidate_payload_sha256": "7bde48e35783277d07ef878e8f001484ac3828bfdda6218eeb96ce5a8c9ba00b",
+      "gain_modules": 81,
+      "gain_bytes": 681984,
+      "install_allocated_delta_bytes": 681984,
+      "close_released_allocated_bytes": 681984,
+      "allocator_rounding_allowance_bytes": 0,
+      "minimum_process_local_headroom_bytes": 3851550720,
+      "minimum_available_host_ram_bytes": 17359556608,
+      "all_five_owned_pids_absent": true,
+      "worker_restored_cold": true,
+      "scope": "Exact logit payload and ordered exporter cache-digest records, not raw cache-tensor replay. Identical conditioning and full logit bytes entail identical errors against the frozen CPU policy by deduction. Complete OCR, paired request-memory/timing qualification and deployment remain pending.",
+      "independent_terminal_review_passed": true
+    },
+    "guard_history": "CPU-only Job guard testing retained its first normal-path ownership failure, a repaired normal-path completion, and a monitor-failure cleanup check with all tracked descendants absent. These tests cover guard behavior, not accelerator performance.",
+    "commitments": [
+      {
+        "receipt": "optimization/dxgi-xpu-calibration-v1-live-02/independent-terminal-assessment.json",
+        "bytes": 2531,
+        "sha256": "85af841efce09a4887f47e8b95d7faad86ac17d817d1989341902c09585de7eb"
+      },
+      {
+        "receipt": "optimization/production-gain-v1-dxgi-numerical-01/calibration-summary.json",
+        "bytes": 65675,
+        "sha256": "f285a71849cfcefb2b5ddc6bd88e2adc366f402a01bc6573acb3d77d03ee2fcc"
+      },
+      {
+        "receipt": "optimization/production-gain-v1-preparation/exact-source-manifest.json",
+        "bytes": 1124,
+        "sha256": "06fbb834c3a4bf04f6f8570b2658c28d08b3311a04da62f2b65ac94b99b7009f"
+      },
+      {
+        "receipt": "optimization/production-gain-v1-dxgi-numerical-01-launcher-review.json",
+        "bytes": 325,
+        "sha256": "627e349303def45a9c15e5e3672ce309463f482f98bcd6ba010811f183b9aa83"
+      },
+      {
+        "receipt": "optimization/production-gain-v1-dxgi-numerical-01-exact-verification.json",
+        "bytes": 547,
+        "sha256": "22ccf0ef1191dc289e0eecaaebf5a65956811829b6230dc29d29b9e13dbd0aea"
+      },
+      {
+        "receipt": "optimization/production-gain-v1-dxgi-numerical-01-runtime-attestation.json",
+        "bytes": 2590,
+        "sha256": "30c3b34c96543afa7032e3ab72336fe02fbabff1340f41f363b10bf09207f922"
+      },
+      {
+        "receipt": "optimization/production-gain-v1-dxgi-numerical-01-collection.json",
+        "bytes": 3020,
+        "sha256": "5096a57fa6600441b8ffb002f39f1f5876b7f6a915a847a2a1bdf19b086e0c3b"
+      },
+      {
+        "receipt": "optimization/production-gain-v1-dxgi-numerical-01-resource.json",
+        "bytes": 67211,
+        "sha256": "e6e7f8ac52bd418bbe04bccb3ba4bc4b8e229e4ac6371ddc1d1860dd205cbffb"
+      },
+      {
+        "receipt": "optimization/production-gain-v1-dxgi-numerical-01-restoration.json",
+        "bytes": 667,
+        "sha256": "32e03e928dc46682dcd6143c5f0d615499197577faf7058d633d79e8ce7fc878"
+      },
+      {
+        "receipt": "optimization/dxgi-guard-cpu-02/owned-resource.json",
+        "bytes": 6612,
+        "sha256": "d9d4ddd7a01d355208bac4a9ff4fa75cb5493abf5ceb515a8dc3f8638060f00f"
+      },
+      {
+        "receipt": "optimization/dxgi-guard-cpu-03/absence-all-chain.json",
+        "bytes": 1799,
+        "sha256": "1394b80e4c064b9e3830cbe63127a99d4d472168bc9b2bea578e6f2640620034"
+      },
+      {
+        "receipt": "optimization/production-gain-v1-dxgi-numerical-01-independent-terminal-assessment.json",
+        "bytes": 3272,
+        "sha256": "e7e12146f089bccc190639687148dfe1c0cf3aeec107e999db07ea39f6c0e1d8"
+      },
+      {
+        "receipt": "optimization/production-gain-v1-guard-final-manifest.json",
+        "bytes": 3012,
+        "sha256": "a3c1e2f7c97a3811d605314d02524557f51359d2281e83daced41ec440c9df31"
+      },
+      {
+        "receipt": "optimization/dxgi-xpu-calibration-v1-live-01/result/summary.json",
+        "bytes": 768,
+        "sha256": "8beb4631b054a055cc67f9bba0e3a83dafcd641e22f2dd60170d5a22074a44aa"
+      },
+      {
+        "receipt": "optimization/dxgi-guard-cpu-01/owned-resource.json",
+        "bytes": 1676,
+        "sha256": "863033bd716c18b5fb11fc6bcf5ebc417bf4dbe16ab03d9793a3f63c0a4ab0c6"
       }
     ]
   }
