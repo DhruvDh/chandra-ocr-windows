@@ -47,7 +47,7 @@
     "recurrent": "The v1 full cached candidate failed frozen policy v2, and the v2 full cached candidate also failed it at eleven positions including a new unapproved decision at 924. Complete OCR and timing remain unrun; no recurrence candidate is qualified or promoted.",
     "normalization": "Gain-only passed complete OCR on all five frozen pages; paired speed remains on hold after two exploratory observations pending independent resolution of the memory qualification. The fused full-trajectory candidate failed frozen policy v2; no optimization is promoted.",
     "paired_speed": "Two of five prespecified pairs are available as exploratory observations only. Frozen memory qualification remains unresolved, so no further pairs or median speed conclusion; no performance promotion.",
-    "production_deployment": "Production deployment remains pending."
+    "production_deployment": "The bounded NorthStone queue policy is separately deployed; the softmax lifetime-trim OCR qualification stopped on its resource gate before completion. No optimized OCR candidate is qualified or promoted."
   },
   "evidence_boundary": "Commitments hash private receipts only; they do not attest remote process identity or substitute for access to underlying evidence. Raw traces, tensors, private paths, and credentials are excluded. Numerical policy v2 was frozen before full candidate runs; capability receipts are not acceptance decisions.",
   "cpu_cached_calibration": {
@@ -1496,6 +1496,280 @@
         "receipt": "optimization/trim-production-gain-v1-complete-ocr-01-independent-terminal-assessment.json",
         "bytes": 2488,
         "sha256": "f2a59c6b0d67b82f16dd68706ed3a8a2ae29bf631344ef4bec5ecb0c24902514"
+      }
+    ]
+  },
+  "router_queue_aborted_phases_v5_v6_2026_10_04": {
+    "scope": "Three retained baseline-only comparison attempts. Each stopped before a candidate batch and produced no accepted timing comparison.",
+    "phases": [
+      {
+        "phase": "v5-01",
+        "result": "Both excluded warmups passed. The comparison rejected its root lease before creating an HTTP client because the lease lacked the installed-router configuration path and URL. No measured requests ran. Independent review found resource admission, terminal drain, and owned-process closure passed; there is no queue result or timing conclusion.",
+        "warmups_passed": true,
+        "measured_requests": 0,
+        "candidate_requests": 0,
+        "resource_and_closure_passed": true
+      },
+      {
+        "phase": "v5-02",
+        "result": "Warmups passed. The first three-request baseline batch was routed Waystone, NorthStone, NorthStone instead of the frozen NorthStone, NorthStone, Waystone assignment. The run stopped without retry before any candidate batch. Independent partial review passed response-quality checks for its limited scope, but the run is unqualified and no timing comparison is accepted.",
+        "baseline_requests": 3,
+        "candidate_requests": 0,
+        "routing_assignment_matched": false,
+        "partial_quality_review_passed": true,
+        "resource_and_closure_passed": true
+      },
+      {
+        "phase": "v6-01",
+        "result": "Both warmups and the single baseline batch’s counted content/usage checks passed, but a second ephemeral comparison-router bind failed with address already in use before any candidate request. The run stopped without retry; the required geometry review remained pending. No timing or promotion conclusion follows.",
+        "baseline_requests": 3,
+        "candidate_requests": 0,
+        "baseline_quality_and_counts_passed": true,
+        "geometry_review_pending": true,
+        "resource_and_closure_passed": true
+      }
+    ],
+    "shared_boundary": "All three attempts are incomplete comparisons with no accepted timing result or promotion. Per-process DXGI checks are process-local budget evidence, not global free-VRAM measurements. Retained restoration receipts show ordinary service state restored after each attempt.",
+    "commitments": [
+      {
+        "receipt": "optimization/router-queue-comparison-v5/plan.json",
+        "bytes": 17739,
+        "sha256": "523f0e7be233c456bdf8a285ed2b2dda6b58c30f7432040a14e74e2d90c6b2c5"
+      },
+      {
+        "receipt": "optimization/queue-original-tiny-v5-01/independent-terminal-resource-closure-assessment.json",
+        "bytes": 13647,
+        "sha256": "387820898198ed34e942f6b93c3c233736070d296b71767b4c9f9fdaa7b90ef3"
+      },
+      {
+        "receipt": "optimization/queue-original-tiny-v5-01/service-restoration.json",
+        "bytes": 1014,
+        "sha256": "f27e5b1b69edea50fb65119b96b6253ed492b960d2882191bac2e29ea38645f0"
+      },
+      {
+        "receipt": "optimization/queue-original-tiny-v5-02/independent-terminal-resource-closure-assessment.json",
+        "bytes": 7416,
+        "sha256": "17e64fd915efa319f9f05fda130785eb4df8a91488b7ee7787af0801a73671fb"
+      },
+      {
+        "receipt": "optimization/queue-original-tiny-v5-02/independent-partial-quality-assessment.json",
+        "bytes": 7339,
+        "sha256": "eb4d190b67d3304e8fb572b7e7d76403bc7d8d57e146db35e25e6d1c1711ed3c"
+      },
+      {
+        "receipt": "optimization/queue-original-tiny-v5-02/service-restoration.json",
+        "bytes": 1486,
+        "sha256": "7730903868a6511fa2007c51eaffaa66f84bf137edbb07f36e6599923d0c94ce"
+      },
+      {
+        "receipt": "optimization/router-queue-comparison-v6/plan.json",
+        "bytes": 17805,
+        "sha256": "ccb28efcbd7bc67398f4e5d64de3457d0200738d86352d962901e00e53ab6f85"
+      },
+      {
+        "receipt": "optimization/queue-original-tiny-v6-01/independent-terminal-resource-closure-assessment.json",
+        "bytes": 7426,
+        "sha256": "6223970ebf7485a44a355253de0c9ed8c18e2b72b96515d2ecf587bb735c60f6"
+      },
+      {
+        "receipt": "optimization/queue-original-tiny-v6-01/service-restoration.json",
+        "bytes": 1483,
+        "sha256": "7918a4b9a53ad4ac6ae4f817d377208b3374e93c5eadb97eb2dd67705c07904c"
+      }
+    ]
+  },
+  "softmax_lifetime_trim_production_gain_numerical_2026_10_04": {
+    "candidate": "text-eager-softmax-lifetime-trim-production-gain-v1",
+    "numerical_result": "Independent exact and numerical reviews passed for the fresh composed output: 395 rows of 248,320 logits and 25,280 ordered cache-digest records match the pinned hybrid evidence under identical conditioning. The candidate payload SHA-256 is 7bde48e35783277d07ef878e8f001484ac3828bfdda6218eeb96ce5a8c9ba00b. This newly measured equality makes the CPU-policy per-position errors identical; existing baseline bbox disagreements remain.",
+    "composition": {
+      "cold_load_calls": 1,
+      "trim_calls": 1,
+      "attention_layers": [
+        3,
+        7,
+        11,
+        15,
+        19,
+        23,
+        27,
+        31
+      ],
+      "attention_interceptions": 3168,
+      "forwarded_interceptions": 0,
+      "norm_modules": 81,
+      "norm_calls_per_module": 396,
+      "installed_gain_bytes": 681984,
+      "released_gain_bytes": 681984,
+      "tensor_metadata_identities": 728,
+      "tensor_metadata_sha256": "d56eba7de75ebcfa50c3d71a6b02781f3916211aefa9d8ed03e0f9b0dd48dbb5",
+      "allocated_bytes_unchanged": true,
+      "trim_and_lifetime_hooks_restored": true
+    },
+    "resource_and_closure": "Independent review passed the unchanged 15/13/2 GiB process-local resource thresholds and 8 GiB host reserve; all owned processes were absent and the ordinary service was restored. The lowest aligned same-process headroom was 5,057,347,584 bytes (4.710 GiB), lower than the periodic-sample minimum. DXGI values are process-local budget telemetry, not global free GPU memory.",
+    "qualification_limits": "Exact numerical qualification and resource/closure review only. No OCR correctness, large-page peak reduction, paired request memory gate, timing benefit, deployment, or promotion is established.",
+    "commitments": [
+      {
+        "receipt": "optimization/softmax-lifetime-trim-production-gain-v1/plan.json",
+        "bytes": 2415,
+        "sha256": "4c74fc17227d23b1eeb754da006d2a1d2f89191e98550059c74eeb4f333edc23"
+      },
+      {
+        "receipt": "optimization/softmax-lifetime-trim-production-gain-v1/softmax_lifetime_candidate.py",
+        "bytes": 2599,
+        "sha256": "13d077cd1802b247b99b83a4218e66b0c3d73fbf55ac5052443e6fdc8d7503e7"
+      },
+      {
+        "receipt": "optimization/softmax-lifetime-trim-production-gain-v1/source-addendum.json",
+        "bytes": 1478,
+        "sha256": "be07daa758479f8be8be502b0ce8d9bc7f2b895e5d43c20d76ed21bed667549e"
+      },
+      {
+        "receipt": "optimization/softmax-lifetime-trim-production-gain-v1-numerical-01-independent-exact-verification.json",
+        "bytes": 1241,
+        "sha256": "76f85027c2089baeaf927271bd733bfab2ec3446f9eef4d67b88c2831e48e4f0"
+      },
+      {
+        "receipt": "optimization/softmax-lifetime-trim-production-gain-v1-numerical-01-independent-numerical-assessment.json",
+        "bytes": 3191,
+        "sha256": "9a22207e1717aae9746ca627a8d2c72dcc990900b77eaffb21ad19ecdfa06bdc"
+      },
+      {
+        "receipt": "optimization/softmax-lifetime-trim-production-gain-v1-numerical-01-independent-resource-closure-assessment.json",
+        "bytes": 7872,
+        "sha256": "63da3e907d4490a432d54a25dd4d44c3dd358ba290d8e2efc2568ec2c1ff4317"
+      },
+      {
+        "receipt": "optimization/softmax-lifetime-trim-production-gain-v1-numerical-01-composition.json",
+        "bytes": 65157,
+        "sha256": "eb7765f66090f6b074ef41fa8beab8b994d63eb8c72bec49797791ab21e3dd09"
+      },
+      {
+        "receipt": "optimization/softmax-lifetime-trim-production-gain-v1-numerical-01-resource.json",
+        "bytes": 70343,
+        "sha256": "e903c3c85f1c796eae9e27a76efc54c52ab12abbcd08b230bdf6c1ff8d3c3c15"
+      },
+      {
+        "receipt": "optimization/softmax-lifetime-trim-production-gain-v1-numerical-01-collection.json",
+        "bytes": 4526,
+        "sha256": "ca63fb6eb6907ca862706e67d2eb0c0d8fa93086e0ed4793c1907a45728b4f24"
+      },
+      {
+        "receipt": "optimization/softmax-lifetime-trim-production-gain-v1-numerical-01-service-restoration.json",
+        "bytes": 1485,
+        "sha256": "c765be406dee1d1ae271a72b576df6d7978f44f073cbebd8e805e545a80395bf"
+      },
+      {
+        "receipt": "optimization/softmax-lifetime-trim-production-gain-v1-numerical-01/norm-experiment.json",
+        "bytes": 7656,
+        "sha256": "374c957ff123065da5ab8d67d94a6d35864cf1b0ad67d2637fe664e47f4d53c2"
+      }
+    ]
+  },
+  "router_queue_v7_bounded_queue_2026_10_04": {
+    "status": "Accepted for bounded queue-policy deployment; no optimized OCR candidate promotion.",
+    "scope": "Three paired warm bursts of three identical synthetic Tiny pages, with unchanged original inference engines and the full 12,384-token allowance. The policy adds one pending NorthStone request while retaining two execution slots (capacity 2, queue limit 1, automatic queue limit 1). This is neither general-document nor cold-start performance evidence; a separate full Intel softmax OCR qualification was attempted and stopped on its process-local headroom gate, as recorded below.",
+    "measured_requests": 18,
+    "excluded_warmups": 2,
+    "pair_order": "AB, BA, AB",
+    "paired_makespan_reductions": [
+      0.8511641447241667,
+      0.8526956593091435,
+      0.8441045229514411
+    ],
+    "median_paired_makespan_reduction": 0.8511641447241667,
+    "quality": "Independent review passed all 18 measured responses for content, table/equation/order, usage, stop and same-vendor bbox consistency. Root visual review matched all 18 overlays to three directly viewed representatives; expected blocks were present, ordered and uncropped. Scope is these synthetic Tiny pages only.",
+    "resources_and_closure": "Independent review passed frozen resource thresholds, normal unload, six drained batches and restoration to the ordinary cold/asleep service state. The initial collection is preserved with ownership_closed=false and an inconclusive access-denied observation; a later addendum closes ownership using the pinned child wait plus two complete Toolhelp snapshots one second apart, with no process kills. DXGI readings are process-local budget telemetry, not global free VRAM.",
+    "deployment": "The separate bounded-router-queue-deployment-01 receipt confirms the queue policy was applied. It configures NorthStone capacity 2, queue_limit 1 and auto_queue_limit 1. Deployment smoke listed models and made zero inference requests; remote-client access was not tested.",
+    "interpretation": "The 85.116% median reduction applies only to the paired warm three-identical-Tiny burst makespan under the tested routing policy. It does not establish OCR model speedup or qualify a numerical optimization. No optimized candidate is promoted.",
+    "private_receipt_commitments": [
+      {
+        "receipt": "optimization/queue-original-tiny-v7-01/comparison/summary.json",
+        "bytes": 396,
+        "sha256": "90cccb94924f182a9ade263a2fe16b74cfd433b216a18e55e4127d8ed8e6aef0"
+      },
+      {
+        "receipt": "optimization/queue-original-tiny-v7-01/terminal-assessment.json",
+        "bytes": 1918,
+        "sha256": "195194208cd648f2142ad5c5048f38986da8b06d8ee374506adf918fa8f25f4d"
+      },
+      {
+        "receipt": "optimization/queue-original-tiny-v7-01/independent-complete-quality-timing-assessment.json",
+        "bytes": 22816,
+        "sha256": "f4c563c8a049b04f4bcd8ccf7848a4b94952c145a19a4857e260a2978e9277be"
+      },
+      {
+        "receipt": "optimization/queue-original-tiny-v7-01/independent-resource-closure-assessment.json",
+        "bytes": 9386,
+        "sha256": "f63c0d56d1a404f2442e21cc1e137bc16775dcbe894bb2b3a8e90a9d911d8529"
+      },
+      {
+        "receipt": "optimization/queue-original-tiny-v7-01/root-visual-geometry-assessment.json",
+        "bytes": 3549,
+        "sha256": "c1f915ea25e77a89136571298a3717b133ac0c59581414b424cb58b69aff2f7a"
+      },
+      {
+        "receipt": "optimization/queue-original-tiny-v7-01/collection.json",
+        "bytes": 251841,
+        "sha256": "0fe09d26838293b26b96570e16b51645d095cc98ac481ac3e70edc77aed0a5c2"
+      },
+      {
+        "receipt": "optimization/queue-original-tiny-v7-01/ownership-closure-final-addendum.json",
+        "bytes": 1643,
+        "sha256": "6ef74d744bde42be4a87161f8f2e2afdbeb59c7a7cbd46ffab33ad718ff46d50"
+      },
+      {
+        "receipt": "optimization/queue-original-tiny-v7-01/service-restoration.json",
+        "bytes": 1485,
+        "sha256": "949d02dfbf33c0ed1cf32d4a45042b6d8187b886afeda5412db646c7e22d9668"
+      },
+      {
+        "receipt": "optimization/bounded-router-queue-deployment-01/deployment.json",
+        "bytes": 5274,
+        "sha256": "8fb2f744123966feca50e8c1c3463d4edefda2eb2aef5dc063ee90d3ce6a9e32"
+      }
+    ]
+  },
+  "softmax_lifetime_trim_complete_ocr_partial_failure_2026_10_04": {
+    "status": "FAILED/incomplete full OCR qualification on the unchanged process-local 2 GiB headroom floor; numerical qualification from the separate full-trajectory run remains distinct and unchanged.",
+    "resource_stop": {
+      "stage": "representative-page OCR prefill before cached decode",
+      "headroom_bytes": 2003304448,
+      "required_minimum_bytes": 2147483648,
+      "below_floor_bytes": 144179200,
+      "below_floor_mib": 137.5,
+      "additional_usage_threshold_passed": true,
+      "host_initial_admission_passed": true,
+      "interpretation": "Process-local DXGI headroom was the binding threshold; this is not a global free-VRAM measurement.",
+      "raw_monitor_stage": "model_load_and_numerical_export"
+    },
+    "partial_quality": "Tiny and small each completed with exact full output/content, stop and usage against the frozen reference (395 generated IDs; historical IDs unavailable), and zero allocated/reserved memory after unload. The independent partial quality record does not qualify the five-page run.",
+    "incomplete_phases": "Representative prefill began, then the resource gate stopped the run before cached decode or a completed output. Routes and ledger did not run. Overall acceptance failed; no complete OCR, timing, or promotion claim follows.",
+    "closure_and_restoration": "All five owned PIDs were independently found absent after outer lease cleanup. Ordinary service restoration was verified: Waystone cold, NorthStone asleep, router ready with queue limit 1. The cleanup establishes process closure, not normal candidate trim restoration; run-level artifact collection was incomplete.",
+    "private_receipt_commitments": [
+      {
+        "receipt": "optimization/softmax-lifetime-trim-production-gain-v1-complete-ocr-01-independent-ocr-acceptance.json",
+        "bytes": 1836,
+        "sha256": "457fcd5d1392f7707e0e225da21e78e5292b3fac4ef82a36ca814f9ca72e01ed"
+      },
+      {
+        "receipt": "optimization/softmax-lifetime-trim-production-gain-v1-complete-ocr-01-independent-partial-quality.json",
+        "bytes": 2755,
+        "sha256": "b28d24dd621219aef3e2eda00914951c9686e19301386080ef9c865e1e83b566"
+      },
+      {
+        "receipt": "optimization/softmax-lifetime-trim-production-gain-v1-complete-ocr-01-independent-resource-closure-assessment.json",
+        "bytes": 9366,
+        "sha256": "3e427222a8e98e43bf4eb6b8745b36a94f4a11a658feda72f4ce5eae7a8c9097"
+      },
+      {
+        "receipt": "optimization/softmax-lifetime-trim-production-gain-v1-complete-ocr-01-collection.json",
+        "bytes": 6587,
+        "sha256": "079c28648dd28d91ff1a20941f02795978aa3a7c2c0bd2bca60d9722f2b61343"
+      },
+      {
+        "receipt": "optimization/softmax-lifetime-trim-production-gain-v1-complete-ocr-01/service-restoration.json",
+        "bytes": 1593,
+        "sha256": "1ad31cf144c812b50afd8a534a911add59dccb6089d118d8200fc36734e11681"
       }
     ]
   }
