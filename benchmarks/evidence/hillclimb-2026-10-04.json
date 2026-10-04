@@ -2757,5 +2757,35 @@
         "sha256": "acd90781da7bd9487f5acb760a1f4a09c751d820dbbddad10c169b0929e07195"
       }
     ]
+  },
+  "native_vision_source_diagnosis": {
+    "status": "SOURCE ONLY; hardware held; no observed backend or causal kernel",
+    "vision_blocks": 24,
+    "heads": 16,
+    "head_dim": 64,
+    "native_patch_tokens": 13464,
+    "tiny_patch_tokens": 832,
+    "native_full_FP32_score_plane_bytes_if_materialized": 11601874944,
+    "tiny_full_FP32_score_plane_bytes_if_materialized": 44302336,
+    "proposed_Q32_native_FP32_score_plane_bytes_if_materialized": 27574272,
+    "efficient_branch_can_select_math_despite_math_disabled": true,
+    "overrideable_allowed_and_actual_selection_unknown": true,
+    "pinned_flash_architecture_whitelist_omits_Alchemist": true,
+    "fence_preparation": "Eight stdlib fake lifecycle checks passed; native execution not admitted",
+    "Q32_partition_preparation": "Disabled unexercised draft, no numerical or safety acceptance",
+    "next_diagnostic": "Observe first vision descriptors and selector, then stop without invoking SDPA; preceding projection admission required",
+    "installed_source_changed": false,
+    "private_receipt_commitments": [
+      {
+        "receipt": "sustained-throughput-v1/intel-compiled-region-v1/native-mask-failure-review-v1/source-freeze.json",
+        "bytes": 11750,
+        "sha256": "1455e6bfab0ae3ee72eac76a646fd2adcc26923798cf7fb4dff2767cd167415f"
+      },
+      {
+        "receipt": "sustained-throughput-v1/intel-compiled-region-v1/native-mask-failure-review-v1/source-diagnosis.md",
+        "bytes": 11004,
+        "sha256": "289ff6dfe8c026c0b38f032d5eaf4d182e69aac311bbbde06a6ad2cd217c5cc4"
+      }
+    ]
   }
 }
