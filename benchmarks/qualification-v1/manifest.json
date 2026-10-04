@@ -1,0 +1,295 @@
+{
+  "schema": "chandra-independent-synthetic-qualification-v1",
+  "split": "independent_synthetic_regression",
+  "scope": "New synthetic content and layout; no real-world general accuracy claim. Frozen before baseline or optimized candidate inference.",
+  "generator_sha256": "46fc1642cdee444229809d5a1bcf06357f073d9538e06523a2b9519e52ef03b0",
+  "font_name": "DejaVuSans.ttf",
+  "font_sha256": "6038a160b491e121c1f12c7bccb4a9c8730296e3adc1086a059404ed84b7451c",
+  "pillow_version": "12.3.0",
+  "fixtures": [
+    {
+      "id": "routes",
+      "image": "routes.png",
+      "width": 1000,
+      "height": 1200,
+      "mode": "RGB",
+      "image_sha256": "8ca610dd8aee7b7bd639ecc6a54f0ded13640cad204f4a17c9ed3fa87bebe587",
+      "pixels_sha256": "e532b6b4be1d5355aaf103303a4c29ed9884e1025f78fa759ee8f12c5ddda493",
+      "expected": {
+        "ordered_blocks": [
+          "FIELD NOTE: TWO ROUTES",
+          "A synthetic account of a valley survey",
+          "WESTERN ROUTE",
+          "Mira began at the cedar gate. Her notebook listed a blue bridge, a stone basin, and a narrow path beside the creek.",
+          "At noon she marked the shaded bend. The water moved slowly there, although the open channel beyond the ridge remained clear.",
+          "She kept the original sequence of observations. A later summary must preserve that sequence rather than merge the two routes.",
+          "EASTERN ROUTE",
+          "Oren left the eastern arch after breakfast. He carried a red flag and stopped first at the orchard, then at the empty mill.",
+          "Clouds gathered above the slope. He recorded the changed light before measuring the final distance to the wooden shelter.",
+          "The route names identify separate accounts. Read the western column completely before reading the eastern column.",
+          "Equation: q = 2r - 5; r = 8; q = 11",
+          "END-ROUTES-VERIFIED"
+        ],
+        "table": [],
+        "end_marker": "END-ROUTES-VERIFIED",
+        "geometry_reference": [
+          {
+            "text": "FIELD NOTE: TWO ROUTES",
+            "label": "Text",
+            "draw_region_pixels": [
+              55,
+              40,
+              563.296875,
+              87
+            ]
+          },
+          {
+            "text": "A synthetic account of a valley survey",
+            "label": "Text",
+            "draw_region_pixels": [
+              55,
+              103,
+              513.234375,
+              136
+            ]
+          },
+          {
+            "text": "WESTERN ROUTE",
+            "label": "Text",
+            "draw_region_pixels": [
+              55,
+              190,
+              316.4375,
+              229
+            ]
+          },
+          {
+            "text": "Mira began at the cedar gate. Her notebook listed a blue bridge, a stone basin, and a narrow path beside the creek.",
+            "label": "Text",
+            "draw_region_pixels": [
+              55,
+              253,
+              463.5625,
+              385
+            ]
+          },
+          {
+            "text": "At noon she marked the shaded bend. The water moved slowly there, although the open channel beyond the ridge remained clear.",
+            "label": "Text",
+            "draw_region_pixels": [
+              55,
+              409,
+              457.28125,
+              541
+            ]
+          },
+          {
+            "text": "She kept the original sequence of observations. A later summary must preserve that sequence rather than merge the two routes.",
+            "label": "Text",
+            "draw_region_pixels": [
+              55,
+              565,
+              465.765625,
+              697
+            ]
+          },
+          {
+            "text": "EASTERN ROUTE",
+            "label": "Text",
+            "draw_region_pixels": [
+              525,
+              190,
+              777.296875,
+              229
+            ]
+          },
+          {
+            "text": "Oren left the eastern arch after breakfast. He carried a red flag and stopped first at the orchard, then at the empty mill.",
+            "label": "Text",
+            "draw_region_pixels": [
+              525,
+              253,
+              915.21875,
+              385
+            ]
+          },
+          {
+            "text": "Clouds gathered above the slope. He recorded the changed light before measuring the final distance to the wooden shelter.",
+            "label": "Text",
+            "draw_region_pixels": [
+              525,
+              409,
+              929.71875,
+              541
+            ]
+          },
+          {
+            "text": "The route names identify separate accounts. Read the western column completely before reading the eastern column.",
+            "label": "Text",
+            "draw_region_pixels": [
+              525,
+              565,
+              940.28125,
+              697
+            ]
+          },
+          {
+            "text": "Equation: q = 2r - 5; r = 8; q = 11",
+            "label": "Text",
+            "draw_region_pixels": [
+              55,
+              970,
+              465.0,
+              1003
+            ]
+          },
+          {
+            "text": "END-ROUTES-VERIFIED",
+            "label": "Text",
+            "draw_region_pixels": [
+              55,
+              1090,
+              330.59375,
+              1123
+            ]
+          }
+        ]
+      },
+      "completion_token_budget_target": [
+        400,
+        650
+      ],
+      "token_budget_scope": "Planning estimate including OCR layout markup; actual token counts must be measured, not asserted."
+    },
+    {
+      "id": "ledger",
+      "image": "ledger.png",
+      "width": 1000,
+      "height": 1200,
+      "mode": "RGB",
+      "image_sha256": "4b6d56f8729cf311570242433a4aad876130dd32ac2688a9b1dba439587f1e27",
+      "pixels_sha256": "3287a833ae2535bba2886043451d050d8d7b0818f7d6c7358285517c8346efa5",
+      "expected": {
+        "ordered_blocks": [
+          "SIGNED BALANCE LEDGER",
+          "Fictional measurements from four sampling stations",
+          "Keep each signed quantity with its station and column. A negative balance is a recorded result, not a missing value.",
+          "Station Shift (mm) Rate (g/h) Balance (g) Birch -2.75 0.125 +18.50 Cobalt +4.20 -0.375 -6.25 Dune 0.00 +1.250 +0.75 Ember -0.40 0.050 -12.00",
+          "Footnote: The plus sign is explicit where printed. Rates retain three decimal places; balances retain two. Zero shift does not imply zero balance.",
+          "Audit note: Cobalt has a positive shift and a negative rate. Ember has the smallest positive rate. These statements must agree with their table rows.",
+          "END-LEDGER-VERIFIED"
+        ],
+        "table": [
+          [
+            "Station",
+            "Shift (mm)",
+            "Rate (g/h)",
+            "Balance (g)"
+          ],
+          [
+            "Birch",
+            "-2.75",
+            "0.125",
+            "+18.50"
+          ],
+          [
+            "Cobalt",
+            "+4.20",
+            "-0.375",
+            "-6.25"
+          ],
+          [
+            "Dune",
+            "0.00",
+            "+1.250",
+            "+0.75"
+          ],
+          [
+            "Ember",
+            "-0.40",
+            "0.050",
+            "-12.00"
+          ]
+        ],
+        "end_marker": "END-LEDGER-VERIFIED",
+        "geometry_reference": [
+          {
+            "text": "SIGNED BALANCE LEDGER",
+            "label": "Text",
+            "draw_region_pixels": [
+              55,
+              40,
+              559.046875,
+              87
+            ]
+          },
+          {
+            "text": "Fictional measurements from four sampling stations",
+            "label": "Text",
+            "draw_region_pixels": [
+              55,
+              109,
+              681.15625,
+              142
+            ]
+          },
+          {
+            "text": "Keep each signed quantity with its station and column. A negative balance is a recorded result, not a missing value.",
+            "label": "Text",
+            "draw_region_pixels": [
+              55,
+              185,
+              852.78125,
+              251
+            ]
+          },
+          {
+            "text": "Station Shift (mm) Rate (g/h) Balance (g) Birch -2.75 0.125 +18.50 Cobalt +4.20 -0.375 -6.25 Dune 0.00 +1.250 +0.75 Ember -0.40 0.050 -12.00",
+            "label": "Table",
+            "draw_region_pixels": [
+              55,
+              335,
+              945,
+              750
+            ]
+          },
+          {
+            "text": "Footnote: The plus sign is explicit where printed. Rates retain three decimal places; balances retain two. Zero shift does not imply zero balance.",
+            "label": "Text",
+            "draw_region_pixels": [
+              55,
+              800,
+              863.5,
+              899
+            ]
+          },
+          {
+            "text": "Audit note: Cobalt has a positive shift and a negative rate. Ember has the smallest positive rate. These statements must agree with their table rows.",
+            "label": "Text",
+            "draw_region_pixels": [
+              55,
+              920,
+              941.25,
+              1019
+            ]
+          },
+          {
+            "text": "END-LEDGER-VERIFIED",
+            "label": "Text",
+            "draw_region_pixels": [
+              55,
+              1090,
+              328.90625,
+              1123
+            ]
+          }
+        ]
+      },
+      "completion_token_budget_target": [
+        400,
+        650
+      ],
+      "token_budget_scope": "Planning estimate including OCR layout markup; actual token counts must be measured, not asserted."
+    }
+  ]
+}

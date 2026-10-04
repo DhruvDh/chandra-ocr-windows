@@ -54,6 +54,11 @@ def cpu_memory(admission=False):
 def sha(path):
     return hashlib.file_digest(open(path, "rb"), "sha256").hexdigest()
 
+def append_logit_row(path, row):
+    """Close each appended little-endian FP32 row before the next forward."""
+    with open(path, "ab") as stream:
+        row.astype("<f4").tofile(stream)
+
 def tensor_record(t):
     c = t.detach().cpu().contiguous()
     return {"shape": list(c.shape), "dtype": str(c.dtype), "finite": bool(torch.isfinite(c).all()), "sha256": hashlib.sha256(c.view(torch.uint8).numpy().tobytes()).hexdigest()}
@@ -218,7 +223,7 @@ def main():
             rows.append(logits)
             if a.device == "cpu":
                 meta.setdefault("memory_positions",[]).append(cpu_memory())
-            torch.stack(rows).numpy().astype("<f4").tofile(outdir / "logits.partial.f32")
+            append_logit_row(outdir / "logits.partial.f32", logits.numpy())
             meta["states"].append(states(result.past_key_values))
             print(json.dumps({"phase":"position", "position":position, "argmax":int(logits.argmax()), "elapsed_seconds":time.monotonic()-start, "peak_rss_kib":peak_rss_kib()}), flush=True)
             if position < len(targets):
