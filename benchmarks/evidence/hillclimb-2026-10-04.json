@@ -1924,5 +1924,65 @@
         "sha256": "a2f36150b6af21e8886ba3bcfc20f1e732ab28370074329b97cb8ae8145447e3"
       }
     ]
+  },
+  "vision_boundary_trim_softmax_postload_gain_complete_ocr_failure_2026_10_04": {
+    "status": "FAILED/incomplete full five-page OCR qualification on the unchanged process-local 2 GiB headroom floor. The independently passed fresh numerical prerequisite remains separate, as recorded above.",
+    "resource_stop": {
+      "periodic_observations": 207,
+      "aligned_trim_snapshots": 6,
+      "combined_minimum_process_local_headroom_bytes": 2010578944,
+      "required_headroom_bytes": 2147483648,
+      "shortfall_bytes": 136904704,
+      "combined_maximum_process_local_usage_bytes": 13606846464,
+      "usage_ceiling_bytes": 13958643712,
+      "interpretation": "The dynamic process-local budget headroom gate failed; usage remained below the 13 GiB ceiling. DXGI budget/usage is process-local, not global free VRAM."
+    },
+    "partial_ocr": {
+      "tiny": "Independent exact content/HTML/bbox/stop/usage pass; 395 generated IDs, historical full IDs unavailable; unload zero.",
+      "small": "Independent exact content/HTML/bbox/stop/usage pass; 395 generated IDs, historical full IDs unavailable; unload zero.",
+      "representative": "Incomplete with no completed output. The record shows 3,617 prompt tokens processed, eight recorded text-attention prefill dispatches returned and zero cached decode calls. These counters do not localize kernel completion or unobserved later operations.",
+      "routes_and_ledger": "Not run.",
+      "acceptance": "Two completed pages only; no full OCR, timing, sustained throughput or promotion qualification."
+    },
+    "closure_and_service": "All five owned processes were independently confirmed absent. Separate restoration receipt confirms ordinary Waystone cold, no pending work and no NorthStone gateway actions. Artifact collection was incomplete.",
+    "controller_cgroup": {
+      "configured_memory_max_bytes": 268435456,
+      "configured_swap_max_bytes": 0,
+      "terminal_memory_peak_bytes": 18055168,
+      "terminal_swap_peak_bytes": 0,
+      "interpretation": "Terminal cgroup peak and swap values are retained; an early memory.events snapshot is not whole-run OOM/event evidence."
+    },
+    "private_receipt_commitments": [
+      {
+        "receipt": "optimization/vision-boundary-trim-softmax-postload-production-gain-v1-complete-ocr-01-independent-ocr-acceptance.json",
+        "bytes": 1976,
+        "sha256": "038851cf6fa73067fef3af48afaf38a9d1406be239e2e3a7f23c9921a250cedd"
+      },
+      {
+        "receipt": "optimization/vision-boundary-trim-softmax-postload-production-gain-v1-complete-ocr-01-independent-terminal-assessment.json",
+        "bytes": 4535,
+        "sha256": "f019b963c693bd2999fd8d2b7c0168dfbcb056bd9fb833a9845c961e1ef3f55e"
+      },
+      {
+        "receipt": "optimization/vision-boundary-trim-softmax-postload-production-gain-v1-complete-ocr-01-independent-resource-closure-audit.json",
+        "bytes": 27553,
+        "sha256": "e886d026d951981b86900d7402f60d97f5280dc7119de8e1a048069799307c15"
+      },
+      {
+        "receipt": "optimization/vision-boundary-trim-softmax-postload-production-gain-v1-complete-ocr-01-independent-partial-quality.json",
+        "bytes": 6035,
+        "sha256": "a4823e366b52d70f3361551917a8eb4cf148b29c667d5868931191dd82133642"
+      },
+      {
+        "receipt": "optimization/vision-boundary-trim-softmax-postload-production-gain-v1-complete-ocr-01-service-restoration.json",
+        "bytes": 767,
+        "sha256": "8416fd752948c0654cb1c824c090f7d9753ac1b23a94bd94135de1d1b1bf9209"
+      },
+      {
+        "receipt": "optimization/vision-boundary-trim-softmax-postload-production-gain-v1-complete-ocr-01-client-cgroup-terminal.json",
+        "bytes": 295,
+        "sha256": "9d3d31b968bd946c7e8993652dc798f678a61c1b24e5cfc2635068c956c19ebf"
+      }
+    ]
   }
 }
