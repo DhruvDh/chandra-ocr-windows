@@ -1,6 +1,6 @@
 # Chandra OCR 2 on Windows
 
-The goal is accurate Chandra OCR 2 on an Intel Arc A770, exposed through the same OpenAI-compatible interface used by the existing ROCm endpoint. A separate router will let callers choose either machine or distribute independent OCR pages between them. Correctness is a prerequisite for comparing speed.
+The goal is accurate Chandra OCR 2 on an Intel Arc A770, exposed through the same OpenAI-compatible interface used by the existing ROCm endpoint. A separate router lets callers choose either machine or distribute independent OCR pages between them. Correctness is a prerequisite for comparing speed.
 
 ## Engine and reference
 

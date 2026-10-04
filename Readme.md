@@ -2,12 +2,12 @@
 
 A public derivative of [Const-me/Whisper](https://github.com/Const-me/Whisper), preserving its history and MPL-2.0 source, with a correctness-first workflow for Chandra OCR 2 and an endpoint router for Windows Intel and Linux ROCm machines. The original project documentation is retained in [WHISPER-README.md](WHISPER-README.md).
 
-The pinned BF16 model runs on an Intel Arc A770 through PyTorch XPU and has passed all three frozen synthetic OCR pages. Endpoint deployment acceptance is in progress. The repository contains a synthetic OCR benchmark, numerical comparison tools, an OpenAI-compatible worker/router and native DirectCompute primitive tests. The native primitives are a foundation for Chandra's Qwen3.5 graph; they do not yet implement the complete model. See the [current work record](docs/work-record.md) for the tested boundary.
+The pinned BF16 model runs on an Intel Arc A770 through PyTorch XPU and has passed all three frozen synthetic OCR pages. The installed endpoint has also passed native and scanned PDF checks through the ordinary Chandra CLI, with raw stop reasons and token counts recorded. The repository contains a synthetic OCR benchmark, numerical comparison tools, an OpenAI-compatible worker/router and native DirectCompute primitive tests. The native primitives are a foundation for Chandra's Qwen3.5 graph; they do not yet implement the complete model. See the [current work record](docs/work-record.md) for the tested boundary.
 
 | Work | Start here |
 | --- | --- |
 | Understand the approach | [Design](docs/design.md) |
-| Reproduce inputs and evaluate results | [Benchmark workflow](benchmarks/README.md) |
+| Reproduce inputs and evaluate results | [Benchmark workflow](benchmarks/README.md), [measured acceptance](benchmarks/evidence/README.md) |
 | Inspect the checkpoint | [Download manifest](provenance/model.json), [inventory verifier](scripts/model_inventory.py) |
 | Run native operator checks | [DirectCompute guide](ChandraNative/README.md) |
 | Install the Intel reference | [Runtime guide](runtime/waystone/README.md), [adapter](runtime/waystone/backend.py) |
@@ -37,9 +37,9 @@ Clients that configure only a base URL can select `/backends/waystone/v1` or `/b
 The existing Chandra CLI contract is:
 
 ```sh
-VLLM_API_BASE=http://127.0.0.1:8002/v1 VLLM_MODEL_NAME=chandra uv run --no-sync chandra input.pdf output --method vllm --batch-size 2 --no-html
+MAX_VLLM_RETRIES=0 VLLM_API_BASE=http://127.0.0.1:8002/v1 VLLM_MODEL_NAME=chandra uv run --no-sync chandra input.pdf output --method vllm --batch-size 2 --no-html
 ```
 
-That command requires a configured, validated endpoint; it is not evidence that the Windows deployment has passed acceptance. The normal output allowance is 12,384 tokens. Private host configuration, downloaded runtimes, models and raw experiments belong in ignored project-local directories.
+The deployed router accepts this command. Set `MAX_VLLM_RETRIES=0` to disable Chandra’s temperature-changing application retries; its OpenAI SDK can still retry transport failures. The normal output allowance is 12,384 tokens. Private host configuration, downloaded runtimes, models and raw experiments belong in ignored project-local directories.
 
 The model is published separately by Datalab under its supplied OpenRAIL license. This repository does not redistribute its weights. [Upstream provenance](provenance/upstream.json) distinguishes this history-preserving derivative from a GitHub fork-network entry.

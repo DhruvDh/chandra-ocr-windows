@@ -1,6 +1,6 @@
 # Run and manage the endpoints
 
-Deployment acceptance is still in progress. The following commands describe the implemented interfaces; consult the work record before directing research work to a newly installed backend.
+The installed Windows and ROCm endpoints have passed the synthetic OCR and CLI checks recorded in the [acceptance measurements](../benchmarks/evidence/README.md). Consult that record and the [work record](work-record.md) for the tested lifecycle and numerical boundaries before changing the deployment.
 
 Clone this repository on both hosts and install the [Windows inference environment](../runtime/waystone/README.md). Download and verify the pinned checkpoint with `scripts/download_model.py` and `scripts/model_inventory.py`; run `scripts/waystone/xpu_probe.py` with the Windows environment's interpreter before loading a model. On the Linux host, `uv sync --locked --group test --group benchmark` installs the separate service/client environment.
 
@@ -36,6 +36,14 @@ uv run --no-sync python -m chandra_service router --config .local/router.json --
 `X-Chandra-Backend` selects `northstone`, `waystone` or `auto`; responses identify the chosen backend. Automatic selection estimates finish cost as `(active + 1) / capacity × expected_page_seconds`, using the larger of local and reported activity. Equal costs rotate. Replace the example costs with measured page medians; identical costs can make a fast client wait unnecessarily for a slower machine. These static estimates do not predict page difficulty, cold loading or remaining work. The router submits once. If a downstream caller cancels, it drains the already submitted upstream request while retaining that backend's capacity. A transport timeout or disconnect leaves execution uncertain, so the backend is quarantined until its cooldown and an idle health observation. Client libraries can implement their own retries; disable those when measuring failures or when duplicate work matters.
 
 For clients such as the Chandra CLI that expose a base URL, select `http://HOST:8002/backends/waystone/v1` or `http://HOST:8002/backends/northstone/v1`; `http://HOST:8002/v1` chooses automatically. Model listings under every prefix remain passive. Management endpoints are not forwarded, and a path/header disagreement is rejected before submission.
+
+Remote clients can reach the router through an SSH tunnel when direct LAN access is unavailable:
+
+```sh
+ssh -N -L 8002:127.0.0.1:8002 USER@NORTHSTONE
+```
+
+Then use the same `http://127.0.0.1:8002` API bases on the client. A native Windows client successfully listed both automatic and explicitly selected models through a temporary SSH tunnel. Direct TCP access from Waystone to NorthStone port 8002 timed out while port 22 connected. Local LAN binding is verified; direct LAN access has not passed. No firewall policy was changed.
 
 Set `MAX_VLLM_RETRIES=0` when using the stock Chandra CLI with this deterministic endpoint. Chandra otherwise retries failed or repetitive output with increasing temperature, which the worker rejects rather than silently ignoring. This setting disables Chandra's application retries; its OpenAI SDK can still retry transport errors independently. Successful first-pass CLI compatibility does not establish replay-free behavior for that client. Use the benchmark's direct HTTP runner when testing failure or cancellation semantics without client retries.
 

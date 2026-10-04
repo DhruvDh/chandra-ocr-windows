@@ -1,5 +1,9 @@
 *.pdf binary
 *.png binary
+# Keep deployed Python and its checkpoint manifest byte-identical across hosts.
+/chandra_service/*.py text eol=lf
+/runtime/waystone/*.py text eol=lf
+/provenance/model.json text eol=lf
 # Preserve upstream documentation and third-party notices byte-for-byte.
 WHISPER-README.md -whitespace
 ChandraNative/vendor/** -whitespace
