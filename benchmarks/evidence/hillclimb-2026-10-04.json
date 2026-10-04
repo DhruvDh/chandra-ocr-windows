@@ -572,5 +572,110 @@
         "sha256": "27d63a796ef4efb19ff7b924ab9bffe5c33600e5bd62c7fd66ab6d405735e891"
       }
     ]
+  },
+  "norm_gain_production_cpu_evidence": {
+    "boundary": "Separate CPU lifetime/replay evidence only. No GPU allocation, XPU peak-memory observation, full-model qualification, speed result, or change to the paired XPU timing hold.",
+    "lifetime_test": {
+      "state": "passed",
+      "scope": "CPU object-lifetime and small-arithmetic test: baseline/production releases the converted-input Python object before gain multiplication; reproduced legacy behavior retains it.",
+      "peak_rss_kib": 233356,
+      "elapsed_seconds": 0.5140755899992655,
+      "process_completed": true,
+      "private_receipt_commitments": [
+        {
+          "receipt": "norm-gain-lifetime-cpu-01.json",
+          "bytes": 1259,
+          "sha256": "c7201b778ce120f0d72f029695c9131ddc1ba279cfd524fd461d246c85b6acca"
+        }
+      ]
+    },
+    "production_cpu_replay": {
+      "status": "passed",
+      "scope": "Production _install CPU seam replay over retained XPU fixtures; CPU versus captured-XPU differences are descriptive, permit reduction-order differences, and are not a failure or promotion.",
+      "fixtures": 162,
+      "norm_modules": 81,
+      "production_install_vs_ordinary_cpu": "Bit-exact across all 162 fixtures.",
+      "captured_fp32_gains": "Byte-exact across all fixtures.",
+      "ownership_and_restoration": "Owner inventory valid, ownership released, and installation restored for every fixture.",
+      "captured_xpu_comparison": {
+        "bit_equal_fixtures": 138,
+        "different_elements": 30,
+        "elements": 2935296,
+        "max_abs": 0.015625,
+        "interpretation": "Descriptive comparison only; reduction differences are allowed."
+      },
+      "process_completed": true,
+      "peak_rss_kib": 238992,
+      "source_identity": {
+        "graph_sha256": "d0c8561d91e31e50d9a57b74196c5a7ad023e42ebe9f84004d0a535310879939",
+        "production_source_sha256": "31044117fbe5d02399f2cb9cf484c0fc67cc7666c4a042d8b379328820d9c02f",
+        "replay_source_sha256": "aab98da08b7e789481c568bcdee69ae35985a35d91df8f692605efbeb3314a8f"
+      },
+      "private_receipt_commitments": [
+        {
+          "receipt": "norm-gain-production-cpu-01.json",
+          "bytes": 167553,
+          "sha256": "1764dd7e25ea4b63266fc6f106736f671295af739375a251eed58bfc7bb17f83"
+        },
+        {
+          "receipt": "norm-gain-production-cpu-01-runreceipt.json",
+          "bytes": 1010,
+          "sha256": "6a9c73b0128dd4cf9ca6606babaec8586fdac002e7ccd80054cfbbf987d8e66a"
+        }
+      ],
+      "replay_script_elapsed_seconds": 1.6900670220002212,
+      "runner_wall_seconds": 2.355770031999782,
+      "timing_source_fields": {
+        "replay_script_elapsed_seconds": "norm-gain-production-cpu-01.json:elapsed_seconds",
+        "runner_wall_seconds": "norm-gain-production-cpu-01-runreceipt.json:wall_seconds"
+      }
+    },
+    "prepared_harness": {
+      "scope": "Source-only production-gain adapters and offline fake tests; no XPU trial or performance promotion.",
+      "candidate_identity": "production-gain-v1",
+      "numerical_helper_revision": 2,
+      "complete_ocr_helper_revision": 4,
+      "paired_helper_revision": 6,
+      "source_review": "Independent source review passed after preserving token/decode mismatch evidence before rejection and correcting request/teardown peak labels.",
+      "offline_tests": {
+        "passed": 99,
+        "subtests_passed": 46,
+        "included_stdlib_adapter_tests": 11,
+        "wall_seconds": 4.101306082999145,
+        "peak_child_rss_kib": 88272
+      },
+      "private_receipt_commitments": [
+        {
+          "receipt": "norm-gain-production-offline-01.json",
+          "bytes": 1611,
+          "sha256": "608eeeb7eea0e35e69be3ea50350499f335c5174e91dfdf473fe66325c2c8989"
+        }
+      ]
+    }
+  },
+  "norm_gain_allocator_source_analysis": {
+    "classification": "Read-only conditional allocator-source analysis; separate from XPU timing, production CPU replay, and runtime observation.",
+    "upstream_commit": "5c4886908584029761b579af026dcfb627c84070",
+    "verified_source_files_count": 5,
+    "all_five_source_byte_counts_and_sha256_verified": true,
+    "gain_inventory": {
+      "gain_count": 81,
+      "logical_bytes": 681984,
+      "all_gain_sizes_are_exact_multiples_of_512": true
+    },
+    "conditional_allocator_reasoning": {
+      "pinned_allocator_assumptions": "Pinned native allocator without custom/private pools or graph capture; small native blocks and segments remain multiples of 512 bytes, so positive surplus is split.",
+      "expected_charge_bytes": 681984,
+      "extra_rounding_allowance_bytes": 0,
+      "runtime_condition": "A synchronized future setup measurement must independently show an allocated delta of exactly 681984 bytes."
+    },
+    "boundary": "No GPU allocator observation, XPU peak-memory measurement, executed-runtime attestation, device-headroom estimate, or hardware safety claim. The existing paired timing batch remains held.",
+    "private_receipt_commitments": [
+      {
+        "receipt": "norm-gain-allocator-source-01.json",
+        "bytes": 2941,
+        "sha256": "573e4832688a022520911b15f8fa87de3deb3276652fab130aaf8804a81ebd70"
+      }
+    ]
   }
 }

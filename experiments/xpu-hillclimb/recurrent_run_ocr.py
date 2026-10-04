@@ -22,7 +22,7 @@ import time
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 GRAPH_HASH = "d0c8561d91e31e50d9a57b74196c5a7ad023e42ebe9f84004d0a535310879939"
-MODES = ("hybrid", "recurrent", "norm-gain", "norm-fused", "recurrent+norm-gain", "recurrent+norm-fused")
+MODES = ("hybrid", "recurrent", "norm-gain", "norm-fused", "recurrent+norm-gain", "recurrent+norm-fused", "production-gain")
 
 
 def sha(path):
@@ -82,8 +82,12 @@ def main():
     paths.extend([ROOT / "provenance/model.json", ROOT / "runtime/waystone/uv.lock"])
     if uses_recurrent:
         paths.append(Path(__file__).with_name("recurrent_candidate.py"))
+    if args.candidate == "production-gain":
+        paths.extend([ROOT / "runtime/waystone/norm_gain.py", Path(__file__).with_name("production_gain_adapter.py")])
     if "norm-" in args.candidate:
         paths.append(Path(__file__).with_name("norm_candidate.py"))
+    summary["helper_revision"] = 4 if args.candidate == "production-gain" else 2
+    summary["candidate_identity"] = "production-gain-v1" if args.candidate == "production-gain" else args.candidate
     summary["source_sha256"] = {str(path.relative_to(ROOT)): sha(path) for path in paths}
 
     def save():
@@ -133,6 +137,15 @@ def main():
             raise RuntimeError("Baseline response lacks a successful committed run")
         summary["comparison_reference"] = {"summary_sha256": sha(args.baseline_summary),
                                            "response_sha256": sha(args.baseline_response)}
+    baseline_tokens = None
+    if args.candidate == "production-gain" and args.baseline_response:
+        token_path = args.baseline_response.with_name(args.baseline_response.name.replace('.response.json', '.tokens.json'))
+        if token_path == args.baseline_response:
+            raise RuntimeError("Production reference response must use explicit .response.json filename")
+        if token_path.exists():
+            baseline_tokens = json.loads(token_path.read_text(encoding="utf-8"))
+            summary["comparison_reference"]["tokens_sha256"] = sha(token_path)
+        summary["comparison_reference"]["full_token_ids_available"] = baseline_tokens is not None
     backend = XPUBackend(args.model, attention_backend="hybrid")
     captured = {}
     original_generate = None
@@ -195,6 +208,9 @@ def main():
             if uses_recurrent:
                 from recurrent_candidate import compiled_recurrent
                 recurrent_receipt = scopes.enter_context(compiled_recurrent(expected_graph_sha256=GRAPH_HASH))
+            if args.candidate == "production-gain":
+                from production_gain_adapter import production_gain_scope
+                norm_receipt = scopes.enter_context(production_gain_scope(backend.model))
             if "norm-" in args.candidate:
                 from norm_candidate import candidate
                 mode = "fused" if args.candidate.endswith("norm-fused") else "gain-only"
@@ -242,6 +258,13 @@ def main():
                 eos.append(backend.processor.tokenizer.convert_tokens_to_ids("<|im_end|>"))
                 if len(generated) != final["usage"]["completion_tokens"] or not generated or generated[-1] not in eos:
                     raise RuntimeError("Complete generated token/terminal metadata disagree")
+                token_comparison = None
+                if args.candidate == "production-gain":
+                    from production_gain_adapter import persist_token_evidence
+                    decoded = backend.processor.tokenizer.decode(generated, skip_special_tokens=True, clean_up_tokenization_spaces=False)
+                    evidence_path = args.output / (label + ".token-evidence.json")
+                    token_evidence = persist_token_evidence(evidence_path, generated, generated[-1], eos, decoded, "".join(chunks), baseline_tokens)
+                    token_comparison = token_evidence['retained_token_comparison']
                 response = {"model": "chandra", "choices": [{"index": 0, "message": {
                     "role": "assistant", "content": "".join(chunks)}, "finish_reason": final["finish_reason"]}],
                     "usage": final["usage"]}
@@ -260,16 +283,26 @@ def main():
                            "expected_recurrent_calls": expected_recurrent, "norm_calls": norm_calls,
                            "expected_calls_per_norm": len(generated) if norm_receipt else 0},
                        "memory": backend.health()["torch_xpu_memory"], "comparable_with_baseline": False}
+                if args.candidate == "production-gain":
+                    row["complete_decode_equals_stream"] = token_evidence["complete_decode_equals_stream"]
+                    row["token_evidence_sha256"] = sha(evidence_path)
+                    row["failure_flags"] = token_evidence["failure_flags"]
+                    row["decode_options"] = {"skip_special_tokens": True, "clean_up_tokenization_spaces": False}
+                    row["retained_token_comparison"] = token_comparison
                 if baseline_response:
                     row["baseline_comparison"] = compare(args.baseline_response, path)
                     if qualification:
                         row["independent_content_and_geometry_comparison"] = qualification.compare(fixture["expected"], baseline_response, response, 12384)
                     row["same_usage_and_stop"] = baseline_response["usage"] == final["usage"] and baseline_response["choices"][0]["finish_reason"] == final["finish_reason"]
                     row["comparable_with_baseline"] = row["same_usage_and_stop"] and row["baseline_comparison"]["exact_html_equal"] and row["correctness"]["passed"] and interception_ok
+                if args.candidate == "production-gain" and any(token_evidence['failure_flags'].values()):
+                    row["comparable_with_baseline"] = False
                 summary["runs"].append(row)
                 save()
                 print(json.dumps({"phase": "complete", "run": label, "elapsed_seconds": elapsed,
                                   "usage": final["usage"], "interception_passed": interception_ok}), flush=True)
+                if args.candidate == "production-gain" and any(row['failure_flags'].values()):
+                    raise RuntimeError("Complete token/decode comparison failed; full evidence and failed row retained")
                 if not row["correctness"]["passed"] or not interception_ok:
                     raise RuntimeError("Complete OCR or exact interception gate failed; raw run retained")
 

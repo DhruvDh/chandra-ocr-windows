@@ -2,7 +2,7 @@
 
 A public fork of [Const-me/Whisper](https://github.com/Const-me/Whisper), preserving its history and MPL-2.0 source, with a correctness-first workflow for Chandra OCR 2 and an endpoint router for Windows Intel and Linux ROCm machines. The original project documentation is retained in [WHISPER-README.md](WHISPER-README.md).
 
-The pinned BF16 model runs on an Intel Arc A770 through PyTorch XPU and has passed all three frozen synthetic OCR pages. The installed endpoint has also passed native and scanned PDF checks through the ordinary Chandra CLI, with raw stop reasons and token counts recorded. The repository contains a synthetic OCR benchmark, numerical comparison tools, an OpenAI-compatible worker/router and native DirectCompute primitive tests. The native primitives are a foundation for Chandra's Qwen3.5 graph; they do not yet implement the complete model. See the [current work record](docs/work-record.md) for the tested boundary.
+The pinned BF16 model runs on an Intel Arc A770 through PyTorch XPU and has passed the original three-page synthetic corpus plus two independent layouts. The installed endpoint has also passed native and scanned PDF checks through the ordinary Chandra CLI, with raw stop reasons and token counts recorded. The repository contains a synthetic OCR benchmark, numerical comparison tools, an OpenAI-compatible worker/router and native DirectCompute primitive tests. The native primitives are a foundation for Chandra's Qwen3.5 graph; they do not yet implement the complete model. See the [current work record](docs/work-record.md) for the tested boundary.
 
 | Work | Start here |
 | --- | --- |

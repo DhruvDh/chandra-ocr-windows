@@ -15,7 +15,7 @@ from norm_candidate import candidate, capture_trained_norms, check_graph
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--norm-mode', choices=['gain-only', 'fused', 'capture'], required=True)
+    parser.add_argument('--norm-mode', choices=['gain-only', 'fused', 'capture', 'production-gain'], required=True)
     parser.add_argument('--norm-fixtures')
     args, export_args = parser.parse_known_args()
     if args.norm_mode == 'capture' and not args.norm_fixtures:
@@ -36,7 +36,10 @@ def main():
         record = {'mode': args.norm_mode, 'source_sha256': {
             f.name: hashlib.sha256(f.read_bytes()).hexdigest() for f in [
                 Path(__file__), Path(__file__).with_name('norm_candidate.py')]},
-            'receipts': receipts, 'scope': 'Numerical experiment only; no serving or performance promotion'}
+            'candidate_identity': 'production-gain-v1' if args.norm_mode == 'production-gain' else args.norm_mode, 'helper_revision': 2, 'receipts': receipts, 'scope': 'Numerical experiment only; no serving or performance promotion'}
+        if args.norm_mode == 'production-gain':
+            for name in ['runtime/waystone/norm_gain.py', 'experiments/xpu-hillclimb/production_gain_adapter.py']:
+                record['source_sha256'][name] = hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
         if output.exists():
             (output / 'norm-experiment.json').write_text(json.dumps(record, indent=2), encoding='utf-8')
         print(json.dumps(record), flush=True)
@@ -53,6 +56,9 @@ def main():
                 hook = model.register_forward_pre_hook(before, with_kwargs=True)
                 stack.callback(hook.remove)
                 receipt = stack.enter_context(capture_trained_norms(model, args.norm_fixtures, lambda: index[0]))
+            elif args.norm_mode == 'production-gain':
+                from production_gain_adapter import production_gain_scope
+                receipt = stack.enter_context(production_gain_scope(model))
             else:
                 receipt = stack.enter_context(candidate(model, mode=args.norm_mode))
             receipts.append(receipt)

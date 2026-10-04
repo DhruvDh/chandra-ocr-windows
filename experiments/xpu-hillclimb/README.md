@@ -12,6 +12,7 @@ The baseline representative page completed correctly with 397 output tokens. Its
 | Explicit-mask text attention | Original numerical gate failed; early probability distributions also moved further from CPU FP32. Set aside. | [Finding and method](attention_candidate.md) |
 | Compiled recurrent updates | Both variants failed full cached numerical checks: six positions for v1 and eleven with contraction disabled. Set aside. | [Method](recurrent_method.md), [candidate](recurrent_candidate.py) |
 | Cached normalization gains | All 395 logit rows, 25,280 cache records and five complete OCR pages match exactly. Two of five planned timing pairs completed; extra peak allocation leaves memory qualification unresolved. Further pairs and promotion are held. | [Method](norm_method.md), [candidate](norm_candidate.py) |
+| Production gain ownership | CPU lifetime checks and all 162 retained trained fixtures pass; no XPU peak-memory or speed evidence yet | [Prospective protocol](../../verification/gain-production-protocol.md), [CPU replay](../../verification/replay_norm_gain_cpu.py) |
 | Native fused normalization | Complete cached trajectory failed the frozen policy at 17 positions, including an unapproved digit decision. Set aside. | [Method](norm_method.md), [exporter](norm_export.py) |
 | Native XPU graph replay | The installed A770 runtime reports graph recording/replay unsupported; no replay comparisons ran | [Probe method](graph_method.md) |
 
