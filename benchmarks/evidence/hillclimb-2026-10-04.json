@@ -51,7 +51,7 @@
   },
   "evidence_boundary": "Commitments hash private receipts only; they do not attest remote process identity or substitute for access to underlying evidence. Raw traces, tensors, private paths, and credentials are excluded. Numerical policy v2 was frozen before full candidate runs; capability receipts are not acceptance decisions.",
   "cpu_cached_calibration": {
-    "scope": "Matched CPU FP32 cached teacher against full uncached teacher at 394 identical conditioned positions; cached exporter retained 395 rows at positions 800\u20131194; no fresh greedy run.",
+    "scope": "Matched CPU FP32 cached teacher against full uncached teacher at 394 identical conditioned positions; cached exporter retained 395 rows at positions 800–1194; no fresh greedy run.",
     "identity_equal": true,
     "rows_compared": 394,
     "argmax_agreement_count": 394,
@@ -785,6 +785,202 @@
         "receipt": "production-gain-v1-preparation/qualification-method.json",
         "bytes": 4895,
         "sha256": "61341c0fec584b6c911ec7812ab697edf9fabe942f8f4a59ba4a5e8f25ddf394"
+      }
+    ]
+  },
+  "resumed_safe_work_2026_10_04": {
+    "disposition": "No optimized candidate promoted. This resumed safe-work record is separate from prior full-trajectory gates and historical evidence.",
+    "png_encoding_probe": {
+      "result": "Four first-page outputs passed exact historical-content, prose, equation, bbox, and stop checks. Candidate encoding saved 0.006308992 seconds per encode (6.3 ms) while increasing payload size 39.5103%; no useful end-to-end gain was established, so the tuning was rejected.",
+      "default_encoding_mean_seconds": 0.021701718000258552,
+      "candidate_encoding_mean_seconds": 0.015392725999845425,
+      "encoding_saving_seconds": 0.006308992000413127,
+      "payload_size_increase_fraction": 0.39510318740800376,
+      "exact_outputs": 4,
+      "commitments": [
+        {
+          "receipt": "optimization/png-probe-20261004/README.md",
+          "bytes": 5272,
+          "sha256": "9d856f23a48298d78f949e777f8d9797cd8b77a277c92598186a441f3af16715"
+        },
+        {
+          "receipt": "optimization/png-probe-20261004/summary.json",
+          "bytes": 7545,
+          "sha256": "d27ee8349f99965fa5a06c7ca17acb087357d64063695a68ee27aef546c2b939"
+        },
+        {
+          "receipt": "optimization/png-probe-20261004/result-1-A.json",
+          "bytes": 1404,
+          "sha256": "ab8c53e0bcc1efebc27d06944e470ff39f34e75c8d98ba462ddd87a6fa667572"
+        },
+        {
+          "receipt": "optimization/png-probe-20261004/result-2-B.json",
+          "bytes": 1481,
+          "sha256": "6981c98554792c3cc1296c099eff17f666f82e2af3208012a9552a84e701f1b3"
+        },
+        {
+          "receipt": "optimization/png-probe-20261004/result-3-B.json",
+          "bytes": 1480,
+          "sha256": "0665f6ced91c584f2eefa82f9c478c8e0e66e4fc537cc198ed122b673a1dcb41"
+        },
+        {
+          "receipt": "optimization/png-probe-20261004/result-4-A.json",
+          "bytes": 1480,
+          "sha256": "7fcd921c990821bc3aae9a10459111468166f84704b0ad609a2a9dc8bd30ad28"
+        }
+      ]
+    },
+    "amd_rolling_cli_live": {
+      "result": "One four-page warmup plus the first A/B pair completed (12 POSTs total; peak active requests 2; all drained). A took 27.515426819001732 seconds and B took 25.45275262799987 seconds, but the frozen exact raw-output gate failed: on the SMALL equation bbox, y2 was 194 for warmup/A and 195 for B. Text, table values, usage, Markdown, and metadata matched. This is a strict parity failure, not a qualified speedup; no replacement, deployment, or promotion occurred.",
+      "status": "rejected-incomplete-strict-parity-failure",
+      "submitted_posts": 12,
+      "peak_active": 2,
+      "all_drained": true,
+      "warmup_pages": 4,
+      "completed_pairs": 1,
+      "pair_A_seconds": 27.515426819001732,
+      "pair_B_seconds": 25.45275262799987,
+      "failed_gate": "SMALL equation bbox y2: warmup/A=194, B=195",
+      "minimum_free_vram_bytes": 4686630912,
+      "minimum_available_ram_bytes": 36763758592,
+      "minimum_free_vram_gib": 4.364765167236328,
+      "minimum_available_ram_gib": 34.23891830444336,
+      "commitments": [
+        {
+          "receipt": "optimization/amd-rolling-cli-live-01/summary.json",
+          "bytes": 23367,
+          "sha256": "6be56ce92128d3ccd0444bd21d231e2111c2b57121ec8d0b4d16dba6540bcfb5"
+        },
+        {
+          "receipt": "optimization/amd-rolling-cli-live-01/terminal-assessment.json",
+          "bytes": 734,
+          "sha256": "57227dec2af0892de690ae93e8fbd6e35244dbead4e7548e200fac3f8fc21e6a"
+        },
+        {
+          "receipt": "optimization/amd-rolling-cli-live-01/warmup/receipt.json",
+          "bytes": 18415,
+          "sha256": "37a80da0a38b93b6f0345f285a21ea636c5695f47b965eb80b2fafec0ab82910"
+        },
+        {
+          "receipt": "optimization/amd-rolling-cli-live-01/pair-0-A/receipt.json",
+          "bytes": 19142,
+          "sha256": "0b33c2fdd5bcdc52932e9a29911ef30a4bcf5d1da4b19a46c1a19997c7fda306"
+        },
+        {
+          "receipt": "optimization/amd-rolling-cli-live-01/pair-0-B/receipt.json",
+          "bytes": 18427,
+          "sha256": "4fc95ceb281ec266bbee0c0d9ebdd5d7ab251dbca81e0ec76163689f94e59da0"
+        },
+        {
+          "receipt": "optimization/amd-rolling-cli-preparation/plan.json",
+          "bytes": 19057,
+          "sha256": "a201429ab5fc468bd4409eac2ae6479f1aee3518b76a21ecb6b02a67c28d41e3"
+        },
+        {
+          "receipt": "optimization/amd-rolling-cli-preparation/run_trial.py",
+          "bytes": 19766,
+          "sha256": "7bbc9c155d8e31c9b4cc1d9c59eee76febc50c1e86038a736090ddee2706c030"
+        },
+        {
+          "receipt": "optimization/amd-rolling-cli-preparation/offline_check.py",
+          "bytes": 3499,
+          "sha256": "1a655dda9d01ff1298cb89e0c79a4ec8013c1d021933e9af9fcdb641245545c9"
+        },
+        {
+          "receipt": "optimization/amd-rolling-cli-preparation/offline-fake-http/checks.json",
+          "bytes": 291,
+          "sha256": "57f5ad3e76cf8f511c7c7a83b493a874cc786c0a7f84ee8a7e899a37fb403c28"
+        },
+        {
+          "receipt": "optimization/amd-rolling-cli-root-lease-01.json",
+          "bytes": 1137,
+          "sha256": "e5da9ea046c6963b3bb67d2420f61b2a67cf9b35598ad9b5997efca1b9398da1"
+        }
+      ]
+    },
+    "intel_telemetry_boundary": {
+      "result": "The Sysman free-memory sentinel remained unchanged after a successful call, so the earlier zero was only initialization; global free VRAM was not reported. The bounded CIM query returned access denied. No Intel candidate GPU run occurred. The retained shared-work observation records the qualified worker service restored, Waystone cold/unloaded and accepting with no pending work; this is a dated state observation, not a continuing guarantee.",
+      "global_free_vram_observed": false,
+      "intel_candidate_gpu_run": false,
+      "commitments": [
+        {
+          "receipt": "optimization/waystone-levelzero-sysman-free-correction-20261004.json",
+          "bytes": 2465,
+          "sha256": "cb2438cc0c4be2bf49b8884237ab43d94591106d2a66a8388b890dc6dc237f56"
+        },
+        {
+          "receipt": "optimization/waystone-cim-memory-access-20261004.json",
+          "bytes": 766,
+          "sha256": "7748fa296ec478c3e44df13f294ad510bc9400b4a6f9dc8a811cc23139f467eb"
+        },
+        {
+          "receipt": "optimization/shared-work-window-state.json",
+          "bytes": 2478,
+          "sha256": "8c1d733a78bbe0e19dbe7c60b019dca3dafa03ac52432343daa2e91fd57de840"
+        }
+      ]
+    }
+  },
+  "amd_client_products_study_2026_10_04": {
+    "scope": "Fresh, separate client-product study on four synthetic text/table pages. Exact saved product inventory/files and HTML content outside validated bbox attributes passed; raw bbox differences were retained. No raw API/chunk equivalence or broader figure claim.",
+    "result": "All 28 POSTs completed and drained (peak concurrency 2). All three candidates were slower; median paired reduction was -0.401925%, so performance was rejected. Candidate B changed one SMALL equation bbox y2 from 194 to 195 on each B run. No deployment or promotion. This result does not replace or reinterpret the earlier strict raw-output gate failure.",
+    "total_posts": 28,
+    "max_active": 2,
+    "all_drained": true,
+    "paired_reductions_fraction": [
+      -0.002109897969302832,
+      -0.004027607837447489,
+      -0.004019250709439426
+    ],
+    "median_paired_reduction_fraction": -0.004019250709439426,
+    "performance_passed": false,
+    "bbox_observation": "On the SMALL equation bbox, B had y2=195 versus y2=194 for A; bbox differences remain part of the record.",
+    "post_trial_state": "A root-requested level-1 sleep completed and the final passive observation reported asleep with zero pending/active work; this was not a new idle-timer acceptance.",
+    "commitments": [
+      {
+        "receipt": "optimization/amd-client-products-v1/plan.json",
+        "bytes": 20980,
+        "sha256": "3a2bba6c1698e30a86dd3d9e8e68bcd39d76c9173f175c5b56142709e0cc0861"
+      },
+      {
+        "receipt": "optimization/amd-client-products-v1/product_contract.py",
+        "bytes": 6754,
+        "sha256": "34b2dac0acf201d2fa91f6e62dc901ab48a75444405d202e262b0afb45becc1a"
+      },
+      {
+        "receipt": "optimization/amd-client-products-v1/run_trial.py",
+        "bytes": 20168,
+        "sha256": "42d0af309a0bc05d4ae2874eb5240fb33fc8741391c20db3a6a6f70b5c6533a1"
+      },
+      {
+        "receipt": "optimization/amd-client-products-v1/focused-check.json",
+        "bytes": 339,
+        "sha256": "c5b41302b804372b21564f05f4237d4f94c3b4919f273a83c00b3f282805ea5e"
+      },
+      {
+        "receipt": "optimization/amd-client-products-v1-root-lease-01.json",
+        "bytes": 1402,
+        "sha256": "510285c6beaeb2207f5e6f05a86272903296fc725aac881d1c697af7f2e6a6d8"
+      },
+      {
+        "receipt": "optimization/amd-client-products-v1-live-01/summary.json",
+        "bytes": 96881,
+        "sha256": "26eff8c543c39a10942fa0618b185683fbf45851cc188231e90e01c3b297a1c8"
+      },
+      {
+        "receipt": "optimization/amd-client-products-v1-live-01/terminal-assessment.json",
+        "bytes": 3565,
+        "sha256": "8a2fecbde9286d0bb0ea3445fc5b6af723bb8ca29a238980d62a0fb3da9c8d27"
+      },
+      {
+        "receipt": "optimization/amd-client-products-v1-live-01/requested-sleep.json",
+        "bytes": 487,
+        "sha256": "9424f44b3d83e5306d46c607954f5d19ba44d6177c546cc70c701e9d208c3096"
+      },
+      {
+        "receipt": "optimization/amd-client-products-v1-live-01/final-passive-state.json",
+        "bytes": 431,
+        "sha256": "047c8e8f2af13dbabf8243cd74dcd8a9ee6639ceec728f2f8731660ce700a5a5"
       }
     ]
   }
