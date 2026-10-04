@@ -2095,5 +2095,133 @@
         "sha256": "93edaa6c1483795eb9749ff5070b040d9af20183c8b3b808864609368c1d6eb5"
       }
     ]
+  },
+  "query_chunk256_vision_boundary_softmax_postload_full_ocr_2026_10_04": {
+    "status": "Independent full-OCR acceptance PASS for all five frozen pages; resource and owned-process closure audit also passed. No engine-performance, sustained-throughput, or deployment claim.",
+    "quality": "Five exact complete outputs passed the frozen content/usage/stop acceptance and subordinate trim review. Completion tokens: Tiny 395, Small 395, Representative 397, Routes 595, Ledger 526. Historical token IDs were unavailable for Tiny, Small and Representative; retained available-ID checks for Routes and Ledger passed.",
+    "composition": {
+      "query_chunk_size": 256,
+      "query_chunk_attention_calls": 40,
+      "chunks": 312,
+      "cached_delegate_calls": 18424,
+      "cold_loads": 5,
+      "image_boundary_trims": 5,
+      "text_calls": 2308,
+      "cached_calls": 2303
+    },
+    "resource_and_closure": {
+      "resource_audit_passed": true,
+      "resource_decisions_passed": 554,
+      "minimum_process_local_headroom_bytes": 4586340352,
+      "all_five_owned_processes_absent": true,
+      "ordinary_waystone_restored_cold": true,
+      "cgroup_terminal_reported_peak": "18.8M, swap 0B",
+      "cgroup_interpretation": "Rounded cgroup accounting, not RSS or exact bytes."
+    },
+    "private_receipt_commitments": [
+      {
+        "receipt": "optimization/query-chunk256-vision-boundary-softmax-postload-production-gain-v1-complete-ocr-01-independent-ocr-acceptance.json",
+        "bytes": 1618,
+        "sha256": "3c6c66de377c6c88878218f45c85afafcc7e7cbe9b028ea9614f0d933daeae77"
+      },
+      {
+        "receipt": "optimization/query-chunk256-vision-boundary-softmax-postload-production-gain-v1-complete-ocr-01-independent-ocr-acceptance-subordinate-trim.json",
+        "bytes": 3162,
+        "sha256": "2240434f126aa5ac3a9bedc7ae66a8271d4c2cc4affd7fe3fb715a3cc3ce406a"
+      },
+      {
+        "receipt": "optimization/query-chunk256-vision-boundary-softmax-postload-production-gain-v1-complete-ocr-01-independent-resource-closure-audit.json",
+        "bytes": 28177,
+        "sha256": "2538b5ff2309e05bed2a95c4efd4b257b350c4b963e370c61d2a91c604d6d9bd"
+      },
+      {
+        "receipt": "optimization/query-chunk256-vision-boundary-softmax-postload-production-gain-v1-complete-ocr-01-collection.json",
+        "bytes": 9692,
+        "sha256": "82faea388cc924fb0743a073f1acba64b588d5621a5abccfd4a144a919af1636"
+      },
+      {
+        "receipt": "optimization/query-chunk256-vision-boundary-softmax-postload-production-gain-v1-complete-ocr-01-service-restoration.json",
+        "bytes": 800,
+        "sha256": "0b9e69fdfbba5a7c8eda74fac03ac06079f08b865d2d758f4d5d151c52c23940"
+      },
+      {
+        "receipt": "optimization/query-chunk256-vision-boundary-softmax-postload-production-gain-v1-complete-ocr-01-client-cgroup-terminal.json",
+        "bytes": 544,
+        "sha256": "430255f9261540deaa74767620a2145705053dfe94a5f9e7633f6a1fabd87b3a"
+      },
+      {
+        "receipt": "optimization/query-chunk256-vision-boundary-softmax-postload-production-gain-v1-complete-ocr-01-independent-reader-command.json",
+        "bytes": 3288,
+        "sha256": "6a454567662922c5d840f0f989cdd46d856cc89a6fd5c77f721e35c085f0d52f"
+      }
+    ]
+  },
+  "dense_corpus_processor_fit_cpu_2026_10_04": {
+    "status": "CPU-only processor fit passed for one actual image sample; no model weights, model forward, GPU, live request or OCR qualification.",
+    "corpus": {
+      "rendered_images": 150,
+      "image_size_pixels": [
+        1400,
+        2200
+      ],
+      "unique_pixel_hashes": 150,
+      "families": {
+        "prose": 30,
+        "columns": 30,
+        "equations": 30,
+        "tables": 30,
+        "long": 30
+      },
+      "render_integrity": "All 150 image SHA-256 values streamed from disk and matched the manifest. Root visual review inspected the contact sheet and one full native columns page; this is sampled visual review, not all-page OCR qualification.",
+      "root_visual_review": "Root inspected the dense contact sheet with five page families and a full columns-page image displayed resized from 1400×2200 to 1248×1961. The sampled page showed both columns in expected reading order, readable text, an equation, ruled table, and terminal marker without observed clipping. This is sampled layout review, not all-page visual or OCR acceptance."
+    },
+    "actual_processor_sample": {
+      "fixture": "page-0001-prose",
+      "input_tokens": 3629,
+      "input_limit_tokens": 4096,
+      "normal_output_allowance_tokens": 12384,
+      "combined_context_tokens": 16013,
+      "normal_context_limit_tokens": 16384,
+      "fit_passed": true,
+      "scope": "One actual image per processor geometry; processor behavior for all corpus content is not qualified."
+    },
+    "memory_scope": "The CPU helper reported peak RSS 713,776 KiB. The terminal controller separately displayed a rounded cgroup charged peak of 615.4M and zero swap; this is not GPU memory evidence.",
+    "private_receipt_commitments": [
+      {
+        "receipt": "optimization/sustained-throughput-v1/first-seen-corpus/processor-receipt-01.json",
+        "bytes": 1670,
+        "sha256": "0ca0978e83f4c4ca947a4d01d2d65a211b9389dc53fee83ca0a4505b62b4ce5c"
+      },
+      {
+        "receipt": "optimization/sustained-throughput-v1/first-seen-corpus/processor-root-admission-01.json",
+        "bytes": 2598,
+        "sha256": "a343a078a3723063bde92f483551ad427ef9c85b930c070ed58308a8bb9de981"
+      },
+      {
+        "receipt": "optimization/sustained-throughput-v1/first-seen-corpus/processor-controller-terminal-01.json",
+        "bytes": 557,
+        "sha256": "c6da1b4f75817ea7d6198b3196ec93eeb3c52a973eceffc66a8df0c30c0341c6"
+      },
+      {
+        "receipt": "optimization/sustained-throughput-v1/first-seen-corpus/dense-v1/render-03/manifest.json",
+        "bytes": 4274951,
+        "sha256": "c9754b1ee49cf56b1dda242f532cbba7840ed4fb2fe2685fd7a6612373b1f050"
+      },
+      {
+        "receipt": "optimization/sustained-throughput-v1/first-seen-corpus/dense-v1/generate.py",
+        "bytes": 9875,
+        "sha256": "9d693195cb96fd288fa60887eab9618f940147034ea8751416392254bf89419f"
+      },
+      {
+        "receipt": "optimization/sustained-throughput-v1/first-seen-corpus/dense-v1/integrity-03-receipt.json",
+        "bytes": 868,
+        "sha256": "74a408260ada1d4d627fb01627d5eefdd1210cf43fc61352ea64ab5ce519e59b"
+      },
+      {
+        "receipt": "optimization/sustained-throughput-v1/first-seen-corpus/dense-v1/root-visual-review-01.json",
+        "bytes": 1008,
+        "sha256": "b9dfb5dad38bd8652c26e6ce950f5de12964b4317b611c2324239b2f6a1e20a3"
+      }
+    ]
   }
 }
