@@ -677,5 +677,115 @@
         "sha256": "573e4832688a022520911b15f8fa87de3deb3276652fab130aaf8804a81ebd70"
       }
     ]
+  },
+  "production_gain_exact_preparation": {
+    "candidate_identity": "production-gain-v1; separate from the earlier experimental norm-gain paired timing result.",
+    "status": "Offline preparation and method review only. The preparation manifest remains unfrozen, nonrunnable, and without hardware authorization; production execution admission is held.",
+    "source_preparation": {
+      "independent_review": "Method review passed source-map consistency, frozen-policy linkage, and counterbalanced five-pair ordering. It identified that the canonical protocol and exact verifier were newer than the original staging tree; a separate immutable analysis-tools addendum now records both without changing the historical 53-file manifest.",
+      "original_staging": {
+        "files": 53,
+        "bytes": 1016585,
+        "inventory_passed": true,
+        "symlinks_absent": true,
+        "copy_hashes_passed": true,
+        "manifest_frozen": false,
+        "runnable": false
+      },
+      "future_method_frozen_before_execution": true,
+      "expected_source_identity": {
+        "norm_export.py": "984fdd70918db1e643eaf06421dbf355c23875aeae4c1293e0f230655698a308",
+        "norm_candidate.py": "774902fee9fd8408f8d7486725e5c1da1d16ea877e7143c00145eea0259e6073",
+        "runtime/waystone/norm_gain.py": "31044117fbe5d02399f2cb9cf484c0fc67cc7666c4a042d8b379328820d9c02f",
+        "experiments/xpu-hillclimb/production_gain_adapter.py": "345cafd06235dfb29a3d30ea98edb1e3b6dc184f74ba69fa6e0a3cf35f3a15df"
+      }
+    },
+    "offline_extractor_and_verifier": {
+      "test_run": "110 tests and 50 subtests passed; CPU-only offline suite, 5.398982 s, peak child RSS 110152 KiB.",
+      "historical_sse": "Deterministic derivation produced a complete tiny JSON from retained stream evidence and passed positive/negative format checks; it was not a historical helper run or numerical-reference substitution.",
+      "historical_generated_ids_available": false,
+      "metadata_audit": {
+        "positions": 395,
+        "ordered_cache_record_equalities": 25280,
+        "raw_logits_payload_rehashed": false,
+        "raw_cache_tensors_compared": false,
+        "cache_equality_basis": "Recorded hashes only."
+      },
+      "limitation": "Offline tests and metadata audit do not qualify candidate runtime outputs; no production-gain GPU evidence exists."
+    },
+    "frozen_future_method": {
+      "numerical_scope": {
+        "logit_rows": 395,
+        "ordered_cache_records": 25280,
+        "raw_cache_tensors_retained": false,
+        "exact_streamed_logit_bytes_and_recorded_cache_hashes_required": true
+      },
+      "complete_ocr_fixtures": [
+        "tiny",
+        "small",
+        "representative",
+        "routes",
+        "ledger"
+      ],
+      "paired_warm_timing_pairs": 5,
+      "timing_rules": "All candidate pair latencies lower, paired median reduction at least 2%, no favorable optional stopping.",
+      "memory_rules": {
+        "install_allocated_delta_bytes": 681984,
+        "release_owned_gain_bytes_exactly": true,
+        "request_peak_extra_bytes_maximum": 681984,
+        "allocator_rounding_slack_bytes": 0,
+        "final_allocated_and_reserved_bytes": 0
+      },
+      "deployment_acceptance_separate": true
+    },
+    "historical_timing_separation": "The earlier two-pair norm-gain trial remains held under its unresolved memory review; this production-gain preparation neither changes nor qualifies it.",
+    "no_trial_boundary": "No GPU trial, inference, runtime qualification, performance promotion, or production deployment has occurred for production-gain-v1.",
+    "private_receipt_commitments": [
+      {
+        "receipt": "norm-gain-exact-offline-01.json",
+        "bytes": 1113,
+        "sha256": "df825eabe23b852de450837b98aa22e417a1f3d955bdbe19d7f5aebfd7f5499a"
+      },
+      {
+        "receipt": "norm-gain-exact-metadata-audit-01.json",
+        "bytes": 1036,
+        "sha256": "69a7ecef9e90fd987b0f9a4fa32d6cedada36d14d4ac51857409948a6c9f3bc9"
+      },
+      {
+        "receipt": "production-gain-v1-preparation/manifest.json",
+        "bytes": 22758,
+        "sha256": "680b620a0ccea4dba2b9ad616802aea60fb912ee87a9e9e35e2ca98e2c93e03b"
+      },
+      {
+        "receipt": "production-gain-v1-preparation/validation.json",
+        "bytes": 489,
+        "sha256": "e5080c993c849428d47ca708e27e744a3992c1a32e4996d418d479091ca88bee"
+      },
+      {
+        "receipt": "production-gain-v1-preparation/exact-source-manifest.json",
+        "bytes": 1124,
+        "sha256": "06fbb834c3a4bf04f6f8570b2658c28d08b3311a04da62f2b65ac94b99b7009f"
+      },
+      {
+        "receipt": "production-gain-v1-preparation/analysis-tools-manifest.json",
+        "bytes": 1044,
+        "sha256": "88ceea7f6f7fb5d5e91b1dd08906c3ab463d9cfcd432e32b1e591c05c8fd7642"
+      },
+      {
+        "receipt": "production-gain-v1-preparation/derived/derivation-receipt.json",
+        "bytes": 923,
+        "sha256": "f31d6385b000e00537977384e4d3b32b1b065cc08d48535435a7e56afa6e5275"
+      },
+      {
+        "receipt": "production-gain-v1-preparation/derived/derivation-checks.json",
+        "bytes": 442,
+        "sha256": "af1b89c46d2f6a8d55400c57e3af78e458be93ae9cc1f21acc4d322a6991e26a"
+      },
+      {
+        "receipt": "production-gain-v1-preparation/qualification-method.json",
+        "bytes": 4895,
+        "sha256": "61341c0fec584b6c911ec7812ab697edf9fabe942f8f4a59ba4a5e8f25ddf394"
+      }
+    ]
   }
 }
