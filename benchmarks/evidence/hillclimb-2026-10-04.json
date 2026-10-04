@@ -2772,7 +2772,7 @@
     "overrideable_allowed_and_actual_selection_unknown": true,
     "pinned_flash_architecture_whitelist_omits_Alchemist": true,
     "fence_preparation": "Eight stdlib fake lifecycle checks passed; native execution not admitted",
-    "Q32_partition_preparation": "Disabled unexercised draft, no numerical or safety acceptance",
+    "Q32_partition_preparation": "The earlier disabled draft had no qualification. Its successor, vision-query-chunk-cpu-v2, now has passing CPU-only synthetic algebra/contract checks; a strict bitwise gate failed and remains retained. Native Tiny GPU numerical/token/HTML/OCR acceptance is still pending.",
     "next_diagnostic": "Observe first vision descriptors and selector, then stop without invoking SDPA; preceding projection admission required",
     "installed_source_changed": false,
     "private_receipt_commitments": [
@@ -2785,6 +2785,51 @@
         "receipt": "sustained-throughput-v1/intel-compiled-region-v1/native-mask-failure-review-v1/source-diagnosis.md",
         "bytes": 11004,
         "sha256": "289ff6dfe8c026c0b38f032d5eaf4d182e69aac311bbbde06a6ad2cd217c5cc4"
+      }
+    ]
+  },
+  "onednn_3_12_3_sdpa_source_analysis_2026_10_04": {
+    "status": "Source-only analysis of the pinned Torch default oneDNN 3.12.3 dependency and SDPA dispatch paths; installed version, active kernel, workspace, and cause remain unobserved.",
+    "scope": {
+      "source_identity": "Torch commit 5c4886908584029761b579af026dcfb627c84070 declares oneDNN v3.12.3; the retained tag resolves to commit 6db5f1ba860ca8f65c3f65c4498ad867e9642447.",
+      "analysis": "The source review identifies a supported general Graph partition path that may allocate a full FP32 score intermediate. For native vision geometry this is 11,601,874,944 bytes for one score value, before other live tensors or scratchpads.",
+      "boundary": "This is a source-supported possible allocation, not an observed allocation or peak, installed wheel identity, selected kernel, or causal explanation. No hardware was executed."
+    },
+    "private_receipt_commitments": [
+      {
+        "receipt": "optimization/sustained-throughput-v1/intel-compiled-region-v1/onednn-sdpa-source-pass-v1/source-note.md",
+        "bytes": 3552,
+        "sha256": "6ecd6598d48c4df4338faf3140f3533ce37081825947fcb5572c47054d77eca3"
+      },
+      {
+        "receipt": "optimization/sustained-throughput-v1/intel-compiled-region-v1/onednn-sdpa-source-pass-v1/source-freeze.json",
+        "bytes": 9537,
+        "sha256": "6a60497b22e63857c2633f8bee48937baff98749c84c81e9b9dabf22e9330bab"
+      }
+    ]
+  },
+  "vision_query_chunk_cpu_v2_source_and_synthetic_check_2026_10_04": {
+    "status": "Source-frozen Q32 vision query-chunk candidate with CPU-only synthetic algebra and contract checks passing; native GPU acceptance remains pending.",
+    "scope": {
+      "cpu_check": "15 CPU tests passed for synthetic tensors up to [1,16,65,64], using MATH-only SDPA and an independent FP64 reference. The candidate and stock path meet the predeclared approximate bounds.",
+      "retained_exactness_failure": "A separate strict stock-MATH bitwise gate failed and remains retained; approximate FP64 agreement does not erase that failure.",
+      "boundary": "No model, real input document, GPU, native extent or Tiny OCR trial was run. No installed GPU behavior, speed, or full-model acceptance is claimed."
+    },
+    "private_receipt_commitments": [
+      {
+        "receipt": "optimization/sustained-throughput-v1/intel-compiled-region-v1/vision-query-chunk-cpu-v2/README.md",
+        "bytes": 4204,
+        "sha256": "6c353b702498ee3c362476b53e44315c7c70f3e3c3fe910a612abfb17083efc3"
+      },
+      {
+        "receipt": "optimization/sustained-throughput-v1/intel-compiled-region-v1/vision-query-chunk-cpu-v2/source-freeze.json",
+        "bytes": 4743,
+        "sha256": "8a26eadd6c80a36a0996cfbdba0835d2223c05ddbf199c178c7d59515147d729"
+      },
+      {
+        "receipt": "optimization/sustained-throughput-v1/intel-compiled-region-v1/vision-query-chunk-cpu-v2/cpu-check.json",
+        "bytes": 4031,
+        "sha256": "efa7c6bd0cd3e5071a5355159b3a06fc4c40d1657fbd77030937721f6f1c69e0"
       }
     ]
   }
