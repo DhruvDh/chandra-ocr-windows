@@ -2590,7 +2590,7 @@
     "target": "Intel GPU inference throughput after repairing NorthStone idle CPU consumption. AMD throughput tuning cancelled.",
     "inference_speedup_accepted": false,
     "saturated_throughput_measured": false,
-    "hardware_hold": "Further experimental Intel launches held after native3959 prefill device loss; source diagnosis and safe partition preparation continue."
+    "hardware_hold": "All further experimental Intel GPU launches held after repeated native3959 device loss and correlated Kernel_141 archive writes. Source/runtime investigation continues; ordinary endpoint restored cold."
   },
   "northstone_idle_cpu_fix": {
     "status": "ACCEPTED scoped ordinary-serving launch fix; committed and pushed in ROCm repository",
@@ -2628,7 +2628,7 @@
     ]
   },
   "ffn_free_greedy_ocr": {
-    "status": "NOT ACCEPTED; v1 failed locally on receipt schema, v2 stopped after load on unresolved generation defaults before producing tokens. Source-reviewed v3 resolves stock defaults; no actual v3 execution.",
+    "status": "FFN B2 complete free-greedy OCR NOT ACCEPTED. Source-reviewed v3 stock-default repair passed separate Tiny B1 recovery; this does not qualify the FFN candidate.",
     "private_receipt_commitments": [
       {
         "receipt": "intel-ffn-row-geometry-free-ocr-v1-AB-001-run/independent-v2-failure-adjudication.json",
@@ -2681,6 +2681,80 @@
         "receipt": "ocrd-context-compatible-v1/normal-execution-v1/runs/ocrd-native-scanned-normal-b1-v1-AB-001-run/controller-terminal.json",
         "bytes": 311,
         "sha256": "da515999a564ae149bf2d48b82cddab6ad06ceeb072b51dbfbf3b2c4a024f338"
+      }
+    ]
+  },
+  "tiny801_recovery_after_native_failure": {
+    "status": "PASS in retained Tiny B1 scope only",
+    "generated_token_ids_exact": 395,
+    "complete_content_usage_stop_exact": true,
+    "zero_unload_completion_latch_and_original_process_closure": true,
+    "visible_Kernel141_inventory_unchanged": true,
+    "performance_claim": false,
+    "private_receipt_commitments": [
+      {
+        "receipt": "intel-tiny801-recovery-greedy-v1-AB-001-run/independent-recovery-acceptance.json",
+        "bytes": 2237,
+        "sha256": "3840f5b5b6a777fe9c5c4c2424b64b8e049887858b959dc2fedb2bbffc3a75b4"
+      }
+    ]
+  },
+  "tiny_prefill_stop_before_solve": {
+    "status": "PASS prefix and bounded capture only; first solve refused",
+    "completed_ATen_fences": 154,
+    "captured_paired_systems": 6,
+    "ocr_completed": false,
+    "performance_claim": false,
+    "zero_unload_and_closure": true,
+    "visible_Kernel141_inventory_unchanged": true,
+    "private_receipt_commitments": [
+      {
+        "receipt": "ocrd-context-compatible-v1/prefill-diagnostic-v1/runs/ocrd-first-text-prefill-diagnostic-v1-AB-001-run/independent-prefix-acceptance.json",
+        "bytes": 23873,
+        "sha256": "5c9eb599528c892f3faca72af1b19f98cb7c955d9e1236aaad47b429b7f040a8"
+      }
+    ]
+  },
+  "native_prefill_prefix_diagnostic": {
+    "status": "FAILED before layer0; no solve, capture or OCR output",
+    "prompt_tokens": 3959,
+    "requested_output_tokens": 12384,
+    "completed_ATen_fences": 3,
+    "device_error_surfaced_at": "Synchronization after second aten.arange.default([1]) in create_causal_mask / sdpa_mask head_arange; causal GPU kernel not established",
+    "observed_resource_floor_breach": false,
+    "original_collection_closure_accepted": false,
+    "fresh_original_process_closure_accepted": true,
+    "ordinary_worker_restored_cold": true,
+    "successful_unload_or_completion_latch": false,
+    "new_Kernel141_archive_temporally_correlated": true,
+    "uptime_increased": true,
+    "installed_A770_driver_fresh_PnP": "32.0.101.8991 WHQL, 2026-08-24",
+    "installed_endpoint_changed": false,
+    "private_receipt_commitments": [
+      {
+        "receipt": "ocrd-context-compatible-v1/prefill-diagnostic-v1/runs/ocrd-first-text-prefill-diagnostic-v1-AB-002-run/independent-failure-audit.json",
+        "bytes": 21758,
+        "sha256": "50fdc5eca07bba209285026790f9fd3d314f635cacc2760bf036f6ac7797ff1c"
+      },
+      {
+        "receipt": "ocrd-context-compatible-v1/prefill-diagnostic-v1/runs/ocrd-first-text-prefill-diagnostic-v1-AB-002-run/root-fresh-process-closure-02.json",
+        "bytes": 3577,
+        "sha256": "8b6868eef4980f7a42831a11cfdc0ca861e6abf7c68c31fcc8ab0afee5eeed3d"
+      },
+      {
+        "receipt": "ocrd-context-compatible-v1/prefill-diagnostic-v1/runs/ocrd-first-text-prefill-diagnostic-v1-AB-002-run/root-service-restoration.json",
+        "bytes": 987,
+        "sha256": "99974bf2bd455edc8b1248fd52d72898c1d312d18e07e176fd4c23ab2f8e69f5"
+      },
+      {
+        "receipt": "ocrd-context-compatible-v1/prefill-diagnostic-v1/runs/ocrd-first-text-prefill-diagnostic-v1-AB-002-run/root-kernel141-after.json",
+        "bytes": 485,
+        "sha256": "fcd5a93801b978f6fd039e9e44ab896db0dc553b52bcbbe196260cbc0252315e"
+      },
+      {
+        "receipt": "ocrd-context-compatible-v1/prefill-diagnostic-v1/runs/ocrd-first-text-prefill-diagnostic-v1-AB-002-run/root-display-pnp-drivers.json",
+        "bytes": 3186,
+        "sha256": "acd90781da7bd9487f5acb760a1f4a09c751d820dbbddad10c169b0929e07195"
       }
     ]
   }
