@@ -1,6 +1,10 @@
 # Current work
 
-Current work targets each node’s highest safe sustained pages per second, using AMD’s historical concurrency near 15 pages as a search region. On Intel, a controlled diagnostic found that FP32 output from the final projection passes the numerical checks at the arithmetic trial’s first failing position. Differences earlier in the model remain, so this candidate now needs full numerical and OCR qualification before throughput testing. The ordinary Windows worker is restored cold; no engine improvement has been deployed.
+Current work targets each node’s highest safe sustained pages per second. The latest Intel candidate, which retains FP32 output from the final batched projection, failed the full numerical comparison and will not advance to OCR or throughput testing. Its worker has exited, and the ordinary Windows endpoint is restored cold.
+
+The candidate completed all 710 positions but failed 18 of them under the unchanged policy. It fixed two earlier failures and introduced eight others. A separate invalid terminal heartbeat prevented resource acceptance, although no sampled memory floor was breached. The retained evidence distinguishes these failures from verified process closure.
+
+The next experiment will locate the first operation where batched execution diverges from matched single-page controls. It remains a source design. AMD testing still needs a coordinated host-RAM window; historical concurrency near 15 pages guides the search for its plateau.
 
 The AMD runner supports actual sequence limits of 2, 4, 8, 12 and 16. Its source review and three CPU checks pass; hardware execution awaits a coordinated host-RAM window.
 

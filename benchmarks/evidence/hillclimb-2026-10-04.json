@@ -51,7 +51,7 @@
   },
   "evidence_boundary": "Commitments hash private receipts only; they do not attest remote process identity or substitute for access to underlying evidence. Raw traces, tensors, private paths, and credentials are excluded. Numerical policy v2 was frozen before full candidate runs; capability receipts are not acceptance decisions.",
   "cpu_cached_calibration": {
-    "scope": "Matched CPU FP32 cached teacher against full uncached teacher at 394 identical conditioned positions; cached exporter retained 395 rows at positions 800–1194; no fresh greedy run.",
+    "scope": "Matched CPU FP32 cached teacher against full uncached teacher at 394 identical conditioned positions; cached exporter retained 395 rows at positions 800\u20131194; no fresh greedy run.",
     "identity_equal": true,
     "rows_compared": 394,
     "argmax_agreement_count": 394,
@@ -1521,7 +1521,7 @@
       },
       {
         "phase": "v6-01",
-        "result": "Both warmups and the single baseline batch’s counted content/usage checks passed, but a second ephemeral comparison-router bind failed with address already in use before any candidate request. The run stopped without retry; the required geometry review remained pending. No timing or promotion conclusion follows.",
+        "result": "Both warmups and the single baseline batch\u2019s counted content/usage checks passed, but a second ephemeral comparison-router bind failed with address already in use before any candidate request. The run stopped without retry; the required geometry review remained pending. No timing or promotion conclusion follows.",
         "baseline_requests": 3,
         "candidate_requests": 0,
         "baseline_quality_and_counts_passed": true,
@@ -2173,7 +2173,7 @@
         "long": 30
       },
       "render_integrity": "All 150 image SHA-256 values streamed from disk and matched the manifest. Root visual review inspected the contact sheet and one full native columns page; this is sampled visual review, not all-page OCR qualification.",
-      "root_visual_review": "Root inspected the dense contact sheet with five page families and a full columns-page image displayed resized from 1400×2200 to 1248×1961. The sampled page showed both columns in expected reading order, readable text, an equation, ruled table, and terminal marker without observed clipping. This is sampled layout review, not all-page visual or OCR acceptance."
+      "root_visual_review": "Root inspected the dense contact sheet with five page families and a full columns-page image displayed resized from 1400\u00d72200 to 1248\u00d71961. The sampled page showed both columns in expected reading order, readable text, an equation, ruled table, and terminal marker without observed clipping. This is sampled layout review, not all-page visual or OCR acceptance."
     },
     "actual_processor_sample": {
       "fixture": "page-0001-prose",
@@ -2410,6 +2410,49 @@
         "bytes": 921,
         "sha256": "7bb7712f05ccd1b0560043ac856f44af4aa792dce0885a798083f107ed7bb0fc",
         "note": "Owned-process closure and cold worker/router restoration."
+      }
+    ]
+  },
+  "tiny_offset80_stock_b2_fp32_output_head_ab_failure_2026_10_04": {
+    "status": "FAILED: full B2 FP32-output-head AB evaluation did not pass numerical policy or resource acceptance.",
+    "scope": {
+      "candidate": "tiny-offset80-stock-b2-fp32-output-lm-head-v1; AB order only.",
+      "numerical_result": "18 rows failed the unchanged frozen numerical policy: 15 TV-budget failures, 9 target-logprob failures, and 2 winner disagreements (categories overlap). Both EOS rows passed. The first failed B86 vector had its scalar disposition independently reproduced; successful candidate vectors were not retained.",
+      "comparison_to_matched_checkpoint": "The preceding matched-hidden diagnostic was checkpoint-local and nonaccepting; this full AB result does not qualify the B2 FP32-output head.",
+      "resource_result": "The audit observed 274/274 passing DXGI decisions and a combined periodic/aligned-snapshot minimum headroom of 5,057,347,584 bytes, but the guard ended with an invalid heartbeat. Complete resource acceptance failed.",
+      "closure": "All five owned processes were independently absent. The ordinary worker was restored cold, and the router reported that backend cold. No NorthStone gateway actions.",
+      "disposition": "No BA run, OCR, throughput, or promotion qualification."
+    },
+    "private_receipt_commitments": [
+      {
+        "receipt": "optimization/tiny-offset80-stock-b2-fp32-output-lm-head-v1-AB-001-run/independent-failed-terminal-assessment.json",
+        "bytes": 4774,
+        "sha256": "5b1c84462eb848d9c16a256a8353ea3d02613bdc6bf9e985b59f78f447870641",
+        "note": "Final independent terminal assessment binding numerical and resource outcomes."
+      },
+      {
+        "receipt": "optimization/tiny-offset80-stock-b2-fp32-output-lm-head-v1-AB-001-run/independent-nonaccepting-numerical-diagnostic.json",
+        "bytes": 27903,
+        "sha256": "b1d31443edfa38a612d2964e89212fc5e393d80d3722805c5e47029448bb9580",
+        "note": "Completed nonaccepting numerical diagnosis for the full AB row set."
+      },
+      {
+        "receipt": "optimization/tiny-offset80-stock-b2-fp32-output-lm-head-v1-AB-001-run/independent-resource-closure-assessment.json",
+        "bytes": 10357,
+        "sha256": "32f32daa5be02cfa36d632ed5ca6a77936b72c3e965bce3efa0be4ef869a490f",
+        "note": "Independent resource audit; heartbeat validity failed, so resource acceptance is incomplete."
+      },
+      {
+        "receipt": "optimization/tiny-offset80-stock-b2-fp32-output-lm-head-v1-AB-001-run/controller-terminal.json",
+        "bytes": 508,
+        "sha256": "8499c654cdfc95ec2a2ebef0ca4615ed87da38d229de496eeed2c25e666ac129",
+        "note": "Controller terminal state and cgroup accounting; not inference-process RSS."
+      },
+      {
+        "receipt": "optimization/tiny-offset80-stock-b2-fp32-output-lm-head-v1-AB-001-run/service-restoration.json",
+        "bytes": 921,
+        "sha256": "20927ccb91eefda2492b9bbe624c0a0717e40db15899b99ccf7021112d283729",
+        "note": "Verified process closure, ordinary worker restored cold, and router backend observation."
       }
     ]
   }
