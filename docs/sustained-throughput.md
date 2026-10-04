@@ -1,6 +1,6 @@
-# Raise each node's sustained OCR throughput
+# Raise Intel's sustained OCR throughput
 
-The target is the largest sustainable number of correctly completed pages per second on each node. Increase pages in flight until throughput stops improving, identify the limiting resource, and change the implementation or batching to raise that ceiling. Optimize NorthStone and Waystone separately. Load balancing can follow once their individual capacity curves are understood. The accepted three-request routing improvement measures burst completion time; it does not establish either node's throughput ceiling.
+The active target is the largest sustainable number of correctly completed pages per second on Waystone's Intel GPU. Increase pages in flight until throughput stops improving, identify the limiting resource, and change inference or batching to raise that ceiling. On October 4 the owner stopped AMD throughput tuning and requested only its idle CPU repair, which passed. Earlier NorthStone methods and results below remain historical preparation. Load balancing can follow once individual capacity is understood. The accepted three-request routing improvement measures burst completion time; it does not establish a throughput ceiling.
 
 ## Measure the serving system that OCRd uses
 

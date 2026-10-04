@@ -2584,5 +2584,104 @@
         "note": "Separate CPU-only entrypoint/cleanup check; no hardware completion qualification."
       }
     ]
+  },
+  "active_scope": {
+    "owner_revision": "2026-10-04",
+    "target": "Intel GPU inference throughput after repairing NorthStone idle CPU consumption. AMD throughput tuning cancelled.",
+    "inference_speedup_accepted": false,
+    "saturated_throughput_measured": false,
+    "hardware_hold": "Further experimental Intel launches held after native3959 prefill device loss; source diagnosis and safe partition preparation continue."
+  },
+  "northstone_idle_cpu_fix": {
+    "status": "ACCEPTED scoped ordinary-serving launch fix; committed and pushed in ROCm repository",
+    "source_commit": "eb00efacf9532786bf3ea3acb99479c6fa564ac1",
+    "launch_default": "HSA_TOOLS_DISABLE_REGISTER=1",
+    "before_core_percent": 99.83391220492528,
+    "after_core_percent": [
+      0.20886936948598697,
+      0.22597930806266356
+    ],
+    "independent_after_core_percent": 0.237,
+    "correctness": "Cold and wake complete OCR content and usage equal retained reference; two successful sleeps. No serving math/context/capacity change.",
+    "evidence_repository": "https://github.com/DhruvDh/chandra-ocr-uv-rocm/tree/codex/native-rocm10-serving/evidence/idle-cpu-fix-2026-10-04",
+    "limits": "Restart and launch setting changed together; original trigger remains unidentified. Explicit0 is required in a newly launched worker for dedicated profiling."
+  },
+  "ffn_batched_row_geometry": {
+    "status": "AB and BA exact numerical PASS; complete OCR and speed remain unaccepted",
+    "full_vocabulary_rows_each": 710,
+    "vocabulary_entries_each": 248320,
+    "state_fields_each": 45440,
+    "original_logit_hash_differences_each": 0,
+    "original_state_hash_differences_each": 0,
+    "purpose": "Batch96 FFN projections while preserving B1 token mixers, norms, head, cache and survivor geometry.",
+    "private_receipt_commitments": [
+      {
+        "receipt": "tiny-offset80-stock-b2-ffn-batched-row-geometry-v1-AB-001-run/independent-actual-acceptance.json",
+        "bytes": 2152,
+        "sha256": "4f69dc87095acbfa756192fa9a74c73c78bae0a52a2e7343c2312565116147c8"
+      },
+      {
+        "receipt": "tiny-offset80-stock-b2-ffn-batched-row-geometry-v1-BA-001-run/independent-actual-acceptance.json",
+        "bytes": 2133,
+        "sha256": "a2e697703a9f4d09f06bfcfa170e3441ca6671db08210abc4a3c06477aae357e"
+      }
+    ]
+  },
+  "ffn_free_greedy_ocr": {
+    "status": "NOT ACCEPTED; v1 failed locally on receipt schema, v2 stopped after load on unresolved generation defaults before producing tokens. Source-reviewed v3 resolves stock defaults; no actual v3 execution.",
+    "private_receipt_commitments": [
+      {
+        "receipt": "intel-ffn-row-geometry-free-ocr-v1-AB-001-run/independent-v2-failure-adjudication.json",
+        "bytes": 1897,
+        "sha256": "60426999298e1eee3f934b57982c3b3f7b3d81a21948d15cc1f0420394854f25"
+      },
+      {
+        "receipt": "ffn-row-geometry-free-ocr-v3/independent-source-review.json",
+        "bytes": 11421,
+        "sha256": "693ce6bad5a6d00f97816c2a4c3a511c2a0954e88df2cebff174a0cda3492e09"
+      }
+    ]
+  },
+  "native_ocrd_conditioning_trial": {
+    "status": "FAILED during native3959 text prefill; zero generated tokens; no native/scanned oracle or performance qualification",
+    "prompt_tokens": 3959,
+    "requested_output_tokens": 12384,
+    "serving_context_tokens": 16384,
+    "device_error": "UR_RESULT_ERROR_DEVICE_LOST",
+    "sampled_resource_floor_breach": false,
+    "minimum_running_LOCAL_headroom_bytes": 6045040640,
+    "maximum_running_additional_LOCAL_usage_bytes": 10192945152,
+    "all_owned_processes_closed": true,
+    "ordinary_worker_restored_cold": true,
+    "successful_unload_or_completion_latch": false,
+    "windows_evidence": "Recent WER Kernel_141 archive temporally correlated. Its contents are denied to the SSH user. No operator, actual onset, system reboot or whole-GPU-reset finding.",
+    "installed_endpoint_changed": false,
+    "private_receipt_commitments": [
+      {
+        "receipt": "ocrd-context-compatible-v1/normal-execution-v1/runs/ocrd-native-scanned-normal-b1-v1-AB-001-run/independent-failure-closure-audit.json",
+        "bytes": 30984,
+        "sha256": "9ff090b4bae5868bdea9baa43e7d9bc51684e2ebf604032b79d24b4e989fd33c"
+      },
+      {
+        "receipt": "ocrd-context-compatible-v1/normal-execution-v1/runs/ocrd-native-scanned-normal-b1-v1-AB-001-run/independent-kernel141-correlation-addendum.json",
+        "bytes": 3472,
+        "sha256": "a22e10dd9142425dae000e86025ce4e70e04e84e1a3609e88ed3ade82f939ae4"
+      },
+      {
+        "receipt": "ocrd-context-compatible-v1/normal-execution-v1/runs/ocrd-native-scanned-normal-b1-v1-AB-001-run/windows-application-kernel-events.json",
+        "bytes": 802,
+        "sha256": "b1b80fb209acdfe15f5983ee62813ff83e87e6f272cd7a61c2fe1d476e9aedcd"
+      },
+      {
+        "receipt": "ocrd-context-compatible-v1/normal-execution-v1/runs/ocrd-native-scanned-normal-b1-v1-AB-001-run/windows-kernel141-metadata-access.json",
+        "bytes": 462,
+        "sha256": "14dadc8c04e8cf25dba7a5ad6374f1a2916e60c2d71604ddd53ce4278c379811"
+      },
+      {
+        "receipt": "ocrd-context-compatible-v1/normal-execution-v1/runs/ocrd-native-scanned-normal-b1-v1-AB-001-run/controller-terminal.json",
+        "bytes": 311,
+        "sha256": "da515999a564ae149bf2d48b82cddab6ad06ceeb072b51dbfbf3b2c4a024f338"
+      }
+    ]
   }
 }
