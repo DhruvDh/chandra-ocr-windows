@@ -1984,5 +1984,116 @@
         "sha256": "9d3d31b968bd946c7e8993652dc798f678a61c1b24e5cfc2635068c956c19ebf"
       }
     ]
+  },
+  "query_chunk256_vision_boundary_softmax_postload_numerical_2026_10_04": {
+    "status": "Independent fresh exact numerical PASS (395 rows, 25,280 ordered cache digests) and independent resource/ownership closure PASS. Full OCR and performance remain unqualified.",
+    "numerical_result": {
+      "logit_shape": [
+        395,
+        248320
+      ],
+      "ordered_cache_digest_records": 25280,
+      "multi_query_attention_calls": 16,
+      "query_chunks": 72,
+      "cached_delegate_calls": 3152,
+      "boundary_trims": 2,
+      "argument_checks": 396,
+      "interpretation": "Fresh exact logit payload and ordered finite cache digests match the pinned hybrid reference. No raw cache replay, full OCR or performance proof."
+    },
+    "resource_and_closure": {
+      "resource_gates_passed": true,
+      "all_owned_processes_absent": true,
+      "ordinary_waystone_restored_cold": true,
+      "northstone_gateway_actions": [],
+      "periodic_observations": 159,
+      "periodic_min_process_local_headroom_bytes": 5990318080,
+      "aligned_trim_snapshots": 2,
+      "combined_min_process_local_headroom_bytes": 5057347584,
+      "interpretation": "Combined minimum includes cold-load pretrim aligned sample and is lower than the periodic-only minimum; both passed the unchanged floors. DXGI values are process-local budget telemetry, not global free VRAM.",
+      "controller_cgroup": {
+        "configured_memory_max_bytes": 268435456,
+        "configured_swap_max_bytes": 0,
+        "terminal_systemd_reported_peak": "256.2M (swap: 0B)",
+        "interpretation": "Rounded cgroup accounting, not RSS or a strict <=256 MiB observation. Early memory.events snapshot is not whole-run evidence."
+      }
+    },
+    "qualification_limits": "No full OCR, throughput/timing or promotion claim.",
+    "private_receipt_commitments": [
+      {
+        "receipt": "optimization/query-chunk256-vision-boundary-softmax-postload-production-gain-v1-numerical-01-independent-exact-verification.json",
+        "bytes": 1267,
+        "sha256": "2afc0fcff71a6338f2ff80582cfad249c81bbe3b07111df61737dd61e59f7183"
+      },
+      {
+        "receipt": "optimization/query-chunk256-vision-boundary-softmax-postload-production-gain-v1-numerical-01-independent-numerical-assessment.json",
+        "bytes": 2265,
+        "sha256": "415fa032cd26e106dc55ce48b780e879da4ebbde9d3ff9382808bc0e671d52b1"
+      },
+      {
+        "receipt": "optimization/query-chunk256-vision-boundary-softmax-postload-production-gain-v1-numerical-01-independent-resource-closure-audit.json",
+        "bytes": 7380,
+        "sha256": "fb3b1bd0dd7a95568733f0517a988f08b07efad62bf117986a5bc414d7a08118"
+      },
+      {
+        "receipt": "optimization/query-chunk256-vision-boundary-softmax-postload-production-gain-v1-numerical-01-service-restoration.json",
+        "bytes": 735,
+        "sha256": "96358a692b3d5195b63dc724bfa93639916605e3e51bf8f8355d3ef04a86448e"
+      },
+      {
+        "receipt": "optimization/query-chunk256-vision-boundary-softmax-postload-production-gain-v1-numerical-01-client-cgroup-terminal.json",
+        "bytes": 745,
+        "sha256": "c188f0e079fcde75904be18fba6f090dc7e1c75b41fdb0054e81a2e7c4cd89fc"
+      },
+      {
+        "receipt": "optimization/query-chunk256-vision-boundary-softmax-postload-production-gain-v1-numerical-01-collection.json",
+        "bytes": 4527,
+        "sha256": "2388b219028ebaf7ffb203088bcab6e854aefec9e0f6728d3a7a39904bad90e5"
+      }
+    ]
+  },
+  "north_shared_s2_throughput_pilot_failed_2026_10_04": {
+    "status": "FAILED at the 4 GiB free-VRAM guard during the first C1 representative warmup; no measured throughput cells completed.",
+    "scope": "One excluded Tiny completed; C1 warmup Tiny and Small passed quality; C1 warmup Representative was interrupted at a minimum free-VRAM observation of 4,221,841,408 bytes (about 3.931896 GiB). C1 warmup Routes and Ledger, all measured cells, C2 and C4 were not submitted.",
+    "resource_and_drain": {
+      "guard_bytes": 4294967296,
+      "minimum_free_vram_bytes": 4221841408,
+      "minimum_free_vram_gib": 3.931896,
+      "submitted_requests_drained": true,
+      "gateway_and_engine_drain_verified": true,
+      "interpretation": "The existing shared engine is not task-owned; the historical hardware_ownership_released:false flag is retained and is not treated as a drain failure. The independent audit separately verifies gateway and actual engine drain."
+    },
+    "disposition": "No valid throughput result, sustained-capacity estimate or speed claim. Shared engine ownership was not transferred to the pilot.",
+    "controller_cgroup": {
+      "terminal_memory_peak_bytes": 28250112,
+      "terminal_swap_peak_bytes": 0,
+      "interpretation": "The failed client unit exited; this is client cgroup accounting, not shared-engine ownership evidence."
+    },
+    "private_receipt_commitments": [
+      {
+        "receipt": "optimization/north-shared-s2-throughput-pilot-01/client-results/summary.json",
+        "bytes": 2433,
+        "sha256": "a156442de43a291ba3ec336ee8df60d58c21f0ddd57d79bf0ed343f47e318d79"
+      },
+      {
+        "receipt": "optimization/north-shared-s2-throughput-pilot-01/runner-results/summary.json",
+        "bytes": 2824,
+        "sha256": "9f242ca4524229117d96ae9d89bf90c0cac6e5e1e2c24b9c40693319a334d54f"
+      },
+      {
+        "receipt": "optimization/sustained-throughput-v1/amd-capacity-v2/failed-pilot-audit.json",
+        "bytes": 4835,
+        "sha256": "998655a2e23510000b429d0712e55ca90a458cb8bca1bdf874b54bfaab617115"
+      },
+      {
+        "receipt": "optimization/north-shared-s2-throughput-pilot-01/client-cgroup-terminal.json",
+        "bytes": 508,
+        "sha256": "72b04119f9c3b81f9943b3b349edbf1cf2deb39d71bb9440b576d7fd07898233"
+      },
+      {
+        "receipt": "optimization/north-shared-s2-throughput-pilot-01/passive-admission.json",
+        "bytes": 7232,
+        "sha256": "93edaa6c1483795eb9749ff5070b040d9af20183c8b3b808864609368c1d6eb5"
+      }
+    ]
   }
 }
