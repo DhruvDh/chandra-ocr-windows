@@ -51,7 +51,7 @@
   },
   "evidence_boundary": "Commitments hash private receipts only; they do not attest remote process identity or substitute for access to underlying evidence. Raw traces, tensors, private paths, and credentials are excluded. Numerical policy v2 was frozen before full candidate runs; capability receipts are not acceptance decisions.",
   "cpu_cached_calibration": {
-    "scope": "Matched CPU FP32 cached teacher against full uncached teacher at 394 identical conditioned positions; cached exporter retained 395 rows at positions 800\u20131194; no fresh greedy run.",
+    "scope": "Matched CPU FP32 cached teacher against full uncached teacher at 394 identical conditioned positions; cached exporter retained 395 rows at positions 800–1194; no fresh greedy run.",
     "identity_equal": true,
     "rows_compared": 394,
     "argmax_agreement_count": 394,
@@ -1085,6 +1085,185 @@
         "receipt": "optimization/dxgi-guard-cpu-01/owned-resource.json",
         "bytes": 1676,
         "sha256": "863033bd716c18b5fb11fc6bcf5ebc417bf4dbe16ab03d9793a3f63c0a4ab0c6"
+      }
+    ]
+  },
+  "production_gain_complete_ocr_partial_2026_10_04": {
+    "scope": "Partial execution of the planned five-page production-gain OCR phase under the reviewed revision-06 guard. Two fixture outputs were completed; the candidate was not fully qualified.",
+    "result": "Tiny and Small each passed their saved complete-output check and unloaded with zero memory. The Representative fixture did not complete: the unchanged process-local 2 GiB margin guard stopped the run at 1,958,739,968 bytes of observed headroom. Routes and Ledger were not run. The batch is incomplete and no full OCR pass, paired timing result, performance claim, or promotion is established. Historical generated IDs remain unavailable.",
+    "completed_fixtures": [
+      "tiny",
+      "small"
+    ],
+    "completed_fixture_count": 2,
+    "planned_page_count": 5,
+    "failed_headroom_bytes": 1958739968,
+    "configured_minimum_running_unused_margin_bytes": 2147483648,
+    "representative_completed": false,
+    "routes_run": false,
+    "ledger_run": false,
+    "all_five_owned_pids_absent": true,
+    "normal_service_restored_cold_accepting": true,
+    "independent_assessment": "FAIL/incomplete on unchanged 2 GiB headroom guard; confirms Tiny/Small exact-output pass and zero unload, Representative incomplete, Routes/Ledger not run, all owned PIDs absent and normal cold accepting service restored.",
+    "commitments": [
+      {
+        "receipt": "optimization/production-gain-v1-ocr-preparation/plan.json",
+        "bytes": 3134,
+        "sha256": "344d2491db83efeb55ab0ee785f5313d40a14dffec9848b7f46b458b81c30d5c"
+      },
+      {
+        "receipt": "optimization/production-gain-v1-dxgi-addendum-revision-06/preparation-receipt.json",
+        "bytes": 3336,
+        "sha256": "07cad7761ba85eecfa2a6e18b1bb78927f17e62b8a99cdbff14b78bad9e41e87"
+      },
+      {
+        "receipt": "optimization/production-gain-v1-complete-ocr-01-root-lease.json",
+        "bytes": 1262,
+        "sha256": "a8498b83de8430fb9ef513326a5ebc340e95c829381b16cf8f1ef24e54756729"
+      },
+      {
+        "receipt": "optimization/production-gain-v1-complete-ocr-01-admission.json",
+        "bytes": 7075,
+        "sha256": "81ea05ad3d51a0a6ebcf1373a17c791d39faf8bebef0831c3dc5d9eeb80a477e"
+      },
+      {
+        "receipt": "optimization/production-gain-v1-complete-ocr-01-preflight.json",
+        "bytes": 8754,
+        "sha256": "d37f4ff7143b3b148ebb11a9d18c929cf4ec2d74f4f0ed446b2362c083ac3419"
+      },
+      {
+        "receipt": "optimization/production-gain-v1-complete-ocr-01-collection.json",
+        "bytes": 4787,
+        "sha256": "35c8f03b75b3d9f62c376a0be3905e9a645330aaf25b624ee383289975d7c3ab"
+      },
+      {
+        "receipt": "optimization/production-gain-v1-complete-ocr-01-resource.json",
+        "bytes": 85078,
+        "sha256": "14795ec26f7a55742991be95943a755b480885dc5c6d144a042df565003bacc6"
+      },
+      {
+        "receipt": "optimization/production-gain-v1-complete-ocr-01-channel.json",
+        "bytes": 1746,
+        "sha256": "3b939324b195098938b079db3fe89770fc3d22b01952c1739065851de1605445"
+      },
+      {
+        "receipt": "optimization/production-gain-v1-complete-ocr-01-runtime-attestation.json",
+        "bytes": 2590,
+        "sha256": "1f8682680279a04c7991549b90dae57a2ecd86eed2af93c1209b8ed94130c660"
+      },
+      {
+        "receipt": "optimization/production-gain-v1-complete-ocr-01-heartbeat.json",
+        "bytes": 335,
+        "sha256": "7ddfc56bebda3893f595860c3d6ca08f078ef508239be22af6039319578098f1"
+      },
+      {
+        "receipt": "optimization/production-gain-v1-complete-ocr-01/batch-summary.json",
+        "bytes": 1374,
+        "sha256": "519afa5001ae35de39a2bb8b44630bf7372dbcc7e32c60c9a9482b766c39fcd3"
+      },
+      {
+        "receipt": "optimization/production-gain-v1-complete-ocr-01/tiny/summary.json",
+        "bytes": 19728,
+        "sha256": "0d38c77fe77af5127504fd1ca7d8be09f693e55519192a46c00e6aea40e5e1e9"
+      },
+      {
+        "receipt": "optimization/production-gain-v1-complete-ocr-01/small/summary.json",
+        "bytes": 19741,
+        "sha256": "8f365ec90f2fb3bf300bd168a16fb0a2f4a6a2293234b468f575f930db0127ff"
+      },
+      {
+        "receipt": "optimization/production-gain-v1-complete-ocr-01/small/timing-0.response.json",
+        "bytes": 1179,
+        "sha256": "3fb78905a76fe02ba7287a4748e0d9ab07db224bbaedfc8e968bd0edc22aedf6"
+      },
+      {
+        "receipt": "optimization/production-gain-v1-complete-ocr-01/small/timing-0.tokens.json",
+        "bytes": 2067,
+        "sha256": "e6d3adeece6b3b9b3ed8ac25021640a5ffc8e10411a028154837299e2fa57390"
+      },
+      {
+        "receipt": "optimization/production-gain-v1-complete-ocr-01/representative/summary.json",
+        "bytes": 4490,
+        "sha256": "dcd20629ac0e2f7e776495de1487a57938ec2ecefd12e143d04f93dfcd310ec4"
+      },
+      {
+        "receipt": "optimization/production-gain-v1-complete-ocr-01-restoration.json",
+        "bytes": 977,
+        "sha256": "2648e5b8b516f2bd3901ab01788cc707969772aad724b428f9fcf899c2968f78"
+      },
+      {
+        "receipt": "optimization/production-gain-v1-complete-ocr-01-final-state.json",
+        "bytes": 1565,
+        "sha256": "7ff23cbc7a1a1842b269b003a10f5eeef185889b39070b9e1c3ee020f23e2459"
+      },
+      {
+        "receipt": "optimization/production-gain-v1-complete-ocr-01-independent-failure-assessment.json",
+        "bytes": 5389,
+        "sha256": "3beae38f9fbe50738c4afc264846410113d62791c5b6f19245b7d26883cda707"
+      }
+    ]
+  },
+  "post_load_cache_trim_feasibility_2026_10_04": {
+    "scope": "Separate load-only cache-trim feasibility trial. The stock model load, same-process snapshot, empty_cache/synchronization and unload were exercised; no inference ran.",
+    "result": "After stock cache trim, reserved memory fell by 1,910,505,472 bytes and same-process DXGI usage fell by 1,953,234,944 bytes. All 728 tensor metadata identities remained stable, allocated memory was unchanged, and unload returned allocated/reserved memory to zero. This establishes load-only feasibility for the observed run; numerical, OCR and speed qualification remain untested.",
+    "reserved_release_bytes": 1910505472,
+    "same_process_dxgi_release_bytes": 1953234944,
+    "tensor_metadata_identities": 728,
+    "tensor_identities_stable": true,
+    "allocated_memory_unchanged": true,
+    "unload_allocated_and_reserved_zero": true,
+    "initial_collection_boundary": "The original collection is retained unchanged and reported one PID still openable, so its owned-process-absence status was false at that collection. A later independent cleanup addendum checked all five owned PIDs absent, without killing processes; the restoration receipt reports the normal service cold and accepting.",
+    "qualification": "No inference, numerical comparison, OCR, or performance qualification.",
+    "commitments": [
+      {
+        "receipt": "optimization/post-load-cache-trim-v1/plan.json",
+        "bytes": 2095,
+        "sha256": "b9f94e3d194f161b2ffbc8dbf79d3d3231aa15b72931fe0695935c1aaa450a20"
+      },
+      {
+        "receipt": "optimization/post-load-cache-trim-v1/load_only.py",
+        "bytes": 5560,
+        "sha256": "70fb71871afe98b433ff04140093ad88e3dd94885baf6e15ad51cc5bec6dd3e1"
+      },
+      {
+        "receipt": "optimization/post-load-cache-trim-v1-load-01-root-lease.json",
+        "bytes": 1277,
+        "sha256": "8217604bd96c055b686c621b603ae7dcf443d9d23495ef05e46d07f1f95ad6bb"
+      },
+      {
+        "receipt": "optimization/post-load-cache-trim-v1-load-01/trim-summary.json",
+        "bytes": 18699,
+        "sha256": "5dbc6b398b19501be05752dcce68438da8875c47562ccad2dac52d45115bafdd"
+      },
+      {
+        "receipt": "optimization/post-load-cache-trim-v1-load-01-collection.json",
+        "bytes": 2486,
+        "sha256": "1f299f829e3e6413483f5f6a1af25e3370215a0dcbee63c1cc8865c706b1b6a6"
+      },
+      {
+        "receipt": "optimization/post-load-cache-trim-v1-load-01-cleanup-addendum.json",
+        "bytes": 817,
+        "sha256": "a2e565595aba092d5243bd73038a9d2127e600892cd58bbe1945070b04da05e4"
+      },
+      {
+        "receipt": "optimization/post-load-cache-trim-v1-load-01/before-tensors.json",
+        "bytes": 165981,
+        "sha256": "e4f44dba2549719c1cb4fd6c4d3b31a24d4a26da74bb7432732ac31551630394"
+      },
+      {
+        "receipt": "optimization/post-load-cache-trim-v1-load-01/after-tensors.json",
+        "bytes": 165981,
+        "sha256": "e4f44dba2549719c1cb4fd6c4d3b31a24d4a26da74bb7432732ac31551630394"
+      },
+      {
+        "receipt": "optimization/post-load-cache-trim-v1-load-01-restoration.json",
+        "bytes": 1499,
+        "sha256": "00b25bbad42dd0629aa1175e3609e6a5a760f2c29088a8252eeaa308d556288b"
+      },
+      {
+        "receipt": "optimization/post-load-cache-trim-v1-load-01-independent-feasibility-assessment.json",
+        "bytes": 4936,
+        "sha256": "5b2b476f72c90aed3bad0cabebf1e1f9aca0e7b9f23e01379fb477ffe71c3ec8"
       }
     ]
   }
