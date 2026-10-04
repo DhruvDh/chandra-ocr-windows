@@ -1,0 +1,15 @@
+# Qualified hybrid profiling
+
+This runner uses the unchanged production `XPUBackend.generate` path: verified pinned weights, exact synthetic PNG and prompt bytes, production processor dimensions, BF16 XPU, vision SDPA and text eager. It preserves all response text and final usage/stop metadata. An independent content gate must accept every retained response before a run contributes performance evidence. Profiling output alone never promotes a candidate.
+
+Run only during an explicit exclusive GPU lease, with the ordinary worker unloaded and service control held by its coordinator. The loader's verified model, scratch allocation and one inference are the bounded allocation; do not overlap another model. The default run comprises one complete warmup, one complete unprofiled timing request and one complete profiled generation. The maximum output allowance stays 12,384; actual tokens and stopping behavior determine completeness. No serving source or installed tools change.
+
+```powershell
+& $Python experiments/xpu-hillclimb/profile_baseline.py --model .runtime/model --image benchmarks/inputs-v2/representative.png --prompt benchmarks/prompt.txt --output $NewPrivateOutput
+```
+
+The profiler enters the same generation thread as the production call and records CPU plus XPU activities. The first nine model forwards are traced by default: one prefill and eight cached decoding calls. Later forward host durations are retained without additional device synchronization. `chandra::prefill` and `chandra::decode` scopes establish the actual full-model phase; operator and device events in `trace.json` identify kernel costs and launch gaps. Shape recording distinguishes projections, attention and recurrent work. Module host durations are asynchronous launch-time observations, not GPU elapsed times. The unprofiled request supplies useful page timing; the profiled total is explicitly perturbed and cannot establish speedup.
+
+For a later decoding window, run separately with `--profile-wait 50 --profile-active 8 --warmups 0 --timings 0` while the same lease remains valid. This loads a new model process and collects a complete output, but its recorded eight-forward window is not a warm request throughput measurement. Trace files may reveal private runtime paths and device details and belong only in private evidence. Source/input hashes and model verification are recorded alongside outputs; self-reporting source hashes do not independently attest remote process identity.
+
+Ranking begins with measured attribution. Likely candidates are text attention's repeated KV materialization, the fallback recurrent/convolution graph's small dispatches, and host/device synchronization during token streaming. Each is a hypothesis until the trace distinguishes its cost. Attention dispatch changes require cached/full, complete teacher-forcing and complete greedy OCR/geometry gates; recurrent or convolution replacements also require trained-layer fixtures and full-model numerical validation. A faster wrong answer is a failed experiment.

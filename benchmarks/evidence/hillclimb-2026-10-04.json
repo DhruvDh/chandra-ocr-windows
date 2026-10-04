@@ -1,0 +1,237 @@
+{
+  "schema": "chandra-hillclimb-evidence-index-v1",
+  "date_utc": "2026-10-04",
+  "promotion": "No optimized candidate promoted; qualified reference remains unchanged hybrid BF16.",
+  "baseline": {
+    "scope": "Frozen representative-page full production generation; content/layout/token/stop gates passed; 397 completion tokens.",
+    "warmup_seconds": 88.0385835,
+    "unprofiled_request_seconds": 85.4972542,
+    "profiled_request_seconds": 126.3749774,
+    "profile_interpretation": "Profiled request is perturbed and is not ordinary latency evidence.",
+    "trace_scope": "One prefill and eight cached decode forwards; attribution is bounded by severe instrumentation perturbation.",
+    "private_receipt_commitments": [
+      {
+        "receipt": "profile-baseline-01/findings.md",
+        "bytes": 6457,
+        "sha256": "8334d03c32b52f8fdc93dba9a6c5e7027c9f2ad6fd6afa3c30f06e3ac967712d"
+      }
+    ]
+  },
+  "attention_candidate": {
+    "status": "FAILED predeclared trained cached/full numerical gate; candidate unqualified.",
+    "scope": "Eight-step trained XPU run; finite tensors and matching greedy token, but all-teacher and complete OCR gates not launched.",
+    "observed_max_abs": 0.125,
+    "observed_rms": 0.0126220677,
+    "required_max_abs": 0.0625,
+    "required_rms": 0.0096618524,
+    "subsequent_cpu_review": "Calibration and nine trained CPU fixtures do not replace XPU replay, full cached generation, or OCR acceptance.",
+    "private_receipt_commitments": [
+      {
+        "receipt": "attention-cache-01.deadline.json",
+        "bytes": 883,
+        "sha256": "55d032b21eaecdcf53d12da74863992c12b4cc92a79af83a979234f2122bc0f7"
+      },
+      {
+        "receipt": "attention-cache-01/attention-candidate.json",
+        "bytes": 12175,
+        "sha256": "c8a1467cf84f4de470114135582e00ed1a7be546d9c8d04bbcc4ec8a9c01851c"
+      },
+      {
+        "receipt": "attention-cache-vs-hybrid-01.json",
+        "bytes": 5340,
+        "sha256": "8b2a87bc3604ce6f8c370e5ab6d3bc5d5ca5d2d2c24b9862d9dfa724a656ec42"
+      }
+    ]
+  },
+  "pending": {
+    "recurrent": "V1 rejected. A separately identified compiler-rounding variant may be investigated under the unchanged policy; it has no qualification or performance result.",
+    "normalization": "Gain-only complete OCR and timing remain pending. Fused full-model qualification remains pending."
+  },
+  "evidence_boundary": "Commitments hash private receipts only; they do not attest remote process identity or substitute for access to underlying evidence. Raw traces, tensors, private paths, and credentials are excluded. Numerical policy v2 remains under calibration; capability receipts are not acceptance decisions.",
+  "cpu_cached_calibration": {
+    "scope": "Matched CPU FP32 cached teacher against full uncached teacher at 394 identical conditioned positions; cached exporter retained 395 rows at positions 800\u20131194; no fresh greedy run.",
+    "identity_equal": true,
+    "rows_compared": 394,
+    "argmax_agreement_count": 394,
+    "max_abs": 6.151199340820312e-05,
+    "max_row_rmse": 8.591224514365847e-06,
+    "max_full_to_cached_kl": 2.5746986568425276e-11,
+    "max_cached_to_full_kl": 2.575166870221674e-11,
+    "max_target_log_probability_error": 6.975421324995068e-06,
+    "terminal_cached_argmax": 248046,
+    "final_cached_vs_uncached": {
+      "max_abs": 1.2874603271484375e-05,
+      "rmse": 2.333009888388915e-06,
+      "argmax_equal": true,
+      "finite": true
+    },
+    "interpretation": "Matched FP32 path-calibration only; it does not qualify BF16 candidates, transfer tolerances, establish OCR accuracy, or rerun greedy termination.",
+    "private_receipt_commitments": [
+      {
+        "receipt": "cpu214-cached-calibration-result.md",
+        "bytes": 3842,
+        "sha256": "f20fe155321f3cfd7578cca19076b73602dc0d1629654658c5d75c3c8e8ed3af"
+      },
+      {
+        "receipt": "cpu214-fp32-cached-vs-full-calibration.json",
+        "bytes": 208200,
+        "sha256": "68f1bf2ebe2e63d770c22100e3183071cb02688fdb9a16ff19bcae9896e9452f"
+      }
+    ]
+  },
+  "unchanged_full_hybrid_reference": {
+    "scope": "Unchanged BF16 hybrid full-cached reference export with 395 vocabulary rows compared to matched CPU FP32 full-teacher distributions; diagnostic reference comparison, not an optimized run.",
+    "rows": 395,
+    "argmax_agreement_count": 391,
+    "cache_equivalence": {
+      "max_abs": 0.125,
+      "rmse": 0.01981234923005104,
+      "argmax_equal": true,
+      "finite": true
+    },
+    "full_hybrid_vs_cpu_fp32": {
+      "max_abs": 3.0317652225494385,
+      "centered_rmse": 0.45958309737319897,
+      "total_variation": 0.37937112891022423,
+      "kl_cpu_actual": 0.38047738963125904,
+      "max_target_log_probability_error": 0.8608795601548564
+    },
+    "argmax_differences": 4,
+    "terminal_hybrid_argmax": 248046,
+    "interpretation": "These full-cached distribution errors are materially larger than the matched CPU FP32 cached/full path errors above; the unchanged hybrid remains the reference, and this comparison does not set or pass candidate numerical policy.",
+    "private_receipt_commitments": [
+      {
+        "receipt": "hybrid-cached-reference-01-summary.json",
+        "bytes": 980,
+        "sha256": "c3380155459c4ccbc1fafc38d6d8fe11704a52d81a405c423d12ed75a1b0d949"
+      }
+    ]
+  },
+  "recurrent_capability": {
+    "scope": "XPU Inductor fullgraph, static-shape single-token recurrent function intercepted all 24 calls across 24 linear-attention layers at the first decode position; trained FP32 states retained; separate independent CPU replay covered the same 24 trained fixtures.",
+    "candidate_fixture_count": 24,
+    "intercepted_calls": 24,
+    "distinct_shape_count": 1,
+    "compiled_vs_eager_fixture_maxima": {
+      "output_max_abs": 5.960464477539063e-08,
+      "output_max_rmse": 9.33139787662185e-10,
+      "state_max_abs": 4.76837158203125e-07,
+      "state_max_rmse": 1.8243440091936236e-09
+    },
+    "bitwise_equal_all_outputs_or_states": false,
+    "independent_cpu_replay_fixture_count": 24,
+    "cpu_vs_xpu_eager_maxima": {
+      "output_max_abs": 1.9073486328125e-06,
+      "state_max_abs": 4.76837158203125e-07
+    },
+    "cpu_vs_xpu_compiled_maxima": {
+      "output_max_abs": 1.9073486328125e-06,
+      "state_max_abs": 2.384185791015625e-07
+    },
+    "interpretation": "Capability and layer-fixture diagnostics only; policy v2 is still being calibrated. No full cached candidate export, complete OCR acceptance, or warm performance gain is established.",
+    "private_receipt_commitments": [
+      {
+        "receipt": "recurrent-capability/recurrent-capability-10/recurrent-candidate.json",
+        "bytes": 65604,
+        "sha256": "e6c32fb042de854fb4fe4543db6091438dd5726e1cab93e8a9188902d14a1445",
+        "note": "SHA-256 to verify before publication"
+      },
+      {
+        "receipt": "recurrent-capability-10-cpu-replay/report.json",
+        "bytes": 36764,
+        "sha256": "ef792f411d5bdcdfe2e5ab1852868e937fd5303dfa5f8a48a996d6d789eb647c"
+      }
+    ]
+  },
+  "recurrent_full_trajectory": {
+    "status": "FAILED frozen policy v2; no free OCR, timing or promotion followed.",
+    "rows": 395,
+    "intercepted_calls": 9456,
+    "sampled_trained_calls": 72,
+    "failed_positions": [
+      806,
+      851,
+      924,
+      982,
+      1170,
+      1174
+    ],
+    "all_failures_in_bbox_attributes": true,
+    "new_decision_positions": [
+      924
+    ],
+    "argmax_agreement_cpu": 390,
+    "hybrid_argmax_agreement_cpu": 391,
+    "argmax_agreement_hybrid": 394,
+    "candidate_maxima": {
+      "tv": 0.40483410834456746,
+      "target_log_probability_error": 0.9592748786769931,
+      "kl_cpu_actual": 0.43476341595661655,
+      "max_abs": 3.0786402225494385,
+      "centered_rmse": 0.4572341334985068
+    },
+    "boundary": "Tiny operator errors do not override the full-trajectory failure. This engineering screen does not establish hallucination or a mathematically incorrect recurrence.",
+    "private_receipt_commitments": [
+      {
+        "receipt": "recurrent-full-cached-11-gate-summary.json",
+        "bytes": 7726,
+        "sha256": "0940cce0c014e65b267c634b1a72631f0d6f5e2a47d3301f8b121d70079a7aeb"
+      },
+      {
+        "receipt": "recurrent-full-cached-11-cpu-replay/report.json",
+        "bytes": 113237,
+        "sha256": "62cf3bfdf502c83d83d62df8010d8c19e44b38551edd12bb3065ad696f7faf6c"
+      }
+    ]
+  },
+  "normalization": {
+    "gain_only": {
+      "status": "Exact cached numerical gate passed; complete OCR and performance pending.",
+      "rows": 395,
+      "cache_records": 25280,
+      "applicable_modules": 81,
+      "calls_per_module": 396,
+      "gain_storage_bytes": 681984
+    },
+    "fused_operator": {
+      "status": "Operator replay only; full-model qualification pending.",
+      "trained_fixtures": 162,
+      "elements": 2935296,
+      "differing_elements": 35,
+      "all_differences_during_prefill": true,
+      "max_abs_vs_original": 0.015625,
+      "cached_fixtures_bit_equal": 81
+    },
+    "private_receipt_commitments": [
+      {
+        "receipt": "norm-gain-only-01-strict-comparison.json",
+        "bytes": 1106,
+        "sha256": "0df892f4dc85643946b843cc783e5b8e60a5a245c3957f7cfd4695aeb25ea908"
+      },
+      {
+        "receipt": "norm-operator-fused-01-comparison.json",
+        "bytes": 61089,
+        "sha256": "d016cf6cab3d2a2c1958dc2701e1346d196170de0173b4819393ed1c7a82dc59"
+      }
+    ]
+  },
+  "native_graph": {
+    "status": "UNSUPPORTED by installed A770 runtime at capture_begin.",
+    "error": "Device does not support graph record and replay feature (UR_DEVICE_INFO_GRAPH_RECORD_AND_REPLAY_SUPPORT_EXP).",
+    "replay_cases_executed": 0,
+    "model_loaded": false,
+    "owned_process_verified_absent": true,
+    "private_receipt_commitments": [
+      {
+        "receipt": "graph-capability-01/graph-capability.json",
+        "bytes": 1540,
+        "sha256": "24b80afabf006ea32d10098c4c8160afdd8650e93df2cdf5df3ad93495e2a45e"
+      },
+      {
+        "receipt": "graph-capability-01-process-absence.json",
+        "bytes": 46,
+        "sha256": "f3c50df497a5ea2ec450414feb1ec16838476016378855ae463ae1e9b4d5a2b5"
+      }
+    ]
+  }
+}
