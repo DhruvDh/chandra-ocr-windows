@@ -1,0 +1,59 @@
+{
+  "schema": "chandra.direct-node-throughput-http-preparation.v1",
+  "date": "2026-10-04",
+  "scope": "Warm-only direct-node HTTP client; fake HTTP validation only",
+  "hardware_executed": false,
+  "services_changed": false,
+  "source_files": {
+    "benchmarks/throughput_live.py": {
+      "sha256": "e40f7efec8bedf0f29e707b7e7206a95145ccc1d5745b8bb6d8989767e1cafb1",
+      "bytes": 27937
+    },
+    "benchmarks/test_throughput_live.py": {
+      "sha256": "de09d1bbb1fe0e2a63f308cbcc34d3f885dc106b63b10bcb0bd2c772df090e0e",
+      "bytes": 15984
+    },
+    "benchmarks/throughput-live-method.md": {
+      "sha256": "e77c63d21cc98c0f9cff0ee06be3a8804ddfe088a8a250222771da02feb48db4",
+      "bytes": 6067
+    },
+    "benchmarks/throughput.py": {
+      "sha256": "0c0978b3bef12b1bf632b1416f740a478c194708a6e03c9448ac8cb652bae374",
+      "bytes": 20269
+    },
+    "benchmarks/endpoint.py": {
+      "sha256": "7b74834002ab304ee04bf62f287923b780c07bddb10106df0dfcb16bc879af56",
+      "bytes": 7476
+    },
+    "benchmarks/evaluate.py": {
+      "sha256": "a38f19c0682b3230da70d94c9303beec4248fac0917b06020c53c8b7970ce79a",
+      "bytes": 13171
+    },
+    "benchmarks/prompt.txt": {
+      "sha256": "025935f3e1de1acdfadd4c7d581ab17eb82e8caaffef7b64962621c80b7ca9a8",
+      "bytes": 2161
+    }
+  },
+  "validation": {
+    "python": "3.12.14",
+    "command": ".venv/bin/python -m pytest -q benchmarks/test_throughput.py benchmarks/test_throughput_live.py benchmarks/test_roofline.py benchmarks/test_endpoint.py",
+    "exit_code": 0,
+    "passed": 44,
+    "pytest_reported_seconds": 0.63
+  },
+  "reviewed_behavior": [
+    "Actual NorthStone and Waystone health profiles and external source/model/worker binding",
+    "Rolling load, per-page quality checks and no submitted POST replay",
+    "Bounded response bytes, partial-failure evidence and cancellation cleanup",
+    "Fresh warm/idle check before measured work",
+    "Whole-run lease, output, client-data and witness-sample forecasts",
+    "Passive backend drain distinct from local client cancellation and hardware ownership"
+  ],
+  "unverified": [
+    "Hardware execution of this adapter",
+    "Node-specific external resource monitor and ownership orchestrator",
+    "Representative first-seen workload and engine occupancy",
+    "Sustained pages-per-second plateau or improvement",
+    "Empirical GPU roofline ceilings"
+  ]
+}
