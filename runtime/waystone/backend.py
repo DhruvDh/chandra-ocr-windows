@@ -10,10 +10,13 @@ from typing import Iterator
 
 
 class XPUBackend:
-    def __init__(self, model_path: str | Path, *, max_pixels: int = 4_000_000, max_input_tokens: int = 16384, max_output_tokens: int = 12384, attention_backend: str = "eager"):
+    def __init__(self, model_path: str | Path, *, max_pixels: int = 4_000_000, max_input_tokens: int = 16384, max_output_tokens: int = 12384, attention_backend: str = "eager", normalization: str = "original"):
         if attention_backend not in {"eager", "sdpa", "hybrid"}:
             raise ValueError("Attention backend must be eager, sdpa or hybrid")
+        if normalization not in {"original", "gain-only"}:
+            raise ValueError("Normalization must be original or gain-only")
         self.attention_backend = attention_backend
+        self.normalization = normalization
         self.model_path = Path(model_path)
         self.max_pixels = max_pixels
         self.max_input_tokens = max_input_tokens
@@ -21,6 +24,7 @@ class XPUBackend:
         self.max_output_tokens = max_output_tokens
         self.model = None
         self.processor = None
+        self._gain_cache = None
         self._runtime_prepared = False
         self._device_identity = None
         self._model_verification = None
@@ -31,7 +35,7 @@ class XPUBackend:
             import torch
             if torch.xpu.is_initialized():
                 memory = {"allocated_bytes": torch.xpu.memory_allocated(), "reserved_bytes": torch.xpu.memory_reserved(), "peak_allocated_bytes": torch.xpu.max_memory_allocated()}
-        return {"backend": "transformers-xpu", "loaded": self.model is not None, "state": "ready" if self.model is not None else "cold", "model": "datalab-to/chandra-ocr-2", "revision": "af93b47dba1b47b6640c86ccf487ed2260ab9a09", "attention_backend": self.attention_backend, "max_prefill_tokens": self.max_prefill_tokens, "processor_size": {"shortest_edge": 3136, "longest_edge": 3145728}, "device": "xpu:0", "dtype": "bfloat16", "device_identity": self._device_identity, "model_verification": self._model_verification, "torch_xpu_memory": memory}
+        return {"backend": "transformers-xpu", "loaded": self.model is not None, "state": "ready" if self.model is not None else "cold", "model": "datalab-to/chandra-ocr-2", "revision": "af93b47dba1b47b6640c86ccf487ed2260ab9a09", "attention_backend": self.attention_backend, "normalization": self.normalization, "gain_cache": {"active": self._gain_cache is not None, "modules": self._gain_cache.module_count if self._gain_cache else 0, "bytes": self._gain_cache.gain_bytes if self._gain_cache else 0}, "max_prefill_tokens": self.max_prefill_tokens, "processor_size": {"shortest_edge": 3136, "longest_edge": 3145728}, "device": "xpu:0", "dtype": "bfloat16", "device_identity": self._device_identity, "model_verification": self._model_verification, "torch_xpu_memory": memory}
 
     def load(self) -> None:
         if self.model is not None:
@@ -59,30 +63,45 @@ class XPUBackend:
         # parameter allocations retain the exact weights and arithmetic.
         warmup = modeling_utils.caching_allocator_warmup
         modeling_utils.caching_allocator_warmup = lambda *args, **kwargs: None
+        model = gain_cache = None
         try:
-            model = AutoModelForImageTextToText.from_pretrained(self.model_path, local_files_only=True, dtype=torch.bfloat16, device_map={"": "xpu:0"}, attn_implementation={"vision_config": "sdpa", "text_config": "eager"} if self.attention_backend == "hybrid" else self.attention_backend)
-        finally:
-            modeling_utils.caching_allocator_warmup = warmup
-        if self.attention_backend == "hybrid":
-            if model.config.vision_config._attn_implementation != "sdpa" or model.config.text_config._attn_implementation != "eager":
-                raise RuntimeError("Hybrid attention configuration was not applied")
-        model.eval()
-        wrong = {str(p.device) for p in model.parameters() if p.device.type != "xpu"}
-        if wrong:
-            raise RuntimeError(f"Model parameters escaped XPU: {wrong}")
-        self.model, self.processor = model, processor
+            try:
+                model = AutoModelForImageTextToText.from_pretrained(self.model_path, local_files_only=True, dtype=torch.bfloat16, device_map={"": "xpu:0"}, attn_implementation={"vision_config": "sdpa", "text_config": "eager"} if self.attention_backend == "hybrid" else self.attention_backend)
+            finally:
+                modeling_utils.caching_allocator_warmup = warmup
+            if self.attention_backend == "hybrid":
+                if model.config.vision_config._attn_implementation != "sdpa" or model.config.text_config._attn_implementation != "eager":
+                    raise RuntimeError("Hybrid attention configuration was not applied")
+            model.eval()
+            wrong = {str(p.device) for p in model.parameters() if p.device.type != "xpu"}
+            if wrong:
+                raise RuntimeError(f"Model parameters escaped XPU: {wrong}")
+            if self.normalization == "gain-only":
+                from .norm_gain import install_gain_cache
+                gain_cache = install_gain_cache(model)
+            self.model, self.processor, self._gain_cache = model, processor, gain_cache
+        except BaseException:
+            if gain_cache is not None:
+                gain_cache.close()
+            model = processor = gain_cache = None
+            self.unload()
+            raise
 
     def unload(self) -> None:
         """Release resident weights at idle; the next request performs a cold load."""
+        if self._gain_cache is not None:
+            self._gain_cache.close()
+            self._gain_cache = None
+        self.model = None
+        self.processor = None
         if not self._runtime_prepared:
             return
         import gc
         import torch
-        self.model = None
-        self.processor = None
         gc.collect()
-        torch.xpu.synchronize()
-        torch.xpu.empty_cache()
+        if torch.xpu.is_initialized():
+            torch.xpu.synchronize()
+            torch.xpu.empty_cache()
 
     def generate(self, request: dict, cancel: threading.Event) -> Iterator[str | dict]:
         from PIL import Image

@@ -55,7 +55,7 @@ def ps_quote(value):
 def remote_command(args, lease_token):
     argv = [args.remote_python, "-m", "chandra_service", "waystone", "--model-path", args.model_path,
             "--host", "127.0.0.1", "--port", str(args.worker_port), "--max-input-tokens", "16384",
-            "--max-output-tokens", "12384", "--attention", "hybrid"]
+            "--max-output-tokens", "12384", "--attention", "hybrid", "--normalization", args.normalization]
     settings = base64.b64encode(json.dumps({"argv": argv, "cwd": args.remote_root, "lease_port": args.lease_port, "lease_token": lease_token}).encode()).decode()
     source = base64.b64encode(zlib.compress(REMOTE_SUPERVISOR.encode())).decode()
     # Invoke native Python directly: PowerShell encoded commands exceed the
@@ -208,7 +208,7 @@ def install(args):
                base.format(description="Chandra OCR router for ROCm and Windows Intel", exec_start=command(router_args))]
     receipt = {"schema_version": 2, "source_root": str(ROOT), "units": list(UNITS), "hosts": hosts,
                "router_port": args.router_port, "worker_port": args.worker_port, "ssh_host": args.ssh_host,
-               "remote_root": args.remote_root, "remote_python": args.remote_python, "model_path": args.model_path,
+               "remote_root": args.remote_root, "remote_python": args.remote_python, "model_path": args.model_path, "normalization": args.normalization,
                "lease_port": args.lease_port, "remote_ownership": "unnamed Windows Job Object; authenticated loopback TCP lease; kill on job close",
                "unit_sha256": {name: hashlib.sha256(text.encode()).hexdigest() for name, text in zip(UNITS, content)}}
     lease_token = secrets.token_urlsafe(32)
@@ -268,6 +268,7 @@ def main():
     install_parser.add_argument("--remote-root", required=True)
     install_parser.add_argument("--remote-python", required=True)
     install_parser.add_argument("--model-path", required=True)
+    install_parser.add_argument("--normalization", choices=["original", "gain-only"], default="original")
     install_parser.add_argument("--northstone-url", default="http://127.0.0.1:8000")
     install_parser.add_argument("--worker-port", type=int, default=18001)
     install_parser.add_argument("--lease-port", type=int, default=18002)

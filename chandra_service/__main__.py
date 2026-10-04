@@ -28,6 +28,7 @@ def main():
     parser.add_argument('--max-input-tokens', type=int, default=16384)
     parser.add_argument('--max-output-tokens', type=int, default=12384)
     parser.add_argument('--attention', choices=['hybrid', 'eager'], default='hybrid', help='Hybrid uses qualified vision SDPA and text eager attention; full SDPA failed cached decoding on the tested XPU')
+    parser.add_argument('--normalization', choices=['original', 'gain-only'], default='original', help='Opt-in exact normalization gain cache; original is the rollback path')
     args = parser.parse_args()
     if args.max_pixels <= 0 or args.max_input_tokens <= 0 or not 1 <= args.max_output_tokens <= 12384:
         parser.error('Pixel/context limits must be positive and output limit must be 1..12384')
@@ -45,7 +46,7 @@ def main():
             parser.error('waystone requires --model-path to a locally provisioned model')
         from runtime.waystone import XPUBackend
         from .service import create_app
-        backend = XPUBackend(args.model_path, max_pixels=args.max_pixels, max_input_tokens=args.max_input_tokens, max_output_tokens=args.max_output_tokens, attention_backend=args.attention)
+        backend = XPUBackend(args.model_path, max_pixels=args.max_pixels, max_input_tokens=args.max_input_tokens, max_output_tokens=args.max_output_tokens, attention_backend=args.attention, normalization=args.normalization)
         app = create_app(backend, queue_limit=args.queue_limit, inference_seconds=args.inference_seconds, idle_seconds=args.idle_seconds)
     else:
         if not args.config:

@@ -19,7 +19,7 @@ SPEC.loader.exec_module(manage)
 def arguments():
     return argparse.Namespace(ssh_host='waystone', remote_root=r'C:\owned checkout', remote_python=r'C:\owned\python.exe',
                               model_path=r'C:\owned\model', worker_port=18001, lease_port=18002, router_port=8002, lan_address=None,
-                              northstone_url='http://127.0.0.1:8000', northstone_page_seconds=1, waystone_page_seconds=2)
+                              northstone_url='http://127.0.0.1:8000', northstone_page_seconds=1, waystone_page_seconds=2, normalization='original')
 
 
 class ManagerTests(unittest.TestCase):
@@ -43,6 +43,14 @@ class ManagerTests(unittest.TestCase):
         encoded_settings = launch[-1].rsplit(' ', 1)[1]
         self.assertEqual(json.loads(base64.b64decode(encoded_settings))['cwd'], r'C:\owned checkout')
         self.assertIn('127.0.0.1:18001:127.0.0.1:18001', launch)
+
+    def test_normalization_selection_reaches_owned_worker(self):
+        for mode in ('original', 'gain-only'):
+            settings = arguments()
+            settings.normalization = mode
+            launch = manage.remote_command(settings, 'test-token')
+            argv = json.loads(base64.b64decode(launch[-1].rsplit(' ', 1)[1]))['argv']
+            self.assertEqual(argv[argv.index('--normalization') + 1], mode)
 
     def test_channel_closes_lease_and_waits_before_ssh_termination(self):
         order = []
