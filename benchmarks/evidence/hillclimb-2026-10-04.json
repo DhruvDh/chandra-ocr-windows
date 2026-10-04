@@ -2328,5 +2328,40 @@
         "note": "Controller terminal memory and swap observation; not inference RSS."
       }
     ]
+  },
+  "bf16_input_fp32_output_torch_mm_api_capability_2026_10_04": {
+    "status": "Model-free installed torch.mm BF16-input / FP32-output API capability passed for the finite cases tested.",
+    "scope": {
+      "verification": "10 exact cases and 200 scalar products checked using reconstructed dyadic operands and exact rational dot products; AB and BA orders, five shapes, dtypes, strides, layouts, and source-input preservation were checked.",
+      "boundary": "This confirms API behavior only for these cases. It does not establish a trained-head implementation, B2 or full-model numerical equivalence, a universal FP32 accumulation guarantee, OCR quality, or workload performance/throughput.",
+      "closure": "All five owned processes were absent and the ordinary worker was restored cold. Seven local DXGI decisions passed; the short run had no continuous host-monitor samples, so no continuous host-minimum claim is made.",
+      "disposition": "Capability evidence only; no model, OCR, engine, or throughput qualification."
+    },
+    "private_receipt_commitments": [
+      {
+        "receipt": "optimization/sustained-throughput-v1/intel-batching/mm-fp32-api-probe/independent-source-review.json",
+        "bytes": 9557,
+        "sha256": "71cab65a522232b65f59322a02f329fb34c96a1432d6f5c061777a2eebec3f89",
+        "note": "Independent source review for the model-free API probe."
+      },
+      {
+        "receipt": "optimization/bf16-input-fp32-output-mm-api-probe-v1-001-run/independent-api-assessment.json",
+        "bytes": 4241,
+        "sha256": "ab1e4f2ec9c676c0f58cb1486874bbac66570a4a49cad3f224ffbddc1d866ef6",
+        "note": "Independent exact assessment of the installed torch.mm API for the retained finite cases."
+      },
+      {
+        "receipt": "optimization/bf16-input-fp32-output-mm-api-probe-v1-001-run/controller-terminal.json",
+        "bytes": 429,
+        "sha256": "1aabb36fc5671c3c6c35eb43d74f1a1d7ac87883debd936da3a3a180aec31b53",
+        "note": "Controller completion and charged-memory/swap record; not inference RSS."
+      },
+      {
+        "receipt": "optimization/bf16-input-fp32-output-mm-api-probe-v1-001-run/service-restoration.json",
+        "bytes": 922,
+        "sha256": "9ffa7b25d6b2d192642036181b7029c6200c01a10aa37cb381e47a3a49cc1398",
+        "note": "Owned-process closure and ordinary cold-service restoration."
+      }
+    ]
   }
 }
