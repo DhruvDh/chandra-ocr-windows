@@ -2528,5 +2528,61 @@
         "note": "Final joined-state-location addendum binds the interpretation to actual export and reference metadata; hash observations do not quantify raw state differences."
       }
     ]
+  },
+  "resident_serial_tiny_small_aba_cancellation_fresh_isolation_2026_10_04": {
+    "status": "Scoped correctness and resident-isolation checks passed; overall run acceptance failed/incomplete because terminal resource completion was not authenticated.",
+    "scope": {
+      "correctness": "A1 Tiny, B Small, A2 Tiny and fresh Tiny each matched the complete reference output, usage, stop and geometry checks; each completed with 395 tokens. Deliberately cancelled B was joined after three generated tokens.",
+      "isolation": "The resident serial A-B-A sequence, cancellation, cleanup and fresh Tiny check passed in the final independent correctness review. It does not qualify general cross-page behavior beyond this sequence.",
+      "superseded_review": "Correctness review 01 was superseded by review 02: the initial reviewer rejected the expected GeneratorExit from deliberate cancellation; review 02 accepted only after verifying cancellation, join, restoration, RoPE clearing and the successful fresh page.",
+      "resource": "Periodic sampled host and DXGI floors passed, including 370 DXGI decisions and minimum periodic local headroom 5,500,108,800 bytes. However SystemExit(0) bypassed attester completion synchronization; the terminal heartbeat/latch was invalid, so resource acceptance is incomplete. Aligned DXGI load/trim snapshots were unavailable; no combined resource minimum is claimed.",
+      "closure": "All five owned processes were independently closed; the ordinary worker was restored cold and the router reported its cold, idle state. Controller charged cgroup peak was 24,109,056 bytes with zero swap; it is not process RSS.",
+      "separate_cpu_check": "A separate CPU-only entrypoint/cleanup check passed; it is not hardware completion evidence.",
+      "disposition": "No speed, OCR-performance, or sustained-throughput qualification."
+    },
+    "private_receipt_commitments": [
+      {
+        "receipt": "optimization/resident-serial-tiny-small-aba-cancel-fresh-v1-AB-001-independent-correctness-01.json",
+        "bytes": 4358,
+        "sha256": "966b6e22e1c2103b9a4ed47b041ac2aa858104817a0458a3f9b6eb5cc56eb2c4",
+        "note": "Superseded initial correctness review; it rejected the expected GeneratorExit from deliberate cancellation before the cancellation/join/restoration/fresh-page evidence was accepted."
+      },
+      {
+        "receipt": "optimization/resident-serial-tiny-small-aba-cancel-fresh-v1-AB-001-independent-correctness-02.json",
+        "bytes": 4945,
+        "sha256": "18451edfc91033ad908d3b57061a6d039ed6bee649504148d6e6e3cde2a169d1",
+        "note": "Final scoped correctness and resident-isolation review; explicitly distinguishes its pass from incomplete terminal resource acceptance."
+      },
+      {
+        "receipt": "optimization/resident-serial-tiny-small-aba-cancel-fresh-v1-AB-001-run/independent-resource-closure-assessment.json",
+        "bytes": 11485,
+        "sha256": "424fbdd493d2d345482f766f2afc61d1b790ca3c42a5b36f65ac726a26219c05",
+        "note": "Independent resource and closure assessment; periodic floors passed, but the terminal heartbeat/completion latch was invalid and aligned DXGI trim snapshots were unavailable."
+      },
+      {
+        "receipt": "optimization/resident-serial-tiny-small-aba-cancel-fresh-v1-AB-001-run/controller-terminal.json",
+        "bytes": 2523,
+        "sha256": "af2f411140729629ca447e47fa15903f0583650c0a84e6d645eebd4bbab7a4f3",
+        "note": "Exact controller cgroup peak and failed exit; cgroup accounting is not process RSS."
+      },
+      {
+        "receipt": "optimization/resident-serial-tiny-small-aba-cancel-fresh-v1-AB-001-run/service-restoration.json",
+        "bytes": 922,
+        "sha256": "a9e98759e0ab4d8351f2e833d7d09d8faa5b7ca6e20255415c11d39511abe07d",
+        "note": "Ordinary worker restored cold after independent process closure; router observation confirms the backend is cold and idle."
+      },
+      {
+        "receipt": "optimization/resident-serial-tiny-small-aba-cancel-fresh-v1-AB-001-run/isolation.json",
+        "bytes": 49226,
+        "sha256": "8edf6014adfa328f906c923afb1d6548e64c431166618dbbb80471418f58d59d",
+        "note": "Bound resident cross-page, cancellation and fresh-page result record."
+      },
+      {
+        "receipt": "optimization/resident-isolation-entrypoint-repair-v1/root-cpu-check.json",
+        "bytes": 845,
+        "sha256": "2bee605003f1daa7ca1e9c77c07b2bfce4b3b0584c9f5cd4fabb37114300fa44",
+        "note": "Separate CPU-only entrypoint/cleanup check; no hardware completion qualification."
+      }
+    ]
   }
 }
