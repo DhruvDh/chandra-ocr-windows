@@ -2223,5 +2223,61 @@
         "sha256": "b9dfb5dad38bd8652c26e6ce950f5de12964b4317b611c2324239b2f6a1e20a3"
       }
     ]
+  },
+  "tiny_offset80_b2_exact_ab_failure_2026_10_04": {
+    "status": "FAILED: the exact AB gate rejected candidate tiny-offset80-hybrid-joined-b2-exact-v1 at the first B2 row.",
+    "scope": {
+      "order": "AB only; one B2 forward attempted, no B1 tail forwards, no survivor extraction or EOS reached.",
+      "first_failure": "Row A, reference index 1 (position 801): full 248,320-element FP32 vector byte mismatch (993,280 bytes).",
+      "prior_checks": "Preparation rows 82 / 5,248 state fields and initial core rows 2 / 128 state fields were exact; the 128-field join check passed. These checks do not establish full trajectory equivalence.",
+      "separate_arithmetic_diagnostic": "The CPU one-row FP32 diagnostic passed its stated local arithmetic checks for the same failed row. This does not waive the exact-byte failure or qualify the engine, full trajectory, EOS, OCR, or throughput.",
+      "resource_and_cleanup": "Independent audit confirmed all five owned processes absent and ordinary Waystone restored cold. Resource-guard collection was incomplete after the candidate failure; no resource breach was evidenced, but this is not a resource-guard pass.",
+      "controller_observation": "Controller-charged memory peak 37,007,360 bytes and swap peak 0 bytes; this is not inference-process RSS.",
+      "disposition": "No BA run was needed to establish rejection. No candidate promotion, full-trajectory, EOS, OCR, or performance qualification."
+    },
+    "private_receipt_commitments": [
+      {
+        "receipt": "optimization/tiny-offset80-b2-exact-AB-001-run/independent-exact-failure-assessment.json",
+        "bytes": 3142,
+        "sha256": "ff6a1eb4bfdd080e475d364ff9ac0151f82fceaf0d20e4d5f6aaca74a2d2fb40",
+        "note": "Independent numerical failure assessment."
+      },
+      {
+        "receipt": "optimization/tiny-offset80-b2-exact-AB-001-run/independent-reader-terminal-addendum.json",
+        "bytes": 979,
+        "sha256": "3782757e2b8bddde13346d9684641bce0ec36751ad60cdd1144096013711253e",
+        "note": "Frozen reader terminal result and binding to the completed resource audit."
+      },
+      {
+        "receipt": "optimization/tiny-offset80-b2-exact-AB-001-run/independent-resource-closure-assessment.json",
+        "bytes": 9368,
+        "sha256": "82073a56c1b7c5c64f57e2b9dba5db3921f736a2401963dd1eb9728c15a44cda",
+        "note": "Resource, collection, owned-process closure, and cold-service restoration audit."
+      },
+      {
+        "receipt": "optimization/tiny-offset80-b2-exact-AB-001-run/first-failure.json",
+        "bytes": 18026,
+        "sha256": "1c33d45f6cac4d735ffed9ffbd118784fd693280009d77412862a8aaacccaf33",
+        "note": "Compact first-mismatch record; large vector payload is not copied into this index."
+      },
+      {
+        "receipt": "optimization/tiny-offset80-b2-exact-AB-001-run/controller-terminal.json",
+        "bytes": 304,
+        "sha256": "0035a86ac290f9f2148fcfe32d1828a8168af38f3e2fde575c1f190fc1161de9",
+        "note": "Controller terminal memory and swap observation; not inference RSS."
+      },
+      {
+        "receipt": "optimization/tiny-offset80-b2-exact-AB-001-run/service-restoration.json",
+        "bytes": 735,
+        "sha256": "97dd07ef0a99e649a67022895337134ff907f6ca514732d8d25570872771fff0",
+        "note": "Ordinary worker cold-restoration receipt."
+      },
+      {
+        "receipt": "optimization/sustained-throughput-v1/intel-batching/stock-arithmetic/failed-exact-A1-diagnostic.stdout.json",
+        "bytes": 1805,
+        "sha256": "08a3f826980601930982ab76c8eaccd2a77e6e556f13182ef8b4f5dc76d169d6",
+        "note": "Separate one-row FP32 arithmetic diagnostic; not trajectory or engine qualification."
+      }
+    ]
   }
 }
