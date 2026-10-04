@@ -41,6 +41,14 @@ def build(model, batch, prefix, patches, completion, vision_segments=None):
     dense = text + weights['vocabulary_head']
     kv = dims['full_attention_layers'] * 2 * dims['kv_heads'] * dims['attention_head_dim'] * dims['weight_bytes']
     recurrent = dims['linear_layers'] * dims['linear_value_heads'] * dims['linear_key_dim'] * dims['linear_value_dim'] * dims['recurrent_state_bytes']
+    # Prefill produces completion token one. Cached forwards consume tokens 1..D.
+    cached_forwards = completion - 1
+    decode_traffic = {
+        'shared_projection_weight_reads': cached_forwards * dims['weight_bytes'] * dense,
+        'attention_kv_reads': batch * kv * (cached_forwards * prefix + cached_forwards * (cached_forwards + 1) // 2),
+        'new_kv_writes': batch * kv * cached_forwards,
+        'recurrent_matrix_reads_and_writes': 2 * batch * recurrent * cached_forwards,
+    }
     def estimate(value, tag):
         return {'value': value, 'status': tag}
     return {
@@ -53,6 +61,26 @@ def build(model, batch, prefix, patches, completion, vision_segments=None):
         'empirical_roofs': {'effective_dram_bytes_per_second': None,
                            'precision_shape_compatible_flops_per_second': None,
                            'ordinary_launch_seconds_per_call': None},
+        'conditional_cached_decode_dram_scenario': {
+            'status': 'conditional_logical_traffic_assumed_to_stream_through_dram',
+            'cached_forwards': cached_forwards,
+            'prefill_produces_first_completion_token': True,
+            'first_attention_context_tokens': prefix + 1 if cached_forwards else None,
+            'last_attention_context_tokens': prefix + cached_forwards if cached_forwards else None,
+            'bytes_per_batch': {**decode_traffic, 'subtotal': sum(decode_traffic.values())},
+            'bytes_per_completed_page': {**{k: v / batch for k, v in decode_traffic.items()},
+                                         'subtotal': sum(decode_traffic.values()) / batch},
+            'other_traffic_bytes': None,
+            'assumptions': [
+                'Batch means active rows in one actual model invocation; equal P/G, no draining or padding waste.',
+                'One shared projection-weight read per cached forward.',
+                'KV attention reads include the newly appended token, plus one separate KV write.',
+                'Each cached forward reads and writes the full FP32 recurrent matrices once.',
+                'Cache reuse/fusion can reduce DRAM traffic; copies/rereads can increase it. This is not a proven DRAM lower bound.',
+                'Excludes convolution history, other activations/scratch, nonlinear work, prefill, vision and host costs.',
+                'A zero cached-decode subtotal at completion=1 still requires prefill and vision work.',
+            ],
+        },
         'phases': {
             'vision': {'projection_flops': estimate(2 * batch * patches * weights['vision_blocks'], 'shape_estimate'),
                        'attention_flops': estimate(4 * batch * dims['vision_layers'] * dims['vision_heads'] * dims['vision_head_dim'] * sum(n*n for n in segments), 'shape_estimate'),

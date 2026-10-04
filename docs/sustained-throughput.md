@@ -28,6 +28,8 @@ Model image processing, vision encoding, text prefill and cached decoding separa
 
 The executable [offline model](../benchmarks/roofline.md) now derives partial phase costs from the pinned model's projection dimensions. Dense decoding projections require about 8.410 GFLOPs per active row; an ideal shared BF16 weight read is about 8.410 GB per batch step. True batching can therefore increase this component's arithmetic intensity approximately in proportion to batch size. Stored state adds about 50.3 MB per page plus 32 KiB per page token, before activations, workspaces and allocator overhead. These estimates explain why batching is worth investigating and why its memory cost must be measured. They do not provide a measured bandwidth ceiling or prove that a proposed batch fits.
 
+The model also reports an additive [conditional cached-decode traffic scenario](roofline-scenarios.md), with batch-amortized weights, KV reads and writes, and FP32 recurrent matrix reads and writes. It counts `completion − 1` cached forwards because prefill produces the first completion token. The scenario document supplies precision-specific nominal vendor inputs and a batch-15 illustration; cache behavior, omitted traffic and unmeasured effective roofs prevent interpreting those ratios as sustained node ceilings.
+
 | Limit | Evidence needed | What it would suggest |
 | --- | --- | --- |
 | Device bandwidth | Memory traffic and achieved bandwidth at a named memory level | Increase useful reuse, reduce traffic or improve access patterns |
