@@ -10,7 +10,7 @@ The baseline representative page completed correctly with 397 output tokens. Its
 | Explicit-mask text attention | Original numerical gate failed; early probability distributions also moved further from CPU FP32. Set aside. | [Finding and method](attention_candidate.md) |
 | Compiled recurrent updates | Tiny trained-operator errors, but the complete cached trajectory failed the frozen numerical policy at six positions. Set aside. | [Method](recurrent_method.md), [candidate](recurrent_candidate.py) |
 | Cached normalization gains | All 395 logit rows and 25,280 cache records match baseline exactly; complete OCR and performance remain pending | [Method](norm_method.md), [candidate](norm_candidate.py) |
-| Native fused normalization | Trained operator replay completed; 35 of 2,935,296 outputs differed, all during prefill. Full-model qualification pending. | [Method](norm_method.md), [exporter](norm_export.py) |
+| Native fused normalization | Complete cached trajectory failed the frozen policy at 17 positions, including an unapproved digit decision. Set aside. | [Method](norm_method.md), [exporter](norm_export.py) |
 | Native XPU graph replay | The installed A770 runtime reports graph recording/replay unsupported; no replay comparisons ran | [Probe method](graph_method.md) |
 
 The [compact evidence record](../../benchmarks/evidence/hillclimb-2026-10-04.json) commits to retained private receipts. Raw traces and trained tensors remain outside Git. Compiler diagnostics and partial runs are evidence of those attempts, never successful qualification or speed measurements. The [independent synthetic pages](../../benchmarks/qualification-v1/README.md) broaden the original development template's regression scope.

@@ -44,10 +44,10 @@
     ]
   },
   "pending": {
-    "recurrent": "V1 rejected. A separately identified compiler-rounding variant may be investigated under the unchanged policy; it has no qualification or performance result.",
-    "normalization": "Gain-only complete OCR and timing remain pending. Fused full-model qualification remains pending."
+    "recurrent": "The v1 full cached candidate failed frozen policy v2. The distinct v2 compiler-control variant has only a one-fixture retained-state capability replay and remains unqualified; full cached candidate evidence, complete OCR gates, and uninstrumented warm timing remain outstanding.",
+    "normalization": "The fused full-trajectory candidate failed frozen policy v2 before OCR or timing. Gain-only complete OCR and timing remain pending until corresponding receipts exist."
   },
-  "evidence_boundary": "Commitments hash private receipts only; they do not attest remote process identity or substitute for access to underlying evidence. Raw traces, tensors, private paths, and credentials are excluded. Numerical policy v2 remains under calibration; capability receipts are not acceptance decisions.",
+  "evidence_boundary": "Commitments hash private receipts only; they do not attest remote process identity or substitute for access to underlying evidence. Raw traces, tensors, private paths, and credentials are excluded. Numerical policy v2 was frozen before full candidate runs; capability receipts are not acceptance decisions.",
   "cpu_cached_calibration": {
     "scope": "Matched CPU FP32 cached teacher against full uncached teacher at 394 identical conditioned positions; cached exporter retained 395 rows at positions 800\u20131194; no fresh greedy run.",
     "identity_equal": true,
@@ -80,7 +80,7 @@
     ]
   },
   "unchanged_full_hybrid_reference": {
-    "scope": "Unchanged BF16 hybrid full-cached reference export with 395 vocabulary rows compared to matched CPU FP32 full-teacher distributions; diagnostic reference comparison, not an optimized run.",
+    "scope": "Unchanged BF16 hybrid full-cached reference export with 395 vocabulary rows compared to matched CPU FP32 cached reference distributions; diagnostic reference comparison, not an optimized run.",
     "rows": 395,
     "argmax_agreement_count": 391,
     "cache_equivalence": {
@@ -128,13 +128,12 @@
       "output_max_abs": 1.9073486328125e-06,
       "state_max_abs": 2.384185791015625e-07
     },
-    "interpretation": "Capability and layer-fixture diagnostics only; policy v2 is still being calibrated. No full cached candidate export, complete OCR acceptance, or warm performance gain is established.",
+    "interpretation": "The 24-layer v1 capability and CPU fixture diagnostics were followed by a full v1 cached-trajectory failure under frozen policy v2 (see recurrent_full_trajectory); layer results do not qualify the candidate. A v2 compiler-control variant has only a one-fixture retained-state replay and is not qualified.",
     "private_receipt_commitments": [
       {
         "receipt": "recurrent-capability/recurrent-capability-10/recurrent-candidate.json",
         "bytes": 65604,
-        "sha256": "e6c32fb042de854fb4fe4543db6091438dd5726e1cab93e8a9188902d14a1445",
-        "note": "SHA-256 to verify before publication"
+        "sha256": "e6c32fb042de854fb4fe4543db6091438dd5726e1cab93e8a9188902d14a1445"
       },
       {
         "receipt": "recurrent-capability-10-cpu-replay/report.json",
@@ -194,7 +193,7 @@
       "gain_storage_bytes": 681984
     },
     "fused_operator": {
-      "status": "Operator replay only; full-model qualification pending.",
+      "status": "Operator replay completed; the subsequent full trajectory failed frozen policy v2 (see norm_fused_full_trajectory).",
       "trained_fixtures": 162,
       "elements": 2935296,
       "differing_elements": 35,
@@ -231,6 +230,93 @@
         "receipt": "graph-capability-01-process-absence.json",
         "bytes": 46,
         "sha256": "f3c50df497a5ea2ec450414feb1ec16838476016378855ae463ae1e9b4d5a2b5"
+      }
+    ]
+  },
+  "recurrent_v2_retained_fixture": {
+    "candidate_variant": "source-identical-compiled-recurrent-decode-v2-no-contract",
+    "scope": "Compiler-control capability replay of one retained trained first-decode fixture; one interception only, not a full trajectory or candidate qualification.",
+    "interceptions": 1,
+    "output": {
+      "max_abs": 0.0,
+      "rmse": 0.0,
+      "bit_equal": true
+    },
+    "fp32_state": {
+      "max_abs": 2.384185791015625e-07,
+      "rmse": 1.713040154172063e-09,
+      "bit_equal": false
+    },
+    "independent_review_qualified": false,
+    "artifact_files_hash_verified": 80,
+    "boundary": "A single retained fixture does not qualify recurrent behavior over all layers or decode positions and establishes no complete OCR or performance gain.",
+    "private_receipt_commitments": [
+      {
+        "receipt": "recurrent-v2-replay-12/recurrent-candidate.json",
+        "bytes": 5628,
+        "sha256": "7aedcb13e025997ce6b6ccfaea5323a9bca9f066d2fb178f7330c4a10f0348ea"
+      },
+      {
+        "receipt": "recurrent-v2-replay-12-code-review.json",
+        "bytes": 1507,
+        "sha256": "973d52a567d4be01ed7f3f4d29df30610931b4b6ec5ff94995d848d38bb7f92a"
+      }
+    ]
+  },
+  "norm_fused_full_trajectory": {
+    "status": "FAILED under frozen coordinator-approved numerical policy v2; no complete OCR or performance run followed.",
+    "policy_version": 2,
+    "policy_status": "Frozen before full candidates; sha256 c38b5e68de30daa925fcb416087453ec8b5c80c161a624d213caa1ad2051a5f4.",
+    "rows": 395,
+    "numerical_budget_screen_passed": false,
+    "semantic_decision_screen_passed": false,
+    "positions_with_budget_failures": [
+      805,
+      806,
+      809,
+      816,
+      851,
+      878,
+      882,
+      886,
+      916,
+      918,
+      924,
+      990,
+      1165,
+      1169,
+      1170,
+      1173,
+      1174
+    ],
+    "budget_failure_count": 17,
+    "changed_decisions": 4,
+    "unapproved_decision_change_positions": [
+      924
+    ],
+    "candidate_maxima": {
+      "total_variation": 0.4585676948006524,
+      "target_log_probability_error": 1.1889685955151634,
+      "kl_cpu_actual": 0.599490900506572,
+      "centered_rmse": 0.45678405456245863
+    },
+    "cache_equivalence": {
+      "max_abs": 0.125,
+      "rmse": 0.02508745715022087,
+      "argmax_equal": true,
+      "finite": true
+    },
+    "scope": "Fused normalization full trajectory rejected by frozen numerical/decision gates. Gain-only complete OCR and timing remain pending; no optimized candidate is promoted.",
+    "private_receipt_commitments": [
+      {
+        "receipt": "norm-fused-full-01-gate-summary.json",
+        "bytes": 4283,
+        "sha256": "44d58df78dcb9b15749f4b26f240e08a3e36d8cde72fed62ce1de192e1cb19b7"
+      },
+      {
+        "receipt": "norm-fused-full-01/norm-experiment.json",
+        "bytes": 6015,
+        "sha256": "6fae027d0fe3c260d02fcb15004986ae5def2ec8ab1f8aefa719c3d3b90b439d"
       }
     ]
   }

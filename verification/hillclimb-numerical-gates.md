@@ -20,7 +20,7 @@ Gain-only normalization caching promises unchanged arithmetic, so it requires bi
 
 Run complete greedy OCR under the ordinary 12,384-token output allowance and exact checkpoint termination rules. Check ordered prose, equations, row/column table associations, labels, page order, terminal markers, actual stop reasons and bounding boxes. Retain the original PNG/PDF regression corpus and the independently composed [qualification pages](../benchmarks/qualification-v1/README.md). These are synthetic regression sets; passing them does not establish general document accuracy. Repeated pages, cancellation, worker recovery and idle unload must also preserve state isolation and release GPU allocations before deployment.
 
-Only qualified candidates proceed to paired, uninstrumented warm timing. Keep loading, compilation and cold requests separate. Require equivalent complete outputs and actual interception counts, and retain failures alongside successful runs. Promote a measurable improvement only after the deployed path passes the same boundaries.
+Only qualified candidates proceed to paired warm timing without profiling or activation capture. Keep loading, compilation and cold requests separate. State the timed boundary precisely: the current harness includes input preparation, generation, streaming and identical buffered event logging. Require equivalent complete outputs and actual interception counts, and retain failures alongside successful runs. Promote a measurable improvement only after the deployed path passes the same boundaries.
 
 ## Preserve the rejected attention trial
 
