@@ -44,7 +44,7 @@ def positive(value, maximum, name):
     return value
 
 
-def validate_admission(admission, url, corpus, monitor, *, execute):
+def validate_admission(admission, url, corpus, monitor, *, execute, work_adapter=None):
     if execute is not True or admission.get('root_live_throughput_lease') is not True or admission.get('candidate') != IDENTITY:
         raise AdmissionError('Explicit execute and fresh matching root admission required')
     parsed = urlsplit(url)
@@ -97,10 +97,22 @@ def validate_admission(admission, url, corpus, monitor, *, execute):
     cycles = admission['warmup_cycles']
     if type(cycles) is not int or not 1 <= cycles <= 10:
         raise AdmissionError('Separately admitted positive warmup required')
-    work, metadata = core.corpus_work(corpus, admission['repeat'])
+    if work_adapter is None:
+        work, metadata = core.corpus_work(corpus, admission['repeat'])
+    else:
+        if admission.get('adapter_identity') != work_adapter.identity:
+            raise AdmissionError('Explicit work adapter identity differs')
+        adapter_pins = admission['adapter_source_sha256']
+        if set(adapter_pins) != set(work_adapter.source_files) or any(
+                not (root / name).resolve().is_relative_to(root)
+                or core.digest((root / name).read_bytes()) != adapter_pins[name]
+                for name in work_adapter.source_files):
+            raise AdmissionError('Work adapter/complete validator source differs')
+        work, metadata = work_adapter.load(corpus, admission)
+    warmup_count = len(metadata.get('warmup_fixture_order', metadata['fixture_order']))
     if metadata != admission['corpus_metadata'] or len(work) != admission['planned_pages'] or len(work) > admission['work_limit']:
         raise AdmissionError('Frozen corpus, order, repeat or work limit differs')
-    if len(metadata['fixture_order']) * cycles > admission['work_limit']:
+    if warmup_count * cycles > admission['work_limit']:
         raise AdmissionError('Warmup exceeds admitted work limit')
     if admission.get('drain_contract') not in ('service-pending-holds-inference', 'external-engine-metrics'):
         raise AdmissionError('Explicit source-supported backend drain contract required')
@@ -116,7 +128,7 @@ def validate_admission(admission, url, corpus, monitor, *, execute):
         raise AdmissionError('Monitor polling interval below 10 ms')
     positive(admission['monitor_max_age_seconds'], 30, 'monitor freshness')
     n = len(configurations)
-    total_requests = (len(work) + len(metadata['fixture_order']) * cycles) * n
+    total_requests = (len(work) + warmup_count * cycles) * n
     sample_forecast = (total_requests
         + 2 * n * (math.ceil(admission['cell_seconds'] / admission['poll_seconds']) + 2)
         + (2 * n + 1) * (math.ceil(admission['drain_seconds'] / admission['poll_seconds']) + 1)
@@ -131,11 +143,12 @@ def validate_admission(admission, url, corpus, monitor, *, execute):
     if type(admission['max_output_bytes']) is not int or admission['max_output_bytes'] <= 8 * 1024**2:
         raise AdmissionError('Integer output budget must include 8 MiB atomic-summary reserve')
     positive(admission['max_client_bytes'], 512 * 1024**2, 'client working budget')
-    requests = {id(item.request): item.request for item in work}
+    input_requests = (tuple(item.request for item in work) if work_adapter is None else work_adapter.requests(work))
+    requests = {id(payload): payload for payload in input_requests}
     working = sum(map(len, requests.values())) + 4 * max(configurations) * admission['response_bytes'] + 8 * 1024**2
     if working > admission['max_client_bytes']:
         raise AdmissionError('Conservative input/response working envelope exceeds client budget')
-    raw_forecast = (len(work) + len(metadata['fixture_order']) * cycles) * len(configurations) * admission['response_bytes']
+    raw_forecast = (len(work) + warmup_count * cycles) * len(configurations) * admission['response_bytes']
     if raw_forecast + sum(map(len, requests.values())) + 8 * 1024**2 > admission['max_output_bytes']:
         raise AdmissionError('Worst-case raw/input disk forecast exceeds admitted output budget')
     return work, metadata
@@ -243,8 +256,8 @@ def check_health(info, admission, *, initial=False):
     return info
 
 
-async def run(admission, url, corpus, monitor, output, *, execute=False, http_transport=None):
-    work, metadata = validate_admission(admission, url, corpus, monitor, execute=execute)
+async def run(admission, url, corpus, monitor, output, *, execute=False, http_transport=None, work_adapter=None):
+    work, metadata = validate_admission(admission, url, corpus, monitor, execute=execute, work_adapter=work_adapter)
     import httpx
     if httpx.__version__ != '0.28.1':
         raise AdmissionError('Pinned HTTPX 0.28.1 required')
@@ -254,6 +267,8 @@ async def run(admission, url, corpus, monitor, output, *, execute=False, http_tr
               'lease_id': admission['lease_id'], 'node_id': admission['node_id'], 'direct_url': url,
               'admission_sha256': core.digest(json.dumps(admission, sort_keys=True).encode()),
               'corpus_metadata': metadata, 'source_sha256': admission['source_sha256'],
+              'adapter_identity': admission.get('adapter_identity'),
+              'adapter_source_sha256': admission.get('adapter_source_sha256'),
               'expected_worker': admission['expected_worker'], 'valid': False,
               'hardware_ownership_released': False, 'backend_drain_verified': False,
               'configurations': [], 'unattempted_concurrency': [],
@@ -263,10 +278,11 @@ async def run(admission, url, corpus, monitor, output, *, execute=False, http_tr
         report['artifact_bytes_written_current'] = artifacts.used
         artifacts.json('summary.json', report, terminal=True)
     written = set()
-    for item in work:
-        if id(item.request) not in written:
-            artifacts.put(core.digest(item.request) + '.request.json', item.request)
-            written.add(id(item.request))
+    input_requests = (tuple(item.request for item in work) if work_adapter is None else work_adapter.requests(work))
+    for payload in input_requests:
+        if id(payload) not in written:
+            artifacts.put(core.digest(payload) + '.request.json', payload)
+            written.add(id(payload))
     save()
     limits = httpx.Limits(max_connections=max(admission['concurrency']), max_keepalive_connections=max(admission['concurrency']))
     transport_events = {}
@@ -356,7 +372,7 @@ async def run(admission, url, corpus, monitor, output, *, execute=False, http_tr
             bounds = core.Bounds(concurrency, admission['request_seconds'], admission['cell_seconds'],
                                  admission['response_bytes'], admission['work_limit'])
             begun = time.monotonic()
-            task = asyncio.create_task(core.measure(items, transport, core.endpoint_validator, bounds,
+            task = asyncio.create_task(core.measure(items, transport, core.endpoint_validator if work_adapter is None else work_adapter.validate, bounds,
                         request_prefix=admission['lease_id'] + '-' + prefix, on_record=receive))
             async def watch():
                 while True:
@@ -395,9 +411,16 @@ async def run(admission, url, corpus, monitor, output, *, execute=False, http_tr
         try:
             witness.sample(admission_required=True)
             report['initial_health'] = await health('initial')
-            fixture_count = len(metadata['fixture_order'])
-            warmup = tuple(replace(work[i], work_id=f'warmup{cycle}:{work[i].fixture_id}')
-                           for cycle in range(admission['warmup_cycles']) for i in range(fixture_count))
+            if work_adapter is None:
+                fixture_count = len(metadata['fixture_order'])
+                warmup = tuple(replace(work[i], work_id=f'warmup{cycle}:{work[i].fixture_id}')
+                               for cycle in range(admission['warmup_cycles']) for i in range(fixture_count))
+            else:
+                warmup = work_adapter.warmup(work, metadata, admission['warmup_cycles'])
+            expected_warmup_count = len(metadata.get('warmup_fixture_order', metadata['fixture_order'])) * admission['warmup_cycles']
+            if (len(warmup) != expected_warmup_count
+                    or any(not isinstance(item, core.Work) or id(item.request) not in written for item in warmup)):
+                raise AdmissionError('Warmup count or payload differs from admitted input envelope')
             for index, concurrency in enumerate(admission['concurrency']):
                 witness.sample(admission_required=True)
                 config = {'concurrency': concurrency, 'warmup': None, 'measured': None}
