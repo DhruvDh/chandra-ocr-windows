@@ -1,0 +1,340 @@
+{
+  "schema": "chandra-public-lifecycle-summary-v1",
+  "date_utc": "2026-10-04",
+  "run": "deployed-lifecycle-02",
+  "passed": true,
+  "elapsed_seconds": 947.237868738,
+  "provenance_verified": false,
+  "runtime_attestation": false,
+  "scope": "Observed deployed crash recovery and two five-minute idle unload cycles on the synthetic tiny fixture; no performance optimization promotion.",
+  "corpus_sha256": "b1ac3a7f4d5c3c6b3aad5a4333437698448de7b5d283f4150904136880ef8905",
+  "crash": {
+    "passed": true,
+    "runner_post_retries": 0,
+    "kill_submitted": true,
+    "restarts_before": 1,
+    "restarts_after": 2,
+    "restarts_after_recovery": 2,
+    "incomplete_stream_verified": true,
+    "interrupted_request": {
+      "fixture": "tiny",
+      "status": 200,
+      "elapsed_seconds": 53.08968611199998,
+      "ttft_seconds": 52.96724142399995,
+      "correctness": {
+        "passed": false,
+        "failures": [
+          "finish_reason",
+          "stream_error",
+          "missing_usage",
+          "table_cells_and_order",
+          "numbers:12.50",
+          "numbers:17",
+          "numbers:203.25",
+          "numbers:7.25",
+          "numbers:29",
+          "numbers:118.75",
+          "numbers:19.75",
+          "numbers:46",
+          "numbers:322.00",
+          "text:REFERENCE TINY",
+          "end_markers:END-TINY-COMPLETE",
+          "equations:y = 3x + 7",
+          "equations:x = 5",
+          "equations:y = 22",
+          "reading_order",
+          "layout_label:Table",
+          "missing_layout"
+        ]
+      },
+      "request_sha256": "c7d3d8597489654b708cca17f32faa290beeb21a5c30d67ecbb063b554f06114",
+      "response_sha256": "5ae13e39bcfa8c8dbaaed83741d370d4f16d181cb1516cb8ca1da9e30146b77e",
+      "provenance_verified": false,
+      "finish_reason": null,
+      "usage": null,
+      "stream_errors": [
+        {
+          "type": "backend_failure",
+          "message": "Backend stream failed. Request was not replayed."
+        }
+      ]
+    },
+    "separate_recovery_request": {
+      "fixture": "tiny",
+      "status": 200,
+      "elapsed_seconds": 106.34608485500002,
+      "ttft_seconds": 26.67871260100003,
+      "correctness": {
+        "passed": true,
+        "failures": []
+      },
+      "request_sha256": "c7d3d8597489654b708cca17f32faa290beeb21a5c30d67ecbb063b554f06114",
+      "response_sha256": "ad9603061df2abbff56394074ba1d2d3195d9072d480ad2dce4c90dbd1f35041",
+      "provenance_verified": false,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 801,
+        "completion_tokens": 395,
+        "total_tokens": 1196
+      },
+      "stream_errors": []
+    },
+    "drained": true,
+    "scope": "An intentionally killed owned supervisor caused an incomplete stream with backend_failure and no terminal stop/usage. Recovery was a separate request, not replay of the interrupted POST."
+  },
+  "idle": {
+    "passed": true,
+    "cycles": [
+      {
+        "index": 1,
+        "passed": true,
+        "request_before_idle": {
+          "fixture": "tiny",
+          "status": 200,
+          "elapsed_seconds": 80.57671482399996,
+          "ttft_seconds": 0.9505858019999778,
+          "correctness": {
+            "passed": true,
+            "failures": []
+          },
+          "request_sha256": "c7d3d8597489654b708cca17f32faa290beeb21a5c30d67ecbb063b554f06114",
+          "response_sha256": "a26389e21d8e71127ab2183f1793309dadba5adc8fc03a74236bc649d84df3a1",
+          "provenance_verified": false,
+          "finish_reason": "stop",
+          "usage": {
+            "prompt_tokens": 801,
+            "completion_tokens": 395,
+            "total_tokens": 1196
+          },
+          "stream_errors": []
+        },
+        "unload_seconds": 300.58550694200005,
+        "poll_observations": 61,
+        "terminal_health": {
+          "loaded": false,
+          "state": "cold",
+          "pending_or_active": 0,
+          "torch_xpu_memory": {
+            "allocated_bytes": 0,
+            "reserved_bytes": 0,
+            "peak_allocated_bytes": 11087373824
+          }
+        },
+        "models_still_listed": {
+          "object": "list",
+          "data": [
+            {
+              "id": "chandra",
+              "object": "model",
+              "created": 0,
+              "owned_by": "local"
+            }
+          ]
+        }
+      },
+      {
+        "index": 2,
+        "passed": true,
+        "request_before_idle": {
+          "fixture": "tiny",
+          "status": 200,
+          "elapsed_seconds": 89.16492506999998,
+          "ttft_seconds": 8.63999619599997,
+          "correctness": {
+            "passed": true,
+            "failures": []
+          },
+          "request_sha256": "c7d3d8597489654b708cca17f32faa290beeb21a5c30d67ecbb063b554f06114",
+          "response_sha256": "f542de6d417f010ad107fac6f69f631328720bb8769d6ac2a49f84aff6e9ca76",
+          "provenance_verified": false,
+          "finish_reason": "stop",
+          "usage": {
+            "prompt_tokens": 801,
+            "completion_tokens": 395,
+            "total_tokens": 1196
+          },
+          "stream_errors": []
+        },
+        "unload_seconds": 300.71505262200003,
+        "poll_observations": 61,
+        "terminal_health": {
+          "loaded": false,
+          "state": "cold",
+          "pending_or_active": 0,
+          "torch_xpu_memory": {
+            "allocated_bytes": 0,
+            "reserved_bytes": 0,
+            "peak_allocated_bytes": 11087373824
+          }
+        },
+        "models_still_listed": {
+          "object": "list",
+          "data": [
+            {
+              "id": "chandra",
+              "object": "model",
+              "created": 0,
+              "owned_by": "local"
+            }
+          ]
+        }
+      }
+    ],
+    "scope": "Health and model-listing polls did not prevent unload; timing has approximately five-second polling resolution. Second request reloads after first unload."
+  },
+  "final_drain_passed": true,
+  "process_memory": {
+    "same_worker_creation_identity_checked": true,
+    "snapshots": {
+      "loaded": {
+        "utc": "2026-10-04T00:16:44.388266+00:00",
+        "workers": [
+          {
+            "role": "venv_launcher",
+            "resident_working_set_bytes": 4329472,
+            "peak_working_set_bytes": 4354048,
+            "private_committed_bytes": 745472
+          },
+          {
+            "role": "inference_worker",
+            "resident_working_set_bytes": 4570132480,
+            "peak_working_set_bytes": 5778878464,
+            "private_committed_bytes": 17345310720
+          }
+        ],
+        "observer_sha256": "4f26c97b5dd3f3afd6b4b3fa11cb889ee948646a2039315cd13ed0aaec18ecf1"
+      },
+      "unloaded": {
+        "utc": "2026-10-04T00:27:48.868759+00:00",
+        "workers": [
+          {
+            "role": "venv_launcher",
+            "resident_working_set_bytes": 4407296,
+            "peak_working_set_bytes": 4444160,
+            "private_committed_bytes": 745472
+          },
+          {
+            "role": "inference_worker",
+            "resident_working_set_bytes": 4441833472,
+            "peak_working_set_bytes": 8382316544,
+            "private_committed_bytes": 6058455040
+          }
+        ],
+        "observer_sha256": "4f26c97b5dd3f3afd6b4b3fa11cb889ee948646a2039315cd13ed0aaec18ecf1"
+      }
+    },
+    "scope": "Windows process RAM snapshot; commit is not resident RAM. Includes a matching venv launcher when present. No process totals are summed; no GPU or driver memory measurement is made.",
+    "driver_vram_measured": false,
+    "torch_scope": "Idle terminal allocated/reserved bytes are zero; historical peak allocated bytes remain nonzero. This is Torch allocator evidence, not driver-wide VRAM or zero process RAM."
+  },
+  "prior_run": {
+    "run": "deployed-lifecycle-01",
+    "overflow_passed": true,
+    "status": "interrupted_by_hard_reboot",
+    "crash_complete": false,
+    "idle_complete": false
+  },
+  "baseline_boundary": {
+    "endpoint_and_recorded_cli_date_utc": "2026-10-03",
+    "resumed_lifecycle_date_utc": "2026-10-04",
+    "warm_medians_seconds": {
+      "northstone": 11.06938948899915,
+      "waystone": 85.16428473699852
+    },
+    "historical_summary_sha256": "e873eddded4b6279b520bd1223d2cf6beb0abe2407b471803d2add0e60ad26a7",
+    "optimization_status": "New hill-climb work requested; no optimized candidate promoted by these baseline receipts."
+  },
+  "independent_byte_checks": {
+    "passed": true,
+    "request_response_pairs_checked": 4,
+    "run_artifacts": [
+      "deployed-lifecycle-02/crash/waystone/001-tiny-run.json",
+      "deployed-lifecycle-02/crash/waystone/002-tiny-run.json",
+      "deployed-lifecycle-02/idle/waystone/001-tiny-run.json",
+      "deployed-lifecycle-02/idle/waystone/002-tiny-run.json"
+    ],
+    "scope": "Local saved request/response SHA-256 consistency; not independent runtime attestation."
+  },
+  "artifact_commitments": [
+    {
+      "artifact": "deployed-lifecycle-02/crash/waystone/001-tiny-request.json",
+      "sha256": "c7d3d8597489654b708cca17f32faa290beeb21a5c30d67ecbb063b554f06114",
+      "bytes": 18361
+    },
+    {
+      "artifact": "deployed-lifecycle-02/crash/waystone/001-tiny-response.raw",
+      "sha256": "5ae13e39bcfa8c8dbaaed83741d370d4f16d181cb1516cb8ca1da9e30146b77e",
+      "bytes": 512
+    },
+    {
+      "artifact": "deployed-lifecycle-02/crash/waystone/001-tiny-run.json",
+      "sha256": "d70677820552aa923bbe8d21783246bbe7388eb9f194e7ae6e09204f7cbfe824",
+      "bytes": 1558
+    },
+    {
+      "artifact": "deployed-lifecycle-02/crash/waystone/002-tiny-request.json",
+      "sha256": "c7d3d8597489654b708cca17f32faa290beeb21a5c30d67ecbb063b554f06114",
+      "bytes": 18361
+    },
+    {
+      "artifact": "deployed-lifecycle-02/crash/waystone/002-tiny-response.raw",
+      "sha256": "ad9603061df2abbff56394074ba1d2d3195d9072d480ad2dce4c90dbd1f35041",
+      "bytes": 11598
+    },
+    {
+      "artifact": "deployed-lifecycle-02/crash/waystone/002-tiny-run.json",
+      "sha256": "50c595ae8ab9240b16a8fe7f6c2f2e5bf3fa8b5fb49952662e3d4c8c89047cc1",
+      "bytes": 1869
+    },
+    {
+      "artifact": "deployed-lifecycle-02/idle/waystone/001-tiny-request.json",
+      "sha256": "c7d3d8597489654b708cca17f32faa290beeb21a5c30d67ecbb063b554f06114",
+      "bytes": 18361
+    },
+    {
+      "artifact": "deployed-lifecycle-02/idle/waystone/001-tiny-response.raw",
+      "sha256": "a26389e21d8e71127ab2183f1793309dadba5adc8fc03a74236bc649d84df3a1",
+      "bytes": 11598
+    },
+    {
+      "artifact": "deployed-lifecycle-02/idle/waystone/001-tiny-run.json",
+      "sha256": "6def9c1e025f346439c2c4aaa6abbf736d7f4c721825598c502c254f4fde695e",
+      "bytes": 1869
+    },
+    {
+      "artifact": "deployed-lifecycle-02/idle/waystone/002-tiny-request.json",
+      "sha256": "c7d3d8597489654b708cca17f32faa290beeb21a5c30d67ecbb063b554f06114",
+      "bytes": 18361
+    },
+    {
+      "artifact": "deployed-lifecycle-02/idle/waystone/002-tiny-response.raw",
+      "sha256": "f542de6d417f010ad107fac6f69f631328720bb8769d6ac2a49f84aff6e9ca76",
+      "bytes": 11598
+    },
+    {
+      "artifact": "deployed-lifecycle-02/idle/waystone/002-tiny-run.json",
+      "sha256": "ded9dc01133b7e0310259932057fa97109752b60efd326f71764cce1fac12598",
+      "bytes": 1867
+    },
+    {
+      "artifact": "deployed-lifecycle-02/lifecycle.json",
+      "sha256": "311a7ee5924cf83b7c754ac0bd0ff7c59ab8fb86b51a0232187f1d55909f6bf3",
+      "bytes": 252008
+    },
+    {
+      "artifact": "resumed-loaded-memory.json",
+      "sha256": "c2af92b3a111eecae2c2e7f30e177cfae26209425cce81192e4220545325ffd9",
+      "bytes": 960
+    },
+    {
+      "artifact": "resumed-unloaded-memory.json",
+      "sha256": "ef375d5b4798eb457cfea99213a6ac7e12d0b2a165c51bbf5bdcaa1741711a7f",
+      "bytes": 959
+    },
+    {
+      "artifact": "deployed-lifecycle-01/lifecycle.json",
+      "sha256": "ac86aebc2995fe44cd1a79fb87cceb9459b1c9a7202835d27666b9a780f67889",
+      "bytes": 20629
+    }
+  ]
+}

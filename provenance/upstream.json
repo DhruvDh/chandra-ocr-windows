@@ -9,8 +9,10 @@
   "derivative": {
     "repository": "https://github.com/DhruvDh/chandra-ocr-windows",
     "visibility": "public",
-    "github_fork_network_member": false,
-    "full_upstream_history_retained": true
+    "github_fork_network_member": true,
+    "full_upstream_history_retained": true,
+    "parent_repository": "https://github.com/Const-me/Whisper",
+    "bootstrap_retired_after_verified_transfer": true
   },
   "checkpoint": {
     "repository": "https://huggingface.co/datalab-to/chandra-ocr-2",

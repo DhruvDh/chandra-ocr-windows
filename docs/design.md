@@ -24,4 +24,4 @@ The router is separate from both inference engines. It selects a backend before 
 
 ## Provenance
 
-The repository retains Const-me/Whisper history at `1ce7399704d8bea92429fc429819d32991fe9152`, with `upstream` pointing to the original repository. It was created as an independent derivative because the initial request was private, then made public with the owner's approval. It is not a GitHub fork-network entry. The original source is MPL-2.0; the downloaded model retains its own OpenRAIL license.
+The repository retains Const-me/Whisper history at `1ce7399704d8bea92429fc429819d32991fe9152`, with `upstream` pointing to the original repository. With the owner’s public-visibility approval, the tested history was transferred into a proper GitHub fork of Const-me/Whisper. The redundant bootstrap repository was retired after verifying the transferred branch and tags; a local Git bundle preserves recovery history. The original source is MPL-2.0; the downloaded model retains its own OpenRAIL license.
