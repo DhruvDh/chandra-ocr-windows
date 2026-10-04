@@ -2949,5 +2949,78 @@
       }
     ],
     "public_CPU_test_mirror": "15 tests pass with the identical candidate source; portable graph discovery and stdout report, 1 GiB/no swap, no model or GPU"
+  },
+  "tiny801_vision_query32_numerical_trajectory_pass_2026_10_04": {
+    "status": "Independent Tiny801 Q32 numerical/state-structure and resource/closure acceptance PASS for the frozen teacher-forced trajectory.",
+    "scope": {
+      "numerical": "All 395 rows of 248,320-token vocabulary logits and all 25,280 ordered state fields matched exactly: zero logit mismatch rows and zero state mismatch fields. Final target gate 248046.",
+      "execution": "Two vision prefill scopes, 24 blocks and 624 completed chunk fences each; full K/V retained and restored. This result covers the frozen Tiny801 teacher-forced trajectory only.",
+      "resources": "Independent acceptance reports completion latch pass, all five original processes gone, ordinary cold restore, minimum host available 15,463,862,272 bytes and minimum local headroom 5,960,892,416 bytes.",
+      "windows_boundary": "The bounded Display/WER queries returned zero records for their interval. Windows uptime increased; one of the two previously listed Kernel 141 archives disappeared, with no newly listed archive. This is incomplete evidence about historical/reset absence, not proof of no reset or universal driver health.",
+      "controller_accounting": "Systemd cgroup MemoryPeak was 268,730,368 bytes, 294,912 bytes above configured MemoryMax; the counter includes page cache, the run exited successfully with zero swap, and no OOM outcome was reported. Do not describe peak as below the configured maximum or as process RSS.",
+      "disposition": "No speed, native 3,959-token, broader attention, sustained-throughput or deployment qualification."
+    },
+    "private_receipt_commitments": [
+      {
+        "receipt": "optimization/intel-tiny801-vision-query32-numerical-v1-execution-revision-02-AB-001-run/independent-actual-acceptance.json",
+        "bytes": 6500,
+        "sha256": "1b06de42792234c42782d10e77f179ca81e67e0acf924e041b79ccb6adaaa375",
+        "note": "Final independent numerical, resource and closure acceptance."
+      },
+      {
+        "receipt": "optimization/intel-tiny801-vision-query32-numerical-v1-execution-revision-02-AB-001-run/AB-001-export.json",
+        "bytes": 7593,
+        "sha256": "ba5c665a1eb0a8e1e779adc51a7032c9133c0fbbeee2a5fd7a5678c0ce44ecea",
+        "note": "Actual outer export receipt bound to the numerical comparison."
+      },
+      {
+        "receipt": "optimization/intel-tiny801-vision-query32-numerical-v1-execution-revision-02-AB-001-run/collection.json",
+        "bytes": 4936,
+        "sha256": "747ae7d0597c6716289a63963c5c20230518bcb8246561bf6c8626935b18c4e7",
+        "note": "Collected artifact manifest bound by the consumer and independent acceptance."
+      },
+      {
+        "receipt": "optimization/intel-tiny801-vision-query32-numerical-v1-execution-revision-02-AB-001-run/independent-numerical/summary.json",
+        "bytes": 930,
+        "sha256": "d00534239b765135dc0079383e3e8108077493c557952a948f9ec4ddff1194b6",
+        "note": "Compact full-row and cache-state comparison result."
+      },
+      {
+        "receipt": "optimization/intel-tiny801-vision-query32-numerical-v1-execution-revision-02-AB-001-run/controller-terminal.json",
+        "bytes": 611,
+        "sha256": "258222948b8830e8ccd840ae9687d23d1caeb4137d2c4ea235293b77c375e0d4",
+        "note": "Controller terminal accounting; includes an explicitly noted cgroup MemoryPeak counter above configured MemoryMax."
+      },
+      {
+        "receipt": "optimization/intel-tiny801-vision-query32-numerical-v1-execution-revision-02-AB-001-run/root-kernel141-after.json",
+        "bytes": 304,
+        "sha256": "3f4ac47f75b567adb551cba9b06a30b06c2cde8e7f52d5612ccc2ae5cbe814aa",
+        "note": "Delayed Kernel 141 archive snapshot after the run."
+      },
+      {
+        "receipt": "optimization/intel-tiny801-vision-query32-numerical-v1-execution-revision-02-AB-001-run/root-windows-events-after.json",
+        "bytes": 669,
+        "sha256": "fc6023ddf0f4e30fcd2d9b5d5729cce32ba596bb601ac0e091d0c605cdbe9190",
+        "note": "Bounded Display and WER event query; zero records in queried interval only."
+      },
+      {
+        "receipt": "optimization/intel-tiny801-vision-query32-numerical-v1-execution-revision-02-AB-001-run/service-restoration.json",
+        "bytes": 921,
+        "sha256": "3120ff45b0b3056975b7cc55033b136d0088b664c48142c860ac3d435e63b608",
+        "note": "Owned-process closure and ordinary cold-service restoration."
+      },
+      {
+        "receipt": "optimization/intel-tiny801-vision-query32-numerical-v1/execution-revision-02/source-freeze.json",
+        "bytes": 7401,
+        "sha256": "b65bfc38e55bd8e3b7fb9a03cd67bccd145afd350d420b96ea0af15a614e4ee3",
+        "note": "Execution revision 02 source freeze."
+      },
+      {
+        "receipt": "optimization/intel-tiny801-vision-query32-numerical-v1/execution-revision-02/independent-source-review.json",
+        "bytes": 86334,
+        "sha256": "7eede1254e152d811c32343b8debd75d5c2f5fbc87150430a56035021aa9096b",
+        "note": "Independent source review for execution revision 02."
+      }
+    ]
   }
 }
