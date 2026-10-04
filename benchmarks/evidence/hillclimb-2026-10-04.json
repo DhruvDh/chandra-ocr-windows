@@ -45,7 +45,9 @@
   },
   "pending": {
     "recurrent": "The v1 full cached candidate failed frozen policy v2, and the v2 full cached candidate also failed it at eleven positions including a new unapproved decision at 924. Complete OCR and timing remain unrun; no recurrence candidate is qualified or promoted.",
-    "normalization": "Gain-only passed retained complete OCR on the tiny page only. The other four pages and warm timing remain pending. The fused full-trajectory candidate failed frozen policy v2; no optimization is promoted."
+    "normalization": "Gain-only passed complete OCR on all five frozen pages; paired speed remains on hold after two exploratory observations pending independent resolution of the memory qualification. The fused full-trajectory candidate failed frozen policy v2; no optimization is promoted.",
+    "paired_speed": "Two of five prespecified pairs are available as exploratory observations only. Frozen memory qualification remains unresolved, so no further pairs or median speed conclusion; no performance promotion.",
+    "production_deployment": "Production deployment remains pending."
   },
   "evidence_boundary": "Commitments hash private receipts only; they do not attest remote process identity or substitute for access to underlying evidence. Raw traces, tensors, private paths, and credentials are excluded. Numerical policy v2 was frozen before full candidate runs; capability receipts are not acceptance decisions.",
   "cpu_cached_calibration": {
@@ -185,7 +187,7 @@
   },
   "normalization": {
     "gain_only": {
-      "status": "Tiny complete OCR acceptance passed with exact retained HTML and geometry; other four pages and warm timing remain pending, so candidate qualification and performance promotion remain false.",
+      "status": "Complete OCR acceptance passed on all five frozen pages. Two of five exploratory paired representative observations are retained; unresolved memory qualification holds the five-pair decision, performance promotion, and deployment.",
       "rows": 395,
       "cache_records": 25280,
       "applicable_modules": 81,
@@ -307,7 +309,7 @@
       "argmax_equal": true,
       "finite": true
     },
-    "scope": "Fused normalization full trajectory rejected by frozen numerical/decision gates. Gain-only complete OCR and timing remain pending; no optimized candidate is promoted.",
+    "scope": "Fused normalization was rejected by frozen numerical and decision gates; no fused free OCR or performance run followed.",
     "private_receipt_commitments": [
       {
         "receipt": "norm-fused-full-01-gate-summary.json",
@@ -442,6 +444,132 @@
         "receipt": "norm-gain-tiny-ocr-01-process-absence.json",
         "bytes": 46,
         "sha256": "1bbec77765738f0c5680d52eab191cccccee75a848f2ef3f80f97398a36b1679"
+      }
+    ]
+  },
+  "norm_gain_complete_ocr_qualification": {
+    "status": "Five frozen synthetic pages passed complete OCR acceptance; no paired speed conclusion or production deployment follows.",
+    "candidate": "gain-only zero-centered norm cached gains",
+    "five_frozen_pages_passed": true,
+    "criteria": "Each page matched exact reference HTML, usage, stop behavior, and geometry; maximum coordinate delta 0 and minimum IoU 1.0 on every page.",
+    "pages": [
+      {
+        "fixture": "tiny",
+        "prompt_tokens": 801,
+        "completion_tokens": 395,
+        "total_tokens": 1196,
+        "terminal_id": 248046,
+        "norm_calls": 31995
+      },
+      {
+        "fixture": "small",
+        "prompt_tokens": 1451,
+        "completion_tokens": 395,
+        "total_tokens": 1846,
+        "terminal_id": 248046,
+        "norm_calls": 31995
+      },
+      {
+        "fixture": "representative",
+        "prompt_tokens": 3617,
+        "completion_tokens": 397,
+        "total_tokens": 4014,
+        "terminal_id": 248046,
+        "norm_calls": 32157
+      },
+      {
+        "fixture": "routes",
+        "prompt_tokens": 1771,
+        "completion_tokens": 595,
+        "total_tokens": 2366,
+        "terminal_id": 248046,
+        "norm_calls": 48195
+      },
+      {
+        "fixture": "ledger",
+        "prompt_tokens": 1771,
+        "completion_tokens": 526,
+        "total_tokens": 2297,
+        "terminal_id": 248046,
+        "norm_calls": 42606
+      }
+    ],
+    "interception": "81 norm modules intercepted each generated token; 186948 calls across five requests; patch scope restored after each request.",
+    "new_reference_token_identity": "Routes and ledger full generated IDs, EOS, and stop set match their newly generated unchanged-hybrid references. Historical generated token IDs are unavailable for tiny, small, and representative, so no identity comparison is claimed for those pages.",
+    "post_unload_memory": "All five receipts report zero allocated and reserved bytes.",
+    "routes_process_boundary": {
+      "initial_openprocess_observation_present": true,
+      "later_independent_openprocess_absent_observations": 2,
+      "later_absence_error_code": 87,
+      "current_child_absence_accepted": true,
+      "initial_transient_presence_resolved": false,
+      "denied_cim_access_counted_as_absence": false,
+      "request_replayed": false
+    },
+    "boundary": "Complete OCR acceptance covers these five frozen synthetic pages. General document accuracy, paired speed and production deployment remain separate questions.",
+    "private_receipt_commitments": [
+      {
+        "receipt": "norm-gain-complete-ocr-qualification.json",
+        "bytes": 21178,
+        "sha256": "3bf20f14ead3018d939d2263f364e6968914d874a6490bf80fbb98885a7c4705"
+      }
+    ]
+  },
+  "norm_gain_paired_representative_v3_01": {
+    "scope": "First two of five prespecified warm paired observations on the representative page; all complete outputs passed identity, content, decode, generation-thread, fresh-state, and interception checks. The paired results are exploratory and incomplete.",
+    "completed_pairs": 2,
+    "required_pairs_for_frozen_decision": 5,
+    "frozen_five_pair_decision_met": false,
+    "observed_pairs_seconds": [
+      {
+        "pair": 0,
+        "hybrid": 87.85423070000252,
+        "gain_only": 84.74693969999498,
+        "exploratory_relative_reduction": 0.03536871218664539
+      },
+      {
+        "pair": 1,
+        "hybrid": 86.93271190000087,
+        "gain_only": 85.08260429999791,
+        "exploratory_relative_reduction": 0.021282064709210347
+      }
+    ],
+    "timing_interpretation": "These two observed pair reductions are exploratory only; do not extrapolate a median speedup or infer the frozen five-pair result.",
+    "output_boundary": "All paired complete outputs matched the frozen exact content/identity checks, including HTML, usage, stop, streamed/full decode, state, and interception gates.",
+    "memory_review": {
+      "persistent_live_gain_bytes": 681984,
+      "candidate_minus_hybrid_peak_allocated_bytes": 1241088,
+      "candidate_minus_hybrid_post_scope_allocated_bytes": 0,
+      "candidate_minus_hybrid_reserved_bytes": 0,
+      "status": "Independent review leaves memory qualification unresolved; the batch is held. This is neither an automatic numeric failure nor a waived peak.",
+      "attribution": "The gain source retains FP32 activation; this is a plausible association, not measured causal attribution."
+    },
+    "cleanup": {
+      "unloaded_allocated_bytes": 0,
+      "unloaded_reserved_bytes": 0,
+      "owned_process_absent": true
+    },
+    "decision": "No performance promotion or deployment. Frozen decision requires all five pairs and the memory gate; no further pairs are authorized while the unresolved memory qualification remains held.",
+    "private_receipt_commitments": [
+      {
+        "receipt": "norm-gain-paired-representative-v3-01/summary.json",
+        "bytes": 70248,
+        "sha256": "8ec678f3fd7ac3b03a2882a2680a44386dbe74b557cda92b085448fbf7bdef71"
+      },
+      {
+        "receipt": "norm-gain-paired-representative-v3-01/batch-review.json",
+        "bytes": 3824,
+        "sha256": "177a46871956f79ff3d05074eec93ec2be3a2e5052a757de7e7239ab27cc1a9a"
+      },
+      {
+        "receipt": "norm-gain-paired-representative-v3-01-process-absence.json",
+        "bytes": 46,
+        "sha256": "6aeb62b8dd98242efdc21d47e492e205f9ba82f0e26e3bb51a97cf5356926397"
+      },
+      {
+        "receipt": "norm-gain-paired-timing-decision.json",
+        "bytes": 1192,
+        "sha256": "27d63a796ef4efb19ff7b924ab9bffe5c33600e5bd62c7fd66ab6d405735e891"
       }
     ]
   }
