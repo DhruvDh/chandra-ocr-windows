@@ -1,5 +1,20 @@
 # Correctness before optimization
 
+The current performance target is [sustained throughput on each node](../docs/sustained-throughput.md): completed correct pages per second at the best safe concurrency, guided by a phase-specific roofline model. Short burst latency and routing gains do not establish that ceiling.
+
+The [offline roofline model](roofline.md) estimates vision, prefill and decode arithmetic, ideal shared weight traffic and persistent state as batch size changes. Run `python benchmarks/roofline.py --batch 15` to inspect that hypothetical scenario. It loads no model and leaves empirical hardware ceilings, peak memory and measured pages/sec unknown.
+
+The [preparation receipt](evidence/throughput-preparation-2026-10-04.json) records 31 passing focused CPU tests, source hashes and the remaining live-measurement work. Offline replay tests exercise the scheduler and accounting; they do not qualify GPU throughput.
+
+`throughput.py` provides a rolling-concurrency measurement core and an offline replay CLI. It refills individual vacant slots, preserves a fixed heterogeneous work sequence across concurrency levels, validates every response and retains raw replies. Any failed page invalidates that configuration's rate and stops further configurations. Warmup is recorded separately. The core distinguishes local transport cleanup from independently verified backend drain. The CLI never contacts the URL supplied as metadata and has no live adapter; its rates are simulator results. Live measurements still require node identity, resource admission, telemetry, complete backend drain and a qualified representative corpus.
+
+For an offline rehearsal, supply the existing `inputs-v2` corpus and a replay JSON mapping each fixture ID to `response_file`, `delay_seconds` and optional `http_status`. Response files are relative to the replay JSON directory and contain complete OpenAI-compatible replies. Use a new output directory. Other fixture schemas are rejected before work starts.
+
+```bash
+python benchmarks/throughput.py --replay /path/to/replay.json --direct-url http://127.0.0.1:8000/v1 --corpus benchmarks/inputs-v2 --output /path/to/new-rehearsal --concurrency 1 2 4 --repeat 10
+python -m unittest discover -s benchmarks -p test_throughput.py -v
+```
+
 The evaluator performs offline comparisons; the explicitly invoked endpoint runner sends only public synthetic fixtures to the endpoint you specify. Neither tool opens Zotero state or dissertation files. `evaluate.py` uses Python's standard library and accepts exported measurements from independently run reference and candidate adapters. No numerical tolerance here is an empirically validated Chandra error budget. The logits gate requires matching reference/candidate identity metadata alongside full-vocabulary arrays and reports target-token log probabilities. Its metadata remains exporter evidence; a self-asserted hash cannot establish independent runtime provenance. Equation gates compare complete Math/Equation/Formula HTML nodes, explicit TeX-delimited nodes or explicit `Equation:` blocks split on semicolons after whitespace normalization. They reject suffixes such as `y = 220` for expected `y = 22`; they do not prove algebraic equivalence. These limitations must be resolved in exporters and stricter semantic adapters before model acceptance.
 
 The retained NorthStone fixture is an installation acceptance test, not an optimization corpus: it contains two known pages, weak equation substring checks, one baseline and one steady repeat, and device-wide memory samples. Its raw response took 22.75 seconds; two-page native/scanned CLI runs took 23.86/24.31 seconds. Those results establish historical compatibility on one shared desktop, not an Intel baseline or a speedup target. The source files inspected are `benchmarks/generate.py`, `benchmarks/ocr.py`, `benchmarks/lifecycle.py`, `stack.json`, `config.json`, `docs/validation.md`, and `evidence/benchmark-baseline.json` in the external `chandra-ocr-uv-rocm` repository.

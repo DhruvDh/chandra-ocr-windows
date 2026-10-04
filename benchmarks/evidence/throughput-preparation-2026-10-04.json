@@ -1,0 +1,49 @@
+{
+  "schema": "chandra.sustained-throughput-preparation.v1",
+  "date": "2026-10-04",
+  "scope": "Offline rolling-load implementation and partial analytical roofline model; no live throughput qualification",
+  "hardware_executed": false,
+  "services_changed": false,
+  "source_files": {
+    "benchmarks/throughput.py": {
+      "sha256": "0c0978b3bef12b1bf632b1416f740a478c194708a6e03c9448ac8cb652bae374",
+      "bytes": 20269
+    },
+    "benchmarks/test_throughput.py": {
+      "sha256": "6b81020db04c6a50d3efadfabdb7d4c3e2fa9f61a04224cc70e348b374c54a6a",
+      "bytes": 13900
+    },
+    "benchmarks/roofline.py": {
+      "sha256": "603e0bab9957ca92630976ed68f662e69e1380b32cbccc3a95f37c1e250389a8",
+      "bytes": 7608
+    },
+    "benchmarks/roofline-inputs.json": {
+      "sha256": "f3e8b70dcd5d65c26cd162e2430691da7f409fa97701564ffa1496f7e316eb9f",
+      "bytes": 1839
+    },
+    "benchmarks/test_roofline.py": {
+      "sha256": "7664a2678fdec136e117eda6a3dcc843e200ec1c0200622d624cb5bc2791287d",
+      "bytes": 3075
+    }
+  },
+  "validation": {
+    "python": "3.12.14",
+    "command": ".venv/bin/python -m pytest -q benchmarks/test_throughput.py benchmarks/test_roofline.py benchmarks/test_endpoint.py",
+    "exit_code": 0,
+    "passed": 31,
+    "pytest_reported_seconds": 0.24,
+    "projection_groups_recomputed_from_retained_inventory": 5,
+    "projection_counts_match_public_assumptions": true,
+    "diff_check_passed": true
+  },
+  "independent_review_scope": "Rolling scheduler, offline replay and methodology; no hardware or runtime qualification",
+  "unverified": [
+    "Live HTTP adapter and node resource admission",
+    "Backend drain and engine occupancy telemetry",
+    "First-seen representative workload capacity",
+    "Per-node sustained pages/sec plateau",
+    "Empirical precision-compatible compute and memory bandwidth roofs",
+    "Safe larger engine sequence counts and Intel true batching"
+  ],
+  "historical_result_boundary": "The accepted three-request routing gain is not a per-node sustained-throughput measurement."
+}

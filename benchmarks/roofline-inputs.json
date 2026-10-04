@@ -1,0 +1,42 @@
+{
+  "schema": "chandra.roofline-inputs.v1",
+  "model_revision": "af93b47dba1b47b6640c86ccf487ed2260ab9a09",
+  "precision": "bfloat16",
+  "projection_elements": {
+    "text_mlp": 2264924160,
+    "text_linear_attention": 1010565120,
+    "text_full_attention": 293601280,
+    "vocabulary_head": 635699200,
+    "vision_blocks": 301989888
+  },
+  "dimensions": {
+    "weight_bytes": 2,
+    "full_attention_layers": 8,
+    "query_heads": 16,
+    "kv_heads": 4,
+    "attention_head_dim": 256,
+    "linear_layers": 24,
+    "linear_value_heads": 32,
+    "linear_key_dim": 128,
+    "linear_value_dim": 128,
+    "recurrent_state_bytes": 4,
+    "vision_layers": 24,
+    "vision_heads": 16,
+    "vision_head_dim": 64,
+    "vocabulary_positions_per_prefill": 1,
+    "output_allowance": 12384
+  },
+  "defaults": {"batch": 1, "prefix": 3617, "patches": 12096, "completion": 397},
+  "source_sha256": {
+    "projection_metadata_inventory": "e4f44dba2549719c1cb4fd6c4d3b31a24d4a26da74bb7432732ac31551630394",
+    "installed_qwen3_5_graph": "d0c8561d91e31e50d9a57b74196c5a7ad023e42ebe9f84004d0a535310879939",
+    "installed_generation_utils": "7c24fb4503d2fadf5aff1bb7b0f253e2e7442b9e2775ea5fa703eea5e47d2b1b"
+  },
+  "assumptions": {
+    "multiply_add_flops": 2,
+    "shared_projection_weight_reads_per_batch": 1,
+    "vision_segments": "One full noncausal segment per page unless explicit segment lengths are supplied; never square concatenated pages.",
+    "page_shapes": "All B hypothetical rows have the same geometry, prefix and completion lengths.",
+    "scope": "Partial dense arithmetic, ideal projection weight traffic and persistent state storage only. Excludes activations, recurrence arithmetic/traffic, nonlinearities, patch embedding/merger, padding waste, driver memory and fragmentation. No measured hardware ceiling or batch admission."
+  }
+}
