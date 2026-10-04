@@ -44,8 +44,8 @@
     ]
   },
   "pending": {
-    "recurrent": "The v1 full cached candidate failed frozen policy v2. The distinct v2 compiler-control variant has only a one-fixture retained-state capability replay and remains unqualified; full cached candidate evidence, complete OCR gates, and uninstrumented warm timing remain outstanding.",
-    "normalization": "The fused full-trajectory candidate failed frozen policy v2 before OCR or timing. Gain-only complete OCR and timing remain pending until corresponding receipts exist."
+    "recurrent": "The v1 full cached candidate failed frozen policy v2, and the v2 full cached candidate also failed it at eleven positions including a new unapproved decision at 924. Complete OCR and timing remain unrun; no recurrence candidate is qualified or promoted.",
+    "normalization": "Gain-only passed retained complete OCR on the tiny page only. The other four pages and warm timing remain pending. The fused full-trajectory candidate failed frozen policy v2; no optimization is promoted."
   },
   "evidence_boundary": "Commitments hash private receipts only; they do not attest remote process identity or substitute for access to underlying evidence. Raw traces, tensors, private paths, and credentials are excluded. Numerical policy v2 was frozen before full candidate runs; capability receipts are not acceptance decisions.",
   "cpu_cached_calibration": {
@@ -185,7 +185,7 @@
   },
   "normalization": {
     "gain_only": {
-      "status": "Exact cached numerical gate passed; complete OCR and performance pending.",
+      "status": "Tiny complete OCR acceptance passed with exact retained HTML and geometry; other four pages and warm timing remain pending, so candidate qualification and performance promotion remain false.",
       "rows": 395,
       "cache_records": 25280,
       "applicable_modules": 81,
@@ -261,7 +261,8 @@
         "bytes": 1507,
         "sha256": "973d52a567d4be01ed7f3f4d29df30610931b4b6ec5ff94995d848d38bb7f92a"
       }
-    ]
+    ],
+    "subsequent_full_trajectory": "The 24-layer cached candidate subsequently failed the frozen policy v2 full-trajectory gate; see recurrent_v2_full_trajectory. The earlier single-fixture capability result does not qualify the candidate."
   },
   "norm_fused_full_trajectory": {
     "status": "FAILED under frozen coordinator-approved numerical policy v2; no complete OCR or performance run followed.",
@@ -317,6 +318,130 @@
         "receipt": "norm-fused-full-01/norm-experiment.json",
         "bytes": 6015,
         "sha256": "6fae027d0fe3c260d02fcb15004986ae5def2ec8ab1f8aefa719c3d3b90b439d"
+      }
+    ]
+  },
+  "recurrent_v2_full_trajectory": {
+    "status": "FAILED unchanged frozen policy v2 / reader 3; complete OCR, performance, and promotion were not run.",
+    "policy_version": 2,
+    "policy_sha256": "c38b5e68de30daa925fcb416087453ec8b5c80c161a624d213caa1ad2051a5f4",
+    "rows": 395,
+    "intercepted_calls": 9456,
+    "sampled_trained_fixtures": 72,
+    "failed_positions": [
+      806,
+      812,
+      843,
+      847,
+      882,
+      916,
+      924,
+      982,
+      990,
+      1170,
+      1174
+    ],
+    "failure_detail": "All eleven positions exceeded target-log-probability error limits; nine also exceeded total-variation limits. Position 924 changed a decision outside the frozen geometry exception set (digit 3 to 4); position 1170 changed a decision inside an eligible bbox exception but still failed numerical budgets.",
+    "numerical_budget_screen_passed": false,
+    "semantic_decision_screen_passed": false,
+    "candidate_maxima": {
+      "total_variation": 0.3900262167766481,
+      "target_log_probability_error": 0.9042609841972258,
+      "kl_cpu_actual": 0.4119747783468607,
+      "centered_rmse": 0.4590366208586148
+    },
+    "argmax_agreement": {
+      "cpu": 390,
+      "hybrid": 393,
+      "terminal_candidate_argmax": 248046
+    },
+    "cache_equivalence": {
+      "max_abs": 0.125,
+      "rmse": 0.021066132932901382,
+      "argmax_equal": true,
+      "finite": true
+    },
+    "trained_fixture_metrics": {
+      "count": 72,
+      "decode_positions": [
+        0,
+        127,
+        393
+      ],
+      "output_max_abs": 1.52587890625e-05,
+      "state_max_abs": 4.76837158203125e-07,
+      "output_bit_equal_count": 47,
+      "state_bit_equal_count": 0
+    },
+    "additional_cpu_replay": "Not run; rejection is decisive and retained XPU fixture metrics remain operator evidence only.",
+    "integrity_scope": "Integrity reader verified 73 retained files; candidate qualification remains false and the owned process was absent.",
+    "private_receipt_commitments": [
+      {
+        "receipt": "recurrent-v2-full-cached-14-gate-summary.json",
+        "bytes": 13504,
+        "sha256": "2ad3be597c6becb3c73cc3e9f37e7c8c216b45e67e074189058b83814e00cc99"
+      },
+      {
+        "receipt": "recurrent-v2-full-cached-14-integrity.json",
+        "bytes": 9214,
+        "sha256": "20952a957757091c8ecf4345484e535e4ef96cad2247e64ef644f94281208c28"
+      },
+      {
+        "receipt": "recurrent-v2-full-cached-14-process-absence.json",
+        "bytes": 46,
+        "sha256": "65d4b9a7634c81dd120e5095bcdae5c9597003d61158f03b65c3eddf050a6789"
+      }
+    ]
+  },
+  "norm_gain_tiny_ocr": {
+    "status": "Complete tiny-fixture OCR acceptance passed; this is the first page only and does not qualify/promote the candidate across the frozen corpus.",
+    "fixture": "tiny",
+    "complete_content_passed": true,
+    "retained_acceptance_comparison": {
+      "exact_html_equal": true,
+      "geometry_exact": true,
+      "block_text_labels_tables_equations_equal": true
+    },
+    "generated_tokens": 395,
+    "terminal_id": 248046,
+    "finish_reason": "stop",
+    "usage": {
+      "prompt_tokens": 801,
+      "completion_tokens": 395,
+      "total_tokens": 1196
+    },
+    "interception": {
+      "modules": 81,
+      "calls_per_module": 395,
+      "total_norm_calls": 31995
+    },
+    "post_unload_memory": {
+      "allocated_bytes": 0,
+      "reserved_bytes": 0,
+      "zero_allocation": true
+    },
+    "owned_child_absent": true,
+    "boundary": "One cold complete OCR request; no warm timing evidence. Provenance and runtime attestation remain false. Candidate qualification and performance promotion remain false.",
+    "private_receipt_commitments": [
+      {
+        "receipt": "norm-gain-tiny-ocr-01/summary.json",
+        "bytes": 17639,
+        "sha256": "61d57b446e063c0884b256ca8f708d2af85878cfc4dc1d57a0bda537ac164cc0"
+      },
+      {
+        "receipt": "norm-gain-tiny-ocr-01/retained-acceptance-comparison.json",
+        "bytes": 6096,
+        "sha256": "d46ad22f96fe13e5e3ef2ad6178aa379a88f54802328432d17bf43937f337e15"
+      },
+      {
+        "receipt": "norm-gain-tiny-ocr-01/review.json",
+        "bytes": 1164,
+        "sha256": "0520fb35cc5b94688d94623c31fc0e88f7e87ca6f6a6086798908e08dc5428c4"
+      },
+      {
+        "receipt": "norm-gain-tiny-ocr-01-process-absence.json",
+        "bytes": 46,
+        "sha256": "1bbec77765738f0c5680d52eab191cccccee75a848f2ef3f80f97398a36b1679"
       }
     ]
   }
