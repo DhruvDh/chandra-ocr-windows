@@ -1266,5 +1266,237 @@
         "sha256": "5b2b476f72c90aed3bad0cabebf1e1f9aca0e7b9f23e01379fb477ffe71c3ec8"
       }
     ]
+  },
+  "trim_production_gain_numerical_2026_10_04": {
+    "candidate": "post-load-cache-trim-production-gain-v1",
+    "result": "Independent numerical review passed the fresh conditioned exact numerical gate; independent resource/closure review passed the run resource gates and process closure. The composed exporter executed one cold load and one stock cache trim. This qualifies numerical evidence for this composed candidate only; it does not establish OCR correctness, a performance gain, or deployment readiness.",
+    "exact_scope": {
+      "logit_shape": [
+        395,
+        248320
+      ],
+      "logit_payload_bytes": 392345600,
+      "raw_logit_sha256": "7bde48e35783277d07ef878e8f001484ac3828bfdda6218eeb96ce5a8c9ba00b",
+      "cache_positions": 395,
+      "ordered_cache_records": 25280,
+      "ordered_cache_metadata_exact_to_hybrid": true,
+      "context_inputs_runtime_response_final_cache_check_exact": true,
+      "raw_cache_replay_available": false
+    },
+    "composed_load_trim": {
+      "cold_load_calls": 1,
+      "trim_calls": 1,
+      "tensor_metadata_identity_count": 728,
+      "tensor_metadata_sha256_before_and_after": "2b58476a94de0ad51da2c300576e8f8e1b1bd099f4fc59c4b9ba2d7046ab79db",
+      "allocated_bytes_before_and_after": 9180272640,
+      "reserved_bytes_before_and_after": [
+        11129585664,
+        9219080192
+      ],
+      "reserved_reduction_bytes": 1910505472,
+      "export_returned": true,
+      "implementation_namespace_restored": true
+    },
+    "production_gain": {
+      "modules": 81,
+      "calls_per_module": 396,
+      "total_calls": 32076,
+      "installed_gain_bytes": 681984,
+      "released_gain_bytes": 681984,
+      "allocator_rounding_allowance_bytes": 0
+    },
+    "resource_and_closure": "Independent review found the unchanged resource gates passed, collection complete, and all owned processes absent. The normal service was restored cold and accepting. Resource review is process-local and does not attest global free GPU memory.",
+    "qualification_limits": "No OCR result, paired timing result, performance gain, service deployment, or candidate promotion is claimed here. The separate full-OCR study is not represented by this numerical entry.",
+    "commitments": [
+      {
+        "receipt": "optimization/post-load-cache-trim-production-gain-v1/plan.json",
+        "bytes": 1582,
+        "sha256": "b2419f0adaa0573def2ddaf4e014e309cd6f2da6e16ba37d82eacd472a00b58f"
+      },
+      {
+        "receipt": "optimization/post-load-cache-trim-production-gain-v1/root-launch-plan.json",
+        "bytes": 4493,
+        "sha256": "1224d14805e958481f9de48b4c4d45aa9ea4214a4a61a48bd59321c322d0e234"
+      },
+      {
+        "receipt": "optimization/post-load-cache-trim-production-gain-v1/source-addendum.json",
+        "bytes": 2130,
+        "sha256": "d8765a80083717eb626f2349ff3814ff472561ba8bb6c98c7af0b95749d783ab"
+      },
+      {
+        "receipt": "optimization/post-load-cache-trim-production-gain-v1/numerical_adapter.py",
+        "bytes": 7557,
+        "sha256": "c6c81204c7387c84321ce53a276ac49a08e1a0a4b06121205ee9d2cae56ad49e"
+      },
+      {
+        "receipt": "optimization/trim-production-gain-v1-numerical-01-composed-exact-verification.json",
+        "bytes": 1048,
+        "sha256": "4bdfaa130f96c8808b5d4e153c8cf970117cc9d7738eb65959ffb924eb757d95"
+      },
+      {
+        "receipt": "optimization/trim-production-gain-v1-numerical-01-independent-numerical-assessment.json",
+        "bytes": 3495,
+        "sha256": "0b3b0fb59009c5c773acb6038237d35139ecd00a173af8aa70fd0456d7658e87"
+      },
+      {
+        "receipt": "optimization/trim-production-gain-v1-numerical-01-independent-resource-closure-assessment.json",
+        "bytes": 7907,
+        "sha256": "cfbc87ed77456f8887a591593e277ecd43c96e80a3f9baecdcc42077e9b10672"
+      },
+      {
+        "receipt": "optimization/trim-production-gain-v1-numerical-01-composition.json",
+        "bytes": 7357,
+        "sha256": "7200c421622371ebee0957c48cd702e29a32d22f5a8e31752edaea5107d8eb50"
+      },
+      {
+        "receipt": "optimization/trim-production-gain-v1-numerical-01-runtime-attestation.json",
+        "bytes": 2590,
+        "sha256": "874abaf8e5a141bd1fff5293f65d1289d885c830748343e24fd555f4b28813c6"
+      },
+      {
+        "receipt": "optimization/trim-production-gain-v1-numerical-01-resource.json",
+        "bytes": 68542,
+        "sha256": "d93ce3f668558fac192bf3d4bd85b1b341ae5305b04db223efc5ce7602631a38"
+      },
+      {
+        "receipt": "optimization/trim-production-gain-v1-numerical-01-collection.json",
+        "bytes": 4312,
+        "sha256": "177b41962b280f414fe30edc109406fa134d01affb87c59972318224fd385b6b"
+      },
+      {
+        "receipt": "optimization/trim-production-gain-v1-numerical-01-service-restoration.json",
+        "bytes": 753,
+        "sha256": "ecf8a181ef6a567ce2d02876faad1d42b1b1202d7962b265635290402da42b6c"
+      },
+      {
+        "receipt": "optimization/trim-production-gain-v1-numerical-01/metadata.json",
+        "bytes": 6893646,
+        "sha256": "5337c136eb9759278b8caf1e2ce5dbfbd54b619a2e921ff2d2d3cdda0409219b"
+      },
+      {
+        "receipt": "optimization/trim-production-gain-v1-numerical-01/norm-experiment.json",
+        "bytes": 7656,
+        "sha256": "374c957ff123065da5ab8d67d94a6d35864cf1b0ad67d2637fe664e47f4d53c2"
+      }
+    ]
+  },
+  "trim_production_gain_ocr_partial_failure_2026_10_04": {
+    "candidate": "post-load-cache-trim-production-gain-v1-ocr",
+    "result": "Independent acceptance review failed complete OCR qualification after a process-local headroom stop on the Representative stage. Tiny and Small completed with exact saved content, stop and usage; historical full token IDs are unavailable, so no ID-equality claim is made. Representative is incomplete; Routes and Ledger did not run.",
+    "completed_pages": [
+      "tiny",
+      "small"
+    ],
+    "completed_page_count": 2,
+    "representative_complete": false,
+    "not_run": [
+      "routes",
+      "ledger"
+    ],
+    "resource_failure": {
+      "scope": "Same-process local DXGI budget; not global free GPU memory.",
+      "observed_headroom_bytes": 1995767808,
+      "required_running_margin_bytes": 2147483648,
+      "result": "Below the unchanged 2 GiB process-local floor; the resource gate failed."
+    },
+    "composition_and_cleanup": "Three cold trims were recorded, but the interrupted composition reports restored=false and no returned batch receipt. All five owned processes were subsequently independently confirmed absent; the normal service was restored cold and accepting.",
+    "qualification_limits": "This is an incomplete OCR run, not a full OCR pass or timing result. The separate exact numerical qualification remains a distinct prior entry. No paired speed result, performance promotion, or deployment is claimed.",
+    "commitments": [
+      {
+        "receipt": "optimization/post-load-cache-trim-production-gain-v1-ocr/plan.json",
+        "bytes": 3130,
+        "sha256": "4bdc9912e4430253b92b28cc0a6c2a30ebeeb4aad538a33ec0ba384ff3e48987"
+      },
+      {
+        "receipt": "optimization/post-load-cache-trim-production-gain-v1-ocr/batch.py",
+        "bytes": 5732,
+        "sha256": "39625b7f6697705e85d39b55817fa432621adf447d58b850b868e50ad25b2764"
+      },
+      {
+        "receipt": "optimization/production-gain-v1-dxgi-addendum-revision-06/preparation-receipt.json",
+        "bytes": 3336,
+        "sha256": "07cad7761ba85eecfa2a6e18b1bb78927f17e62b8a99cdbff14b78bad9e41e87"
+      },
+      {
+        "receipt": "optimization/trim-production-gain-v1-complete-ocr-01-root-lease.json",
+        "bytes": 2569,
+        "sha256": "3b2938012871594e80a86807f3f6ad7180a3cc15654ffeb1db246f8a26415fd1"
+      },
+      {
+        "receipt": "optimization/trim-production-gain-v1-complete-ocr-01-admission.json",
+        "bytes": 7085,
+        "sha256": "68f59dc9b75a926b172692c27dc7c2a4e593761237ab38b881c9a8cc9d46da0f"
+      },
+      {
+        "receipt": "optimization/trim-production-gain-v1-complete-ocr-01-preflight.json",
+        "bytes": 8948,
+        "sha256": "e138cf48d4dccd3d8f7cf373c8598dc37fb78f62022fe8b7711297ee5be1cc41"
+      },
+      {
+        "receipt": "optimization/trim-production-gain-v1-complete-ocr-01-composition-admission.json",
+        "bytes": 7752,
+        "sha256": "773dd90459badb01383de2de750e2ae5d017375bf86dbf57ea31543370d38f84"
+      },
+      {
+        "receipt": "optimization/trim-production-gain-v1-complete-ocr-01-composition.json",
+        "bytes": 23718,
+        "sha256": "3c8988a939f0f1da9b9e9de339dc85bfa201fcd1eb097f356b9be848e3eafd5f"
+      },
+      {
+        "receipt": "optimization/trim-production-gain-v1-complete-ocr-01-collection.json",
+        "bytes": 6373,
+        "sha256": "b3e9be371814d0fdb83d304f5a5063dda4cfdba444e4592daeba5f6613bada40"
+      },
+      {
+        "receipt": "optimization/trim-production-gain-v1-complete-ocr-01-resource.json",
+        "bytes": 89499,
+        "sha256": "fb3bc33a0c1829ac04e36f4ebaa441b85851d95a12bce79f659727888cefa320"
+      },
+      {
+        "receipt": "optimization/trim-production-gain-v1-complete-ocr-01-channel.json",
+        "bytes": 2525,
+        "sha256": "03abfe21062e19d60684baf23a1d2e0914ad44c117323ddd625bc7ba0fa4e17a"
+      },
+      {
+        "receipt": "optimization/trim-production-gain-v1-complete-ocr-01/batch-summary.json",
+        "bytes": 1374,
+        "sha256": "b91ce9ffaa23a7904436d60a6f39bcd1bddb6760903e418fe28a9f59402627a0"
+      },
+      {
+        "receipt": "optimization/trim-production-gain-v1-complete-ocr-01/tiny/summary.json",
+        "bytes": 19720,
+        "sha256": "f46607c84c94dc1886533e69e1788425dcac73ad64a63418dde6bf4052480f3d"
+      },
+      {
+        "receipt": "optimization/trim-production-gain-v1-complete-ocr-01/small/summary.json",
+        "bytes": 19739,
+        "sha256": "76602a023d99c7438357be35236aa0b282ab1e02d19830e623d0a90a1e30cf12"
+      },
+      {
+        "receipt": "optimization/trim-production-gain-v1-complete-ocr-01/representative/summary.json",
+        "bytes": 4492,
+        "sha256": "6fe46b7f10dc75ea106e36348133a80402d736b8f9761ae09c1648547a81f0b7"
+      },
+      {
+        "receipt": "optimization/trim-production-gain-v1-complete-ocr-01-service-restoration.json",
+        "bytes": 753,
+        "sha256": "0ea202ae0e3b4cf3f6b2613f0e749c6ab200fb69c890821996eb5410be6bcdc5"
+      },
+      {
+        "receipt": "optimization/trim-production-gain-v1-complete-ocr-01-independent-resource-closure-assessment.json",
+        "bytes": 13080,
+        "sha256": "e244012d08593ab211011248df0bb8ad51ce44d7825b83e80a49d1b36280a8da"
+      },
+      {
+        "receipt": "optimization/trim-production-gain-v1-complete-ocr-01-independent-ocr-acceptance-revision-2.json",
+        "bytes": 2831,
+        "sha256": "ff232410c2e90e5f0ad6b499a707fd8b1b5e849b74640d67737bfe3223f16726"
+      },
+      {
+        "receipt": "optimization/trim-production-gain-v1-complete-ocr-01-independent-terminal-assessment.json",
+        "bytes": 2488,
+        "sha256": "f2a59c6b0d67b82f16dd68706ed3a8a2ae29bf631344ef4bec5ecb0c24902514"
+      }
+    ]
   }
 }
