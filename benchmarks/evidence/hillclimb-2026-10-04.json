@@ -2279,5 +2279,54 @@
         "note": "Separate one-row FP32 arithmetic diagnostic; not trajectory or engine qualification."
       }
     ]
+  },
+  "tiny_offset80_b2_arithmetic_ab_failure_2026_10_04": {
+    "status": "FAILED: stock-arithmetic AB completed the frozen 710-row evaluation but 12 rows failed numerical policy.",
+    "scope": {
+      "candidate": "tiny-offset80-hybrid-joined-b2-arithmetic-v1; AB order only.",
+      "coverage": "710 primary rows and 45,440 state fields evaluated; all preparation and initial rows exact. EOS passed on both rows. Successful candidate vectors were not retained.",
+      "numerical_failures": "12 rows failed at least one policy check: 11 TV-budget failures, 9 target-logprob failures, and 3 original-winner disagreements (categories overlap).",
+      "first_failure": "Row B, reference index 82 (position 882), target-logprob budget; the separately retained first failing vector was independently recomputed and its failed disposition reproduced.",
+      "resource_and_closure": "Independent resource guard completed successfully: all 264 DXGI decisions passed, combined minimum headroom 5,057,347,584 bytes, and host minimum available memory 16,761,372,672 bytes. All five owned processes were independently absent; ordinary Waystone was restored cold with no NorthStone gateway actions.",
+      "disposition": "Numerical failure remains decisive despite successful resource collection and EOS checks. No BA run, free OCR, throughput, or promotion qualification."
+    },
+    "private_receipt_commitments": [
+      {
+        "receipt": "optimization/tiny-offset80-b2-arithmetic-AB-001-run/independent-numerical-failure-assessment.json",
+        "bytes": 19918,
+        "sha256": "b1a66640fd41a11b2cc75f0fe249be116645f1723c253c60afcf313625a66e42",
+        "note": "Independent numerical assessment; full 710-row policy result."
+      },
+      {
+        "receipt": "optimization/tiny-offset80-b2-arithmetic-AB-001-run/independent-reader-terminal-addendum.json",
+        "bytes": 5546,
+        "sha256": "c16b23fccb417ee057a8e4580c5d1b49e6ebfeb3bb19a47f46a97c879eeba951",
+        "note": "Frozen reader terminal result, bound to the final resource audit."
+      },
+      {
+        "receipt": "optimization/tiny-offset80-b2-arithmetic-AB-001-run/independent-resource-closure-assessment.json",
+        "bytes": 11583,
+        "sha256": "8e0ef4a0be9c0d908ff40ce951833b10219ea506add4c4fe90428c40027911fb",
+        "note": "Independent completed resource-guard and process-closure audit."
+      },
+      {
+        "receipt": "optimization/tiny-offset80-b2-arithmetic-AB-001-run/independent-first-failure-vector-diagnostic.json",
+        "bytes": 2282,
+        "sha256": "ae98b5b6e3fe8b63fc47a721a1efe8791c7d39a3704711ba1e14c0cb380357c6",
+        "note": "Independent recomputation of the first failing vector; limited to that row."
+      },
+      {
+        "receipt": "optimization/tiny-offset80-b2-arithmetic-AB-001-run/service-restoration.json",
+        "bytes": 922,
+        "sha256": "9262e8d07793c76c596a5d797e8cecbb7811f1dc1281cbae2ab68643327d1a74",
+        "note": "Ordinary worker cold-restoration and no-gateway-action receipt."
+      },
+      {
+        "receipt": "optimization/tiny-offset80-b2-arithmetic-AB-001-run/controller-terminal.json",
+        "bytes": 320,
+        "sha256": "a6d7ca47827fab2209455c46ead6548e41f22d99cfafa8d1dcdf767bb927e9ec",
+        "note": "Controller terminal memory and swap observation; not inference RSS."
+      }
+    ]
   }
 }
