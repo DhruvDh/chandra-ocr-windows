@@ -5,7 +5,7 @@ import json
 import logging
 import math
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from contextlib import asynccontextmanager
 from urllib.parse import urlsplit
 
@@ -21,6 +21,7 @@ class Endpoint:
     url: str
     capacity: int = 1
     queue_limit: int = 0
+    auto_queue_limit: int = field(default=0, kw_only=True)
     expected_page_seconds: float = 1
     active: int = 0
     state: str = "unverified"
@@ -51,6 +52,8 @@ class Endpoint:
             raise ValueError("Backend capacity must be positive")
         if type(self.queue_limit) is not int or self.queue_limit < 0:
             raise ValueError("Backend queue_limit must be a nonnegative integer")
+        if type(self.auto_queue_limit) is not int or not 0 <= self.auto_queue_limit <= self.queue_limit:
+            raise ValueError("Backend auto_queue_limit must be an integer between zero and queue_limit")
         if (isinstance(self.expected_page_seconds, bool) or not isinstance(self.expected_page_seconds, (int, float))
                 or not math.isfinite(self.expected_page_seconds) or self.expected_page_seconds <= 0):
             raise ValueError("expected_page_seconds must be a positive finite number")
@@ -138,7 +141,7 @@ def create_router(config, client=None):
     async def health():
         await asyncio.gather(*(probe(e) for e in endpoints))
         statuses = {e.name: {"state": e.state, "active": e.active, "remote_active": e.remote_active,
-                               "capacity": e.capacity, "queue_limit": e.queue_limit, "expected_page_seconds": e.expected_page_seconds, "uncertain": e.uncertain} for e in endpoints}
+                               "capacity": e.capacity, "queue_limit": e.queue_limit, "auto_queue_limit": e.auto_queue_limit, "expected_page_seconds": e.expected_page_seconds, "uncertain": e.uncertain} for e in endpoints}
         good = [e for e in endpoints if e.state not in {"unverified", "offline", "failed", "degraded"}]
         return {"state": "ready" if len(good) == len(endpoints) else "degraded" if good else "offline", "backends": statuses}
 
@@ -171,13 +174,14 @@ def create_router(config, client=None):
         await asyncio.gather(*(probe(e) for e in candidates))
         async with lock:
             ready = [e for e in candidates if e.state not in {"offline", "failed", "degraded", "unverified"}
-                     and max(e.active, e.remote_active) < e.capacity + (e.queue_limit if selection != "auto" else 0)]
+                     and max(e.active, e.remote_active) < e.capacity + (e.queue_limit if selection != "auto" else e.auto_queue_limit)]
             if not ready:
                 return error("Selected OCR backend is unavailable or at capacity; inspect /health and retry later.")
             # Static estimated finish cost: ((observed occupancy + 1) / capacity)
             # * configured page seconds. Calibrate with representative corpus medians;
             # this cannot predict page difficulty, cold-load time, or remaining work
-            # in an active request. It only ranks currently available backends, with
+            # in an active request or discrete execution waves. Queued estimates
+            # are approximations, not promised completion times. It ranks eligible backends, with
             # round-robin ties; explicit selection still selects its named backend.
             def finish_cost(e):
                 return ((max(e.active, e.remote_active) + 1) / e.capacity) * e.expected_page_seconds
