@@ -2455,5 +2455,78 @@
         "note": "Verified process closure, ordinary worker restored cold, and router backend observation."
       }
     ]
+  },
+  "tiny_offset80_stock_first_cached_divergence_diagnostic_2026_10_04": {
+    "status": "Completed first-cached-divergence diagnostic; acceptance gate not applied.",
+    "scope": {
+      "coverage": "84 exact checked rows and 5,376 state fields, including 82 preparation rows and A1/B81 controls; one joined B2 forward. This is not a full B2 trajectory.",
+      "trace": "The earliest captured differing output was layer 3 self-attention o_proj, whose input already differed by one BF16 element out of 4,096 in each row; no equal-input/different-output bracket was found. This output boundary is distinct from the earlier stored-state hash differences.",
+      "preceding_agreement": "Captured earlier recurrent outputs, layer-3 q/k/v projections and norms, and returned aligned BF16 attention probabilities matched. The trace leaves DynamicCache and active functional operands opaque, so it does not attribute the difference to an operator or prove upstream equality.",
+      "resource": "Periodic minimum headroom was 5,874,974,720 bytes; the combined periodic-plus-aligned-load minimum was 5,057,347,584 bytes at cold load before trim, with maximum usage 11,184,046,080 bytes. The audited thresholds passed; all five owned processes were closed and ordinary service restored cold.",
+      "disposition": "Diagnostic only: no batch acceptance, full-trajectory/OCR qualification, performance or throughput claim. The proposed one-step AV/gate follow-up is not a result.",
+      "state_hash_observation": "A recurrent states 0/1 and B recurrent states 0/1/2 had differing checkpoint hashes at earlier layers despite matching captured outputs; magnitudes are unknown and raw states were not retained. Layer 3 keys and values matched in both rows. Thus exactness of earlier captured outputs does not imply equality of stored recurrent states."
+    },
+    "private_receipt_commitments": [
+      {
+        "receipt": "optimization/tiny-offset80-stock-first-cached-divergence-v1-AB-001-run/independent-interpretation.json",
+        "bytes": 9396,
+        "sha256": "f49a6929a55aa204f953e86ad3b37718d2fcc2920e6d72bc30b627df33da81d5",
+        "note": "Final independent bounded interpretation; explicitly nonaccepting."
+      },
+      {
+        "receipt": "optimization/tiny-offset80-stock-first-cached-divergence-v1-AB-001-run/independent-first-cached-divergence-diagnostic.json",
+        "bytes": 1412827,
+        "sha256": "3829ea8801954af18dd2cbf9af56bb4832ef21006effcdd184dd9284b44790c0",
+        "note": "Independent trace diagnostic for the 84 checked rows and one joined B2 step."
+      },
+      {
+        "receipt": "optimization/tiny-offset80-stock-first-cached-divergence-v1-AB-001-run/independent-resource-closure-assessment.json",
+        "bytes": 19321,
+        "sha256": "d86b8f4f6d04306c09ee19e6bf1dad5e99e6113f77c8949d86c903ab2e113aea",
+        "note": "Independent periodic resource and owned-process closure audit; aligned loads are separately corrected below."
+      },
+      {
+        "receipt": "optimization/tiny-offset80-stock-first-cached-divergence-v1-AB-001-run/independent-resource-closure-aligned-load-addendum.json",
+        "bytes": 2916,
+        "sha256": "f88966a0c782910f4473d1fce69d7c27b5258053e5a2890ec5de094782e07f45",
+        "note": "Bound aligned-load snapshots and combined resource extrema; original audit preserved."
+      },
+      {
+        "receipt": "optimization/tiny-offset80-stock-first-cached-divergence-v1-AB-001-run/independent-reader-command.json",
+        "bytes": 3585,
+        "sha256": "23832e481fdd0757eea5d64aa28c7a21c7210ba9f64c7c0e5a0b585af0733e47",
+        "note": "Independent reader command and input bindings."
+      },
+      {
+        "receipt": "optimization/tiny-offset80-stock-first-cached-divergence-v1-AB-001-run/independent-reader-terminal.json",
+        "bytes": 476,
+        "sha256": "572ad2d652004512d079e0b5bff4566deddd7e5dfd7930d66f397b79ea1d48b2",
+        "note": "Independent reader terminal result; charged memory is not RSS."
+      },
+      {
+        "receipt": "optimization/tiny-offset80-stock-first-cached-divergence-v1-AB-001-run/controller-terminal.json",
+        "bytes": 821,
+        "sha256": "4e0a0580c5e59dcb4d3ed04db488eb1d94f156cd6d4f29ca1989109543703e74",
+        "note": "Root controller terminal result; charged memory is not RSS."
+      },
+      {
+        "receipt": "optimization/tiny-offset80-stock-first-cached-divergence-v1-AB-001-run/service-restoration.json",
+        "bytes": 921,
+        "sha256": "f16aa8ec461db47e2bb71194cf2c2c14080d3b7897f9c330c65294973e01e0ee",
+        "note": "Owned-process closure and ordinary cold service restoration."
+      },
+      {
+        "receipt": "optimization/tiny-offset80-stock-first-cached-divergence-v1-AB-001-run/native-lifecycle-preflight.json",
+        "bytes": 668,
+        "sha256": "346a6ddacec3d50709f41d5693b2c3ba4b34fa990638f6e092351a52b90d0a81",
+        "note": "Model-free native lifecycle helper preflight only."
+      },
+      {
+        "receipt": "optimization/tiny-offset80-stock-first-cached-divergence-v1-AB-001-run/independent-joined-state-location-addendum.json",
+        "bytes": 10318,
+        "sha256": "da5d446ed8709e08ca5aa19f13002c37e722adce2b0b2f5fc78dd56eb441bfe2",
+        "note": "Final joined-state-location addendum binds the interpretation to actual export and reference metadata; hash observations do not quantify raw state differences."
+      }
+    ]
   }
 }

@@ -1,12 +1,12 @@
 # Current work
 
-Current work targets each node’s highest safe sustained pages per second. The latest Intel candidate, which retains FP32 output from the final batched projection, failed the full numerical comparison and will not advance to OCR or throughput testing. Its worker has exited, and the ordinary Windows endpoint is restored cold.
+Current work targets each node’s highest safe sustained pages per second. No inference-engine speedup or concurrency plateau has been accepted. The latest Intel diagnostic completed, all five owned processes exited, and the ordinary Windows endpoint returned cold.
 
-The candidate completed all 710 positions but failed 18 of them under the unchanged policy. It fixed two earlier failures and introduced eight others. A separate invalid terminal heartbeat prevented resource acceptance, although no sampled memory floor was breached. The retained evidence distinguishes these failures from verified process closure.
+The diagnostic found the first differing captured output at layer 3’s attention output projection, whose input already differs by one BF16 value per row. Earlier recurrent cache-state hashes also differ despite matching captured outputs. The next targeted diagnostic will distinguish attention-value reduction from sigmoid gating and multiplication; it cannot by itself resolve the earlier state differences. The [evidence index](../benchmarks/evidence/hillclimb-2026-10-04.json) retains the interpretation, state-location addendum and corrected resource extrema.
 
-The next experiment will locate the first operation where batched execution diverges from matched single-page controls. It remains a source design. AMD testing still needs a coordinated host-RAM window; historical concurrency near 15 pages guides the search for its plateau.
+A separate resident adapter has passed 23 independently reviewed CPU tests. Its next hardware check will complete A–B–A, cancel B, then complete a fresh A with one model load. That checks state isolation before sustained timing. AMD’s reviewed runner supports actual sequence limits of 2, 4, 8, 12 and 16; execution awaits a coordinated host-RAM window. Historical concurrency near 15 pages guides that search.
 
-The AMD runner supports actual sequence limits of 2, 4, 8, 12 and 16. Its source review and three CPU checks pass; hardware execution awaits a coordinated host-RAM window.
+The earlier B2-only FP32-output head candidate remains rejected: it failed 18 of 710 positions, fixing two earlier failures while introducing eight. Its terminal heartbeat also failed. The preceding stock-arithmetic candidate failed 12 positions. Neither advances to complete OCR or throughput testing; the new diagnostic does not change those outcomes.
 
 Started October 3, 2026. The commissioned outcome is a correctness-validated Chandra OCR 2 endpoint on Waystone’s Windows Intel GPU, selectable or load-balanced with NorthStone’s ROCm endpoint. The public repository preserves Const-me/Whisper’s history. It is a public GitHub fork, with complete model inference supplied by PyTorch XPU and native DirectCompute operators developed alongside it. The native graph is not yet a serving backend.
 
