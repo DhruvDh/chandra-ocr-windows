@@ -2832,5 +2832,122 @@
         "sha256": "efa7c6bd0cd3e5071a5355159b3a06fc4c40d1657fbd77030937721f6f1c69e0"
       }
     ]
+  },
+  "ocrd_first_vision_sdpa_selector_prefix_2026_10_04": {
+    "status": "Two independently accepted metadata-only first-vision selector prefixes reached OVERRIDEABLE and stopped before SDPA; no attention kernel or full OCR was run.",
+    "runs": [
+      {
+        "run": "AB-001",
+        "profile": "Tiny (832 patches, 801 prompt tokens)",
+        "choice": "torch._fused_sdp_choice returned 4 (OVERRIDEABLE)",
+        "qkv": "BF16 [1,16,patches,64] for query/key/value",
+        "boundary": "Stopped before vision.first_sdpa; metadata only, zero SDPA/text forwards and zero output bytes; no tensor data copied.",
+        "cleanup": "Unload and restoration passed; candidate/runtime allocation and reservation zero; five owned PIDs absent and cold service restored.",
+        "commitments": [
+          {
+            "receipt": "optimization/ocrd-context-compatible-v1/vision-first-sdpa-selector-v1/runs/ocrd-vision-first-sdpa-selector-v1-AB-001-run/independent-prefix-acceptance.json",
+            "bytes": 34605,
+            "sha256": "769b50d0bb619da28c862d73fd6380d2fc3ade31fdafaa60d1deebb6e715e4c8",
+            "note": "Independent accepted first-vision prefix and cleanup/closure checks."
+          },
+          {
+            "receipt": "optimization/ocrd-context-compatible-v1/vision-first-sdpa-selector-v1/runs/ocrd-vision-first-sdpa-selector-v1-AB-001-run/vision-first-sdpa.json",
+            "bytes": 2717,
+            "sha256": "1fde09e05d3284812dadf5e4e3d1da0e03dfea46da9d53bae03b666babd6eae1",
+            "note": "Actual first-vision tensor descriptors and metadata-only selector result."
+          },
+          {
+            "receipt": "optimization/ocrd-context-compatible-v1/vision-first-sdpa-selector-v1/runs/ocrd-vision-first-sdpa-selector-v1-AB-001-run/root-kernel141-after.json",
+            "bytes": 611,
+            "sha256": "2d01043957396ec656262676333cbded48482f029cf25f7b53c78af9fb1bf59c",
+            "note": "After-event Kernel 141 inventory snapshot; archive inventory remained unchanged."
+          }
+        ]
+      },
+      {
+        "run": "AB-002",
+        "profile": "normal-native (13,464 patches, 3,959 prompt tokens)",
+        "choice": "torch._fused_sdp_choice returned 4 (OVERRIDEABLE)",
+        "qkv": "BF16 [1,16,patches,64] for query/key/value",
+        "boundary": "Stopped before vision.first_sdpa; metadata only, zero SDPA/text forwards and zero output bytes; no tensor data copied.",
+        "cleanup": "Unload and restoration passed; candidate/runtime allocation and reservation zero; five owned PIDs absent and cold service restored.",
+        "commitments": [
+          {
+            "receipt": "optimization/ocrd-context-compatible-v1/vision-first-sdpa-selector-v1/runs/ocrd-vision-first-sdpa-selector-v1-AB-002-run/independent-prefix-acceptance.json",
+            "bytes": 35993,
+            "sha256": "eefc23eddde24b556ffb1cacdf77add721a9d5814cb6383e2c3f8b9b80b4786a",
+            "note": "Independent accepted first-vision prefix and cleanup/closure checks."
+          },
+          {
+            "receipt": "optimization/ocrd-context-compatible-v1/vision-first-sdpa-selector-v1/runs/ocrd-vision-first-sdpa-selector-v1-AB-002-run/vision-first-sdpa.json",
+            "bytes": 2914,
+            "sha256": "8fe57561d21580b52a34f2b092c5bea81d417211a4fdc53c822a9f272189ddca",
+            "note": "Actual first-vision tensor descriptors and metadata-only selector result."
+          },
+          {
+            "receipt": "optimization/ocrd-context-compatible-v1/vision-first-sdpa-selector-v1/runs/ocrd-vision-first-sdpa-selector-v1-AB-002-run/root-kernel141-after.json",
+            "bytes": 611,
+            "sha256": "1fb5f0e2f1405937318c25982bcd2fdbe3c3b95042d310e4a6a8f1501d9a000c",
+            "note": "After-event Kernel 141 inventory snapshot; archive inventory remained unchanged."
+          }
+        ]
+      }
+    ],
+    "boundary": {
+      "selector": "Both first-vision calls used the metadata-only torch._fused_sdp_choice API and returned choice 4 (OVERRIDEABLE), while math was disabled and no SDPA forward occurred. This does not identify the eventual backend or kernel.",
+      "resource_and_restoration": "Both bounded prefix checks passed their retained resource/closure and cleanup checks, released runtime/candidate allocations, closed owned processes, and restored the ordinary service cold.",
+      "kernel_inventory": "Delayed Kernel 141 archive inventory remained unchanged after both runs.",
+      "unresolved": "The installed oneDNN internal path remains unknown. Earlier numerical failures remain unchanged. No full attention/native acceptance, OCR, speed, or performance qualification follows; the separate Q32 Tiny run is outside this record."
+    },
+    "private_receipt_commitments": [
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/vision-first-sdpa-selector-v1/independent-source-review.json",
+        "bytes": 48472,
+        "sha256": "b4e7472478236356dd5777c38e6ff3ec6cac0c9d741b065f822ba4ece420d47f",
+        "note": "Source review for the frozen bounded selector prefix; not installed kernel evidence."
+      }
+    ]
+  },
+  "tiny801_vision_query32_greedy_ocr_pass_2026_10_04": {
+    "status": "Independent Tiny free-greedy OCR acceptance PASS for the Q32 candidate; full numerical trajectory remains pending.",
+    "scope": {
+      "output": "All 395 available generated token IDs were accepted; complete HTML and layout matched the pinned reference. Usage was 801 prompt plus 395 completion tokens, terminating at EOS 248046.",
+      "execution": "One Tiny page; 24 vision blocks, 624 completed chunk fences, 394 cached B1 forwards, and no B2 forwards, joins or extractions. Full K/V was retained.",
+      "resource_and_restoration": "Acceptance confirms resource thresholds, completion latch, all five original processes absent, runtime restoration, zero candidate allocation/reservation, cold ordinary-service restoration, and unchanged bounded Kernel 141 inventory.",
+      "source": "The source-frozen CPU-v2 candidate is present in the public repository with the same SHA-256 as the frozen leaf source; it remains inactive pending complete numerical trajectory acceptance.",
+      "disposition": "One-page OCR acceptance only. No full numerical trajectory, batch/native attention, speed, sustained-throughput or deployment qualification."
+    },
+    "private_receipt_commitments": [
+      {
+        "receipt": "optimization/intel-tiny801-vision-query32-greedy-v1-AB-001-run/independent-q32-ocr-acceptance.json",
+        "bytes": 2382,
+        "sha256": "f72a2b8bfa48d1786aacc96e932760c07e8902be6a151663fb4c4d0fc216c0b3",
+        "note": "Independent full Tiny Q32 OCR acceptance, bounded to one page."
+      },
+      {
+        "receipt": "optimization/intel-tiny801-vision-query32-greedy-v1-AB-001-run/root-kernel141-after.json",
+        "bytes": 611,
+        "sha256": "37c1abd6004acf44bf0cd1e33965d6d323bc2ba25a0593c32760076d549017cb",
+        "note": "After-event Kernel 141 snapshot; bounded inventory check only."
+      },
+      {
+        "receipt": "optimization/sustained-throughput-v1/intel-compiled-region-v1/vision-query-chunk-cpu-v2/independent-source-review.json",
+        "bytes": 8725,
+        "sha256": "2ee7ca6d74a6e837fcfe7435830130863f9381cb14f277880dcbb5b18da6bd08",
+        "note": "Leaf source review for the v2 candidate."
+      },
+      {
+        "receipt": "optimization/sustained-throughput-v1/intel-compiled-region-v1/vision-query-chunk-cpu-v2/source-freeze.json",
+        "bytes": 4743,
+        "sha256": "8a26eadd6c80a36a0996cfbdba0835d2223c05ddbf199c178c7d59515147d729",
+        "note": "Leaf source freeze; records hardware acceptance as a separate boundary."
+      },
+      {
+        "receipt": "vision-query32-publication-cpu.json",
+        "bytes": 964,
+        "sha256": "3dd281f67595a291c9203f9b7f3f4ccfd6b124c82a16766808b4838b11218bb2"
+      }
+    ],
+    "public_CPU_test_mirror": "15 tests pass with the identical candidate source; portable graph discovery and stdout report, 1 GiB/no swap, no model or GPU"
   }
 }
