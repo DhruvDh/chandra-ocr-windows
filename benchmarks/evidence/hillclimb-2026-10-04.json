@@ -2363,5 +2363,54 @@
         "note": "Owned-process closure and ordinary cold-service restoration."
       }
     ]
+  },
+  "tiny_offset80_stock_b2_matched_hidden_diagnostic_2026_10_04": {
+    "status": "Completed matched-hidden AB diagnostic; this is not full candidate qualification.",
+    "scope": {
+      "reproduction": "The vector at the prior arithmetic trial's first failure, B82, was reproduced byte for byte. Upstream B2 hidden values differed in 1,946 of 2,560 elements (max absolute difference 0.0625; RMS 0.0122588093).",
+      "matched_checkpoint_findings": "For identical checkpoint operands, rowwise and batched FP32 outputs matched, stock Linear and ordinary mm matched, and ordinary BF16 output matched rounded FP32 output. B2 FP32-output target error was 0.045759633 against the unchanged 0.051573264 limit, versus 0.071861587 for stock BF16; A2 checks passed.",
+      "interpretation": "This local threshold crossing does not establish that upstream arithmetic differences are absent or qualify the full trajectory. Rowwise head execution showed no advantage at these checkpoints.",
+      "resource_and_closure": "All five owned processes were closed and ordinary service restored cold. Resource audit passed its observed gates; combined periodic and aligned-snapshot minimum headroom was 5,057,347,584 bytes.",
+      "controller_memory": "Probe controller charged-memory display was 43.8M; reader controller display was 491.9M and included reference file cache. Neither is inference-process RSS.",
+      "disposition": "No full-trajectory, OCR, or throughput qualification. The next candidate is B2-only FP32 output, subject to a separate complete gate."
+    },
+    "private_receipt_commitments": [
+      {
+        "receipt": "optimization/tiny-offset80-stock-b2-matched-hidden-b82-v1-AB-001-run/independent-matched-diagnostic.json",
+        "bytes": 25400,
+        "sha256": "bdeddbfcfcc8b6aa3830b4cb63e088b04b7a4c8a8b141130c6ce5b0e1b8371b4",
+        "note": "Source-bound completed diagnostic; no acceptance gate."
+      },
+      {
+        "receipt": "optimization/tiny-offset80-stock-b2-matched-hidden-b82-v1-AB-001-run/independent-interpretation.json",
+        "bytes": 3306,
+        "sha256": "74f5520084363e1129f8cc4b572d5cfa0304e2aaa2bd54a175bb1355d7d17809",
+        "note": "Independent interpretation preserving the matched-checkpoint limits."
+      },
+      {
+        "receipt": "optimization/tiny-offset80-stock-b2-matched-hidden-b82-v1-AB-001-run/independent-resource-closure-audit.json",
+        "bytes": 15891,
+        "sha256": "49262bf6b55faf21510d413fea90c41e811dd2734ce4432f194a86d8789438c9",
+        "note": "Independent local resource and ownership closure audit."
+      },
+      {
+        "receipt": "optimization/tiny-offset80-stock-b2-matched-hidden-b82-v1-AB-001-run/controller-terminal.json",
+        "bytes": 437,
+        "sha256": "9b145cbc2df1cb3c07812dee2cf6d932298c63fa6614ea7afe7ecba1a48b7c40",
+        "note": "Probe controller terminal record; charged-memory display includes cache, not RSS."
+      },
+      {
+        "receipt": "optimization/tiny-offset80-stock-b2-matched-hidden-b82-v1-AB-001-run/reader-controller-terminal.json",
+        "bytes": 384,
+        "sha256": "d6682958b8860fb5d4f27380a5d57d9bd52b35237d83e925c1e66a3db758be92",
+        "note": "Diagnostic-reader controller terminal record; charged-memory display includes reference cache, not RSS."
+      },
+      {
+        "receipt": "optimization/tiny-offset80-stock-b2-matched-hidden-b82-v1-AB-001-run/service-restoration.json",
+        "bytes": 921,
+        "sha256": "7bb7712f05ccd1b0560043ac856f44af4aa792dce0885a798083f107ed7bb0fc",
+        "note": "Owned-process closure and cold worker/router restoration."
+      }
+    ]
   }
 }

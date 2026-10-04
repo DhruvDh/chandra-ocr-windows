@@ -1,6 +1,8 @@
 # Current work
 
-Current work targets the highest safe sustained pages per second on each node, using AMD’s historical concurrency near 15 pages as a search region. Intel’s stock two-row batch completed all 710 numerical positions but failed 12 of them and will not advance to throughput testing. A tiny follow-up verified stock BF16-input matrix multiplication with FP32 output on the installed A770 runtime. The next diagnostic compares identical trained hidden vectors through the original and FP32-output projections to distinguish rounding from earlier model differences. The ordinary Windows worker is restored cold; AMD trials await a coordinated host-RAM window.
+Current work targets each node’s highest safe sustained pages per second, using AMD’s historical concurrency near 15 pages as a search region. On Intel, a controlled diagnostic found that FP32 output from the final projection passes the numerical checks at the arithmetic trial’s first failing position. Differences earlier in the model remain, so this candidate now needs full numerical and OCR qualification before throughput testing. The ordinary Windows worker is restored cold; no engine improvement has been deployed.
+
+The AMD runner supports actual sequence limits of 2, 4, 8, 12 and 16. Its source review and three CPU checks pass; hardware execution awaits a coordinated host-RAM window.
 
 Started October 3, 2026. The commissioned outcome is a correctness-validated Chandra OCR 2 endpoint on Waystone’s Windows Intel GPU, selectable or load-balanced with NorthStone’s ROCm endpoint. The public repository preserves Const-me/Whisper’s history. It is a public GitHub fork, with complete model inference supplied by PyTorch XPU and native DirectCompute operators developed alongside it. The native graph is not yet a serving backend.
 
