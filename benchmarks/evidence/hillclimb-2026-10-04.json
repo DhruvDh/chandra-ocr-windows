@@ -3022,5 +3022,78 @@
         "note": "Independent source review for execution revision 02."
       }
     ]
+  },
+  "native_first_vision_query32_primitive_pass_2026_10_04": {
+    "status": "Independent actual acceptance PASS for one native first-vision Q32/full-KV stock primitive capture and its bounded resource/closure checks.",
+    "scope": {
+      "execution": "One stock SDPA call processed Q=32 with full K/V length 13,464 using unchanged native conditioning (3,959 prompt tokens); one completion fence passed. The run captured a 55,282,077-byte BF16 snapshot, then stopped before projection, later vision blocks, or text.",
+      "selector": "Backend selector returned OVERRIDEABLE. The call used stock SDPA; the result does not establish which internal oneDNN kernel executed.",
+      "primitive_diagnostics": "Against a row-streamed FP64 reference, XPU max absolute residual was 0.003911766494 and RMSE 0.0002083267741; CPU stock-MATH was 0.003900733506 and 0.0002079095213. 31,549/32,768 outputs matched FP64-rounded BF16. These are descriptive primitive diagnostics with no new accuracy tolerance or operator-quality pass threshold.",
+      "resource_and_closure": "Independent acceptance passed its bounded resource checks: minimum host available 17,143,832,576 bytes, minimum local headroom 6,089,146,368 bytes, completion latch passed, all five owned processes closed, and ordinary service restored cold.",
+      "kernel_observation": "After restoration, uptime increased and one old Kernel 141 archive remained; an earlier listed archive had disappeared and no new archive appeared. This bounded observation does not establish the cause or prove absence of a reset.",
+      "disposition": "No full native vision, OCR, sustained-throughput, or device-safety qualification."
+    },
+    "private_receipt_commitments": [
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/vision-native-first-query32-v1/runs/ocrd-vision-native-first-query32-v1-AB-001-run/independent-actual-acceptance.json",
+        "bytes": 5973,
+        "sha256": "5a88228f709e992fa029e5b805db46c2e495584ab25e1f1f300b1a7948d87250",
+        "note": "Final independent actual primitive, resource and closure acceptance."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/vision-native-first-query32-v1/runs/ocrd-vision-native-first-query32-v1-AB-001-run/first-query32.json",
+        "bytes": 3445,
+        "sha256": "01c259d786e97dd3ee0a23cb2d5d7be9da611123468be87a0c03a25486ad8475",
+        "note": "Actual single stock Q32/full-KV call and captured tensor descriptors."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/vision-native-first-query32-v1/runs/ocrd-vision-native-first-query32-v1-AB-001-run/independent-primitive-reference.json",
+        "bytes": 2109,
+        "sha256": "23b0a4d493320d0418ad5242bae5be0b6b63ada47da9902d5f45de77de560d29",
+        "note": "FP64 and CPU stock-MATH residual diagnostics; defines no acceptance tolerance."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/vision-native-first-query32-v1/runs/ocrd-vision-native-first-query32-v1-AB-001-run/AB-001-export.json",
+        "bytes": 11466,
+        "sha256": "1fe35b8eb74a8dec67473cc45086ad7064a99f073759dabd94ba7ff204f10f3f",
+        "note": "Outer producer export for the one-call capture."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/vision-native-first-query32-v1/runs/ocrd-vision-native-first-query32-v1-AB-001-run/collection.json",
+        "bytes": 4472,
+        "sha256": "70b5715065f30a1e21452dd137dc18975aea5e730dc83a145e22c60759cee34f",
+        "note": "Collected artifacts and closure binding."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/vision-native-first-query32-v1/runs/ocrd-vision-native-first-query32-v1-AB-001-run/controller-terminal.json",
+        "bytes": 577,
+        "sha256": "f7af58134827a0274ef82cd4cb1e6e3ee6618b73f86b3629a5473b093e2845a3",
+        "note": "Controller terminal accounting and outcome."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/vision-native-first-query32-v1/runs/ocrd-vision-native-first-query32-v1-AB-001-run/root-kernel141-after.json",
+        "bytes": 304,
+        "sha256": "60b78f591e941b68d7abe2e7aa098247d6233a3335c81a6dfd4be7af8b7d9221",
+        "note": "Delayed Kernel 141 archive snapshot after restoration."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/vision-native-first-query32-v1/runs/ocrd-vision-native-first-query32-v1-AB-001-run/service-restoration.json",
+        "bytes": 922,
+        "sha256": "305044f646ec910ae77dea63f9e0e2f0eead3f6909010cb3c5dc22b748672238",
+        "note": "Owned-process closure and cold service restoration."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/vision-native-first-query32-v1/independent-source-review.json",
+        "bytes": 74671,
+        "sha256": "b772f225fd75b21834a9f15457562f509c9ac9f52be939db515ae9c203af228a",
+        "note": "Independent source review for the bounded first-Q32 primitive."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/vision-native-first-query32-v1/primitive-source-freeze.json",
+        "bytes": 5081,
+        "sha256": "c39fda484dfc5273660f81cfef000515b4aed40e8a433d70ac1d58f7c26234bb",
+        "note": "Frozen primitive-specific source and scope."
+      }
+    ]
   }
 }
