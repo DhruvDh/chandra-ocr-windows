@@ -3734,5 +3734,58 @@
       }
     ],
     "repair_boundary": "Revision 02 fixes staged-helper import resolution. Its unchanged Windows guard reader still shares the identified heartbeat-I/O risk; actual OS ownership, complete OCR, cancellation, streaming, repeated idle cycles and throughput remain unqualified."
+  },
+  "windows_atomic_publisher_native_2026_10_05": {
+    "status": "The finite POSIX publisher probe passed independent native review on Waystone after ordinary os.replace/share7 tests failed on both ReFS and NTFS. Benchmark guard integration remains in progress.",
+    "scope": {
+      "ordinary_failures": "Holding a share7 target reader still caused WinError5 in ordinary replacement on both tested volumes. Both tiny-file probe processes closed; no GPU or service changes occurred. The specific historical CLI04 handle holder remains unknown.",
+      "accepted_native_cases": "Four iterations on the actual project ReFS volume retained the ordinary share3 refusal control, then passed POSIX replacement with coherent old-handle bytes, exact new-open bytes, metadata checks and first-time publication: eight successful native publication calls.",
+      "identity_and_closure": "The accepted run uses direct managed base CPython for this stdlib-only scope. Its PID and creation match the parent-held kernel process handle, exit code is zero, later PID absence is verified and the temporary namespace is removed. The earlier venv-redirector identity mismatch remains unaccepted.",
+      "limits": "This qualifies finite own-file publication/coherence and closure only. It does not establish CLI, monitor/guard integration, inference numerics, GPU behavior, performance or deployment. No Intel throughput improvement is accepted."
+    },
+    "private_receipt_commitments": [
+      {
+        "receipt": "windows-reader-probe-e5-20261005-001/independent-source-and-native-failure-review.json",
+        "bytes": 9645,
+        "sha256": "2afac29adb4ab7e5d09064eb258cb63cd2349ab4e97a696706c650591d1571ff",
+        "note": "Both ordinary replacement/share7 failures and process closure, ReFS and NTFS."
+      },
+      {
+        "receipt": "windows-atomic-publisher-probe-v1/source-freeze.json",
+        "bytes": 7663,
+        "sha256": "cf51593873045b25cfa3313414598a7b50fa7d62ca0b9f4bfa390f914991dd3d",
+        "note": "Frozen three-source POSIX publisher/probe packet."
+      },
+      {
+        "receipt": "windows-atomic-publisher-probe-v1/independent-source-review.json",
+        "bytes": 11372,
+        "sha256": "f35f82b499147dbe5a1fad16dfde576544d1e9bd6ae560a049c76c6ed9710902",
+        "note": "Independent finite stdlib publisher/probe source review."
+      },
+      {
+        "receipt": "windows-atomic-publisher-native-e-20261005-001/root-identity-join-failure.json",
+        "bytes": 620,
+        "sha256": "d5275edc18d47906c5576e00b514e0ba3796a267128bb5c421ceb2d4cc0539ce",
+        "note": "Initial POSIX semantic cases completed, but redirector/child identity join failed; not accepted."
+      },
+      {
+        "receipt": "windows-atomic-publisher-native-e-20261005-002/publisher-probe.json",
+        "bytes": 4036,
+        "sha256": "d392cfa22653359b71f21648fcda2d5481b3d68bab960864a07a4c71da8ef44e",
+        "note": "Original four-iteration native receipt on the actual ReFS volume."
+      },
+      {
+        "receipt": "windows-atomic-publisher-native-e-20261005-002/root-collected-acceptance.json",
+        "bytes": 1041,
+        "sha256": "b24c9d80b3c96a8c3d04a067598edcea991765115409ed142618ed8b30acab22",
+        "note": "Root source/volume/kernel identity and closure join for run002."
+      },
+      {
+        "receipt": "windows-atomic-publisher-native-e-20261005-002/independent-native-review.json",
+        "bytes": 13970,
+        "sha256": "3fd246cb7b36999543a4346360bd670bb29a72eff34ddcb5828ecfafd1186d3a",
+        "note": "Independent actual eight-publication and owned-process closure acceptance, scoped to tiny own files."
+      }
+    ]
   }
 }
