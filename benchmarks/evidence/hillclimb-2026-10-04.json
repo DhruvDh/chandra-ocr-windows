@@ -2607,7 +2607,7 @@
     "limits": "Restart and launch setting changed together; original trigger remains unidentified. Explicit0 is required in a newly launched worker for dedicated profiling."
   },
   "ffn_batched_row_geometry": {
-    "status": "AB and BA exact numerical PASS; complete OCR and speed remain unaccepted",
+    "status": "AB and BA strict 710-row numerical PASS for the separate batched-row-geometry v1 trial; its OCR and performance remain unaccepted. The distinct normal-size free-OCR v2 AB/BA outcome is recorded separately.",
     "full_vocabulary_rows_each": 710,
     "vocabulary_entries_each": 248320,
     "state_fields_each": 45440,
@@ -3490,6 +3490,76 @@
         "bytes": 25262,
         "sha256": "68108b7646f8b59eb4d1bda16ea1d08138476f7f98f3732f9889b0c48cdfe3f6",
         "note": "Independent scanned resource, completion, closure and restoration review."
+      }
+    ]
+  },
+  "normal3959_ffn_b2_complete_output_state_isolation_ab_ba_2026_10_05": {
+    "status": "Normal-size FFN B2 AB and BA runs passed complete-output and state-isolation quality review; both independent resource/closure gates and root acceptances passed. This does not qualify resident timing or an engine speedup.",
+    "scope": {
+      "outputs_and_state": "Both row orders completed four outputs: two normal-page outputs with 556 tokens each, Tiny with 395, and repeated native with 556. In each order, 949 B2 forwards and 161 B1-tail forwards completed; token IDs and reference-associated projections matched exactly, and EOS survivor handling plus repeated-native output passed. The retained strict Tiny/Small numerical records and E6 accepted B1 cases remain separate evidence.",
+      "runtime_and_resource": "Independent AB and BA audits passed their frozen resource floors, completion latch, unload, restoration, process closure and cold-service checks. BA\u2019s delayed Kernel_141 visibility changed from present before the run to empty after restoration; the bounded interval queries and rising uptime do not support a universal no-reset claim.",
+      "disposition": "This is normal-size FFN batching correctness and state-isolation evidence, not a warm three-burst or client-queue improvement. No validated Intel speedup, matched resident timing, sustained plateau, full CLI, normal full-model numerical equivalence or deployment qualification follows. The exact four-page resident-CLI attempt failed safely without an accepted complete output when its three-second SSH witness call timed out and the client rejected the resource witness under its unchanged four-second freshness policy; all owned processes closed and the ordinary endpoint returned cold, but no formal zero-cleanup handoff or completion latch was established. The source-02 witness repair is in progress; no CLI result is accepted."
+    },
+    "private_receipt_commitments": [
+      {
+        "receipt": "ffn-native3959-free-ocr-v2/source-freeze.json",
+        "bytes": 4264,
+        "sha256": "5d9cb6a1a7a6a0997037be29a35c0663f6d5b9816f842266503fecd4b3b3bfff",
+        "note": "Frozen normal-size FFN B2 source and trial profile."
+      },
+      {
+        "receipt": "ffn-native3959-free-ocr-v2/independent-source-review.json",
+        "bytes": 18502,
+        "sha256": "964082097570b2c4c302ce0837112e2a2088aca7f406b6ca93b4cd49f901be5e",
+        "note": "Independent source review for the frozen B2 free-OCR trial."
+      },
+      {
+        "receipt": "ffn-native3959-free-ocr-v2/paired-collected-acceptance.json",
+        "bytes": 2555,
+        "sha256": "55e98faa84593b9871477227babddbc10d61022583b7b08073e2358db419381b",
+        "note": "Paired AB/BA acceptance across four complete outputs per order."
+      },
+      {
+        "receipt": "intel-ffn-native3959-free-ocr-v2-AB-001-run/root-AB-acceptance.json",
+        "bytes": 1084,
+        "sha256": "535db1658996dee55f43310a8892fa4e75b5bf7b00f5ccf7139ca84648a9fa0d",
+        "note": "Root AB acceptance binds its exact-quality and runtime/resource reviews."
+      },
+      {
+        "receipt": "intel-ffn-native3959-free-ocr-v2-AB-001-run/independent-quality-audit.json",
+        "bytes": 86527,
+        "sha256": "75b73ef2352df27469d1de7bdf2b07a87c246849da0a301422a36c3db99099f7",
+        "note": "Independent AB complete-output and state-isolation review."
+      },
+      {
+        "receipt": "intel-ffn-native3959-free-ocr-v2-AB-001-run/independent-runtime-resource-audit.json",
+        "bytes": 52725,
+        "sha256": "a7b9c80ce392bda2c04f906ff1fa9fbd4f2a01bfd994cbef6fd9164d76419d02",
+        "note": "Independent AB runtime, resource, closure and restoration review."
+      },
+      {
+        "receipt": "intel-ffn-native3959-free-ocr-v2-BA-001-run/root-BA-acceptance.json",
+        "bytes": 2018,
+        "sha256": "4fd526a34fe9185bb131a5b3f9df2891955cd74031e57f1c50f37ebd46345dab",
+        "note": "Root BA acceptance binds its exact-quality and runtime/resource reviews."
+      },
+      {
+        "receipt": "intel-ffn-native3959-free-ocr-v2-BA-001-run/independent-quality-audit.json",
+        "bytes": 86555,
+        "sha256": "57c6d48659d7fa5204772879b9f705a8ec59dee599a158422c2fd29219261f00",
+        "note": "Independent BA complete-output and state-isolation review."
+      },
+      {
+        "receipt": "intel-ffn-native3959-free-ocr-v2-BA-001-run/independent-runtime-resource-audit.json",
+        "bytes": 54435,
+        "sha256": "f15fbf349418ac69ce918c2d2bd627a0e933ef807cecfefe5c0cca62af75bc67",
+        "note": "Independent BA runtime, resource, closure, restoration and bounded delayed-Windows review."
+      },
+      {
+        "receipt": "ocrd-context-compatible-v1/normal-cli-endpoint-v2/execution-revision-01/runs/ocrd-normal-cli-resident-b1-v2-execution-revision-01-AB-001-run/independent-failure-recovery-assessment.json",
+        "bytes": 26489,
+        "sha256": "2b5776133f0fb7d0e1ffcffb2292b8ea348a6e2b3aafd543e940c13d426ef943",
+        "note": "Independent failed original-CLI attempt assessment: no accepted complete output or formal zero/latch; observed resource samples passed and owned closure/cold recovery verified. This is failure evidence, not CLI acceptance."
       }
     ]
   }
