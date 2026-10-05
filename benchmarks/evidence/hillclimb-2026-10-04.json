@@ -4089,5 +4089,31 @@
       "allow_full_model_diagnostic_collection": true,
       "decision": "Independent assessment permits uninterrupted current-state full-model diagnostic capture; it does not accept the model, OCR, serving, performance or deployment."
     }
+  },
+  "original_cli_revision06_four_page_acceptance_2026_10_05": {
+    "status": "Independent actual review passed the finite four-page original CLI B1 run, including complete outputs, content/layout, resource checks, normal completion and recovery.",
+    "scope": "Four original native and scanned pages completed EOS with token counts 556, 560, 556 and 559. The run used one model load, native 3,959-token conditioning, 12,384 requested output tokens and a 16,384-token combined context. Original formatting is retained, including the CLI Markdown page-boundary limitation: stripped page outputs are concatenated without a separating newline.",
+    "boundary": "No throughput, cancellation, idle-retirement, kernel-deployment, full-model numerical-equivalence or sustained-service qualification.",
+    "private_receipt_commitments": [
+      {
+        "receipt": "ocrd-context-compatible-v1/normal-cli-endpoint-v2/execution-revision-06/runs/ocrd-normal-cli-resident-b1-v2-execution-revision-06-AB-001-run/independent-ocr-cli-resource-assessment.json",
+        "bytes": 83782,
+        "sha256": "e1567616e69fd8d333b8bf2a238db24b34d051e42bd6d691842a17cd10d7acdf",
+        "note": "Independent actual CLI, output-quality, resource, completion and recovery assessment; formatting limitation retained."
+      }
+    ]
+  },
+  "full_model_baseline_revision03_pre_first_forward_failure_2026_10_05": {
+    "status": "The full-model B1 baseline diagnostic failed before its first forward because the pinned Transformers model lacks graph.is_fast_path_available.",
+    "observed_result": "Zero prefill forwards and zero cached forwards; no generation output. The failure receipt also records a secondary unload-memory error. Original owned processes were closed, the root unit was retired, and the ordinary endpoint was restored cold. No automatic replay or performance measurement occurred.",
+    "boundary": "This is a prerequisite/API failure, not a candidate numerical result or GPU-kernel failure; a minimal source revision is needed before another baseline attempt.",
+    "private_receipt_commitments": [
+      {
+        "receipt": "stock-fused-gdn-full-model-b1-v1/execution-revision-03/runs/stock-fused-gdn-full-model-b1-v1-baseline-trajectory-native-0-AB-001-run/root-failure-diagnosis.json",
+        "bytes": 1656,
+        "sha256": "ad763b196d21c7b8808c75e87567772de9ce2b93f9795fa9ef9b7a7ac8c87f79",
+        "note": "Root failure diagnosis records the pre-forward API exception, cleanup, process closure and cold restoration."
+      }
+    ]
   }
 }
