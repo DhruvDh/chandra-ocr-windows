@@ -4036,5 +4036,58 @@
         "note": "Independent decision holds progression pending primitive attribution; no full-model admission."
       }
     ]
+  },
+  "stock_fused_gdn_accurate_exp_trained72_actual_and_policy_held_2026_10_05": {
+    "status": "The accurate-exp candidate completed 72 authentic trained-operator captures with qualified native execution and cleanup. Every local state/output assessment satisfies the unchanged envelope. Production numerical policy remains held; bounded full-model diagnostic capture is permitted by a separate independent decision.",
+    "runtime_scope": {
+      "coverage": "Seventy-two separate trained T1 operators from the Tiny trajectory fixtures at positions 0, 127 and 393 across 24 layers; this is not a recurrent rollout or full-model/OCR qualification.",
+      "provider": "The returned compiled-kernel metadata identified Intel __imf_expf and a distinct compiled hash for the accurate-exp candidate. The internal exp values were not observed and correct rounding is not certified.",
+      "execution_and_cleanup": "The independent runtime review passed 225 closed-artifact checks, native resource guards, primary exits, original Job retirement and ordinary cold restoration. The 39.212-second channel interval is diagnostic elapsed time, not throughput.",
+      "memory_boundary": "The root cgroup peak was 268,660,736 bytes, 225,280 bytes above the configured 268,435,456-byte maximum, with zero swap. Two live event samples reported zero OOM counts; they do not prove full-run OOM absence or explain the peak excess."
+    },
+    "numerical_diagnostic": {
+      "disposition": "Not accepted; the numerical policy remains held and no acceptance boundary was changed.",
+      "candidate_local_state": "The accurate-exp candidate had zero frozen local state-envelope failures and zero inconclusive cases across 72 cases; its worst budget fraction was 0.72267815745.",
+      "stock_comparator": "The unchanged stock reference remained outside its local state envelope in 39 cases across 95 components.",
+      "bf16_output": "The candidate remained within its BF16 output envelope. It differed from stock at 29 values, with maximum absolute difference 1.9073486328125e-6.",
+      "descriptive_rms": "Candidate pooled state RMS was 4.46800235239e-10, versus 7.26813518047e-10 for stock and 6.25905953078e-10 for the original fused candidate; accurate-exp RMS was lower than the original fused candidate in 71 of 72 cases. These local comparisons do not establish rollout or model-level correctness."
+    },
+    "boundary": "Local tests and experimental admission do not establish full-model numerical correctness, complete OCR/EOS/geometry, sustained throughput or deployment acceptance.",
+    "private_receipt_commitments": [
+      {
+        "receipt": "stock-fused-gdn-accurate-exp-controller-v1/runs/stock-fused-gdn-accurate-exp-root-v1-001/independent-actual-review.json",
+        "bytes": 45237,
+        "sha256": "1c54efe8f2cc026c3c8927dd15db68fb31b91a47694b055099dba71cf48e6989",
+        "note": "Independent actual-provider, native execution, resource, artifact, retirement and restoration review."
+      },
+      {
+        "receipt": "stock-fused-gdn-accurate-exp-controller-v1/runs/stock-fused-gdn-accurate-exp-root-v1-001/actual-numerical-diagnostic-v1/independent-local-numerical-diagnostic.json",
+        "bytes": 9706,
+        "sha256": "e0a1a282c363196e4019db19610fa5a36f80830dfe311eb284f41cffd0dcc439",
+        "note": "Independent local numerical diagnostic; policy held, not accepted."
+      },
+      {
+        "receipt": "stock-fused-gdn-accurate-exp-controller-v1/runs/stock-fused-gdn-accurate-exp-root-v1-001/actual-numerical-diagnostic-v1/summary.json",
+        "bytes": 42908,
+        "sha256": "3a01b0318816e1866e0ec047ff573b4a3e7e90d3076f477fcb72c527bdf45352",
+        "note": "Compact 72-case numerical summary."
+      },
+      {
+        "receipt": "stock-fused-gdn-accurate-exp-controller-v1/runs/stock-fused-gdn-accurate-exp-root-v1-001/actual-numerical-diagnostic-v1/rows.jsonl",
+        "bytes": 369972,
+        "sha256": "e79a5bfbc23c1009fb9f57d251f420627b87f797f84295152a56b7c17e2513df",
+        "note": "Per-case numerical rows bound by the independent diagnostic."
+      },
+      {
+        "receipt": "accurate-exp-primitive-experimental-admission-v1/decision.json",
+        "bytes": 22953,
+        "sha256": "46ab30d43970e9aac0fd102ce1ff49844cc8ee8abc5c230c9e9cc93897e122c5",
+        "note": "Bounded full-model diagnostic collection permitted; production policy and full-model qualification remain unaccepted."
+      }
+    ],
+    "experimental_progression": {
+      "allow_full_model_diagnostic_collection": true,
+      "decision": "Independent assessment permits uninterrupted current-state full-model diagnostic capture; it does not accept the model, OCR, serving, performance or deployment."
+    }
   }
 }
