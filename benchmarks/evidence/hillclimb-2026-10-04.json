@@ -3988,5 +3988,53 @@
         "note": "Exact terminal unit, configured memory cap, measured peak and unavailable post-exit cgroup counters."
       }
     ]
+  },
+  "stock_fused_gdn_trained72_actual_and_policy_hold_2026_10_05": {
+    "status": "A genuine 72-case native operator capture and independent closure review passed; numerical acceptance remains false and the frozen policy remains held.",
+    "runtime_scope": {
+      "coverage": "Seventy-two separately assessed trained T1 operators from the Tiny trajectory fixtures at positions 0, 127 and 393 across 24 layers; this is not a continuous recurrent rollout or full-model equivalence test.",
+      "execution_and_cleanup": "Independent runtime review passed the native capture, 225 closed-artifact checks, primary exits, Job retirement and ordinary cold restoration. The 37.213-second channel interval is diagnostic elapsed time, not throughput.",
+      "memory_boundary": "Native resource guards passed, but the separate root cgroup peak was 268,730,368 bytes against a configured 268,435,456-byte maximum, with event counters unavailable. No blanket within-limit controller-memory claim follows."
+    },
+    "numerical_diagnostic": {
+      "disposition": "Not accepted; the numerical policy was unchanged and remains held.",
+      "state_envelope": "Candidate state exceeded the frozen envelope in five cases (ordinals 2, 4, 6, 9 and 11), across 133 components; the maximum budget fraction was 1.28904872957. Stock also exceeded its state envelope in 39 cases across 95 components.",
+      "bf16_output": "Both stock and candidate stayed within the BF16 output envelope. Candidate and stock differed at 29 of 294,912 BF16 output values across 23 cases; the maximum pair difference was 1.9073486328125e-6.",
+      "descriptive_rms": "Candidate pooled state RMS was 6.25905953078e-10 versus stock 7.26813518047e-10, with lower casewise RMS in 70 of 72 cases. This does not waive the candidate envelope failures."
+    },
+    "experimental_decision": "Full-model diagnostic admission remains false, held pending primitive attribution. An accurate-exp source variant using the installed Intel __imf_expf is a source-only draft; it has not been run, and no cause for the numerical failures is established.",
+    "boundary": "No numerical-policy pass, full-model diagnostic, OCR, performance or deployment qualification is established.",
+    "private_receipt_commitments": [
+      {
+        "receipt": "stock-fused-gdn-trained72-controller-v1/execution-revision-02/runs/stock-fused-gdn-trained72-root-v1-001/independent-actual-review.json",
+        "bytes": 43692,
+        "sha256": "35f852214580e6c685b0537edbfa69fe94e20bed02778b33e8e5ec799b2408bf",
+        "note": "Independent native execution, closed-artifact, resource and cold-restoration review."
+      },
+      {
+        "receipt": "stock-fused-gdn-trained72-controller-v1/execution-revision-02/runs/stock-fused-gdn-trained72-root-v1-001/actual-numerical-diagnostic-v1/independent-local-numerical-diagnostic.json",
+        "bytes": 14184,
+        "sha256": "152a0023d8286e4d63966e723988d699cb9dcc77eb7f6a694e4e368542923668",
+        "note": "Independent numerical diagnostic; false acceptance and held policy."
+      },
+      {
+        "receipt": "stock-fused-gdn-trained72-controller-v1/execution-revision-02/runs/stock-fused-gdn-trained72-root-v1-001/actual-numerical-diagnostic-v1/summary.json",
+        "bytes": 42851,
+        "sha256": "b12b27159037828e66216f3bb1c2ef4d651054b8a529f31dab7cd42f574eb7ac",
+        "note": "Compact 72-case numerical summary."
+      },
+      {
+        "receipt": "stock-fused-gdn-trained72-controller-v1/execution-revision-02/runs/stock-fused-gdn-trained72-root-v1-001/actual-numerical-diagnostic-v1/rows.jsonl",
+        "bytes": 285345,
+        "sha256": "2a93c4e13dbdbc79189b632a30fdf28ce471c12107d50494e3487cdfedd128a6",
+        "note": "Per-case numerical rows bound by the independent review."
+      },
+      {
+        "receipt": "primitive-numerical-experimental-admission-v1/decision.json",
+        "bytes": 17276,
+        "sha256": "97ce2a385757a1a1551d53120662d212c4a21c0f7a976f337d54403ab6bdf260",
+        "note": "Independent decision holds progression pending primitive attribution; no full-model admission."
+      }
+    ]
   }
 }
