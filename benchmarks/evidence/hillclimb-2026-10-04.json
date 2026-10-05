@@ -3097,7 +3097,7 @@
     ]
   },
   "native_first_vision_attention_query32_complete_2026_10_04": {
-    "status": "Independent actual acceptance PASS for one complete first-vision attention operation, capture, resource and closure; full native vision/OCR remain unqualified.",
+    "status": "Independent actual acceptance PASS for one complete first-vision attention operation, capture, resource and closure; full native OCR remains unqualified.",
     "scope": {
       "execution": "421 stock calls and fences covered all 13,464 query rows against full K/V. Query chunks were at most 32 rows; the final chunk had 24. Native conditioning remained 3,959 prompt tokens with the 12,384-token output allowance.",
       "capture_and_stop": "The full operation output was finite. The first 32 query rows and outputs, plus the full keys and values, matched the accepted prior first-call capture by tensor-value equality. Execution stopped before projection, later vision blocks, and text.",
@@ -3175,8 +3175,8 @@
       "execution": "24 stock vision blocks and 10,104 Q32 chunk fences reached the visual-return fence with full K/V retained. A boundary trim completed and the pretext shim was entered. No text-body forward, accepted embedding receipt, finite embedding digest, or vision-complete artifact was produced.",
       "failure": "The first caught boundary error was UR_RESULT_ERROR_UNKNOWN (2147483646); later cleanup returned UR_RESULT_ERROR_DEVICE_LOST (20). The original traceback was cleared, so the exact failing expression and causal kernel are unknown.",
       "resource_and_closure": "No sampled resource-floor breach was observed, but the heartbeat/guard and resource-completion latch did not complete, and zero-memory unload was not established. All five owned processes are absent and ordinary service is cold. This is not a resource-qualified complete-vision pass.",
-      "windows_observation": "The fresh prelaunch archive inventory was already empty. The delayed inventory remained empty and bounded Display/WER queries returned no events. An older archive disappearance before launch remains unexplained; these observations do not prove that no reset occurred.",
-      "disposition": "No complete-vision, OCR, timing, speedup, or deployment qualification. Hardware trials remain on hold pending review of the minimal candidate; the installed engine and driver are unchanged."
+      "windows_observation": "The fresh prelaunch archive inventory and earlier delayed inventory were empty through the prior 00:01:09 UTC cutoff. A later host observation at 00:16:24 and delayed check at 00:18:07 found a new Kernel_141 archive created at 00:03:27 UTC. Uptime had increased, the driver remained 32.0.101.8991, and host-available memory was 20,019,367,936 bytes. Access to Report.wer metadata was denied. Bounded Display/System and WER/Application queries succeeded without truncation and returned no records over 23:55:28\u201300:18:07. The archive creation is observed, but the exact incident time and cause are unknown; these facts do not establish a causal link to the trial or prove absence of a reset.",
+      "disposition": "This individual boundary-trim trial failed and did not qualify complete vision. A subsequent no-boundary-trim trial separately passed one complete native-vision stage; neither result identifies the failure cause or proves a fix. Full-page OCR, throughput and deployment remain unqualified."
     },
     "private_receipt_commitments": [
       {
@@ -3238,6 +3238,83 @@
         "bytes": 490,
         "sha256": "aae3dc1b7c1702f00e9bd60807764fc64bc7493526f73c8afc993aeeb8f68713",
         "note": "Bounded post-run Display and WER event queries; zero matching events."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/vision-native-complete-query32-no-boundary-trim-v1/root-machine-observation.json",
+        "bytes": 639,
+        "sha256": "2c634d9d553a1e12f7a0783f0e26a50385071eecd3707c3a4cc7646a939e96dd",
+        "note": "Later host observation found a Kernel_141 archive created at 00:03:27 UTC; Report.wer was inaccessible."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/vision-native-complete-query32-no-boundary-trim-v1/root-delayed-failure-observation.json",
+        "bytes": 1016,
+        "sha256": "21f78c0988257b7c1596b11f4953dddd69b5978a6380251ac4fb689f965f1533",
+        "note": "Delayed archive observation and bounded Display/System and WER/Application query results through 00:18:07 UTC."
+      }
+    ]
+  },
+  "native_complete_vision_no_boundary_trim_pass_2026_10_05": {
+    "status": "Independent actual acceptance PASS for one complete native-vision stage, boundary embedding, resource, unload and closure; no text, OCR, performance or deployment qualification.",
+    "scope": {
+      "execution": "One 24-block native-vision stage completed 10,104 Q32 chunk fences with full 13,464-token K/V. Both boundary synchronizations remained; the optional boundary cache release was omitted. The finite BF16 CPU embedding receipt has shape [1, 3959, 2560], 20,270,080 bytes and digest 5aa7c90d513e975e75eebba26392a2b1e4561af5bf41e0bfa08711eef8393765. Text-body forwards and emitted output bytes were zero.",
+      "resource_and_closure": "The acceptance passed completion latch, restoration, zero allocated/reserved memory and closure of all five owned processes; ordinary service returned cold. Across 55 DXGI decisions, minimum headroom was 6,351,880,192 bytes, with two post-load decisions minimum 5,057,347,584 bytes. Ten host samples had minimum available RAM 16,607,375,360 bytes.",
+      "windows_observation": "A delayed check 188.965 seconds after cold restoration found the same Kernel_141 archive created at 00:03:27 UTC; uptime increased and bounded Display/System and WER/Application queries returned no records. This bounded observation proves neither universal absence of resets nor a causal fix. The prior failed cache-release run and this successful no-release run do not establish why the earlier failure occurred.",
+      "timing_and_disposition": "The 58.714897-second channel interval is diagnostic elapsed time, not OCR latency or speedup. This accepts one complete-vision stage only: no text-body OCR, full-page numerical/quality acceptance, performance qualification or deployment. Source-only full-page revision05 preparation is next, with one native or scanned case per fresh Windows process and both complete outputs required."
+    },
+    "private_receipt_commitments": [
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/vision-native-complete-query32-no-boundary-trim-v1/runs/ocrd-vision-native-complete-query32-no-boundary-trim-v1-AB-001-run/independent-actual-acceptance.json",
+        "bytes": 17947,
+        "sha256": "39b1816e8deae0eddd84316f72836633ff53ebbd88fa35e976f5ce49a5209a5b",
+        "note": "Independent actual acceptance for one complete native-vision stage, resource, unload and closure only."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/vision-native-complete-query32-no-boundary-trim-v1/runs/ocrd-vision-native-complete-query32-no-boundary-trim-v1-AB-001-run/vision-complete.json",
+        "bytes": 6129,
+        "sha256": "83e76d45d2e006ebd01e17bed9e01061116bc16167fb8647a03ccbd5d9f5dc6a",
+        "note": "Finite BF16 boundary embedding receipt; no text-body output."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/vision-native-complete-query32-no-boundary-trim-v1/runs/ocrd-vision-native-complete-query32-no-boundary-trim-v1-AB-001-run/AB-001-export.json",
+        "bytes": 17004,
+        "sha256": "143f090cf20cca53fa680af9a1d2b3784d2618cffe8c4e23fe970e0260168d5e",
+        "note": "Producer export and stage telemetry."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/vision-native-complete-query32-no-boundary-trim-v1/runs/ocrd-vision-native-complete-query32-no-boundary-trim-v1-AB-001-run/collection.json",
+        "bytes": 4322,
+        "sha256": "b4bdb5ecd4d71ad1b6ab83da53ea49f5dc838a541a87793f79709d73ca9eee98",
+        "note": "Collected outputs and owned-process closure evidence."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/vision-native-complete-query32-no-boundary-trim-v1/runs/ocrd-vision-native-complete-query32-no-boundary-trim-v1-AB-001-run/controller-terminal.json",
+        "bytes": 533,
+        "sha256": "f1cee518fdfdd5da4147607b6d983b47c556fca8c6e124b9fb862a0d33a9b66e",
+        "note": "Stopped controller terminal receipt."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/vision-native-complete-query32-no-boundary-trim-v1/runs/ocrd-vision-native-complete-query32-no-boundary-trim-v1-AB-001-run/service-restoration.json",
+        "bytes": 921,
+        "sha256": "36146ad2ac8bbf50f4b9d93f3b56abf5cfb66ba0e2521d2e3ea065ecf90cb582",
+        "note": "Five owned processes closed and ordinary service cold."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/vision-native-complete-query32-no-boundary-trim-v1/runs/ocrd-vision-native-complete-query32-no-boundary-trim-v1-AB-001-run/root-delayed-windows-after.json",
+        "bytes": 807,
+        "sha256": "54e542a0f5676723c6884d07c5a584aa5c0c5cbbdfd10993aabd3adfe52995a0",
+        "note": "188.965-second delayed archive/event observation after restoration."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/vision-native-complete-query32-no-boundary-trim-v1/source-freeze.json",
+        "bytes": 9487,
+        "sha256": "f012faa75f6320f8c636e4db874052560d12e7ad1b6c93661a4f7e4e1ccf7dd5",
+        "note": "Frozen no-boundary-trim source integration."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/vision-native-complete-query32-no-boundary-trim-v1/independent-source-review.json",
+        "bytes": 60910,
+        "sha256": "4aa599468b65506180a9dcbd043539a2ce7f32c7380c4fccc9061e6b4aec1e26",
+        "note": "Independent source review of the frozen candidate."
       }
     ]
   }
