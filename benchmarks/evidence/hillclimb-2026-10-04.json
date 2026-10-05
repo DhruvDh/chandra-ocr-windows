@@ -4151,5 +4151,33 @@
         "note": "Full actual-function composition regression reproduces R04 trailing-newline failure and verifies the narrow R05 repair; this is source evidence, distinct from the actual capture review."
       }
     ]
+  },
+  "full_model_accurate_exp_candidate_r05_truncated_trajectory_2026_10_05": {
+    "status": "Independent audit confirms an actual accurate-exp candidate run, but complete candidate-trajectory qualification failed because cached-forward coverage exceeded the stock reference and the retained capture was truncated.",
+    "actual_execution": {
+      "compiled_launches": "All 13,344 fixed candidate compiled-kernel launches were authenticated, and the reviewed provider scopes were restored.",
+      "coverage_failure": "Candidate generation returned after 556 cached forwards versus 555 in the stock baseline. The fixed capture retained 556 logit rows and was marked incomplete/truncated; complete response, token-evidence and token artifacts are absent.",
+      "free_history": "Selected consumed token IDs diverged at cached ordinals 127 and 393. Why the free-running candidate generation differs is not established; no complete output/EOS trajectory was authenticated."
+    },
+    "resource_and_closure": {
+      "resource_gate": "The monitor failed on the coverage exception; no completion latch or successful zero-allocator handoff was recorded, and unload_zero is false. Sampled periodic floors passed, but resource qualification did not complete.",
+      "root_memory": "Root cgroup peak was 268,701,696 bytes, 266,240 bytes above the configured 268,435,456-byte maximum, with zero swap. The cause and full-run OOM history remain unknown.",
+      "run_cutoff": "Independent review verified closure of known original creation identities, strict absence for the guard PID, and ordinary cold restoration at this run cutoff. This is not a statement of present service state."
+    },
+    "boundary": "No local numerical scoring, full OCR/EOS, complete trajectory, pair acceptance or performance measurement was completed. The 456.739-second instrumented interval is not throughput; no gain is qualified.",
+    "private_receipt_commitments": [
+      {
+        "receipt": "stock-fused-gdn-full-model-b1-v1/execution-revision-05/runs/stock-fused-gdn-full-model-b1-v1-candidate-trajectory-native-0-AB-001-run/independent-actual-review.json",
+        "bytes": 52333,
+        "sha256": "f42e466a3ae0221b5e10e441dad84ba5c18e6fbafa0ed69f752bdd85e43d8617",
+        "note": "Independent failed-actual review: capture integrity and closure checked, but trajectory, output and resource gates failed."
+      },
+      {
+        "receipt": "stock-fused-gdn-full-model-b1-v1/execution-revision-05/runs/stock-fused-gdn-full-model-b1-v1-candidate-trajectory-native-0-AB-001-run/root-failure-diagnosis.json",
+        "bytes": 2922,
+        "sha256": "44314a7e5560e246a2b7c89df79fbf560ec734e1188f227e1215d303f9913437",
+        "note": "Root diagnosis binds 13,344 launches, 556-versus-555 coverage, truncated capture and failure cleanup."
+      }
+    ]
   }
 }
