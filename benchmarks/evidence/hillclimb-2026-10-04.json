@@ -5003,5 +5003,25 @@
         "note": "Running prime cutoff; no final accepted output or rate implied."
       }
     ]
+  },
+  "intel_c2_closed_20261005": {
+    "status": "independently_reviewed_closed_observation",
+    "completed_correct_measured_pages": 16,
+    "measured_seconds": 2706.0,
+    "completed_correct_pages_per_second": 0.005912786400591279,
+    "all_twenty_requests_correct": true,
+    "measured_two_row_cells": 5,
+    "measured_single_row_cells": 6,
+    "measured_b2_forwards": 2775,
+    "measured_b1_forwards": 3330,
+    "same_once_loaded_worker": true,
+    "five_minute_idle_retirement": true,
+    "ordinary_endpoint_restored_cold": true,
+    "root_memory_peak_bytes": 34820096,
+    "terminal_root_cgroup_event_counters_available": false,
+    "ceiling_established": false,
+    "performance_gain_accepted": false,
+    "deployed": false,
+    "independent_assessment_sha256": "748ea82f1df9440a2586a26ec27b04a5673e2c5f8a7f83dca3c510911c2912f1"
   }
 }
