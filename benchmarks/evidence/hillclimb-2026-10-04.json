@@ -3835,5 +3835,71 @@
         "note": "Independent PF04 worker-admission identity failure review."
       }
     ]
+  },
+  "exact_context_native_profiler_and_operator_initialization_2026_10_05": {
+    "status": "Scoped exact-context OCR/resource/profiler acceptance; no inference speedup or deployment acceptance.",
+    "context_tokens": 16384,
+    "native_prompt_tokens": 3959,
+    "output_allowance": 12384,
+    "completed_output_tokens": 556,
+    "profile_cached_forwards": [
+      32,
+      39
+    ],
+    "profile_counts": {
+      "cpu_op": 82022,
+      "xpu_driver": 234793,
+      "overhead": 351969,
+      "xpu_runtime": 21233,
+      "kernel": 20806,
+      "gpu_memcpy": 427
+    },
+    "trace": {
+      "bytes": 20181775,
+      "sha256": "7f8390f79009fe610a5f938621ed8a0b3814996237bc64363ca71056be056796",
+      "raw_bytes": 265123506
+    },
+    "timing_boundary": "Eight-forward perturbed diagnostic only. Inherited unprofiled summary label is stale; no end-to-end or sustained throughput comparison follows.",
+    "operator_attempt_005": "Ownership ACK succeeded after 1.208 seconds with one token; Torch initialization reported no XPU devices before kernel execution. Both Jobs closed and ordinary service returned cold. Private commit approached 1 GiB; cap cause and driver failure unproved.",
+    "deployment": false,
+    "validated_intel_throughput_improvement": false,
+    "private_receipt_commitments": [
+      {
+        "receipt": "profiler-native3959-diagnostic-v1/execution-revision-06/runs/ocrd-native-scanned-normal-vision-query32-b1-v2-execution-revision-06-native-0-AB-004-run/independent-ocr-resource-profiler-assessment.json",
+        "bytes": 10981,
+        "sha256": "9492d74ba23084ed5c5fcb81d9fa432723905bd29d4ebdc95234d3a05683c5e7",
+        "note": "Independent scoped complete native OCR, resource closure and eight-forward trace linkage."
+      },
+      {
+        "receipt": "profiler-native3959-diagnostic-v1/execution-revision-06/runs/ocrd-native-scanned-normal-vision-query32-b1-v2-execution-revision-06-native-0-AB-004-run/cached-decode-analysis.json",
+        "bytes": 19965,
+        "sha256": "8078791839c2a1e531d7f1a526e7a9e0cd8a18d429c389a21d4f7cf4cf1bada2",
+        "note": "Bounded streaming diagnostic aggregation; inclusive sums and profiler perturbation are explicit."
+      },
+      {
+        "receipt": "profiler-native3959-diagnostic-v1/execution-revision-06/runs/ocrd-native-scanned-normal-vision-query32-b1-v2-execution-revision-06-native-0-AB-004-run/collection.json",
+        "bytes": 4835,
+        "sha256": "940072de1934f918e36ae85f24a8fcfe21656c4e5efae150b2eac1fff7cfc3ad",
+        "note": "Closed artifact commitments and five recorded process identity checks."
+      },
+      {
+        "receipt": "profiler-native3959-diagnostic-v1/execution-revision-06/runs/ocrd-native-scanned-normal-vision-query32-b1-v2-execution-revision-06-native-0-AB-004-run/controller-terminal.json",
+        "bytes": 373,
+        "sha256": "32d2ea11d7707449dc24d180ee1fa28cccf42452661dc0574f16390ac7d35ec0",
+        "note": "Retained actual root invocation, normal exit, memory peak and zero swap."
+      },
+      {
+        "receipt": "profiler-native3959-diagnostic-v1/execution-revision-06/runs/ocrd-native-scanned-normal-vision-query32-b1-v2-execution-revision-06-native-0-AB-004-run/delayed-windows-metadata.json",
+        "bytes": 701,
+        "sha256": "8eead06ca173037978799eb1723dd205cad2fbc979aa5748a52376497dfed58f",
+        "note": "Bounded delayed metadata observation; absence is not universal reset proof."
+      },
+      {
+        "receipt": "stock-fused-gdn-one-layer-controller-v4/runs/stock-fused-gdn-one-layer-root-v1-005/independent-failure-review.json",
+        "bytes": 20725,
+        "sha256": "2b31f8631d6ab843527d86eda156effe6f9fff7fdd6097b990786bd7856044d1",
+        "note": "Contained operator initialization failure; no candidate kernel or numerical result."
+      }
+    ]
   }
 }
