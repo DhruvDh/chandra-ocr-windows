@@ -4900,5 +4900,108 @@
         "note": "Existing controller projection source PASS; fresh root admission still required."
       }
     ]
+  },
+  "prospective_stock_C1_repaired_closed_observation_2026_10_05": {
+    "status": "Independently reviewed closed repeated-page C1 observation; no concurrency ceiling, comparative gain, new numerical policy or deployment acceptance.",
+    "measured_correct_pages": 16,
+    "excluded_prime_pages": 2,
+    "excluded_warmup_pages": 2,
+    "measured_seconds": 2451.5,
+    "completed_correct_pages_per_second": 0.006526616357332245,
+    "passive_drain_inclusive_seconds": 2451.516,
+    "total_unique_requests": 20,
+    "once_loaded_worker": true,
+    "all_complete_content_geometry_and_EOS_joins_passed": true,
+    "maximum_normalized_coordinate_displacement": 1,
+    "five_minute_idle_retirement_clean": true,
+    "terminal_Torch_allocated_and_reserved_bytes": [
+      0,
+      0
+    ],
+    "known_outer_original_identities_absent": 10,
+    "ordinary_endpoint_restored_cold": true,
+    "root_unit_retired": true,
+    "root_peak_bytes": 32608256,
+    "terminal_root_cgroup_events_available": false,
+    "periodic_resources": {
+      "minimum_process_LOCAL_headroom_bytes": 3354394624,
+      "maximum_process_LOCAL_usage_bytes": 12098011136,
+      "passing_DXGI_decisions": 3344,
+      "minimum_host_available_bytes": 15286575104,
+      "host_samples": 647,
+      "continuous_peak_proof": false
+    },
+    "corpus": "Alternating repeated native/scanned synthetic page1 with fresh image/vision/prefill processing; distinct heterogeneous corpus unqualified.",
+    "performance_improvement_accepted": false,
+    "throughput_ceiling_accepted": false,
+    "deployment_accepted": false,
+    "private_receipt_commitments": [
+      {
+        "receipt": "c1-prospective-closed-independent-review-02/assessment.json",
+        "bytes": 30812,
+        "sha256": "b7dfb05b53adda546b3f09ecf880163f9054f7310edd7767aeca4513e156bc3e",
+        "note": "Independent genuine complete output/EOS/lifetime/timing/observed resource and clean closure review."
+      },
+      {
+        "receipt": "fixed-worker-throughput-c1-prospective-root-materials-02/root-decision-01.json",
+        "bytes": 1255,
+        "sha256": "d4d78a3715d828e4c7f2eaa29a4ca25f79c33638448ae54d4439886adc69d087",
+        "note": "Root qualifies the finite C1 observation and preserves no-gain/no-ceiling scope."
+      },
+      {
+        "receipt": "fixed-worker-throughput-c1-prospective-root-materials-02/root-terminal-01.json",
+        "bytes": 731,
+        "sha256": "ec62ec3b08069111ee7f00fb1ecc2067405585fb10864f62c275c6f1908a3058",
+        "note": "Original root exited0 with peak below cap; unavailable final event counters explicit."
+      },
+      {
+        "receipt": "fixed-worker-throughput-c1-prospective-root-materials-02/root-retirement-01.json",
+        "bytes": 266,
+        "sha256": "64bc594c2305d3f4e5497fb2a3d1920d917548a80416ea3d6cc4fd10fb6e13cc",
+        "note": "Original root unit, PID and cgroup retired."
+      }
+    ]
+  },
+  "prospective_stock_C2_running_point_2026_10_05": {
+    "status": "Fresh independently source-reviewed v4 C2 point running; final prime/measurement/quality/resource/closure acceptance pending.",
+    "started_utc": "2026-10-05T20:36:31.510613+00:00",
+    "observed_utc": "2026-10-05T20:41:19.856367+00:00",
+    "capacity": 2,
+    "maximum_active_GPU_rows": 2,
+    "active_actor_count": 1,
+    "worker_starts_at_cutoff": 1,
+    "pending_at_cutoff": 2,
+    "planned_prime_warmup_measured": [
+      2,
+      2,
+      16
+    ],
+    "original_outer_child_root_seconds": [
+      6000,
+      5700,
+      6300
+    ],
+    "clock_renewal": false,
+    "actual_performance_accepted": false,
+    "private_receipt_commitments": [
+      {
+        "receipt": "fixed-worker-throughput-c2-prospective-root-materials-01/root-launch-intent-01.json",
+        "bytes": 4656,
+        "sha256": "a5fde8f2e675dc5f8b455b533abe23a85b2f885e646adf2171e91d38da8cdb6c",
+        "note": "Root admits one fresh C2 point after reviewed C1 closure, with unchanged workload and caps."
+      },
+      {
+        "receipt": "fixed-worker-throughput-c2-prospective-root-materials-01/staging-complete-01.json",
+        "bytes": 604,
+        "sha256": "a76786eac76b8ab0245169aa11206f61b257c32404ff53136c9fa153dfcfc662",
+        "note": "Authenticated source-only staging; no GPU/service action."
+      },
+      {
+        "receipt": "fixed-worker-throughput-c2-prospective-root-materials-01/live-passive-observation-01.json",
+        "bytes": 2860,
+        "sha256": "1547707926fa223c5a02282d0dd1bae0a4fe73e9b0625d1a7e4cd4b9c2cb6f7f",
+        "note": "Running prime cutoff; no final accepted output or rate implied."
+      }
+    ]
   }
 }
