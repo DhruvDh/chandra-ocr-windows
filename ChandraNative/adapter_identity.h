@@ -1,5 +1,7 @@
 // New ChandraNative code, MPL-2.0. Bind DXGI logical identity to WDDM PCI address.
 #pragma once
+#include <windows.h>
+#include <bcrypt.h>
 #include <d3dkmthk.h>
 #include <dxgi1_2.h>
 #include <wrl/client.h>
