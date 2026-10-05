@@ -4276,5 +4276,114 @@
         "note": "Root authorized bounded CPU assessment only after actual capture and owned producer closure."
       }
     ]
+  },
+  "stock_fixed_worker_C1_prime_projection_failure_2026_10_05": {
+    "status": "Independent review reproduces a frozen scanned projection failure during prime. Both pages pass complete visible semantics; warmup and measured throughput were not exercised.",
+    "scope": {
+      "original_pixels": true,
+      "prompt_tokens": 3959,
+      "output_allowance": 12384,
+      "context_tokens": 16384,
+      "dtype": "BF16",
+      "once_only_prime_requests": 2,
+      "warmup_pages": 0,
+      "measured_pages": 0,
+      "sustained_pages_per_second": null
+    },
+    "projection": {
+      "native_exact": true,
+      "scanned_exact": false,
+      "scanned_other_markup_bytes_equal": true,
+      "changed_bbox_coordinates": 7,
+      "changed_boxes": 5,
+      "maximum_absolute_normalized_coordinate_difference": 1,
+      "coordinate_domain": [
+        0,
+        1000
+      ],
+      "coordinate_unit": "0.1 percent of corresponding page axis; not one image pixel",
+      "complete_visible_lexical_scientific_table_and_layout_passed": true
+    },
+    "limits": {
+      "actual_child_EOS_tokens_collected": false,
+      "clean_allocator_and_terminal_guard_accepted": false,
+      "old_verdict": "FAIL preserved",
+      "throughput_accepted": false,
+      "retrospective_regrading": false,
+      "deployment": false
+    },
+    "closure": {
+      "known_child_creation_identities_absent": 3,
+      "outer_creation_identities_absent": 8,
+      "strictly_absent_unknown_creation_wrappers": 2,
+      "ordinary_service_restored_cold_at_cutoff": true,
+      "controller_retired": true,
+      "root_memory_peak_bytes": 28844032,
+      "root_swap_peak_bytes": 0
+    },
+    "prospective_policy": "For fresh controlled two-fixture studies only: unchanged full-visible semantics, all remaining markup bytes equal, every box within one normalized unit, real closed producer EOS matched to response and usage, unchanged numerical qualification and ownership/clock limits. Client extension source review and fresh admission remain required.",
+    "private_receipt_commitments": [
+      {
+        "receipt": "fixed-worker-throughput-c1-root-v1/live-c1-001/independent-prime-closed-data-assessment.json",
+        "bytes": 19539,
+        "sha256": "33aae0873e68b7900f8f92e9c6192bdb1cd83b6de8d9d08eb1edc923928022af",
+        "note": "Independent frozen failure, semantic/difference and closure assessment."
+      },
+      {
+        "receipt": "fixed-worker-throughput-c1-root-v1/live-c1-001/prospective-correctness-policy.json",
+        "bytes": 5828,
+        "sha256": "519d85cbe5533d52854c767dcd101f914131c44debaf893585cd101af511ad09",
+        "note": "Inactive explicitly prospective output predicate; no numeric or old-verdict waiver."
+      },
+      {
+        "receipt": "ocr-correctness-prospective-adoption-v1.json",
+        "bytes": 1805,
+        "sha256": "6aa16d176a6ed3710b58b7ba04cc9fd8f1e13254b9be08e1a12db5c9f5a86355",
+        "note": "Root selects future isolated-study predicate; no hardware or deployment authority."
+      }
+    ]
+  },
+  "on_demand_E6_cancellation_survivor_projection_failure_2026_10_05": {
+    "status": "First pair passes; intentional native cancellation leaves scanned peer running in the same worker. Survivor completes expected content but frozen exact projection fails. Full lifecycle remains unqualified.",
+    "actual": {
+      "submitted_requests": 4,
+      "first_pair_full_pass": true,
+      "cancelled_native_stream_closed_seconds": 60.573,
+      "survivor_completed_seconds_after_pair_admission": 182.3225,
+      "survivor_completed_seconds_after_cancel_close": 121.75,
+      "survivor_complete_lexical_scientific_table_and_layout_passed": true,
+      "survivor_completion_usage": 556,
+      "survivor_changed_bbox_coordinates": 7,
+      "survivor_changed_boxes": 5,
+      "maximum_absolute_normalized_bbox_coordinate_difference": 1,
+      "same_worker_continued": true,
+      "automatic_inference_replay": false
+    },
+    "missing_acceptance": [
+      "Final post-cancel token/cell/cache/fence audit",
+      "Five-minute idle retirement",
+      "Fresh-pair wake/start result",
+      "Clean terminal guard/allocator acceptance",
+      "Whole lifecycle and deployment"
+    ],
+    "closure": {
+      "known_owned_processes_closed": true,
+      "ordinary_service_restored_cold_at_cutoff": true,
+      "controller_retired": true
+    },
+    "boundary": {
+      "old_verdict": "FAIL preserved",
+      "causal_cache_or_numeric_mechanism_established": false,
+      "throughput_accepted": false,
+      "deployment": false
+    },
+    "private_receipt_commitments": [
+      {
+        "receipt": "on-demand-child-lifecycle-e6-short-root-002/independent-closed-data-assessment.json",
+        "bytes": 23468,
+        "sha256": "2be36a1feb2c38427e37f721728b2d614768a79896a24464401478bdc4c3c393",
+        "note": "Independent actual cancellation survivor, strict failure and unexercised-gate review."
+      }
+    ]
   }
 }
