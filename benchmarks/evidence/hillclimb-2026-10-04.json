@@ -4447,7 +4447,13 @@
       "unit_retired": true,
       "accepted": false,
       "policy_adopted": false,
-      "independent_numerical_review_pending": true
+      "independent_numerical_review_pending": false,
+      "independent_row_and_recomputation_review_passed": true,
+      "independently_recomputed_complete_layer_indices": [
+        0,
+        5
+      ],
+      "numerical_qualification": "HOLD"
     },
     "limits": [
       "Original one-step N budgets are reset-state arithmetic screens, not proved accumulated FP32 envelopes. Failed/inconclusive results remain preserved.",
@@ -4497,6 +4503,12 @@
         "bytes": 229,
         "sha256": "d51f1e9aaccb84179e083785a9b50f7706f2cd369f00b4dccfc189473f3bf517",
         "note": "CPU unit and original cgroup retired."
+      },
+      {
+        "receipt": "fixed-native-history-accumulated-recurrence-v1/actual-continuous-review-01/assessment.json",
+        "bytes": 898091,
+        "sha256": "3c70f3f75c952721d282abbba1c07d7e5fa5ea4aea86516ce2e26f4cb1ab6756",
+        "note": "Independent all-row reconciliation and complete representative/worst layer recomputation; original numerical HOLD retained."
       }
     ]
   }
