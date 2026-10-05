@@ -4179,5 +4179,102 @@
         "note": "Root diagnosis binds 13,344 launches, 556-versus-555 coverage, truncated capture and failure cleanup."
       }
     ]
+  },
+  "full_model_accurate_exp_candidate_r06_complete_native_diagnostic_2026_10_05": {
+    "status": "Independent review passes complete native visible OCR and all 72 selected local numerical checks from the closed accurate-exp candidate run. Accumulated full-model accuracy, serving and speed remain unqualified.",
+    "capture": {
+      "artifacts": 233,
+      "artifact_bytes": 741424760,
+      "completion_and_logit_rows": 557,
+      "cached_forwards": 556,
+      "finite_BF16_logit_values": 138314240,
+      "compiled_kernel_launches": 13344,
+      "full_expected_text_table_and_geometry_passed": true,
+      "unload_allocated_and_reserved_zero": true
+    },
+    "local_numerics": {
+      "oracle_unchanged": true,
+      "prepared_shared_inputs_and_stock_observer_joined": true,
+      "completed_cases": 72,
+      "candidate_envelope_failure_cases": 0,
+      "candidate_envelope_failure_components": 0,
+      "candidate_inconclusive_cases": 0,
+      "stock_replay_state_failure_cases": 34,
+      "stock_replay_state_failure_components": 156,
+      "stock_replay_output_failure_cases": 0,
+      "stock_replay_inconclusive_cases": 0,
+      "candidate_max_state_budget_fraction": {
+        "value": 0.7461362590449881,
+        "ordinal": 5
+      },
+      "candidate_max_output_budget_fraction": {
+        "value": 0.9885541611078265,
+        "ordinal": 13
+      },
+      "stock_max_state_budget_fraction": {
+        "value": 1.2461753448000763,
+        "ordinal": 21
+      },
+      "candidate_state_exact_stock_replay_cases": 0,
+      "candidate_output_exact_stock_replay_cases": 57,
+      "different_BF16_output_values": 18,
+      "interpretation": "Candidate local recurrence falls within all unchanged prospective componentwise envelopes on these actual operands; stock-current-state reference failures are retained. Local references use the candidate trajectory current initial state. This neither bounds accumulated candidate-versus-stock state nor certifies vendor elementary functions or adopts the held numerical contract."
+    },
+    "same_history_boundary": {
+      "paired_prediction_rows": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "first_generated_token_divergence_index": 6,
+      "rows0_and1_logits_exact": true,
+      "maximum_absolute_logit_difference": 0.25,
+      "row6_stock_top2_margin": 0.0,
+      "row6_candidate_top2_margin": 0.125,
+      "interpretation": "At the first divergence, stock emits one of two tied maxima and candidate emits a unique winner. The initial bounding box changes from 62 to 63 while complete visible OCR passes. Later consumed histories differ and are not same-input logit comparisons. No accumulated full-model error policy has been adopted."
+    },
+    "resource_and_closure": {
+      "known_owned_processes_closed": true,
+      "ordinary_service_restored_cold_at_run_cutoff": true,
+      "root_memory_max_bytes": 268435456,
+      "root_memory_peak_bytes": 268685312,
+      "root_memory_peak_excess_bytes": 249856,
+      "root_swap_peak_bytes": 0,
+      "resource_budget_accepted": false,
+      "cause": "Small cgroup peak excess has unknown cause; complete memory.events history unavailable."
+    },
+    "boundary": {
+      "instrumented_elapsed_seconds": 460.625,
+      "performance_accepted": false,
+      "scanned_case_reviewed": false,
+      "numerical_policy_adopted": false,
+      "candidate_full_model_accuracy_qualified": false,
+      "production_deployment": false,
+      "validated_Intel_throughput_gain_percent": 0
+    },
+    "private_receipt_commitments": [
+      {
+        "receipt": "stock-fused-gdn-full-model-b1-v1/execution-revision-06/runs/stock-fused-gdn-full-model-b1-v1-candidate-trajectory-native-0-AB-001-run/independent-actual-review.json",
+        "bytes": 18336,
+        "sha256": "956d4f54bea88da0999ae19a3b5255eabdc13577de988c1a1fb07b5fa8b2be21",
+        "note": "Independent complete visible OCR, 72-case local replay, seven same-history logit comparisons and resource/closure review."
+      },
+      {
+        "receipt": "stock-fused-gdn-full-model-b1-v1/execution-revision-06/runs/stock-fused-gdn-full-model-b1-v1-candidate-trajectory-native-0-AB-001-run/collection.json",
+        "bytes": 39439,
+        "sha256": "2be565e28eb8bb75fa2054c29bb2d50e1cc5e0e91514017312e5f2954d4ba0a4",
+        "note": "All 233 collected artifacts authenticated and owned processes closed."
+      },
+      {
+        "receipt": "stock-fused-gdn-full-model-b1-v1/execution-revision-06/runs/stock-fused-gdn-full-model-b1-v1-candidate-trajectory-native-0-AB-001-run/root-closed-data-assessment-authorization.json",
+        "bytes": 2065,
+        "sha256": "29c72ef904027d0f1791fe6623e09f54af11d681b91a7b7339162de58b832474",
+        "note": "Root authorized bounded CPU assessment only after actual capture and owned producer closure."
+      }
+    ]
   }
 }
