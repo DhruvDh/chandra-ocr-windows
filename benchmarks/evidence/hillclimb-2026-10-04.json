@@ -3787,5 +3787,53 @@
         "note": "Independent actual eight-publication and owned-process closure acceptance, scoped to tiny own files."
       }
     ]
+  },
+  "precompute_and_profiler_admission_failures_2026_10_05": {
+    "status": "Four recent producer attempts failed before an accepted model/profile or performance result. Their boundaries identify different admission and orchestration failures, not GPU compatibility, numerical behavior or throughput.",
+    "attempts": {
+      "PF03": "Profiler revision 03 was rejected before channel submission by the pre-channel lease; preflight processes closed and ordinary service returned cold.",
+      "F1002": "The ordinary listener wait ended after twenty half-second polls, before the original fifteen-second shutdown grace. It submitted no F1 Torch/GPU/JIT process; service returned cold.",
+      "F1003": "The native worker failed its Windows inventory check before Torch import or ready handshake because its Windows path did not match the POSIX manifest representation. Independent review confirmed this upstream integrity failure, all owned processes closed and ordinary service returned cold.",
+      "PF04": "The profiler worker rejected its admission identity before model, generation or profiler setup. Its earlier runtime attester had initialized Torch/XPU, but there was no model load or profiler compute. The channel exited 1; owned processes closed and service returned cold."
+    },
+    "disposition": "No attempt produced accepted numerical or performance evidence. Source repairs and composition checks must address the distinct failures; the directly matched TE6 comparison remains pending.",
+    "private_receipt_commitments": [
+      {
+        "receipt": "profiler-native3959-diagnostic-v1/execution-revision-03/runs/ocrd-native-scanned-normal-vision-query32-b1-v2-execution-revision-06-native-0-AB-001-run/root-failed-recovery-assessment.json",
+        "bytes": 4179,
+        "sha256": "e334aaa35406caef8b07e2ba841c5937360d7dc0c989ee33fd6cef10756447f2",
+        "note": "PF03 root failure/recovery: pre-channel lease rejection; no channel, Torch or GPU submission."
+      },
+      {
+        "receipt": "stock-fused-gdn-one-layer-controller-v1/runs/stock-fused-gdn-one-layer-root-v1-002/root-failed-precompute-assessment.json",
+        "bytes": 773,
+        "sha256": "90c0e7682e097d79a36308b91980e1e0610df2e20e3cee163de0e66eb91126a6",
+        "note": "F1002 failure: short listener wait expired before the ordinary shutdown grace; no worker/GPU result."
+      },
+      {
+        "receipt": "stock-fused-gdn-one-layer-controller-v2/runs/stock-fused-gdn-one-layer-root-v1-003/root-failed-precompute-assessment.json",
+        "bytes": 1018,
+        "sha256": "736110f31f856bfacecab05cd749294edeeb90f4e82f574259b65af5aa1ca126",
+        "note": "F1003 root failure: Windows inventory path mismatch stopped before Torch."
+      },
+      {
+        "receipt": "stock-fused-gdn-one-layer-controller-v2/runs/stock-fused-gdn-one-layer-root-v1-003/independent-failure-review.json",
+        "bytes": 16799,
+        "sha256": "e30fa9d29804d962461641ae828cc6e25eb4bf6589e0a84a8d9edde0327f6911",
+        "note": "Independent F1003 failure review."
+      },
+      {
+        "receipt": "profiler-native3959-diagnostic-v1/execution-revision-04/runs/ocrd-native-scanned-normal-vision-query32-b1-v2-execution-revision-06-native-0-AB-002-run/root-failed-recovery-assessment.json",
+        "bytes": 1105,
+        "sha256": "88fa11e3f1f6bb357bc5a738f7964848f35bb0ccbb356db2d730f3ff0a8d281d",
+        "note": "PF04 root failure/recovery assessment."
+      },
+      {
+        "receipt": "profiler-native3959-diagnostic-v1/execution-revision-04/runs/ocrd-native-scanned-normal-vision-query32-b1-v2-execution-revision-06-native-0-AB-002-run/independent-worker-identity-failure-review.json",
+        "bytes": 10284,
+        "sha256": "3e118c8a3becf195c03012ca4d017b5ef242f583bc3fdf47f0d4f729f3efc729",
+        "note": "Independent PF04 worker-admission identity failure review."
+      }
+    ]
   }
 }
