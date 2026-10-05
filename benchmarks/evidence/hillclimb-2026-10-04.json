@@ -3930,5 +3930,63 @@
         "note": "Independent local numerical diagnostic; policy held and no trajectory/OCR qualification."
       }
     ]
+  },
+  "stock_fused_gdn_actual_008_and_trained72_gate_2026_10_05": {
+    "status": "Run 008 authenticated one physical-A770 compiled fused recurrent-operator invocation. Native retirement and later recovery passed separately; overall acceptance remains false because original controller collection failed with WinError 5. Numerical and performance acceptance remain pending.",
+    "actual_primitive": {
+      "runtime": "The official CompiledKernel ran once at grid 16x32, one warp and three stages; its compiled-kernel cache hash matches run 007.",
+      "capture": "The prepared capture was 6,358,064 bytes with SHA-256 81a4b3a4bf8c194b876e47fbfea23767e3d9b48fd8197274cedcb99717763117, identical to run 007. Physical binding, unchanged inputs and exact retained-stock-reference output/state checks passed.",
+      "numerical_scope": "Numerical assessment was not repeated for 008; its capture is byte-identical to the previously assessed 007 capture. The candidate numerical policy remains held."
+    },
+    "lifecycle_and_recovery": {
+      "native_retirement": "Independent review passed bounded native retirement: both primary handles exited zero, the sealed worker reported zero Torch allocations, and one residual member of the original Job was retired within the existing five-second closure grace. Native elapsed time was 22.453 seconds. Computation and resource limits were unchanged.",
+      "overall_controller": "The original controller collection still failed with WinError 5 and its exit status was not rewritten. Metadata-only recovery verified both original Jobs at zero, all nine artifact commitments and the original 18 creation lifetimes closed; ordinary service was restored cold.",
+      "later_pid_query": "A later fresh query returned access denied for numeric PID 89164 and absence for the other 17 recorded PIDs. The cause and possible PID reuse remain unknown, so current absence of all 18 is not established. A later bounded metadata check at 305.28 seconds was empty; it does not prove universal reset absence."
+    },
+    "current_72_gate": {
+      "operator_source": "The independent 72-case operator-source review passed source readiness only (321 typed source rows and 222 typed outputs); it grants no hardware execution or numerical acceptance.",
+      "controller_source": "Original controller revision 01 failed the actual -c/runpy import before configuration or native execution. Revision 02 authenticates and loads its owned sibling explicitly; four focused CPU checks and independent source review pass. The original failure remains retained.",
+      "actual_execution": "Root dispatched revision 02 exactly once. The native channel returned zero in 37.213 seconds. The controller authenticated all 72 closed captures, exited zero and restored the ordinary endpoint cold. Independent actual and numerical reviews remain pending; this duration is a qualification clock, not inference throughput.",
+      "root_memory_observation": "Configured root MemoryMax was 268,435,456 bytes, with swap disabled. Recorded MemoryPeak was 268,730,368 bytes, 294,912 bytes above that nominal value; cause is unproved and post-exit cgroup event counters were unavailable. Result was success and recorded swap peak was zero. No claim that measured peak was below the configured value."
+    },
+    "boundary": "The 72-case numerical policy, recurrent rollouts, full-model OCR, original CLI, sustained throughput plateau and deployment remain unqualified.",
+    "private_receipt_commitments": [
+      {
+        "receipt": "stock-fused-gdn-one-layer-controller-v7/runs/stock-fused-gdn-one-layer-root-v1-008/independent-actual-review.json",
+        "bytes": 35820,
+        "sha256": "6d4fdcc7cbd517e35922aa27a9e5ded16a6939e998a1e01a213245640aa2a497",
+        "note": "Independent actual-run and recovery assessment; overall false with the original WinError 5 preserved."
+      },
+      {
+        "receipt": "stock-fused-gdn-trained72-v1/independent-source-review.json",
+        "bytes": 111313,
+        "sha256": "44d3f4f69c1cad1b1adf145941036bfc5a9360484a111697afabcea1fda428a3",
+        "note": "72-case operator source readiness only; no hardware or numerical approval."
+      },
+      {
+        "receipt": "stock-fused-gdn-trained72-controller-v1/independent-source-review.json",
+        "bytes": 12919,
+        "sha256": "bbb8779f1db493c09f9fab05e8c5feacfad9c55cd94fe5fbfac20ca3f43830e0",
+        "note": "Controller source review failure; helper import fails before configuration or native execution."
+      },
+      {
+        "receipt": "stock-fused-gdn-trained72-controller-v1/execution-revision-02/independent-source-review.json",
+        "bytes": 15856,
+        "sha256": "9de2614099cb369a08c1af089c644f62a9180551d55e631262e4a3345aa95bb9",
+        "note": "Independent revision 02 source review only."
+      },
+      {
+        "receipt": "stock-fused-gdn-trained72-controller-v1/execution-revision-02/runs/stock-fused-gdn-trained72-root-v1-001/root-result.json",
+        "bytes": 4103,
+        "sha256": "da75cd84026fb9b9486bcdf25295d2548243db44a6ae2c052d8bd7fe72ec05bb",
+        "note": "Root controller complete 72-case collection; independent actual and numerical reviews pending."
+      },
+      {
+        "receipt": "stock-fused-gdn-trained72-controller-v1/execution-revision-02/runs/stock-fused-gdn-trained72-root-v1-001/root-terminal-unit-observation.json",
+        "bytes": 868,
+        "sha256": "19e5807af8927dd28fd4e0e317bde2048a84c48e3817ced1a9c2069d93444c31",
+        "note": "Exact terminal unit, configured memory cap, measured peak and unavailable post-exit cgroup counters."
+      }
+    ]
   }
 }
