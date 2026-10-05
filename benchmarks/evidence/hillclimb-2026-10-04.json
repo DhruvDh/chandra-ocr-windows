@@ -51,7 +51,7 @@
   },
   "evidence_boundary": "Commitments hash private receipts only; they do not attest remote process identity or substitute for access to underlying evidence. Raw traces, tensors, private paths, and credentials are excluded. Numerical policy v2 was frozen before full candidate runs; capability receipts are not acceptance decisions.",
   "cpu_cached_calibration": {
-    "scope": "Matched CPU FP32 cached teacher against full uncached teacher at 394 identical conditioned positions; cached exporter retained 395 rows at positions 800\u20131194; no fresh greedy run.",
+    "scope": "Matched CPU FP32 cached teacher against full uncached teacher at 394 identical conditioned positions; cached exporter retained 395 rows at positions 800–1194; no fresh greedy run.",
     "identity_equal": true,
     "rows_compared": 394,
     "argmax_agreement_count": 394,
@@ -1521,7 +1521,7 @@
       },
       {
         "phase": "v6-01",
-        "result": "Both warmups and the single baseline batch\u2019s counted content/usage checks passed, but a second ephemeral comparison-router bind failed with address already in use before any candidate request. The run stopped without retry; the required geometry review remained pending. No timing or promotion conclusion follows.",
+        "result": "Both warmups and the single baseline batch’s counted content/usage checks passed, but a second ephemeral comparison-router bind failed with address already in use before any candidate request. The run stopped without retry; the required geometry review remained pending. No timing or promotion conclusion follows.",
         "baseline_requests": 3,
         "candidate_requests": 0,
         "baseline_quality_and_counts_passed": true,
@@ -2173,7 +2173,7 @@
         "long": 30
       },
       "render_integrity": "All 150 image SHA-256 values streamed from disk and matched the manifest. Root visual review inspected the contact sheet and one full native columns page; this is sampled visual review, not all-page OCR qualification.",
-      "root_visual_review": "Root inspected the dense contact sheet with five page families and a full columns-page image displayed resized from 1400\u00d72200 to 1248\u00d71961. The sampled page showed both columns in expected reading order, readable text, an equation, ruled table, and terminal marker without observed clipping. This is sampled layout review, not all-page visual or OCR acceptance."
+      "root_visual_review": "Root inspected the dense contact sheet with five page families and a full columns-page image displayed resized from 1400×2200 to 1248×1961. The sampled page showed both columns in expected reading order, readable text, an equation, ruled table, and terminal marker without observed clipping. This is sampled layout review, not all-page visual or OCR acceptance."
     },
     "actual_processor_sample": {
       "fixture": "page-0001-prose",
@@ -3175,7 +3175,7 @@
       "execution": "24 stock vision blocks and 10,104 Q32 chunk fences reached the visual-return fence with full K/V retained. A boundary trim completed and the pretext shim was entered. No text-body forward, accepted embedding receipt, finite embedding digest, or vision-complete artifact was produced.",
       "failure": "The first caught boundary error was UR_RESULT_ERROR_UNKNOWN (2147483646); later cleanup returned UR_RESULT_ERROR_DEVICE_LOST (20). The original traceback was cleared, so the exact failing expression and causal kernel are unknown.",
       "resource_and_closure": "No sampled resource-floor breach was observed, but the heartbeat/guard and resource-completion latch did not complete, and zero-memory unload was not established. All five owned processes are absent and ordinary service is cold. This is not a resource-qualified complete-vision pass.",
-      "windows_observation": "The fresh prelaunch archive inventory and earlier delayed inventory were empty through the prior 00:01:09 UTC cutoff. A later host observation at 00:16:24 and delayed check at 00:18:07 found a new Kernel_141 archive created at 00:03:27 UTC. Uptime had increased, the driver remained 32.0.101.8991, and host-available memory was 20,019,367,936 bytes. Access to Report.wer metadata was denied. Bounded Display/System and WER/Application queries succeeded without truncation and returned no records over 23:55:28\u201300:18:07. The archive creation is observed, but the exact incident time and cause are unknown; these facts do not establish a causal link to the trial or prove absence of a reset.",
+      "windows_observation": "The fresh prelaunch archive inventory and earlier delayed inventory were empty through the prior 00:01:09 UTC cutoff. A later host observation at 00:16:24 and delayed check at 00:18:07 found a new Kernel_141 archive created at 00:03:27 UTC. Uptime had increased, the driver remained 32.0.101.8991, and host-available memory was 20,019,367,936 bytes. Access to Report.wer metadata was denied. Bounded Display/System and WER/Application queries succeeded without truncation and returned no records over 23:55:28–00:18:07. The archive creation is observed, but the exact incident time and cause are unknown; these facts do not establish a causal link to the trial or prove absence of a reset.",
       "disposition": "This individual boundary-trim trial failed and did not qualify complete vision. A subsequent no-boundary-trim trial separately passed one complete native-vision stage; neither result identifies the failure cause or proves a fix. Full-page OCR, throughput and deployment remain unqualified."
     },
     "private_receipt_commitments": [
@@ -3379,11 +3379,11 @@
     ]
   },
   "full_visible_ground_truth_contract_v3_source_preparation_2026_10_05": {
-    "status": "V3 ground-truth correction passed independent source review and an offline rescore of retained E5 content. It did not change E5\u2019s original v2 FAIL; later E6 isolated native and scanned acceptances are recorded separately.",
+    "status": "V3 ground-truth correction passed independent source review and an offline rescore of retained E5 content. It did not change E5’s original v2 FAIL; later E6 isolated native and scanned acceptances are recorded separately.",
     "scope": {
       "correction": "The v1/v2 ground-truth taxonomy contradicted the pinned prompt. V3 uses prompt-canonical labels, including `Section-Header` and `Equation-Block`; checker logic, 104 lexical token records, 16 cells, geometry rule and numerical criteria remain unchanged.",
       "relationship_to_e5": "This is a separate source-only contract correction, not an E5 rerun or retrospective promotion. E5 remains formally failed; fresh cases must satisfy the corrected gate and completion checks.",
-      "qualification": "The correction and retained-output rescore pass, but neither supplies fresh runtime qualification or changes E5\u2019s formal failure. Isolated E6 native and scanned page1 cases later passed their separate checks; full CLI, throughput and deployment remain unqualified."
+      "qualification": "The correction and retained-output rescore pass, but neither supplies fresh runtime qualification or changes E5’s formal failure. Isolated E6 native and scanned page1 cases later passed their separate checks; full CLI, throughput and deployment remain unqualified."
     },
     "private_receipt_commitments": [
       {
@@ -3497,7 +3497,7 @@
     "status": "Normal-size FFN B2 AB and BA runs passed complete-output and state-isolation quality review; both independent resource/closure gates and root acceptances passed. This does not qualify resident timing or an engine speedup.",
     "scope": {
       "outputs_and_state": "Both row orders completed four outputs: two normal-page outputs with 556 tokens each, Tiny with 395, and repeated native with 556. In each order, 949 B2 forwards and 161 B1-tail forwards completed; token IDs and reference-associated projections matched exactly, and EOS survivor handling plus repeated-native output passed. The retained strict Tiny/Small numerical records and E6 accepted B1 cases remain separate evidence.",
-      "runtime_and_resource": "Independent AB and BA audits passed their frozen resource floors, completion latch, unload, restoration, process closure and cold-service checks. BA\u2019s delayed Kernel_141 visibility changed from present before the run to empty after restoration; the bounded interval queries and rising uptime do not support a universal no-reset claim.",
+      "runtime_and_resource": "Independent AB and BA audits passed their frozen resource floors, completion latch, unload, restoration, process closure and cold-service checks. BA’s delayed Kernel_141 visibility changed from present before the run to empty after restoration; the bounded interval queries and rising uptime do not support a universal no-reset claim.",
       "disposition": "This is normal-size FFN batching correctness and state-isolation evidence, not a warm three-burst or client-queue improvement. No validated Intel speedup, matched resident timing, sustained plateau, full CLI, normal full-model numerical equivalence or deployment qualification follows. The exact four-page resident-CLI attempt failed safely without an accepted complete output when its three-second SSH witness call timed out and the client rejected the resource witness under its unchanged four-second freshness policy; all owned processes closed and the ordinary endpoint returned cold, but no formal zero-cleanup handoff or completion latch was established. The source-02 witness repair is in progress; no CLI result is accepted."
     },
     "private_receipt_commitments": [
@@ -4383,6 +4383,120 @@
         "bytes": 23468,
         "sha256": "2be36a1feb2c38427e37f721728b2d614768a79896a24464401478bdc4c3c393",
         "note": "Independent actual cancellation survivor, strict failure and unexercised-gate review."
+      }
+    ]
+  },
+  "fixed_native_history_complete_capture_and_carried_screen_2026_10_05": {
+    "status": "Complete closed native controlled-history capture passed independent integrity review; full CPU replay completed with failed/inconclusive original engineering screens. Numerical qualification and performance remain held.",
+    "scope": {
+      "case": "native-0",
+      "prompt_tokens": 3959,
+      "original_output_allowance": 12384,
+      "context_tokens": 16384,
+      "dtype": "BF16",
+      "fixed_history_tokens_with_EOS": 556,
+      "fixed_history_is_truth": false,
+      "cached_forwards": 555,
+      "linear_layers": 24,
+      "prepared_and_output_records": 13320,
+      "state_checkpoints": 96,
+      "raw_logit_prediction_rows": [
+        0,
+        1,
+        128,
+        394,
+        555
+      ],
+      "ordinary_OCR_accepted": false,
+      "performance_accepted": false
+    },
+    "capture": {
+      "independent_integrity_review_passed": true,
+      "collected_artifacts": 193,
+      "collector_bytes": 1024693548,
+      "final_parent_bytes": 1926197,
+      "final_total_bytes": 1026619745,
+      "artifact_cap_bytes": 1036460032,
+      "parent_cap_bytes": 5242880,
+      "compiled_hash": "01830900424a5084fd504202373f864134441ec16da521ad87278f4256bff9aa",
+      "provider_restored": true,
+      "zero_unload": true,
+      "native_process_checks_closed": 5,
+      "ordinary_service_restored_cold_at_cutoff": true,
+      "root_unit_retired": true,
+      "root_memory_max_bytes": 268435456,
+      "root_reported_memory_peak_bytes": 268722176,
+      "whole_run_resource_accepted": false
+    },
+    "continuous_CPU_replay": {
+      "completed_layers": 24,
+      "output_observations": 13320,
+      "state_observations": 96,
+      "failed_state_observations": 72,
+      "failed_output_observations": 0,
+      "inconclusive_state_observations": 0,
+      "inconclusive_output_observations": 11853,
+      "elapsed_seconds": 444.28060569398804,
+      "ru_maxrss_kib": 128728,
+      "torch_imported": false,
+      "CPU_count": 1,
+      "memory_max_bytes": 268435456,
+      "reported_memory_peak_bytes": 268435456,
+      "end_OOM_events": 0,
+      "end_OOM_kill_events": 0,
+      "unit_retired": true,
+      "accepted": false,
+      "policy_adopted": false,
+      "independent_numerical_review_pending": true
+    },
+    "limits": [
+      "Original one-step N budgets are reset-state arithmetic screens, not proved accumulated FP32 envelopes. Failed/inconclusive results remain preserved.",
+      "Interval dependency propagation can make continuous FP64 uncertainty conservative; no tolerance multiplier or failure waiver is adopted.",
+      "Controlled history and operator replay do not establish complete free-running OCR, full-model mathematical truth, sustained speed or deployment.",
+      "Root peak exceeds nominal cap; cause unknown and terminal cgroup events unavailable after removal. Whole-run resource acceptance withheld."
+    ],
+    "private_receipt_commitments": [
+      {
+        "receipt": "fixed-native-history-accumulated-recurrence-v1/actual-capture-review-01/assessment.json",
+        "bytes": 5669,
+        "sha256": "dc67035d44fe8c329de5c777faa0a15d543f1b3625ea4b2b59b463d1d8bf8ec0",
+        "note": "Independent genuine closed-capture integrity/resource scope assessment."
+      },
+      {
+        "receipt": "fixed-native-history-accumulated-recurrence-v1/execution-revision-01/runs/fixed-native-history-accumulated-recurrence-v1-candidate-trajectory-native-0-AB-001-run/collection.json",
+        "bytes": 35056,
+        "sha256": "4ebd11dfdccba743b5c7395e88d97f480e90e2394f55b812f133fd5cdd2e7f5a",
+        "note": "Authentic collected file and native process-creation closure commitments."
+      },
+      {
+        "receipt": "fixed-native-history-accumulated-recurrence-v1/root-materials-01/actual-closed-data-authorization-01.json",
+        "bytes": 3763,
+        "sha256": "7aa22e33b6c95ab29e2191242703361f34c83f3cda369397a0a049ed78505291",
+        "note": "Root permits finite CPU assessment of closed data only."
+      },
+      {
+        "receipt": "fixed-native-history-accumulated-recurrence-v1/continuous-replay-native-0-01/summary.json",
+        "bytes": 891872,
+        "sha256": "aed4dd1d9815bb0704e002cea43e701d0e9dfe02123234717c9613ecd2315533",
+        "note": "Complete unchanged carried engineering screen; failed/inconclusive outcomes retained."
+      },
+      {
+        "receipt": "fixed-native-history-accumulated-recurrence-v1/continuous-replay-native-0-01/rows.jsonl",
+        "bytes": 10697435,
+        "sha256": "06d0a896d516c06f27e0f70c0b7b0909b836c81e481d7ae152a6182662624b59",
+        "note": "All thirteen-thousand-plus temporal output/state observation rows."
+      },
+      {
+        "receipt": "fixed-native-history-accumulated-recurrence-v1/root-materials-01/continuous-replay-terminal-01.json",
+        "bytes": 2124,
+        "sha256": "52c40c4a1d272ac2a26848e3886f7ca74ec972bc92ca290fec286cf625abe844",
+        "note": "Genuine CPU unit terminal and script containment evidence."
+      },
+      {
+        "receipt": "fixed-native-history-accumulated-recurrence-v1/root-materials-01/continuous-replay-retirement-01.json",
+        "bytes": 229,
+        "sha256": "d51f1e9aaccb84179e083785a9b50f7706f2cd369f00b4dccfc189473f3bf517",
+        "note": "CPU unit and original cgroup retired."
       }
     ]
   }
