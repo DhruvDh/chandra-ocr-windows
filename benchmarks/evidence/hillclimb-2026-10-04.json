@@ -3322,10 +3322,10 @@
     "status": "E5 native-only full-page run formally FAIL; the v2 gate rejected three heading labels despite prompt-canonical output. Runtime/resource and content reviews are separate; no OCR or performance acceptance.",
     "scope": {
       "native_output": "Native case only: 3,959 prompt tokens, the full 12,384-token output allowance and 16,384 context. Generation emitted 556 tokens including EOS. Full 104-token visible sequence matched, all 16 table cells matched, and all nine source-geometry groups passed.",
-      "gate_contract": "The bound v2 visible gate rejected blocks 0, 2 and 4: output label `Section-Header` is present in the authenticated prompt, while the frozen ground truth allowed noncanonical `Title` or `Section-header`. The frozen formal FAIL remains. The original v2 runtime verdict is unchanged; the separate offline v3 content rescore does not replace it or promoted.",
+      "gate_contract": "The bound v2 visible gate rejected blocks 0, 2 and 4: output label `Section-Header` is present in the authenticated prompt, while the frozen ground truth allowed noncanonical `Title` or `Section-header`. The frozen formal FAIL remains. The original v2 verdict was not changed or promoted; the separate offline v3 content reassessment is recorded below.",
       "resource_and_closure": "Independent review found 195 DXGI samples and 38 host samples above frozen floors (minimum process-local headroom 4,321,837,056 bytes; minimum host available RAM 15,087,439,872 bytes). Candidate unload reached zero and all five owned identities closed; ordinary service returned cold. Formal resource completion/latch remained false because the correctness exception prevented normal cleanup handoff; this is not a sampled floor breach.",
       "windows_observation": "At 361.927 seconds after cold restoration, the same Kernel_141 archive created at 00:03:27 UTC remained. Uptime increased and bounded Display/System and WER/Application queries returned no records. This is a bounded observation, not universal no-reset evidence or cause attribution.",
-      "timing_and_disposition": "Unprofiled backend generation took 171.239 seconds and cold channel time was 198.727 seconds; neither is comparable with an accepted 3,959-token baseline, and no speedup is claimed. No scanned page was run or admitted. No full OCR, throughput or deployment qualification follows."
+      "timing_and_disposition": "Unprofiled backend generation took 171.239 seconds and cold channel time was 198.727 seconds; neither is comparable with an accepted 3,959-token baseline, and no speedup is claimed. No scanned page was run or admitted in E5. These E5 measurements provide no OCR, throughput or deployment qualification; the later E6 isolated pair is recorded separately."
     },
     "private_receipt_commitments": [
       {
@@ -3379,11 +3379,11 @@
     ]
   },
   "full_visible_ground_truth_contract_v3_source_preparation_2026_10_05": {
-    "status": "V3 ground-truth contract correction passed independent source review; offline rescore of retained E5 content also passed. E5 remains formally failed under its original v2 gate; no fresh OCR acceptance.",
+    "status": "V3 ground-truth correction passed independent source review and an offline rescore of retained E5 content. It did not change E5\u2019s original v2 FAIL; later E6 isolated native and scanned acceptances are recorded separately.",
     "scope": {
       "correction": "The v1/v2 ground-truth taxonomy contradicted the pinned prompt. V3 uses prompt-canonical labels, including `Section-Header` and `Equation-Block`; checker logic, 104 lexical token records, 16 cells, geometry rule and numerical criteria remain unchanged.",
-      "relationship_to_e5": "This is a separate source-only contract correction, not an E5 rerun or retrospective promotion. E5 stays formally failed until a fresh reviewed run satisfies the corrected gate and formal completion checks.",
-      "qualification": "The v3 source review and offline content rescore pass. The rescore does not convert E5 into a formal pass: its original run remains failed and lacked the completion latch. A fresh native and separately admitted scanned run remain necessary for full-page OCR qualification; no speedup or deployment qualification."
+      "relationship_to_e5": "This is a separate source-only contract correction, not an E5 rerun or retrospective promotion. E5 remains formally failed; fresh cases must satisfy the corrected gate and completion checks.",
+      "qualification": "The correction and retained-output rescore pass, but neither supplies fresh runtime qualification or changes E5\u2019s formal failure. Isolated E6 native and scanned page1 cases later passed their separate checks; full CLI, throughput and deployment remain unqualified."
     },
     "private_receipt_commitments": [
       {
@@ -3427,6 +3427,69 @@
         "bytes": 9690,
         "sha256": "5dcf02f110673c8b857d17d8f5587249005543d87943320c0449526f13a88761",
         "note": "Offline reassessment of retained E5 visible content; does not change the original formal failure or supply runtime qualification."
+      }
+    ]
+  },
+  "normal_page_e6_isolated_native_scanned_acceptance_2026_10_05": {
+    "status": "The E6 isolated native and scanned page1 cases both passed independent content, raw-markup, runtime, resource and closure review. They establish two case-specific results, not resident CLI, batching, sustained throughput or deployment qualification.",
+    "scope": {
+      "cases": "The independently accepted pair covers one native and one scanned page1 case in separate fresh processes. Each used the exact 3,959-token conditioning, 12,384-token output allowance and 16,384-token context; each emitted 556 completion tokens including EOS. Both matched all 104 visible tokens, 16 table cells and nine geometry groups, with raw-markup semantic inspection and normal completion, resource-floor, process-closure and cold-restoration checks passing.",
+      "timing_and_disposition": "Native generation was 169.354624 seconds and scanned generation was 168.293067 seconds. These are diagnostic single-case observations, not a plateau baseline or validated speedup. Full CLI validation and deployment remain pending. Source-only B2 v1 review failed; the v2 repair and resident-CLI source preparation remain pending."
+    },
+    "private_receipt_commitments": [
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/normal-execution-vision-query32-v2/execution-revision-06/source-freeze.json",
+        "bytes": 11733,
+        "sha256": "9ca83d86672ef1384add0a46e9498bea5c3efce020aecfe402145bf0b68a2bcf",
+        "note": "Frozen E6 candidate and isolated native/scanned case bindings."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/normal-execution-vision-query32-v2/execution-revision-06/independent-source-review.json",
+        "bytes": 13584,
+        "sha256": "139ad8085a1e72f5bf8427e9739ba403dfd90fa2658f2422aa89888d546c3903",
+        "note": "Independent review of frozen E6 source and case preparation."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/normal-execution-vision-query32-v2/execution-revision-06/paired-collected-acceptance.json",
+        "bytes": 15411,
+        "sha256": "5dc7d0a337e1c401b2c7a3cf86aa4ee772d4dd2d715ab0dd7e0f7518c99be240",
+        "note": "Paired reader acceptance for the two isolated cases; no CLI or performance claim."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/normal-execution-vision-query32-v2/execution-revision-06/runs/ocrd-native-scanned-normal-vision-query32-b1-v2-execution-revision-06-native-0-AB-001-run/root-native-acceptance.json",
+        "bytes": 1001,
+        "sha256": "d60c506131d81836b436cf7f0a0b6bb5cfebc5599a9fc1e682b22b0bb9a85cbe",
+        "note": "Root native-case acceptance, including independent quality and runtime/resource reviews."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/normal-execution-vision-query32-v2/execution-revision-06/runs/ocrd-native-scanned-normal-vision-query32-b1-v2-execution-revision-06-native-0-AB-001-run/independent-native-quality-audit.json",
+        "bytes": 73369,
+        "sha256": "6669b0cd0b2d096794e8bfc02b33455d79a08a92b368d5416b5ccd98854b521f",
+        "note": "Independent native output, raw-markup, semantic and token review."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/normal-execution-vision-query32-v2/execution-revision-06/runs/ocrd-native-scanned-normal-vision-query32-b1-v2-execution-revision-06-native-0-AB-001-run/independent-runtime-resource-audit.json",
+        "bytes": 24404,
+        "sha256": "908bec5efac92995c5e25f76ced5aef82656010a5376a593dbfc3d754289d2e2",
+        "note": "Independent native resource, completion, closure and restoration review."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/normal-execution-vision-query32-v2/execution-revision-06/runs/ocrd-native-scanned-normal-vision-query32-b1-v2-execution-revision-06-scanned-0-AB-001-run/root-scanned-acceptance.json",
+        "bytes": 959,
+        "sha256": "3c46608795a172e80ed6ea29056524f7eeaf9b924183164f9b80fb8dc86c3492",
+        "note": "Root scanned-case acceptance, including independent quality and runtime/resource reviews."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/normal-execution-vision-query32-v2/execution-revision-06/runs/ocrd-native-scanned-normal-vision-query32-b1-v2-execution-revision-06-scanned-0-AB-001-run/independent-scanned-quality-audit.json",
+        "bytes": 72936,
+        "sha256": "352f9c77ba60ac36e3a0a17256479a09ebe67cb79c99e20166229a44ee6a12ae",
+        "note": "Independent scanned output, raw-markup, semantic and token review."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/normal-execution-vision-query32-v2/execution-revision-06/runs/ocrd-native-scanned-normal-vision-query32-b1-v2-execution-revision-06-scanned-0-AB-001-run/independent-runtime-resource-audit.json",
+        "bytes": 25262,
+        "sha256": "68108b7646f8b59eb4d1bda16ea1d08138476f7f98f3732f9889b0c48cdfe3f6",
+        "note": "Independent scanned resource, completion, closure and restoration review."
       }
     ]
   }
