@@ -4775,9 +4775,130 @@
       "failed_predicate_input_snapshot_retained": false,
       "heartbeat_interval_seconds": 1,
       "heartbeat_freshness_bound_seconds_unchanged": 4,
-      "source_repair_pending": true,
+      "source_repair_pending": false,
       "definitive_causal_attribution": false
     },
     "independent_closed_review_passed": true
+  },
+  "prospective_stock_C1_repaired_running_point_2026_10_05": {
+    "status": "Fresh point running after independently reviewed monitor repair; no final measurement, numerical promotion or throughput gain accepted.",
+    "observed_utc": "2026-10-05T20:06:26.130911+00:00",
+    "actual_at_cutoff": {
+      "accepted_prime_pages": 2,
+      "transport_DONE_warmup": 2,
+      "transport_DONE_measured": 10,
+      "planned_measured_pages": 16,
+      "worker_starts": 1,
+      "all_26_live_witness_predicates_passed": true,
+      "available_host_ram_bytes": 15671365632,
+      "process_LOCAL_headroom_bytes": 4678942720,
+      "additional_usage_bytes": 11559043072
+    },
+    "preserved_limits": {
+      "outer_seconds": 6000,
+      "child_seconds": 5700,
+      "controller_seconds": 6300,
+      "heartbeat_freshness_seconds": 4,
+      "minimum_host_available_GiB": 8,
+      "minimum_process_LOCAL_headroom_GiB": 2,
+      "maximum_additional_usage_GiB": 13,
+      "requests": 20,
+      "original_clock_renewal": false
+    },
+    "final_complete_output_EOS_resource_closure_joins_pending": true,
+    "performance_accepted": false,
+    "deployment_accepted": false,
+    "private_receipt_commitments": [
+      {
+        "receipt": "g3-independent-source-review-01/independent-source-review.json",
+        "bytes": 4705,
+        "sha256": "e7bd3d7b33f34d36dc7eb86736e2755eee36f32d7da0b703958683980e2966e2",
+        "note": "Independent narrow monitor source review; no actual run acceptance."
+      },
+      {
+        "receipt": "fixed-worker-throughput-c1-prospective-root-materials-02/root-launch-intent-01.json",
+        "bytes": 4286,
+        "sha256": "b94ea8d2189ec1edb2d4b84adc792443cf67ef19924a2a9b90d4aa20ec73aa85",
+        "note": "Fresh single Intel point, unchanged bounds and frozen source admission."
+      },
+      {
+        "receipt": "fixed-worker-throughput-c1-prospective-root-materials-02/live-passive-observation-04.json",
+        "bytes": 20304,
+        "sha256": "8bc330069202d039897718f9b5a599eed8703a01552cd69eaec6605f82f403cb",
+        "note": "Passive running cutoff; complete final outcome remains pending."
+      }
+    ]
+  },
+  "selected_state_exact_squared_error_diagnostic_2026_10_05": {
+    "status": "Separate exact diagnostic independently criticized; conditional selected-state Frobenius/RMS improvement at all eight checkpoints, with global numerical HOLD preserved.",
+    "selected_layers": [
+      0,
+      5
+    ],
+    "checkpoints": 8,
+    "exact_IEEE_dyadic_squared_error_difference": true,
+    "per_head_reference_uncertainty_brackets_checked": 256,
+    "strictly_negative_upper_error_difference_at_all_eight": true,
+    "conditional_on_inherited_FP64_local_enclosure": true,
+    "maximum_component_error_uniformly_improved": false,
+    "global_capture_state_failures_unchanged": 72,
+    "global_FP32_or_kernel_acceptance": false,
+    "performance_accepted": false,
+    "private_receipt_commitments": [
+      {
+        "receipt": "norm-reference-selected-state-exact-comparison-01/assessment.json",
+        "bytes": 8223,
+        "sha256": "a49dd9b5eadabd79e026436d968edc2295178d2e79e2989d4abd681b2f0063f8",
+        "note": "Exact dyadic ordering and explicitly conditional reference uncertainty."
+      },
+      {
+        "receipt": "norm-reference-selected-state-exact-independent-critique-01/README.md",
+        "bytes": 4224,
+        "sha256": "4ea75b6daaf148ee465b65ad13f06fa07b38e0f1ca942864ba7989e6be710576",
+        "note": "Independent algebra, seal and synthetic arithmetic criticism; no tensor replay."
+      }
+    ]
+  },
+  "prepared_source_candidates_2026_10_05": {
+    "status": "Source qualification only; actual hardware correctness and sustained speed pending.",
+    "C2_C4": {
+      "single_GPU_actor": true,
+      "maximum_active_rows": 2,
+      "C4_additional_queued_rows": 2,
+      "same_twenty_request_workload_and_clocks": true,
+      "actual_fit_or_speed_qualified": false
+    },
+    "preparation_prefix": {
+      "casts_normalization_and_query_scaling_fused": true,
+      "recurrence_018309_unchanged": true,
+      "large_stride_overflow_guard_and_signature_pin": true,
+      "actual_GPU_compile_or_numerical_pass": false
+    },
+    "private_receipt_commitments": [
+      {
+        "receipt": "v4-independent-source-review-01/independent-source-review.json",
+        "bytes": 5916,
+        "sha256": "03f5c714bb2d27a1ef408b725c222f8fba3272d5d29a6ad9e7120dfa0fe6bfcb",
+        "note": "Independent real ASGI/owner/static-pair/client CPU tests at C2/C4."
+      },
+      {
+        "receipt": "preparation-prefix-source-review-01/assessment-002.json",
+        "bytes": 2958,
+        "sha256": "57d9d4249db0fb21a89d251969342836b30bf611e4bfffa0ba0dbd91beea5ceb",
+        "note": "Prefix v2 source guard and arithmetic review."
+      },
+      {
+        "receipt": "preparation-qualification-source-review-01/operator-review.json",
+        "bytes": 5566,
+        "sha256": "75dd34941d979284cc68a063b76206c304eae1b1ad08df9ca021a9215a70221f",
+        "note": "Narrow raw72 GPU qualification worker source PASS; hardware not executed."
+      },
+      {
+        "receipt": "preparation-qualification-source-review-01/controller-review.json",
+        "bytes": 2823,
+        "sha256": "3cc8256e0db1d294e7029e247e3905c598d42214bd7ab5618238fff065dc23c0",
+        "note": "Existing controller projection source PASS; fresh root admission still required."
+      }
+    ]
   }
 }
