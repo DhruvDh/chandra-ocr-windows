@@ -4643,7 +4643,7 @@
     ]
   },
   "stock_prepared_companion_selected_layers_actual_2026_10_05": {
-    "status": "Selected diagnostic layers 0 and 5 genuinely captured on Arc XPU after all 72 exact stock checks in each Job; comparative numerical review pending.",
+    "status": "Selected layers 0 and 5 captured genuinely on Arc XPU after all 72 exact stock checks per Job; independent paired CPU diagnostic reproduced. No kernel/numerical policy/throughput adoption.",
     "selected_layers": [
       0,
       5
@@ -4669,12 +4669,38 @@
         "bytes": 3087,
         "sha256": "73185195f908390338c9ac54296f62c63198b6b92c5c26ce2ad2594e073c4da9",
         "note": "Genuine closed selected-layer capture, not numerical policy acceptance."
+      },
+      {
+        "receipt": "norm-reference-actual-independent-review-01/paired-stock-review-01/assessment.json",
+        "bytes": 7287,
+        "sha256": "41dc61ffd7c8881031a7e485daf047efec7815c87d5c3cc1fc6b46a1504c98ce",
+        "note": "Separately sealed same-input selected-layer stock/candidate diagnostic; main seal unchanged."
       }
-    ]
+    ],
+    "paired_diagnostic": {
+      "output_observations_per_implementation": 1110,
+      "within_local_output_screens_per_implementation": 1110,
+      "candidate_state_screens": {
+        "within": 2,
+        "failed": 6
+      },
+      "stock_state_screens": {
+        "within": 0,
+        "failed": 8
+      },
+      "candidate_Frobenius_RMS_error_lower_at_all_eight_checkpoints": true,
+      "final_stock_to_candidate_Frobenius_ratios": {
+        "layer0": 5.087607,
+        "layer5": 10.912245
+      },
+      "maximum_component_error_uniformly_improved": false,
+      "rounding_eta_certified": false,
+      "whole_model_truth_or_kernel_adoption": false
+    }
   },
   "prospective_stock_C1_sustained_point_2026_10_05": {
-    "status": "Fresh original fixed-worker C1 point running at this observation cutoff; no accepted sustained result yet.",
-    "observed_utc": "2026-10-05T19:04:27.087373+00:00",
+    "status": "Both actual prime pages passed complete content, prospective geometry and producer EOS; first warmup canceled after passive monitor rejected occupied request capacity. No measured pages or accepted throughput; original failure preserved.",
+    "observed_utc": "2026-10-05T19:16:02.046688+00:00",
     "planned_prime_pages": 2,
     "planned_warmup_pages": 2,
     "planned_measured_pages": 16,
@@ -4698,7 +4724,60 @@
         "bytes": 13846,
         "sha256": "4bddb315c9ac303ae8a2ed75feb5e2c93cd45a4995b723b4f06d3782f0735983",
         "note": "Consumer-compatible source-only independent PASS; actual outcome remains pending."
+      },
+      {
+        "receipt": "fixed-worker-throughput-c1-prospective-root-materials-01/live-c1-prospective-001/windows-receipts/prime/policy-prime.json",
+        "bytes": 14403,
+        "sha256": "23634875e63c9a5512186ba0dabeedcab3ee66b4f05f3db47894d04828f78292",
+        "note": "Actual two-page complete prime and authentic EOS gate."
+      },
+      {
+        "receipt": "fixed-worker-throughput-c1-prospective-root-materials-01/live-c1-prospective-001/windows-receipts/measured/summary.json",
+        "bytes": 5574,
+        "sha256": "16c637340205e41418d1af6285c17bd4a0ff16736ee030396b2a178c8536ad71",
+        "note": "Failed warmup, no measured output; retained incomplete request."
+      },
+      {
+        "receipt": "fixed-worker-throughput-c1-prospective-root-materials-01/root-terminal-01.json",
+        "bytes": 550,
+        "sha256": "6c8830d274f20e8fcc3f88be4919905e7c7cea200d1f3f113fddcd86bc4810cd",
+        "note": "Original controller failed with exit1; terminal cgroup counters unavailable."
+      },
+      {
+        "receipt": "fixed-worker-throughput-c1-prospective-root-materials-01/root-retirement-01.json",
+        "bytes": 415,
+        "sha256": "51493890e7a025475d3c1b7a1d3db0cde3f3a2c0c3a92e40ff91d368871174fd",
+        "note": "Task-owned controller retired; root PID and cgroup absent."
+      },
+      {
+        "receipt": "c1-prospective-independent-review-01/assessment.json",
+        "bytes": 11077,
+        "sha256": "dd94b96828c14de205f2f02c7a529dffacc07e12c7e8e3ced5869cd6a6133c08",
+        "note": "Independent closed prime, partial warmup, monitor source contradiction and closure review; causal snapshot absent."
       }
-    ]
+    ],
+    "initial_running_observation_utc": "2026-10-05T19:04:27.087373+00:00",
+    "actual": {
+      "prime_complete_correct_pages": 2,
+      "warmup_complete_correct_pages": 0,
+      "measured_pages": 0,
+      "first_warmup_elapsed_to_failed_passive_drain_seconds": 5.015,
+      "worker_starts": 1,
+      "owned_process_identities_absent": 10,
+      "ordinary_endpoint_restored_cold_at_cutoff": true,
+      "root_unit_retired": true,
+      "root_peak_bytes": 21733376,
+      "clean_terminal_guard_or_allocator_acceptance": false,
+      "failed_request_replayed": false
+    },
+    "failure_diagnosis": {
+      "source_supported_defect": "HTTP health accepting is false while the one-slot service is occupied; passive witness incorrectly required accepting=true throughout inference.",
+      "failed_predicate_input_snapshot_retained": false,
+      "heartbeat_interval_seconds": 1,
+      "heartbeat_freshness_bound_seconds_unchanged": 4,
+      "source_repair_pending": true,
+      "definitive_causal_attribution": false
+    },
+    "independent_closed_review_passed": true
   }
 }
