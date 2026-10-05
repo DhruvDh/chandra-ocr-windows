@@ -3317,5 +3317,117 @@
         "note": "Independent source review of the frozen candidate."
       }
     ]
+  },
+  "native_full_page_e5_native_case_failure_2026_10_05": {
+    "status": "E5 native-only full-page run formally FAIL; the v2 gate rejected three heading labels despite prompt-canonical output. Runtime/resource and content reviews are separate; no OCR or performance acceptance.",
+    "scope": {
+      "native_output": "Native case only: 3,959 prompt tokens, the full 12,384-token output allowance and 16,384 context. Generation emitted 556 tokens including EOS. Full 104-token visible sequence matched, all 16 table cells matched, and all nine source-geometry groups passed.",
+      "gate_contract": "The bound v2 visible gate rejected blocks 0, 2 and 4: output label `Section-Header` is present in the authenticated prompt, while the frozen ground truth allowed noncanonical `Title` or `Section-header`. The frozen formal FAIL remains. The original v2 runtime verdict is unchanged; the separate offline v3 content rescore does not replace it or promoted.",
+      "resource_and_closure": "Independent review found 195 DXGI samples and 38 host samples above frozen floors (minimum process-local headroom 4,321,837,056 bytes; minimum host available RAM 15,087,439,872 bytes). Candidate unload reached zero and all five owned identities closed; ordinary service returned cold. Formal resource completion/latch remained false because the correctness exception prevented normal cleanup handoff; this is not a sampled floor breach.",
+      "windows_observation": "At 361.927 seconds after cold restoration, the same Kernel_141 archive created at 00:03:27 UTC remained. Uptime increased and bounded Display/System and WER/Application queries returned no records. This is a bounded observation, not universal no-reset evidence or cause attribution.",
+      "timing_and_disposition": "Unprofiled backend generation took 171.239 seconds and cold channel time was 198.727 seconds; neither is comparable with an accepted 3,959-token baseline, and no speedup is claimed. No scanned page was run or admitted. No full OCR, throughput or deployment qualification follows."
+    },
+    "private_receipt_commitments": [
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/normal-execution-vision-query32-v2/execution-revision-05/runs/ocrd-native-scanned-normal-vision-query32-b1-v2-execution-revision-05-native-0-AB-001-run/independent-output-assessment-v2.json",
+        "bytes": 17960,
+        "sha256": "6f5b776b61336a5cb39f1520a073db131ba34fc484bb9f1b31f4f97c5fe9559c",
+        "note": "Frozen actual-output assessment; original E5 v2 failure retained."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/normal-execution-vision-query32-v2/execution-revision-05/runs/ocrd-native-scanned-normal-vision-query32-b1-v2-execution-revision-05-native-0-AB-001-run/independent-runtime-resource-audit.json",
+        "bytes": 22500,
+        "sha256": "141c00f98b6543fc353684c25e15c1734ea7fdf8090c158480b283b285dce59f",
+        "note": "Independent resource, cleanup, closure and delayed Windows audit."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/normal-execution-vision-query32-v2/execution-revision-05/runs/ocrd-native-scanned-normal-vision-query32-b1-v2-execution-revision-05-native-0-AB-001-run/independent-runtime-resource-check.json",
+        "bytes": 1879,
+        "sha256": "3d1887cb3aa6b58fced4c64256eceafc3781877cab537252f4a484bc2157455d",
+        "note": "Bound runtime/resource audit check."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/normal-execution-vision-query32-v2/execution-revision-05/runs/ocrd-native-scanned-normal-vision-query32-b1-v2-execution-revision-05-native-0-AB-001-run/collection.json",
+        "bytes": 4517,
+        "sha256": "92009410bafc8fd8abfdb98eb9b90b8a3f03671cab220033712e2dd5c4de0fa5",
+        "note": "Collected E5 artifacts and process-closure evidence."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/normal-execution-vision-query32-v2/execution-revision-05/runs/ocrd-native-scanned-normal-vision-query32-b1-v2-execution-revision-05-native-0-AB-001-run/controller-terminal.json",
+        "bytes": 528,
+        "sha256": "24713bcf9a224a87d30f32d9ede172dc5b29d33c4093093f0ad3e01c8af42c15",
+        "note": "E5 controller terminal result."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/normal-execution-vision-query32-v2/execution-revision-05/runs/ocrd-native-scanned-normal-vision-query32-b1-v2-execution-revision-05-native-0-AB-001-run/service-restoration.json",
+        "bytes": 921,
+        "sha256": "d05a92288b08ba9fe2d6d1ae65a692429bb28e664e7f60241a5cfb13f5237fd5",
+        "note": "All five owned processes closed and ordinary service cold."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/normal-execution-vision-query32-v2/execution-revision-05/runs/ocrd-native-scanned-normal-vision-query32-b1-v2-execution-revision-05-native-0-AB-001-run/root-delayed-windows-after.json",
+        "bytes": 847,
+        "sha256": "bd3a12b0dc29abc2ab4d728e16a1049533807d1d5c2e43e4359e29c2cd455299",
+        "note": "361.927-second bounded archive/event observation after restoration."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/normal-execution-vision-query32-v2/execution-revision-05/source-freeze.json",
+        "bytes": 12889,
+        "sha256": "a6ebac383a7bec1a00aa1bfa6db8c2ced33079164507fc159a23612f8a307b25",
+        "note": "Frozen E5 native/scanned source profile and gate bindings."
+      }
+    ]
+  },
+  "full_visible_ground_truth_contract_v3_source_preparation_2026_10_05": {
+    "status": "V3 ground-truth contract correction passed independent source review; offline rescore of retained E5 content also passed. E5 remains formally failed under its original v2 gate; no fresh OCR acceptance.",
+    "scope": {
+      "correction": "The v1/v2 ground-truth taxonomy contradicted the pinned prompt. V3 uses prompt-canonical labels, including `Section-Header` and `Equation-Block`; checker logic, 104 lexical token records, 16 cells, geometry rule and numerical criteria remain unchanged.",
+      "relationship_to_e5": "This is a separate source-only contract correction, not an E5 rerun or retrospective promotion. E5 stays formally failed until a fresh reviewed run satisfies the corrected gate and formal completion checks.",
+      "qualification": "The v3 source review and offline content rescore pass. The rescore does not convert E5 into a formal pass: its original run remains failed and lacked the completion latch. A fresh native and separately admitted scanned run remain necessary for full-page OCR qualification; no speedup or deployment qualification."
+    },
+    "private_receipt_commitments": [
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/full-visible-page1-acceptance-v3/preparation.json",
+        "bytes": 2510,
+        "sha256": "7f606cfe9bf2305491c469550a1bafd81ff09d0dcdb3ee671428b3029fc44e6e",
+        "note": "V3 source preparation record; explicitly not actual OCR acceptance."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/full-visible-page1-acceptance-v3/README.md",
+        "bytes": 3449,
+        "sha256": "6dbc5a4637e4a67b5f0cb7c40eefcd034019f42710c8df50f4d36cd7c818a332",
+        "note": "V3 correction scope; this retained README predates the completed independent source review."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/full-visible-page1-acceptance-v3/full_visible.py",
+        "bytes": 9941,
+        "sha256": "b12a17e63846c554d3b3bca04df56b5d8b8880a8805f6976b55e0af463f25850",
+        "note": "Checker source; unchanged from the reviewed logic."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/full-visible-page1-acceptance-v3/ground-truth.json",
+        "bytes": 48387,
+        "sha256": "e3069808b467565efc7b1e5c90c55b897fc5cbd13c91a58be6da914677d2095f",
+        "note": "Corrected canonical label contract, bound to the same visible content."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/full-visible-page1-acceptance-v3/test_full_visible.py",
+        "bytes": 4305,
+        "sha256": "0dea50465526838c7049b4898d46c2a5bc62232fbdc01237e488fecd53849ae2",
+        "note": "V3 source-level checker tests."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/full-visible-page1-acceptance-v3/independent-source-review.json",
+        "bytes": 10076,
+        "sha256": "91171d2a28214d1780e28d31decf95bb35bd4ca33aa80e87cfc7152dba23c342",
+        "note": "Independent source review passed; v3 corrects prompt/ground-truth label taxonomy only."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/full-visible-page1-acceptance-v3/offline-native-content-reassessment.json",
+        "bytes": 9690,
+        "sha256": "5dcf02f110673c8b857d17d8f5587249005543d87943320c0449526f13a88761",
+        "note": "Offline reassessment of retained E5 visible content; does not change the original formal failure or supply runtime qualification."
+      }
+    ]
   }
 }
