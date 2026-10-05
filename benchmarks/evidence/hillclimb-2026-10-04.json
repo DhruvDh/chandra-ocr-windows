@@ -4115,5 +4115,41 @@
         "note": "Root failure diagnosis records the pre-forward API exception, cleanup, process closure and cold restoration."
       }
     ]
+  },
+  "stock_gdn_full_model_reference_r04_failure_r05_capture_2026_10_05": {
+    "status": "R04 remains a pre-model composition failure; R05 independently passed a finite original-stock full native-page trajectory capture and its runtime/closure checks.",
+    "r04_preserved_failure": "R04 stopped before model load, page processing or output after a frozen derivation-anchor mismatch in the summary cleanup replacement. The later R05 composition regression established that the full-file anchor retained a final newline excluded from the function AST source span. Owned processes closed and the ordinary endpoint returned cold; no replay or performance measurement occurred.",
+    "r05_stock_reference_capture": {
+      "scope": "One complete synthetic native page using the original stock B1 path: 556 EOS-terminated tokens and 556 full-vocabulary logit rows, with 35,584 state-field fingerprints, 13,320 cached recurrent calls and 72 selected local replays. The accepted E6 raw HTML, full token IDs and conditioning matched.",
+      "review": "Independent review passed baseline capture integrity, resource checks, completion, closure and cold restoration. This authenticates the stock reference capture only; it does not numerically score the full logit vectors or qualify a candidate, scanned-page acceptance or OCR throughput.",
+      "timing": "The 444.735-second instrumented interval is not throughput or a speed comparison. Validated Intel throughput gain remains 0%.",
+      "memory_boundary": "The root cgroup peak was 268,709,888 bytes, 274,432 bytes above the nominal 268,435,456-byte maximum. The cause and full-runtime event history remain unknown."
+    },
+    "private_receipt_commitments": [
+      {
+        "receipt": "stock-fused-gdn-full-model-b1-v1/execution-revision-04/independent-source-review.json",
+        "bytes": 206175,
+        "sha256": "18e031ba09ba14803e2bd67556523b043acc081e9c6c108c8d4881f0fd6ed360",
+        "note": "Focused R04 source review; source readiness is distinct from actual-runtime compatibility and the failed pre-model attempt."
+      },
+      {
+        "receipt": "stock-fused-gdn-full-model-b1-v1/execution-revision-04/runs/stock-fused-gdn-full-model-b1-v1-baseline-trajectory-native-0-AB-001-run/root-failure-diagnosis.json",
+        "bytes": 1618,
+        "sha256": "34eb8bb8c419014441f9be5ab6469b6492ae40be84d18292b04ef5298fe60ae7",
+        "note": "R04 pre-model frozen derivation-anchor failure; no page, model load or generation output."
+      },
+      {
+        "receipt": "stock-fused-gdn-full-model-b1-v1/execution-revision-05/runs/stock-fused-gdn-full-model-b1-v1-baseline-trajectory-native-0-AB-001-run/independent-actual-review.json",
+        "bytes": 50571,
+        "sha256": "57d231817059afe2fe48c1cc258a0c103af4156c3d297af95abafb51a7b4a354",
+        "note": "Independent R05 original-stock baseline capture, runtime/resource and closure review."
+      },
+      {
+        "receipt": "stock-fused-gdn-full-model-b1-v1/execution-revision-05/independent-source-review.json",
+        "bytes": 209180,
+        "sha256": "d0bd808e38431b0a2258b0ddf527888f4e93e56f493def051b726bb1a4b9533e",
+        "note": "Full actual-function composition regression reproduces R04 trailing-newline failure and verifies the narrow R05 repair; this is source evidence, distinct from the actual capture review."
+      }
+    ]
   }
 }
