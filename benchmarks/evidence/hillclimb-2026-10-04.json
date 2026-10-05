@@ -3562,5 +3562,177 @@
         "note": "Independent failed original-CLI attempt assessment: no accepted complete output or formal zero/latch; observed resource samples passed and owned closure/cold recovery verified. This is failure evidence, not CLI acceptance."
       }
     ]
+  },
+  "gdn_input_projection_ffn_row_geometry_ab_ba_2026_10_05": {
+    "status": "AB and reversed BA passed the frozen Tiny/Small teacher-forcing numerical gate for the combined GDN input-projection and FFN row-geometry candidate. Both independent resource/completion/closure reviews and root acceptances passed.",
+    "scope": {
+      "numerical": "Each order covered 710 full-vocabulary rows (248,320 entries each) and 45,440 primary state fields with zero exact hash differences, plus 82 preparation rows/5,248 state fields. The candidate completed 314 B2 steps and 80 B1 tails; BA reversed physical row order. Four inherited target-versus-winner departures remained: A row 13 (target 15, winner 16), A row 47 (target 19, winner 15), and rows 370 in A and B (target 24, winner 22). No free-greedy acceptance follows; this is teacher forcing on retained Tiny/Small fixtures.",
+      "execution": "Across 24 GDN input-projection layers, batched projection calls were 314 versus 628 row-supplied calls per projection. Each of 81 normalized-gain fields recorded 790 calls per order. Completion latch, resource, unload, owned-process closure and cold-service restoration passed in both orders.",
+      "boundary": "This is not normal free OCR, full-model numerical equivalence, resident timing, a throughput gain, CLI acceptance or deployment. Successful candidate tensors are not retained; accepted vector/state identity is bound by the audited hash receipts. Weight identity is metadata-only, not a tensor-payload hash. Earlier strict Tiny/Small and normal-size FFN OCR records remain distinct."
+    },
+    "private_receipt_commitments": [
+      {
+        "receipt": "sustained-throughput-v1/intel-batching/gdn-input-projection-ffn-batched-row-geometry-v1/execution-v1/freeze.json",
+        "bytes": 8363,
+        "sha256": "81b730e555e05205185334946f5a7561ea9f244ba98aa196ce16aa4e8a47d68c",
+        "note": "Frozen execution source and method."
+      },
+      {
+        "receipt": "sustained-throughput-v1/intel-batching/gdn-input-projection-ffn-batched-row-geometry-v1/execution-v1/integration-manifest.json",
+        "bytes": 18851,
+        "sha256": "66ccdd811bc249590efd257a7e32b44195d24db402e3ef59208e5c5a721a8daa",
+        "note": "Source identity manifest."
+      },
+      {
+        "receipt": "sustained-throughput-v1/intel-batching/gdn-input-projection-ffn-batched-row-geometry-v1/execution-v1/independent-source-review.json",
+        "bytes": 28398,
+        "sha256": "6bd5f640dafff9b45813b94abeb7aad0bfd29134dfb7b9aafee50f39bb49c7b8",
+        "note": "Independent source and integration review."
+      },
+      {
+        "receipt": "sustained-throughput-v1/intel-batching/gdn-input-projection-ffn-batched-row-geometry-v1/candidate.py",
+        "bytes": 18574,
+        "sha256": "c1f61fd870126dd942935fc64a29c74a3e9e1655a9e336e0df530581b59a19e8",
+        "note": "Candidate core."
+      },
+      {
+        "receipt": "tiny-offset80-stock-b2-gdn-input-projection-ffn-row-geometry-v1-AB-001-run/root-AB-acceptance.json",
+        "bytes": 41849,
+        "sha256": "b3607a09ff0b20938c43069fb837d6460cc3bb62dfa7c61d1d43889d9a0d8259",
+        "note": "Root acceptance; 138 retained artifacts rehashed."
+      },
+      {
+        "receipt": "tiny-offset80-stock-b2-gdn-input-projection-ffn-row-geometry-v1-AB-001-run/independent-numerical-audit.json",
+        "bytes": 101708,
+        "sha256": "67af2568cf7add8699a777ec6390846618b9a7bd9fa89a4581a99a6c013adc62",
+        "note": "Independent exact numerical audit, AB order."
+      },
+      {
+        "receipt": "tiny-offset80-stock-b2-gdn-input-projection-ffn-row-geometry-v1-AB-001-run/independent-runtime-resource-audit.json",
+        "bytes": 45425,
+        "sha256": "2131e854d07799b3c68641cdc331272190f24b2a1a088bd647dcdc0f3652f219",
+        "note": "Independent resource, completion, closure and restoration audit, AB order."
+      },
+      {
+        "receipt": "tiny-offset80-stock-b2-gdn-input-projection-ffn-row-geometry-v1-BA-001-run/root-BA-acceptance.json",
+        "bytes": 41524,
+        "sha256": "975bbf85ff3c8e1adda4a8c5716c876af15a0cb431ceb33dfc074eed7e9c6a99",
+        "note": "Root acceptance; 143 retained artifacts rehashed."
+      },
+      {
+        "receipt": "tiny-offset80-stock-b2-gdn-input-projection-ffn-row-geometry-v1-BA-001-run/independent-numerical-audit.json",
+        "bytes": 104780,
+        "sha256": "b162038fa8d6bb3bbaf69ee076b2824ddcb3ebb69df0b19533ac815ec5bf4cd2",
+        "note": "Independent exact numerical audit, reversed BA row order."
+      },
+      {
+        "receipt": "tiny-offset80-stock-b2-gdn-input-projection-ffn-row-geometry-v1-BA-001-run/independent-runtime-resource-audit.json",
+        "bytes": 49139,
+        "sha256": "00d26b0d65ff0823af53bd3ba4d7c92cd4262bf4eff9c11a2f96aa189faad8cc",
+        "note": "Independent resource, completion, closure and restoration audit, BA order."
+      }
+    ]
+  },
+  "normal_cli_revision_02_03_failures_2026_10_05": {
+    "status": "Revisions 02, 03 and 04 failed complete CLI qualification. Independent assessments verify owned-process closure and cold restoration after each failure.",
+    "revision_02": "The run aborted before accepting ready/export/candidate output after the three-second SSH readiness read timed out; no runtime attestation or formal zero/latch was accepted.",
+    "revision_03": "Readiness succeeded. The retained record includes HTTP witness and SSH idle-export timeouts, client SIGTERM, and WinError5 guard-persistence failure, but does not establish their relative ordering or causal connection. SIGTERM is not normal completion; no output or formal resource-completion latch was accepted.",
+    "next": "CLI05 is preparing replacement-compatible live-file readers across the guard stack; the specific handle behind CLI04's sharing failure remains unidentified. Complete CLI qualification remains required before serving deployment.",
+    "private_receipt_commitments": [
+      {
+        "receipt": "ocrd-context-compatible-v1/normal-cli-endpoint-v2/execution-revision-02/runs/ocrd-normal-cli-resident-b1-v2-execution-revision-02-AB-001-run/independent-failure-recovery-assessment.json",
+        "bytes": 27903,
+        "sha256": "dcdf1e368594c3a2adc266f2db238ab4bc22c7cfb3e197fb852d4feabee68570",
+        "note": "CLI02 failure and recovery assessment."
+      },
+      {
+        "receipt": "ocrd-context-compatible-v1/normal-cli-endpoint-v2/execution-revision-03/runs/ocrd-normal-cli-resident-b1-v2-execution-revision-03-AB-001-run/independent-failure-recovery-assessment.json",
+        "bytes": 38906,
+        "sha256": "af00469e4c5bf5bb5fcd729bb93e1ce4143fd6df515c8626364db8be5e0ca36a",
+        "note": "CLI03 failure and recovery assessment."
+      },
+      {
+        "receipt": "ocrd-context-compatible-v1/normal-cli-endpoint-v2/execution-revision-04/independent-source-review.json",
+        "bytes": 21731,
+        "sha256": "fdd00a3f8e4182a673cbb7e132a538ab9bb5fbf920546ead7f2b180007a3fba7",
+        "note": "Independent source review passed; this does not qualify its later failed actual run."
+      },
+      {
+        "receipt": "ocrd-context-compatible-v1/normal-cli-endpoint-v2/execution-revision-04/source-freeze.json",
+        "bytes": 46892,
+        "sha256": "77f4a9aa7a2c8094c5b31c3b0521ee9892774bab7311b9042bbffd18b2e61058",
+        "note": "Frozen CLI04 source identity."
+      },
+      {
+        "receipt": "ocrd-context-compatible-v1/normal-cli-endpoint-v2/execution-revision-04/runs/ocrd-normal-cli-resident-b1-v2-execution-revision-04-AB-001-run/independent-failure-recovery-assessment.json",
+        "bytes": 51974,
+        "sha256": "0be400bc2b0e1506c110b6ef35a7749d63faea672fe042282607b83df42f1565",
+        "note": "Independent failed CLI04 qualification and verified process closure/cold recovery; no complete CLI acceptance."
+      }
+    ],
+    "revision_04_source": {
+      "status": "Independent source review passed and the source freeze is committed below. A four-page run launched, then failed; no complete CLI result is accepted."
+    },
+    "revision_04_actual": "The actual heartbeat records WinError5 raised while replacing heartbeat.pending with heartbeat.json at 1791175531.248774; the native guard reports Monitor failure at 1791175532.0096028. The current witness then fails with EOF before a complete HTTP header and the original CPU client is terminated by SIGTERM. The exact failing handle and causal relationship across the processes are unproved. Native metadata contains 556 tokens/nine chunks for page 0 and zero tokens/chunks for page 1; scanned processing started without a merged output. No complete original CLI report, direct zero cleanup or completion latch was accepted. Independent assessment verifies all five owned Windows PIDs absent, CPU client retired and ordinary service restored cold. A delayed check 276.949 seconds after restoration found an empty bounded archive inventory, successful untruncated zero-event queries and increasing uptime; these observations are limited to their cutoff. No GPU failure is inferred."
+  },
+  "normal3959_gdn_ffn_h3_ab_acceptance_2026_10_05": {
+    "status": "H3 AB passed independent complete-output, finite state-isolation, runtime/resource, completion and closure acceptance for its bounded four-output scope. BA was not run.",
+    "scope": {
+      "outputs": "Two normal outputs (native and scanned), Tiny, and repeated native completed with 556, 556, 395 and 556 tokens. Exact reference-associated tokens/projections and EOS checks passed; the root accepted the complete four-output set. The trial completed 949 B2 and 161 B1-tail forwards.",
+      "state_isolation": "The finite AB two-cell state-isolation checks passed, including the 128 joined-state fields per cell and repeated-native output. This is not normal full-vocabulary or full-model numerical equivalence; weight identity is scoped metadata evidence rather than an independent weight-payload hash.",
+      "runtime": "Independent runtime/resource review passed the scoped completion, latch, owned-process closure and cold-restoration gates.",
+      "timing_and_boundary": "The 512.797-second resident diagnostic is not a matched performance comparison. It is about 4.47% longer by arithmetic than prior FFN AB/BA observations of 490.844/490.781 seconds, but protocol matching and performance acceptance are absent. No BA, normal full-vocabulary equivalence, sustained plateau, validated gain, full CLI or deployment is qualified."
+    },
+    "private_receipt_commitments": [
+      {
+        "receipt": "intel-gdn-input-projection-ffn-native3959-free-ocr-v1-AB-001-run/root-AB-acceptance.json",
+        "bytes": 68263,
+        "sha256": "0401f75e0d2296a785731b81f0ea1a09addac6726ca7c46c28992a88e404ee01",
+        "note": "Finite H3 AB root acceptance with 205 original artifact commitments rehashed."
+      },
+      {
+        "receipt": "intel-gdn-input-projection-ffn-native3959-free-ocr-v1-AB-001-run/independent-quality-state-isolation-audit.json",
+        "bytes": 122553,
+        "sha256": "74e4c6263c5d505c4d6c2eb4eca282f04868e433ee442caf5ce120c42cd710be",
+        "note": "Independent four-output correctness and finite state-isolation review."
+      },
+      {
+        "receipt": "intel-gdn-input-projection-ffn-native3959-free-ocr-v1-AB-001-run/independent-runtime-resource-audit.json",
+        "bytes": 86661,
+        "sha256": "0b7bb24c7eb22c27821bd4fa1a5ca2b2ace7273330a63fe10338cf63117da092",
+        "note": "Independent runtime/resource, completion, ownership and restoration review."
+      }
+    ]
+  },
+  "normal_resident_timing_te4_source_only_2026_10_05": {
+    "status": "The TE4 source review passed 11 CPU checks, but its actual run is blocked pending a qualified CLI04 result. No timing or performance evidence exists.",
+    "scope": "Source-only preparation; it does not establish native inference timing or an Intel speedup.",
+    "private_receipt_commitments": [
+      {
+        "receipt": "ffn-native3959-resident-timing-v1/execution-revision-04/independent-source-review.json",
+        "bytes": 9642,
+        "sha256": "598c6f523fc11fcd110c337a56654613251121c46471b17b711b096787b2a02f",
+        "note": "Independent TE4 source review; no actual run accepted."
+      }
+    ]
+  },
+  "on_demand_child_lifecycle_e1_import_failure_2026_10_05": {
+    "status": "Lifecycle E1 remains rejected: its 37 CPU tests missed the actual attester/runpy sibling-import failure. A separate revision 02 passes narrow source review and actual-topology CPU regressions; live bindings remain disabled.",
+    "scope": "Source and CPU-only validation only. No lifecycle runtime result or service behavior is qualified.",
+    "private_receipt_commitments": [
+      {
+        "receipt": "on-demand-child-lifecycle-v1/execution-revision-01/independent-source-review.json",
+        "bytes": 22305,
+        "sha256": "e587de48e677e41d32c2c4fe227383a321557db9660595bf95aab6f4043f79ea",
+        "note": "Independent source review rejects E1 because runpy cold-start cannot resolve sibling bindings."
+      },
+      {
+        "receipt": "on-demand-child-lifecycle-v1/execution-revision-02/independent-source-review.json",
+        "bytes": 26061,
+        "sha256": "790269f7e21fccf7ad7fe4e9da757e40b3988311292fd90670e03d0a203ccadc",
+        "note": "Narrow import-topology source repair PASS; preserves original failure and names the unresolved Windows guard-I/O runtime limitation."
+      }
+    ],
+    "repair_boundary": "Revision 02 fixes staged-helper import resolution. Its unchanged Windows guard reader still shares the identified heartbeat-I/O risk; actual OS ownership, complete OCR, cancellation, streaming, repeated idle cycles and throughput remain unqualified."
   }
 }
