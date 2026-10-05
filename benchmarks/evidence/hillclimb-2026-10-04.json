@@ -3901,5 +3901,34 @@
         "note": "Contained operator initialization failure; no candidate kernel or numerical result."
       }
     ]
+  },
+  "stock_fused_gdn_actual_007_compiled_primitive_pilot_2026_10_05": {
+    "status": "Run 007 authenticated one genuine official compiled recurrent-kernel invocation on the physical A770 and a narrow exact retained-reference check. Its actual numerical-policy decision remains held; the overall pilot failed the original 120-second Job deadline.",
+    "actual_primitive": {
+      "runtime": "A child-only MSVC 14.44.35207/Windows SDK 10.0.26100.0 environment with CC=CXX=cl.EXE resolved the official compiled target on the physical A770. One fixed CompiledKernel invocation ran at grid 16x32, one warp and three stages; Triton compiled-kernel cache hash 705a8ad1916a973845469cf9eed72b83fab5ab6303b1afbbfcf865d6e7e69b8c.",
+      "capture": "Prepared shared-input capture was 6,358,064 bytes, SHA-256 81a4b3a4bf8c194b876e47fbfea23767e3d9b48fd8197274cedcb99717763117. Input isolation and equality to the retained stock reference passed. Candidate BF16 output exactly matched stock across 4,096 values.",
+      "numerical_diagnostic": "Candidate FP32 state differed from stock in 189,637 of 524,288 values, maximum absolute difference 4.76837158203125e-7. Candidate local FP64 state maximum absolute error was 2.2313551628627692e-7 versus stock 2.7942586955376214e-7, but the proposed numerical policy remains held; no threshold was widened or acceptance granted.",
+      "capture_sha256": "81a4b3a4bf8c194b876e47fbfea23767e3d9b48fd8197274cedcb99717763117",
+      "compiled_kernel_cache_hash": "705a8ad1916a973845469cf9eed72b83fab5ab6303b1afbbfcf865d6e7e69b8c"
+    },
+    "overall_pilot": {
+      "disposition": "Whole-pilot FAIL under the original fixed 120-second Job deadline because one owned descendant remained after worker completion through sampled Job elapsed time 119.531 seconds. No descendant executable name is attributed. The worker itself completed with no reported errors, exit 0 and Torch allocator zero; the root/controller exited 1.",
+      "recovery": "The first collection observed one original identity present but exited. Eventual cleanup left both Jobs with zero active processes; fresh closure checks later found all 16 observed process identities absent, and ordinary service was restored cold. Root cgroup memory peak was 27,889,664 bytes with zero swap; its recorded PID was absent.",
+      "boundary": "This is a one-layer diagnostic only. Full 72-case numerical validation, recurrent rollout, full-model/OCR acceptance, performance improvement and deployment remain unqualified. F5 source cleanup remains pending within the original caps and deadlines."
+    },
+    "private_receipt_commitments": [
+      {
+        "receipt": "stock-fused-gdn-one-layer-controller-v6/runs/stock-fused-gdn-one-layer-root-v1-007/independent-actual-review.json",
+        "bytes": 40113,
+        "sha256": "1e5ca42fe27c3d71052f155de5be0be2701d0e19bb3648697430ea7a4bbc311b",
+        "note": "Independent actual-execution and whole-pilot review; primitive invocation passed but original Job-timeout gate failed."
+      },
+      {
+        "receipt": "stock-fused-gdn-one-layer-controller-v6/runs/stock-fused-gdn-one-layer-root-v1-007/actual-numerical-diagnostic/independent-local-numerical-diagnostic.json",
+        "bytes": 18083,
+        "sha256": "664b4b7077ef7baf5b94736a783b888bfd8f7199be7fa31a1d2c72d006a72484",
+        "note": "Independent local numerical diagnostic; policy held and no trajectory/OCR qualification."
+      }
+    ]
   }
 }
