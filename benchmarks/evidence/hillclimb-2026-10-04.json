@@ -51,7 +51,7 @@
   },
   "evidence_boundary": "Commitments hash private receipts only; they do not attest remote process identity or substitute for access to underlying evidence. Raw traces, tensors, private paths, and credentials are excluded. Numerical policy v2 was frozen before full candidate runs; capability receipts are not acceptance decisions.",
   "cpu_cached_calibration": {
-    "scope": "Matched CPU FP32 cached teacher against full uncached teacher at 394 identical conditioned positions; cached exporter retained 395 rows at positions 800–1194; no fresh greedy run.",
+    "scope": "Matched CPU FP32 cached teacher against full uncached teacher at 394 identical conditioned positions; cached exporter retained 395 rows at positions 800\u20131194; no fresh greedy run.",
     "identity_equal": true,
     "rows_compared": 394,
     "argmax_agreement_count": 394,
@@ -1521,7 +1521,7 @@
       },
       {
         "phase": "v6-01",
-        "result": "Both warmups and the single baseline batch’s counted content/usage checks passed, but a second ephemeral comparison-router bind failed with address already in use before any candidate request. The run stopped without retry; the required geometry review remained pending. No timing or promotion conclusion follows.",
+        "result": "Both warmups and the single baseline batch\u2019s counted content/usage checks passed, but a second ephemeral comparison-router bind failed with address already in use before any candidate request. The run stopped without retry; the required geometry review remained pending. No timing or promotion conclusion follows.",
         "baseline_requests": 3,
         "candidate_requests": 0,
         "baseline_quality_and_counts_passed": true,
@@ -2173,7 +2173,7 @@
         "long": 30
       },
       "render_integrity": "All 150 image SHA-256 values streamed from disk and matched the manifest. Root visual review inspected the contact sheet and one full native columns page; this is sampled visual review, not all-page OCR qualification.",
-      "root_visual_review": "Root inspected the dense contact sheet with five page families and a full columns-page image displayed resized from 1400×2200 to 1248×1961. The sampled page showed both columns in expected reading order, readable text, an equation, ruled table, and terminal marker without observed clipping. This is sampled layout review, not all-page visual or OCR acceptance."
+      "root_visual_review": "Root inspected the dense contact sheet with five page families and a full columns-page image displayed resized from 1400\u00d72200 to 1248\u00d71961. The sampled page showed both columns in expected reading order, readable text, an equation, ruled table, and terminal marker without observed clipping. This is sampled layout review, not all-page visual or OCR acceptance."
     },
     "actual_processor_sample": {
       "fixture": "page-0001-prose",
@@ -3175,7 +3175,7 @@
       "execution": "24 stock vision blocks and 10,104 Q32 chunk fences reached the visual-return fence with full K/V retained. A boundary trim completed and the pretext shim was entered. No text-body forward, accepted embedding receipt, finite embedding digest, or vision-complete artifact was produced.",
       "failure": "The first caught boundary error was UR_RESULT_ERROR_UNKNOWN (2147483646); later cleanup returned UR_RESULT_ERROR_DEVICE_LOST (20). The original traceback was cleared, so the exact failing expression and causal kernel are unknown.",
       "resource_and_closure": "No sampled resource-floor breach was observed, but the heartbeat/guard and resource-completion latch did not complete, and zero-memory unload was not established. All five owned processes are absent and ordinary service is cold. This is not a resource-qualified complete-vision pass.",
-      "windows_observation": "The fresh prelaunch archive inventory and earlier delayed inventory were empty through the prior 00:01:09 UTC cutoff. A later host observation at 00:16:24 and delayed check at 00:18:07 found a new Kernel_141 archive created at 00:03:27 UTC. Uptime had increased, the driver remained 32.0.101.8991, and host-available memory was 20,019,367,936 bytes. Access to Report.wer metadata was denied. Bounded Display/System and WER/Application queries succeeded without truncation and returned no records over 23:55:28–00:18:07. The archive creation is observed, but the exact incident time and cause are unknown; these facts do not establish a causal link to the trial or prove absence of a reset.",
+      "windows_observation": "The fresh prelaunch archive inventory and earlier delayed inventory were empty through the prior 00:01:09 UTC cutoff. A later host observation at 00:16:24 and delayed check at 00:18:07 found a new Kernel_141 archive created at 00:03:27 UTC. Uptime had increased, the driver remained 32.0.101.8991, and host-available memory was 20,019,367,936 bytes. Access to Report.wer metadata was denied. Bounded Display/System and WER/Application queries succeeded without truncation and returned no records over 23:55:28\u201300:18:07. The archive creation is observed, but the exact incident time and cause are unknown; these facts do not establish a causal link to the trial or prove absence of a reset.",
       "disposition": "This individual boundary-trim trial failed and did not qualify complete vision. A subsequent no-boundary-trim trial separately passed one complete native-vision stage; neither result identifies the failure cause or proves a fix. Full-page OCR, throughput and deployment remain unqualified."
     },
     "private_receipt_commitments": [
@@ -3379,11 +3379,11 @@
     ]
   },
   "full_visible_ground_truth_contract_v3_source_preparation_2026_10_05": {
-    "status": "V3 ground-truth correction passed independent source review and an offline rescore of retained E5 content. It did not change E5’s original v2 FAIL; later E6 isolated native and scanned acceptances are recorded separately.",
+    "status": "V3 ground-truth correction passed independent source review and an offline rescore of retained E5 content. It did not change E5\u2019s original v2 FAIL; later E6 isolated native and scanned acceptances are recorded separately.",
     "scope": {
       "correction": "The v1/v2 ground-truth taxonomy contradicted the pinned prompt. V3 uses prompt-canonical labels, including `Section-Header` and `Equation-Block`; checker logic, 104 lexical token records, 16 cells, geometry rule and numerical criteria remain unchanged.",
       "relationship_to_e5": "This is a separate source-only contract correction, not an E5 rerun or retrospective promotion. E5 remains formally failed; fresh cases must satisfy the corrected gate and completion checks.",
-      "qualification": "The correction and retained-output rescore pass, but neither supplies fresh runtime qualification or changes E5’s formal failure. Isolated E6 native and scanned page1 cases later passed their separate checks; full CLI, throughput and deployment remain unqualified."
+      "qualification": "The correction and retained-output rescore pass, but neither supplies fresh runtime qualification or changes E5\u2019s formal failure. Isolated E6 native and scanned page1 cases later passed their separate checks; full CLI, throughput and deployment remain unqualified."
     },
     "private_receipt_commitments": [
       {
@@ -3497,7 +3497,7 @@
     "status": "Normal-size FFN B2 AB and BA runs passed complete-output and state-isolation quality review; both independent resource/closure gates and root acceptances passed. This does not qualify resident timing or an engine speedup.",
     "scope": {
       "outputs_and_state": "Both row orders completed four outputs: two normal-page outputs with 556 tokens each, Tiny with 395, and repeated native with 556. In each order, 949 B2 forwards and 161 B1-tail forwards completed; token IDs and reference-associated projections matched exactly, and EOS survivor handling plus repeated-native output passed. The retained strict Tiny/Small numerical records and E6 accepted B1 cases remain separate evidence.",
-      "runtime_and_resource": "Independent AB and BA audits passed their frozen resource floors, completion latch, unload, restoration, process closure and cold-service checks. BA’s delayed Kernel_141 visibility changed from present before the run to empty after restoration; the bounded interval queries and rising uptime do not support a universal no-reset claim.",
+      "runtime_and_resource": "Independent AB and BA audits passed their frozen resource floors, completion latch, unload, restoration, process closure and cold-service checks. BA\u2019s delayed Kernel_141 visibility changed from present before the run to empty after restoration; the bounded interval queries and rising uptime do not support a universal no-reset claim.",
       "disposition": "This is normal-size FFN batching correctness and state-isolation evidence, not a warm three-burst or client-queue improvement. No validated Intel speedup, matched resident timing, sustained plateau, full CLI, normal full-model numerical equivalence or deployment qualification follows. The exact four-page resident-CLI attempt failed safely without an accepted complete output when its three-second SSH witness call timed out and the client rejected the resource witness under its unchanged four-second freshness policy; all owned processes closed and the ordinary endpoint returned cold, but no formal zero-cleanup handoff or completion latch was established. The source-02 witness repair is in progress; no CLI result is accepted."
     },
     "private_receipt_commitments": [
@@ -4509,6 +4509,195 @@
         "bytes": 898091,
         "sha256": "3c70f3f75c952721d282abbba1c07d7e5fa5ea4aea86516ce2e26f4cb1ab6756",
         "note": "Independent all-row reconciliation and complete representative/worst layer recomputation; original numerical HOLD retained."
+      }
+    ]
+  },
+  "norm_reference_carried_screen_actual_2026_10_05": {
+    "status": "Authentic complete alternative reference-method replay independently reproduced; numerical/global FP32/serving/performance adoption withheld.",
+    "scope": {
+      "same_prepared_operands_and_FP64_centers": true,
+      "original_N_budgets_unchanged": true,
+      "original_interval_results_preserved": true,
+      "conditional_inherited_local_Envelope": true,
+      "full_transformer_FP64_truth_claimed": false
+    },
+    "actual": {
+      "completed_layers": 24,
+      "output_observations": 13320,
+      "state_observations": 96,
+      "within_output_observations": 13320,
+      "failed_state_screens": 72,
+      "failed_output_screens": 0,
+      "inconclusive_state_observations": 0,
+      "inconclusive_output_observations": 0,
+      "elapsed_seconds": 368.1062016710057,
+      "one_CPU": true,
+      "Torch_imported": false,
+      "ru_maxrss_kib": 118328,
+      "memory_max_bytes": 268435456,
+      "script_end_memory_peak_bytes": 268435456,
+      "script_end_memory_limit_events": 1000,
+      "script_end_OOM_events": 0,
+      "script_end_OOM_kill_events": 0,
+      "swap_events": 0,
+      "unit_retired": true
+    },
+    "independent_review": {
+      "all_rows_authenticated": true,
+      "invariant_metrics_exactly_equal_to_preserved_interval_method": 107328,
+      "complete_recomputed_layers": [
+        0,
+        5
+      ]
+    },
+    "numerical_accepted": false,
+    "private_receipt_commitments": [
+      {
+        "receipt": "fixed-native-history-accumulated-recurrence-v1/norm-reference-replay-native-0-01/summary.json",
+        "bytes": 25291,
+        "sha256": "ee92d2bafe868733f56a134281d714489880dbaaf46cadd227ea6cefefc6f9da",
+        "note": "Complete separate carried screen; conditional reference assumptions and old results preserved."
+      },
+      {
+        "receipt": "norm-reference-actual-independent-review-01/assessment.json",
+        "bytes": 7446,
+        "sha256": "0bc4ff00a05598eaa3b1ba9073ba8c13cb003313ad3f97a9e7329dc1b97e6d40",
+        "note": "Independent authentication, all-row reconciliation and two complete layer reproductions."
+      },
+      {
+        "receipt": "norm-reference-actual-root-materials-01/norm-reference-terminal-01.json",
+        "bytes": 607,
+        "sha256": "ddb24b849b99f4634d6f9deaf5757246c51af1b9fe98da3538042c5ed31f6fd7",
+        "note": "Genuine completed CPU unit, with unavailable final cgroup counters declared."
+      },
+      {
+        "receipt": "norm-reference-actual-root-materials-01/norm-reference-retirement-01.json",
+        "bytes": 321,
+        "sha256": "6e76a08d88df11578717f1f9c17c852f03212a2eb54a26a24fd4f271616d8f31",
+        "note": "Original PID and cgroup gone; unit retired."
+      }
+    ]
+  },
+  "full_model_fused_r08_ordinary_native_output_timing_2026_10_05": {
+    "status": "Complete native ordinary page collected and independently reviewed; visible semantics PASS, frozen geometry predicate FAIL, whole-point resource acceptance withheld. No performance gain/deployment.",
+    "actual": {
+      "case": "native-0",
+      "prompt_tokens": 3959,
+      "completion_tokens_including_EOS": 557,
+      "requested_output_allowance": 12384,
+      "context_tokens": 16384,
+      "dtype": "BF16",
+      "generation_seconds": 196.1566235999926,
+      "first_text_seconds": 31.94907269999385,
+      "compiled_kernel": "01830900424a5084fd504202373f864134441ec16da521ad87278f4256bff9aa",
+      "compiled_and_provider_calls": 13344,
+      "cached_forwards": 556,
+      "linear_layers": 24,
+      "tensor_and_logit_diagnostic_copies_enabled": false,
+      "provider_and_caller_checks_retained": true,
+      "true_EOS": 248046,
+      "full_visible_content_passed": true,
+      "remaining_markup_bytes_exactly_match_stock": true,
+      "maximum_normalized_bbox_displacement": 9,
+      "prospective_bbox_bound": 1,
+      "geometry_policy_passed": false,
+      "root_memory_max_bytes": 268435456,
+      "root_reported_memory_peak_bytes": 268451840,
+      "final_cgroup_events_available": false,
+      "minimum_observed_combined_LOCAL_headroom_bytes": 3640918016,
+      "minimum_observed_host_available_bytes": 15680208896,
+      "owned_process_checks_closed": 5,
+      "zero_unload": true,
+      "ordinary_endpoint_restored_cold": true,
+      "root_unit_retired": true
+    },
+    "comparison": "The earlier approximately 169-second stock single-page observation is historical and unmatched. This 196.157-second observation is slower and is not a repeated sustained comparison at the concurrency plateau.",
+    "whole_point_resource_accepted": false,
+    "performance_accepted": false,
+    "deployment_accepted": false,
+    "private_receipt_commitments": [
+      {
+        "receipt": "r08-ordinary-native-independent-review-01/assessment.json",
+        "bytes": 18258,
+        "sha256": "477e17e89891cc5f2ebfac02e8598a5ddbe62135107ffa77ba24eef493bc0b9f",
+        "note": "Independent actual complete OCR, true EOS, hashes/provider, resource and closure assessment."
+      },
+      {
+        "receipt": "stock-fused-gdn-full-model-b1-v1/execution-revision-08/runs/stock-fused-gdn-full-model-b1-v1-candidate-ocr-native-0-AB-001-run/collection.json",
+        "bytes": 4971,
+        "sha256": "acd81f14f24bcc28b4cf3d77d7aabc36570da4615ca5a0959aa7b92004a716a6",
+        "note": "All genuine collected artifact and native process commitments."
+      },
+      {
+        "receipt": "r08-ordinary-root-materials-01/ordinary-native-terminal-01.json",
+        "bytes": 686,
+        "sha256": "0bbf44f868b41e19d7a463758d2d9e4d032d3af406d268b3ba1254c20a208bfb",
+        "note": "Actual terminal peak and unavailable final counter caveat."
+      },
+      {
+        "receipt": "r08-ordinary-root-materials-01/ordinary-native-retirement-01.json",
+        "bytes": 249,
+        "sha256": "3c5a9fb958d0bcdf51067fb133d9776c9a87bb9afffabadd0cdc2fcfde2f69a0",
+        "note": "Original root producer retired."
+      }
+    ]
+  },
+  "stock_prepared_companion_selected_layers_actual_2026_10_05": {
+    "status": "Selected diagnostic layers 0 and 5 genuinely captured on Arc XPU after all 72 exact stock checks in each Job; comparative numerical review pending.",
+    "selected_layers": [
+      0,
+      5
+    ],
+    "cached_forwards_per_layer": 555,
+    "canonical_initial_states_and_prepared_history_match_candidate": true,
+    "same_stock_suffix_after_query_scaling": true,
+    "all_stock_reference_cases_exact_per_job": 72,
+    "model_loaded": false,
+    "numerical_accepted": false,
+    "throughput_accepted": false,
+    "owned_jobs_closed": true,
+    "root_units_retired": true,
+    "private_receipt_commitments": [
+      {
+        "receipt": "stock-prepared-recurrence-root-v1/runs/stock-prepared-recurrence-root-v1-layer-00-001/root-result.json",
+        "bytes": 3087,
+        "sha256": "bc095416adf9e448799cf37427fccdc9b1da2f23c9b7b57765485db7cefdefc2",
+        "note": "Genuine closed selected-layer capture, not numerical policy acceptance."
+      },
+      {
+        "receipt": "stock-prepared-recurrence-root-v1/runs/stock-prepared-recurrence-root-v1-layer-05-001/root-result.json",
+        "bytes": 3087,
+        "sha256": "73185195f908390338c9ac54296f62c63198b6b92c5c26ce2ad2594e073c4da9",
+        "note": "Genuine closed selected-layer capture, not numerical policy acceptance."
+      }
+    ]
+  },
+  "prospective_stock_C1_sustained_point_2026_10_05": {
+    "status": "Fresh original fixed-worker C1 point running at this observation cutoff; no accepted sustained result yet.",
+    "observed_utc": "2026-10-05T19:04:27.087373+00:00",
+    "planned_prime_pages": 2,
+    "planned_warmup_pages": 2,
+    "planned_measured_pages": 16,
+    "capacity": 1,
+    "outer_seconds": 6000,
+    "child_seconds": 5700,
+    "root_controller_seconds": 6300,
+    "original_clock_renewal": false,
+    "source_review_passed": true,
+    "actual_performance_accepted": false,
+    "failed_previous_C1_results_preserved": true,
+    "private_receipt_commitments": [
+      {
+        "receipt": "fixed-worker-throughput-c1-prospective-root-materials-01/root-launch-intent-01.json",
+        "bytes": 4271,
+        "sha256": "a6d13a4070e407fb35d188962b84435263c4588258cc9c37cd29d71a33e4f0ba",
+        "note": "Fresh root exact source/admission/run intent."
+      },
+      {
+        "receipt": "fixed-worker-throughput-c1-prospective-preparation-v2/independent-source-review.json",
+        "bytes": 13846,
+        "sha256": "4bddb315c9ac303ae8a2ed75feb5e2c93cd45a4995b723b4f06d3782f0735983",
+        "note": "Consumer-compatible source-only independent PASS; actual outcome remains pending."
       }
     ]
   }
