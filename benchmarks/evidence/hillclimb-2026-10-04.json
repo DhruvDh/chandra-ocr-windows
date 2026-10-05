@@ -3168,5 +3168,77 @@
         "note": "Frozen first-attention candidate source."
       }
     ]
+  },
+  "native_complete_vision_query32_failure_2026_10_04": {
+    "status": "Independent audit FAIL for complete-vision execution; resource and unload completion were not established. Prior bounded first-attention PASS remains separate.",
+    "scope": {
+      "execution": "24 stock vision blocks and 10,104 Q32 chunk fences reached the visual-return fence with full K/V retained. A boundary trim completed and the pretext shim was entered. No text-body forward, accepted embedding receipt, finite embedding digest, or vision-complete artifact was produced.",
+      "failure": "The first caught boundary error was UR_RESULT_ERROR_UNKNOWN (2147483646); later cleanup returned UR_RESULT_ERROR_DEVICE_LOST (20). The original traceback was cleared, so the exact failing expression and causal kernel are unknown.",
+      "resource_and_closure": "No sampled resource-floor breach was observed, but the heartbeat/guard and resource-completion latch did not complete, and zero-memory unload was not established. All five owned processes are absent and ordinary service is cold. This is not a resource-qualified complete-vision pass.",
+      "windows_observation": "The fresh prelaunch archive inventory was already empty. The delayed inventory remained empty and bounded Display/WER queries returned no events. An older archive disappearance before launch remains unexplained; these observations do not prove that no reset occurred.",
+      "disposition": "No complete-vision, OCR, timing, speedup, or deployment qualification. Hardware trials remain on hold pending review of the minimal candidate; the installed engine and driver are unchanged."
+    },
+    "private_receipt_commitments": [
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/vision-native-complete-query32-v1/runs/ocrd-vision-native-complete-query32-v1-AB-001-run/independent-failure-audit.json",
+        "bytes": 19894,
+        "sha256": "ee02457d979de11c73dbb0cc4011ac3ca353b6e1291f12fd88939626a22ed877",
+        "note": "Frozen independent full-vision failure and resource audit."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/vision-native-complete-query32-v1/runs/ocrd-vision-native-complete-query32-v1-AB-001-run/independent-failure-check.json",
+        "bytes": 2530,
+        "sha256": "96c154ddf39dfb6f57f33a26d10c4dcefe3dfc9c344ccfc255a57aa93f77fa35",
+        "note": "Bound audit check; confirms scope and incomplete resource/unload qualification."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/vision-native-complete-query32-v1/runs/ocrd-vision-native-complete-query32-v1-AB-001-run/AB-001-export.json",
+        "bytes": 16102,
+        "sha256": "0e93c16e1dada8489f83fa68727d0177e76f18e54b4f8a76d9663affaba2413e",
+        "note": "Producer export receipt for the full-vision attempt."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/vision-native-complete-query32-v1/runs/ocrd-vision-native-complete-query32-v1-AB-001-run/collection.json",
+        "bytes": 4247,
+        "sha256": "45f7b086fff80f1838410e665aee3d00ff97a91a8c4f0a5ff75ab10d9c25cbda",
+        "note": "Collected artifacts and owned-process closure evidence."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/vision-native-complete-query32-v1/runs/ocrd-vision-native-complete-query32-v1-AB-001-run/controller-terminal.json",
+        "bytes": 443,
+        "sha256": "47ef34cf207d7f7d55fb55e1cf67fc96d0b952cf3376d6f1fde548ce385465bc",
+        "note": "Controller exited 1; no restart or retry."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/vision-native-complete-query32-v1/runs/ocrd-vision-native-complete-query32-v1-AB-001-run/service-restoration.json",
+        "bytes": 922,
+        "sha256": "800dcc848b7cb604c362bcea7990de0bafd47fcadbc6fe4188e407478df27cd7",
+        "note": "Five owned processes closed; ordinary service restored cold."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/vision-native-complete-query32-v1/root-kernel141-before.json",
+        "bytes": 121,
+        "sha256": "f6109f36979b4909acb10d991497c790cc5b105d5238042f6d9ab9de43d84832",
+        "note": "Fresh prelaunch archive inventory was empty."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/vision-native-complete-query32-v1/runs/ocrd-vision-native-complete-query32-v1-AB-001-run/root-kernel141-after.json",
+        "bytes": 121,
+        "sha256": "9c379a5330ae78b4ae28f0a01aa4347c03161da9c8b43df2b0a3c5a6bb926e4f",
+        "note": "Delayed archive inventory remained empty after the run."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/vision-native-complete-query32-v1/root-windows-events-before.json",
+        "bytes": 490,
+        "sha256": "5beed79dc8a85c7c4c72690da05acbc0cfdfb14a56efccafe92ea0412aa09d3c",
+        "note": "Bounded prelaunch Display and WER event queries."
+      },
+      {
+        "receipt": "optimization/ocrd-context-compatible-v1/vision-native-complete-query32-v1/runs/ocrd-vision-native-complete-query32-v1-AB-001-run/root-windows-events-after.json",
+        "bytes": 490,
+        "sha256": "aae3dc1b7c1702f00e9bd60807764fc64bc7493526f73c8afc993aeeb8f68713",
+        "note": "Bounded post-run Display and WER event queries; zero matching events."
+      }
+    ]
   }
 }
