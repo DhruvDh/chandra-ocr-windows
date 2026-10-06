@@ -1,6 +1,6 @@
 # DirectCompute CPU-side timing
 
-Ordered B1 projection measured about 6.5x faster in correctness-checked public A770 calibration, yet complete tiny-model decode improved only 1.91x (533.5653 s to 279.3955 s) with all 395 scalar logit/margin/token journal rows unchanged. This instrumentation measures where the `chandra::dc::Device` owner thread spends wall time in command recording, buffer creation, drains, readiness polling and sleeps, so later Windows runs can replace guesses about the remaining decode cost with observations. The production implementation compiled on Windows, and its [repaired portable test passed strict MSVC compilation and four inherited environment states](../benchmarks/evidence/directcompute-cpu-timing-msvc-2026-10-06.json), alongside independent GCC/Clang review. A separate original-tiny 14-token A770 host-timing observation has closed safely and awaits independent attribution review; it supplies no throughput or observer-overhead qualification.
+Ordered B1 projection measured about 6.5x faster in correctness-checked public A770 calibration, yet complete tiny-model decode improved only 1.91x (533.5653 s to 279.3955 s) with all 395 scalar logit/margin/token journal rows unchanged. This instrumentation measures where the `chandra::dc::Device` owner thread spends wall time in command recording, buffer creation, drains, readiness polling and sleeps, so later Windows runs can replace guesses about the remaining decode cost with observations. The production implementation compiled on Windows, and its [repaired portable test passed strict MSVC compilation and four inherited environment states](../benchmarks/evidence/directcompute-cpu-timing-msvc-2026-10-06.json), alongside independent GCC/Clang review. The [closed original-tiny 14-token A770 observation](../benchmarks/evidence/directcompute-host-timing-2026-10-06.json) passes 1,712 independent accounting and lifecycle checks with all scalar rows unchanged. Its bounded phase differences retain nested drains and the post-prefill drain boundary; it supplies no GPU execution, throughput or observer-overhead qualification.
 
 ## Boundary
 
@@ -127,7 +127,7 @@ It should print three lines with `"checks_passed":10` and `"environment_route":"
 
 ## Remaining Windows verification
 
-Build11 compiled the production Device and helper, and the standalone repaired test passes strict MSVC `/W4 /WX` with no new warnings. The real A770 host-timing observation has closed and awaits independent attribution review. Complete the remaining activation and observer-overhead checks before treating these measurements as a comparison:
+Build11 compiled the production Device and helper, and the standalone repaired test passes strict MSVC `/W4 /WX` with no new warnings. The real A770 host-timing observation passes independent attribution review within its explicitly capped host-wall scope. Complete the remaining activation and observer-overhead checks before treating these measurements as a comparison:
 
 1. With the variable unset, confirm unchanged generated tokens, logits journal and readback bytes against a prior run, and the disabled marker in every observation.
 2. With `yes`, confirm rejection before any device identity or model upload is recorded. An empty value cannot be set from `cmd` (see Activation).

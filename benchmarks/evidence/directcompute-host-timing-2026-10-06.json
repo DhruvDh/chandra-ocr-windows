@@ -1,0 +1,556 @@
+{
+  "schema": "chandra.directcompute.closed-host-timing.v1",
+  "reviewed_utc": "2026-10-06T01:58:41.769372+00:00",
+  "scope": "One original tiny 14-token native host-wall observation, CPU timing enabled, tensor diagnostics disabled, ordered8. No complete page or observer-overhead comparison.",
+  "input_manifest_sha256": "6e5df5e8b33a7fbee2414fafab5b2212fb5a4a80b40b34b390ae829326116a36",
+  "model_revision": "af93b47dba1b47b6640c86ccf487ed2260ab9a09",
+  "prompt_tokens": 801,
+  "normal_output_allowance": 12384,
+  "diagnostic_token_cap": 14,
+  "context_limit": 16384,
+  "native_executable": {
+    "bytes": 1050112,
+    "sha256": "bbfdf28c4caa2a7d11fa08509dd9b1b756aba1edf1eb90b790065b80fd87521e"
+  },
+  "native_result": {
+    "bytes": 362209,
+    "sha256": "203305742ae5c7e429845cee22b3594dad5abcd634c98c51e75188dca90e7aba"
+  },
+  "scalar_journal": {
+    "bytes": 3755,
+    "sha256": "2c1b364ecc1e0a3bc95eef94d2ba46e7656aa265756ac2a76ce4fdda8e3c0eb1"
+  },
+  "independent_audit": {
+    "bytes": 309933,
+    "sha256": "dd2b63c303c8a3211035d3a063f85fa4922cd143debcb791f027f0568b65b331"
+  },
+  "independent_checks_passed": 1712,
+  "generated_token_ids": [
+    2539,
+    795,
+    1402,
+    1944,
+    420,
+    20,
+    18,
+    220,
+    20,
+    22,
+    220,
+    19,
+    17,
+    16
+  ],
+  "all14_scalar_rows_equal_closed_trained03ordered": true,
+  "native_duration_seconds": 92.7210732,
+  "wrapper_duration_seconds": 93.03100000001723,
+  "phase_differences": [
+    {
+      "phase": "device_creation",
+      "phase_wall_seconds": 0.0757986,
+      "recorder_elapsed_difference_nanoseconds": 75815200,
+      "accounted_difference_nanoseconds": 0,
+      "unattributed_difference_nanoseconds": 75815200,
+      "top_level_differences_nanoseconds": {
+        "dispatch": 0,
+        "buffer_create": 0,
+        "upload": 0,
+        "zero": 0,
+        "drain.outside_readback": 0,
+        "readback": 0
+      },
+      "nested_drain_differences_nanoseconds": {
+        "drain.readback_before_copy": 0,
+        "drain.readback_after_copy": 0
+      },
+      "dispatch_calls": 0,
+      "dispatch_record_nanoseconds": 0,
+      "dispatch_compile_nanoseconds": 0,
+      "readback_calls": 0,
+      "drain_sleep_differences": {
+        "outside_readback": {
+          "count": 0,
+          "nanoseconds": 0,
+          "requested_nanoseconds": 0,
+          "mean_actual_milliseconds": null,
+          "current_cumulative_maximum_nanoseconds": 0
+        },
+        "readback_after_copy": {
+          "count": 0,
+          "nanoseconds": 0,
+          "requested_nanoseconds": 0,
+          "mean_actual_milliseconds": null,
+          "current_cumulative_maximum_nanoseconds": 0
+        },
+        "readback_before_copy": {
+          "count": 0,
+          "nanoseconds": 0,
+          "requested_nanoseconds": 0,
+          "mean_actual_milliseconds": null,
+          "current_cumulative_maximum_nanoseconds": 0
+        }
+      },
+      "clock_reads": 2
+    },
+    {
+      "phase": "authenticated_model_import_upload",
+      "phase_wall_seconds": 26.3259812,
+      "recorder_elapsed_difference_nanoseconds": 26325966200,
+      "accounted_difference_nanoseconds": 13390060000,
+      "unattributed_difference_nanoseconds": 12935906200,
+      "top_level_differences_nanoseconds": {
+        "dispatch": 0,
+        "buffer_create": 91601600,
+        "upload": 3460158600,
+        "zero": 0,
+        "drain.outside_readback": 9838299800,
+        "readback": 0
+      },
+      "nested_drain_differences_nanoseconds": {
+        "drain.readback_before_copy": 0,
+        "drain.readback_after_copy": 0
+      },
+      "dispatch_calls": 0,
+      "dispatch_record_nanoseconds": 0,
+      "dispatch_compile_nanoseconds": 0,
+      "readback_calls": 0,
+      "drain_sleep_differences": {
+        "outside_readback": {
+          "count": 766,
+          "nanoseconds": 9611346900,
+          "requested_nanoseconds": 766000000,
+          "mean_actual_milliseconds": 12.547450261096605,
+          "current_cumulative_maximum_nanoseconds": 45466500
+        },
+        "readback_after_copy": {
+          "count": 0,
+          "nanoseconds": 0,
+          "requested_nanoseconds": 0,
+          "mean_actual_milliseconds": null,
+          "current_cumulative_maximum_nanoseconds": 0
+        },
+        "readback_before_copy": {
+          "count": 0,
+          "nanoseconds": 0,
+          "requested_nanoseconds": 0,
+          "mean_actual_milliseconds": null,
+          "current_cumulative_maximum_nanoseconds": 0
+        }
+      },
+      "clock_reads": 11089
+    },
+    {
+      "phase": "complete_vision_forward",
+      "phase_wall_seconds": 15.2108392,
+      "recorder_elapsed_difference_nanoseconds": 15210863400,
+      "accounted_difference_nanoseconds": 15194222200,
+      "unattributed_difference_nanoseconds": 16641200,
+      "top_level_differences_nanoseconds": {
+        "dispatch": 186848800,
+        "buffer_create": 145676700,
+        "upload": 0,
+        "zero": 0,
+        "drain.outside_readback": 14861696700,
+        "readback": 0
+      },
+      "nested_drain_differences_nanoseconds": {
+        "drain.readback_before_copy": 0,
+        "drain.readback_after_copy": 0
+      },
+      "dispatch_calls": 8631,
+      "dispatch_record_nanoseconds": 18697900,
+      "dispatch_compile_nanoseconds": 154281000,
+      "readback_calls": 0,
+      "drain_sleep_differences": {
+        "outside_readback": {
+          "count": 957,
+          "nanoseconds": 14523107600,
+          "requested_nanoseconds": 957000000,
+          "mean_actual_milliseconds": 15.175661024033438,
+          "current_cumulative_maximum_nanoseconds": 45466500
+        },
+        "readback_after_copy": {
+          "count": 0,
+          "nanoseconds": 0,
+          "requested_nanoseconds": 0,
+          "mean_actual_milliseconds": null,
+          "current_cumulative_maximum_nanoseconds": 0
+        },
+        "readback_before_copy": {
+          "count": 0,
+          "nanoseconds": 0,
+          "requested_nanoseconds": 0,
+          "mean_actual_milliseconds": null,
+          "current_cumulative_maximum_nanoseconds": 0
+        }
+      },
+      "clock_reads": 75781
+    },
+    {
+      "phase": "text_embedding",
+      "phase_wall_seconds": 0.0053216,
+      "recorder_elapsed_difference_nanoseconds": 5299100,
+      "accounted_difference_nanoseconds": 4556200,
+      "unattributed_difference_nanoseconds": 742900,
+      "top_level_differences_nanoseconds": {
+        "dispatch": 4377200,
+        "buffer_create": 179000,
+        "upload": 0,
+        "zero": 0,
+        "drain.outside_readback": 0,
+        "readback": 0
+      },
+      "nested_drain_differences_nanoseconds": {
+        "drain.readback_before_copy": 0,
+        "drain.readback_after_copy": 0
+      },
+      "dispatch_calls": 10,
+      "dispatch_record_nanoseconds": 29700,
+      "dispatch_compile_nanoseconds": 4331500,
+      "readback_calls": 0,
+      "drain_sleep_differences": {
+        "outside_readback": {
+          "count": 0,
+          "nanoseconds": 0,
+          "requested_nanoseconds": 0,
+          "mean_actual_milliseconds": null,
+          "current_cumulative_maximum_nanoseconds": 45466500
+        },
+        "readback_after_copy": {
+          "count": 0,
+          "nanoseconds": 0,
+          "requested_nanoseconds": 0,
+          "mean_actual_milliseconds": null,
+          "current_cumulative_maximum_nanoseconds": 0
+        },
+        "readback_before_copy": {
+          "count": 0,
+          "nanoseconds": 0,
+          "requested_nanoseconds": 0,
+          "mean_actual_milliseconds": null,
+          "current_cumulative_maximum_nanoseconds": 0
+        }
+      },
+      "clock_reads": 79
+    },
+    {
+      "phase": "ordered_multimodal_merge",
+      "phase_wall_seconds": 0.0263448,
+      "recorder_elapsed_difference_nanoseconds": 26352900,
+      "accounted_difference_nanoseconds": 25807200,
+      "unattributed_difference_nanoseconds": 545700,
+      "top_level_differences_nanoseconds": {
+        "dispatch": 3327200,
+        "buffer_create": 171900,
+        "upload": 0,
+        "zero": 0,
+        "drain.outside_readback": 22308100,
+        "readback": 0
+      },
+      "nested_drain_differences_nanoseconds": {
+        "drain.readback_before_copy": 0,
+        "drain.readback_after_copy": 0
+      },
+      "dispatch_calls": 1,
+      "dispatch_record_nanoseconds": 8800,
+      "dispatch_compile_nanoseconds": 3315600,
+      "readback_calls": 0,
+      "drain_sleep_differences": {
+        "outside_readback": {
+          "count": 2,
+          "nanoseconds": 21897200,
+          "requested_nanoseconds": 2000000,
+          "mean_actual_milliseconds": 10.9486,
+          "current_cumulative_maximum_nanoseconds": 45466500
+        },
+        "readback_after_copy": {
+          "count": 0,
+          "nanoseconds": 0,
+          "requested_nanoseconds": 0,
+          "mean_actual_milliseconds": null,
+          "current_cumulative_maximum_nanoseconds": 0
+        },
+        "readback_before_copy": {
+          "count": 0,
+          "nanoseconds": 0,
+          "requested_nanoseconds": 0,
+          "mean_actual_milliseconds": null,
+          "current_cumulative_maximum_nanoseconds": 0
+        }
+      },
+      "clock_reads": 28
+    },
+    {
+      "phase": "text_request_cache_creation",
+      "phase_wall_seconds": 0.028198,
+      "recorder_elapsed_difference_nanoseconds": 28189200,
+      "accounted_difference_nanoseconds": 27438700,
+      "unattributed_difference_nanoseconds": 750500,
+      "top_level_differences_nanoseconds": {
+        "dispatch": 0,
+        "buffer_create": 25213400,
+        "upload": 0,
+        "zero": 88900,
+        "drain.outside_readback": 2136400,
+        "readback": 0
+      },
+      "nested_drain_differences_nanoseconds": {
+        "drain.readback_before_copy": 0,
+        "drain.readback_after_copy": 0
+      },
+      "dispatch_calls": 0,
+      "dispatch_record_nanoseconds": 0,
+      "dispatch_compile_nanoseconds": 0,
+      "readback_calls": 0,
+      "drain_sleep_differences": {
+        "outside_readback": {
+          "count": 0,
+          "nanoseconds": 0,
+          "requested_nanoseconds": 0,
+          "mean_actual_milliseconds": null,
+          "current_cumulative_maximum_nanoseconds": 45466500
+        },
+        "readback_after_copy": {
+          "count": 0,
+          "nanoseconds": 0,
+          "requested_nanoseconds": 0,
+          "mean_actual_milliseconds": null,
+          "current_cumulative_maximum_nanoseconds": 0
+        },
+        "readback_before_copy": {
+          "count": 0,
+          "nanoseconds": 0,
+          "requested_nanoseconds": 0,
+          "mean_actual_milliseconds": null,
+          "current_cumulative_maximum_nanoseconds": 0
+        }
+      },
+      "clock_reads": 391
+    },
+    {
+      "phase": "text_prefill",
+      "phase_wall_seconds": 38.4730739,
+      "recorder_elapsed_difference_nanoseconds": 38473079200,
+      "accounted_difference_nanoseconds": 38442559800,
+      "unattributed_difference_nanoseconds": 30519400,
+      "top_level_differences_nanoseconds": {
+        "dispatch": 1374759700,
+        "buffer_create": 598349600,
+        "upload": 0,
+        "zero": 0,
+        "drain.outside_readback": 36469450500,
+        "readback": 0
+      },
+      "nested_drain_differences_nanoseconds": {
+        "drain.readback_before_copy": 0,
+        "drain.readback_after_copy": 0
+      },
+      "dispatch_calls": 36454,
+      "dispatch_record_nanoseconds": 104114000,
+      "dispatch_compile_nanoseconds": 1213863700,
+      "readback_calls": 0,
+      "drain_sleep_differences": {
+        "outside_readback": {
+          "count": 2032,
+          "nanoseconds": 35968898500,
+          "requested_nanoseconds": 2032000000,
+          "mean_actual_milliseconds": 17.701229576771656,
+          "current_cumulative_maximum_nanoseconds": 2570433800
+        },
+        "readback_after_copy": {
+          "count": 0,
+          "nanoseconds": 0,
+          "requested_nanoseconds": 0,
+          "mean_actual_milliseconds": null,
+          "current_cumulative_maximum_nanoseconds": 0
+        },
+        "readback_before_copy": {
+          "count": 0,
+          "nanoseconds": 0,
+          "requested_nanoseconds": 0,
+          "mean_actual_milliseconds": null,
+          "current_cumulative_maximum_nanoseconds": 0
+        }
+      },
+      "clock_reads": 302703
+    },
+    {
+      "phase": "greedy_cached_decode_and_token_readback",
+      "phase_wall_seconds": 12.4623799,
+      "recorder_elapsed_difference_nanoseconds": 12462374200,
+      "accounted_difference_nanoseconds": 12406064400,
+      "unattributed_difference_nanoseconds": 56309800,
+      "top_level_differences_nanoseconds": {
+        "dispatch": 81482300,
+        "buffer_create": 177902300,
+        "upload": 0,
+        "zero": 0,
+        "drain.outside_readback": 11733861800,
+        "readback": 412818000
+      },
+      "nested_drain_differences_nanoseconds": {
+        "drain.readback_before_copy": 206652400,
+        "drain.readback_after_copy": 201869000
+      },
+      "dispatch_calls": 24492,
+      "dispatch_record_nanoseconds": 49474700,
+      "dispatch_compile_nanoseconds": 0,
+      "readback_calls": 14,
+      "drain_sleep_differences": {
+        "outside_readback": {
+          "count": 473,
+          "nanoseconds": 11510382200,
+          "requested_nanoseconds": 473000000,
+          "mean_actual_milliseconds": 24.334846088794926,
+          "current_cumulative_maximum_nanoseconds": 2644655200
+        },
+        "readback_after_copy": {
+          "count": 14,
+          "nanoseconds": 198052000,
+          "requested_nanoseconds": 14000000,
+          "mean_actual_milliseconds": 14.146571428571429,
+          "current_cumulative_maximum_nanoseconds": 15677700
+        },
+        "readback_before_copy": {
+          "count": 13,
+          "nanoseconds": 201833700,
+          "requested_nanoseconds": 13000000,
+          "mean_actual_milliseconds": 15.52566923076923,
+          "current_cumulative_maximum_nanoseconds": 17684300
+        }
+      },
+      "clock_reads": 214869
+    },
+    {
+      "phase": "request_retirement_and_drain",
+      "phase_wall_seconds": 0.0108894,
+      "recorder_elapsed_difference_nanoseconds": 10890800,
+      "accounted_difference_nanoseconds": 10015100,
+      "unattributed_difference_nanoseconds": 875700,
+      "top_level_differences_nanoseconds": {
+        "dispatch": 0,
+        "buffer_create": 0,
+        "upload": 0,
+        "zero": 0,
+        "drain.outside_readback": 10015100,
+        "readback": 0
+      },
+      "nested_drain_differences_nanoseconds": {
+        "drain.readback_before_copy": 0,
+        "drain.readback_after_copy": 0
+      },
+      "dispatch_calls": 0,
+      "dispatch_record_nanoseconds": 0,
+      "dispatch_compile_nanoseconds": 0,
+      "readback_calls": 0,
+      "drain_sleep_differences": {
+        "outside_readback": {
+          "count": 0,
+          "nanoseconds": 0,
+          "requested_nanoseconds": 0,
+          "mean_actual_milliseconds": null,
+          "current_cumulative_maximum_nanoseconds": 2644655200
+        },
+        "readback_after_copy": {
+          "count": 0,
+          "nanoseconds": 0,
+          "requested_nanoseconds": 0,
+          "mean_actual_milliseconds": null,
+          "current_cumulative_maximum_nanoseconds": 15677700
+        },
+        "readback_before_copy": {
+          "count": 0,
+          "nanoseconds": 0,
+          "requested_nanoseconds": 0,
+          "mean_actual_milliseconds": null,
+          "current_cumulative_maximum_nanoseconds": 17684300
+        }
+      },
+      "clock_reads": 7
+    },
+    {
+      "phase": "model_buffer_release_and_drain",
+      "phase_wall_seconds": 0.100367,
+      "recorder_elapsed_difference_nanoseconds": 100375600,
+      "accounted_difference_nanoseconds": 97376900,
+      "unattributed_difference_nanoseconds": 2998700,
+      "top_level_differences_nanoseconds": {
+        "dispatch": 0,
+        "buffer_create": 0,
+        "upload": 0,
+        "zero": 0,
+        "drain.outside_readback": 97376900,
+        "readback": 0
+      },
+      "nested_drain_differences_nanoseconds": {
+        "drain.readback_before_copy": 0,
+        "drain.readback_after_copy": 0
+      },
+      "dispatch_calls": 0,
+      "dispatch_record_nanoseconds": 0,
+      "dispatch_compile_nanoseconds": 0,
+      "readback_calls": 0,
+      "drain_sleep_differences": {
+        "outside_readback": {
+          "count": 0,
+          "nanoseconds": 0,
+          "requested_nanoseconds": 0,
+          "mean_actual_milliseconds": null,
+          "current_cumulative_maximum_nanoseconds": 2644655200
+        },
+        "readback_after_copy": {
+          "count": 0,
+          "nanoseconds": 0,
+          "requested_nanoseconds": 0,
+          "mean_actual_milliseconds": null,
+          "current_cumulative_maximum_nanoseconds": 15677700
+        },
+        "readback_before_copy": {
+          "count": 0,
+          "nanoseconds": 0,
+          "requested_nanoseconds": 0,
+          "mean_actual_milliseconds": null,
+          "current_cumulative_maximum_nanoseconds": 17684300
+        }
+      },
+      "clock_reads": 7
+    }
+  ],
+  "final_clock_reads": 604956,
+  "clock_frequency_hz": 10000000,
+  "process_job": {
+    "peak_process_commit_bytes": 10586595328,
+    "peak_job_commit_bytes": 10595250176,
+    "process_commit_limit_bytes": 12884901888,
+    "job_commit_limit_bytes": 13153337344,
+    "affinity_mask": 1,
+    "priority_class": 16384,
+    "total_job_processes": 3,
+    "active_job_processes_after_wait": 0,
+    "returncode": 0,
+    "kill_on_job_close": true
+  },
+  "minimum_sampled_available_host_RAM_bytes": 19598413824,
+  "sampled_guard_stop_reason": null,
+  "owned_buffer_zero": true,
+  "worker_restored_cold": true,
+  "automatic_replay": false,
+  "measurement_kind": "Host wall intervals, including waits and descheduling; not CPU utilization or GPU execution time.",
+  "independent_limits": [
+    "This is one original tiny-input 14-token diagnostic prefix; no producer EOS, whole page, exact-client, saturation or throughput qualification.",
+    "The cached-decode host phase window includes the explicit drain after the text_prefill stamp, embeddings release, 13 cached advances, 14 logits readbacks, host argmax/journal work and prior observation serialization. No per-drain trace separates those costs; queued GPU work can finish in a later host phase window.",
+    "No matched enabled/disabled observer-cost pair or measured steady_clock read cost exists in this point; 10MHz is clock frequency, not call overhead.",
+    "Host sleep/fence wall intervals include time GPU work can progress and time the owner thread can be descheduled. Their totals do not identify GPU execution time, CPU utilization or wholly removable overhead.",
+    "Sleep maxima are cumulative and are not subtracted to make phase-local maxima. Means derive from phase-local total/count; per-sleep trace and distribution are unavailable.",
+    "Host RAM floor/process-budget headroom observations are sampled; process-local WDDM budget is not global free VRAM.",
+    "Standalone MSVC compile/test receipt had three active compiler descendants before Job handle close. Kill-on-close is recorded and source closes the handle, but post-close descendant count was not observed.",
+    "The source input manifest explicitly retains unqualified AMD internals/position specialization provenance; this audit authenticates packaged bytes and does not re-decode pixels or assert exact-client equivalence."
+  ],
+  "observer_overhead_qualified": false,
+  "GPU_execution_timing_qualified": false,
+  "complete_OCR_qualified": false,
+  "exact_client_qualified": false,
+  "sustained_throughput_qualified": false,
+  "speedup_claim": false,
+  "deployment": false
+}
