@@ -153,6 +153,57 @@ void bf16Rounding() {
     }
 }
 
+// Control-model BF16 words at the edges, against hand-derived bit patterns and against the shader's integer
+// carry rounding (tsr_fake::bf) of FP32 inputs, with D3D11 flushing FP32 subnormals to a signed zero.
+void bf16ModelEdges() {
+    const struct { double v; uint32_t want; } fixed[] = {
+        {0x1p127, 0x7f000000u}, {-0x1p127, 0xff000000u},                          // Finite 2^127.
+        {0x1p127 + 0x1p119, 0x7f000000u}, {-0x1p127 - 0x1p119, 0xff000000u},      // Tie to even (down).
+        {0x1p127 + 3 * 0x1p119, 0x7f020000u}, {-0x1p127 - 3 * 0x1p119, 0xff020000u}, // Tie to even (up).
+        {0x1p127 + 0x1p119 + 0x1p75, 0x7f010000u},                               // One binary64 ulp above a tie.
+        {0x1p128 - 0x1p120, 0x7f7f0000u}, {-0x1p128 + 0x1p120, 0xff7f0000u},      // Largest finite BF16.
+        {0x1p128 - 0x1p119 - 0x1p75, 0x7f7f0000u}, {-0x1p128 + 0x1p119 + 0x1p75, 0xff7f0000u},
+        {0x1p128 - 0x1p119, 0x7f800000u}, {-0x1p128 + 0x1p119, 0xff800000u},      // Overflow tie goes to even: infinity.
+        {0x1.fffffep127, 0x7f800000u}, {-0x1.fffffep127, 0xff800000u},            // Largest finite FP32.
+        {0x1p130, 0x7f800000u}, {-0x1p1000, 0xff800000u},
+        {std::numeric_limits<double>::max(), 0x7f800000u}, {-std::numeric_limits<double>::infinity(), 0xff800000u},
+        {std::numeric_limits<double>::infinity(), 0x7f800000u},
+        {0x1p127 - 0x1p118, 0x7f000000u}, {0x1p127 - 0x1p119, 0x7eff0000u},        // Rounding up into the top binade.
+        {1.0 + 0x1p-8, 0x3f800000u}, {-1.0 - 3 * 0x1p-8, 0xbf820000u},
+        {0x1p-126, 0x00800000u}, {-0x1p-126, 0x80800000u},                        // Smallest normal.
+        {0x1.fffffffffffffp-127, 0u}, {-0x1.fffffffffffffp-127, 0x80000000u},     // Flushed, sign kept.
+        {0x1p-130, 0u}, {-0x1p-149, 0x80000000u}, {0.0, 0u}, {-0.0, 0x80000000u},
+        {std::nan(""), 0x7fc00000u}, {-std::nan(""), 0x7fc00000u}};
+    for (const auto& c : fixed) {
+        if (tsr::bf16ModelBits(c.v) != c.want)
+            std::cerr << "bf16ModelBits(" << std::hexfloat << c.v << std::defaultfloat << ") = 0x" << std::hex
+                      << tsr::bf16ModelBits(c.v) << ", want 0x" << c.want << std::dec << "\n";
+        EXPECT(tsr::bf16ModelBits(c.v) == c.want);
+    }
+    const auto carry = [](uint32_t u) {
+        const float f = vc::fromBits(u);
+        return std::fpclassify(f) == FP_SUBNORMAL ? u & 0x80000000u : tsr_fake::bf(f);
+    };
+    uint64_t mismatches = 0;
+    // Every BF16 high half, each with the low halves that decide rounding (exact, below/at/above a tie, top).
+    for (uint32_t high = 0; high < 0x10000u; ++high)
+        for (const uint32_t low : {0x0000u, 0x0001u, 0x7fffu, 0x8000u, 0x8001u, 0xffffu}) {
+            const uint32_t u = high << 16 | low;
+            if ((u & 0x7f800000u) == 0x7f800000u && (u & 0x007fffffu) != 0) continue; // NaN: canonical above.
+            mismatches += tsr::bf16ModelBits(double(vc::fromBits(u))) != carry(u);
+        }
+    // Every FP32 value of both signs in the top binade [2^127, 2^128), where the old helper overflowed.
+    for (uint32_t m = 0; m < 0x800000u; ++m)
+        for (const uint32_t s : {0u, 0x80000000u}) {
+            const uint32_t u = s | 0x7f000000u | m;
+            mismatches += tsr::bf16ModelBits(double(vc::fromBits(u))) != carry(u);
+        }
+    EXPECT(mismatches == 0);
+    // The oracle rounding still refuses everything outside the normal BF16 range.
+    EXPECT(contains(thrown([] { tsr::bf16NearestBits(0x1p127); }), "normal BF16 range"));
+    EXPECT(contains(thrown([] { tsr::bf16NearestBits(-1.0); }), "normal BF16 range"));
+}
+
 void oracle(bool quick) {
     std::vector<int> j; std::vector<double> e, p;
     for (uint32_t i = 0; i < tsr::cases().size(); ++i) {
@@ -442,7 +493,7 @@ int main(int argc, char** argv) {
     }
     const fs::path shaders = fs::absolute(argv[1]), scratch = fs::absolute(argv[2]); const bool quick = argc == 4;
     try {
-        sha256Vectors(); frozenShaders(shaders, scratch); plan(); productionSource(shaders); generator(); bf16Rounding(); oracle(quick);
+        sha256Vectors(); frozenShaders(shaders, scratch); plan(); productionSource(shaders); generator(); bf16Rounding(); bf16ModelEdges(); oracle(quick);
         Json waves = Json::array();
         const std::vector<std::pair<uint32_t, tsr_fake::WaveOrder>> models = quick
             ? std::vector<std::pair<uint32_t, tsr_fake::WaveOrder>>{{32, tsr_fake::WaveOrder::ascending}}

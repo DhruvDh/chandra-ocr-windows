@@ -7,6 +7,7 @@
 #define PSAPI_VERSION 2
 #include "inference_core.h"
 #include "diagnostics.h"
+#include "head_audit.h"
 #include <algorithm>
 #include <chrono>
 #include <filesystem>
@@ -21,7 +22,7 @@ namespace {
 using namespace chandra::dc;
 using namespace chandra::dc::inference;
 struct Options {
-    bool execute = false, forecast = false, diagnosticDump = false; uint32_t diagnosticCap = 0;
+    bool execute = false, forecast = false, diagnosticDump = false, headRowAudit = false; uint32_t diagnosticCap = 0;
     std::filesystem::path model, shaders, manifest, output, diagnosticPlan; std::string pci, luid, manifestSha, diagnosticPlanSha;
 };
 Options options(int argc, wchar_t** argv) {
@@ -31,6 +32,7 @@ Options options(int argc, wchar_t** argv) {
         if (name == L"--execute") { o.execute = true; continue; }
         if (name == L"--forecast") { o.forecast = true; continue; }
         if (name == L"--diagnostic-dump") { o.diagnosticDump = true; continue; }
+        if (name == L"--head-row-audit") { o.headRowAudit = true; continue; }
         require(i + 1 < argc, "CLI option value is missing"); std::wstring value = argv[++i];
         if (name == L"--model-dir") o.model = value;
         else if (name == L"--shader-root") o.shaders = value;
@@ -50,6 +52,8 @@ Options options(int argc, wchar_t** argv) {
     for (const auto* p : {&o.model, &o.shaders, &o.manifest, &o.output}) require(!p->empty() && p->is_absolute(), "Explicit absolute model/shader/input/output paths required");
     require(!o.pci.empty() && !o.luid.empty() && !o.manifestSha.empty(), "Explicit PCI, LUID and input-manifest SHA-256 required");
     require(o.diagnosticPlan.empty() == o.diagnosticPlanSha.empty() && (o.diagnosticPlan.empty() || (o.diagnosticDump && o.diagnosticPlan.is_absolute())), "A diagnostic plan requires --diagnostic-dump, an absolute path and its SHA-256");
+    // Bounded native-1 locator: the prefill prediction and at most one cached decode prediction.
+    require(!o.headRowAudit || (o.execute && o.diagnosticCap >= 1 && o.diagnosticCap <= head_audit::maximumPredictions), "--head-row-audit requires --execute and --diagnostic-token-cap 1 or 2");
     require(std::filesystem::is_directory(o.model) && std::filesystem::is_directory(o.shaders), "Explicit model and shader directories must exist");
     require(!std::filesystem::exists(o.output), "Fresh output directory required; existing output is never overwritten"); return o;
 }
@@ -131,6 +135,32 @@ public:
         require(diagnostics::safeName(name), "Unsafe diagnostic filename refused"); return std::make_unique<DiagnosticFile>(root / std::filesystem::u8path(name));
     }
 };
+// --head-row-audit (head_audit.h): authenticated rows come from the held model handle at payload offsets
+// taken from the importer's own inventory; raw GPU row dumps go to a fresh directory under output.
+std::unique_ptr<head_audit::Auditor> headAudit(Device& device, const ModelWeights& weights, const Json& provenance, const Handle& model, const std::filesystem::path& directory, uint32_t requestedPredictions) {
+    LARGE_INTEGER size{}; require(GetFileSizeEx(model.value, &size) && uint64_t(size.QuadPart) == provenance.at("model_bytes").get<uint64_t>(), "Head audit model file length differs from the importer");
+    auto readAt = [file = model.value](uint64_t offset, void* destination, uint32_t bytes) {
+        OVERLAPPED at{}; at.Offset = DWORD(offset); at.OffsetHigh = DWORD(offset >> 32); DWORD got = 0;
+        require(bytes <= head_audit::sourceChunkBytes && ReadFile(file, destination, bytes, &got, &at) && got == bytes, "Head audit source read incomplete");
+    };
+    uint8_t prefix[8]; readAt(0, prefix, 8); uint64_t header = 0; for (unsigned i = 0; i < 8; ++i) header |= uint64_t(prefix[i]) << (8 * i);
+    require(header > 1 && header <= 1024 * 1024, "Head audit safetensors header length outside bound");
+    const uint64_t payload = 8 + header; uint64_t headBegin = UINT64_MAX, normBegin = UINT64_MAX;
+    for (const auto& row : provenance.at("inventory")) {
+        if (row.at("name") == "model.language_model.embed_tokens.weight") headBegin = row.at("data_offsets").at(0).get<uint64_t>();
+        if (row.at("name") == "model.language_model.norm.weight") normBegin = row.at("data_offsets").at(0).get<uint64_t>();
+    }
+    require(headBegin != UINT64_MAX && normBegin != UINT64_MAX, "Head audit needs the importer's embedding and final-norm offsets");
+    require(CreateDirectoryW(directory.c_str(), nullptr), "Fresh head audit directory creation failed; existing output is never reused");
+    return std::make_unique<head_audit::Auditor>(device, weights.at("model.language_model.embed_tokens.weight"), head_audit::Tensor{headBegin}, head_audit::Tensor{normBegin}, textWidth, requestedPredictions,
+        [readAt, payload](uint64_t offset, void* destination, uint32_t bytes) { readAt(payload + offset, destination, bytes); },
+        [directory](const std::string& name, const void* data, size_t bytes) {
+            require(diagnostics::safeName(name), "Unsafe head audit filename refused");
+            DiagnosticFile file(directory / std::filesystem::u8path(name)); file.write(data, bytes); file.flush();
+        },
+        [](const void* data, size_t bytes) { return diagnostics::sha256(data, bytes); },
+        [observed = &device] { return Json::parse(observed->memoryJson()); });
+}
 Json forecast(const Input& in, const Options& o, const DiagnosticRequest* diagnostic) {
     Json result = forecastReport(in, o.manifestSha, o.diagnosticCap);
     if (diagnostic) result["diagnostics"] = {{"requested", true}, {"dump_written", false}, {"plan", diagnostic->plan.resolved}, {"plan_sha256", diagnostic->plan.sha256}, {"plan_file", diagnostic->planFile}};
@@ -140,6 +170,9 @@ Json execute(const Input& in, const Options& o, const DiagnosticRequest* diagnos
     auto start = Clock::now(); Json phases = Json::array(), memories = Json::array(); std::vector<uint32_t> generated;
     Json report = executionReport(in, o.manifestSha, o.diagnosticCap);
     if (diagnostic) report["diagnostic_dump_requested"] = true;
+    // A requested head audit reads audit_incomplete until its own report replaces this entry, so a run
+    // failing before or during the audit never reads as clean. Every requested prediction must be audited.
+    if (o.headRowAudit) report["head_row_audit"] = head_audit::notStarted(o.diagnosticCap);
     std::unique_ptr<Device> device; std::unique_ptr<diagnostics::Recorder> recorder; auto stamp = Clock::now();
     auto phase = [&](const char* name) { auto now = Clock::now(); phases.push_back({{"name", name}, {"wall_seconds", std::chrono::duration<double>(now - stamp).count()}}); stamp = now; if (device) memories.push_back({{"phase", name}, {"observed", Json::parse(device->memoryJson())}, {"host_process", hostMemory()}}); if (recorder) recorder->boundary(name); };
     try {
@@ -150,16 +183,31 @@ Json execute(const Input& in, const Options& o, const DiagnosticRequest* diagnos
         {
             // Empty selection is the complete normal inference graph. No
             // diagnostic subset or CPU-resident tensor copy is substituted.
+            // --head-row-audit holds this read-only, non-write-shared handle across the importer's whole-file
+            // SHA-256 and every later audit read, so no writer can change the authenticated bytes in between.
+            std::unique_ptr<Handle> auditSource;
+            if (o.headRowAudit) auditSource = std::make_unique<Handle>(CreateFileW((o.model / L"model.safetensors").c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr));
             ModelWeights weights(*device, o.model.wstring()); phase("authenticated_model_import_upload"); report["model_provenance"] = Json::parse(weights.provenanceJson());
             require(report["model_provenance"].at("full_graph_requested") == true && report["model_provenance"].at("omitted_graph_tensors").empty() && report["model_provenance"].at("tie_byte_equality") == true, "Full original graph and authenticated tied output head required");
             if (recorder) recorder->authenticatedModel(report["model_provenance"], report["device_identity"]);
-            RequestHooks hooks; hooks.phase = phase; // Observers stay empty unless a dump was explicitly requested.
+            std::unique_ptr<head_audit::Auditor> audit;
+            if (auditSource) audit = headAudit(*device, weights, report["model_provenance"], *auditSource, o.output / L"head-row-audit", o.diagnosticCap);
+            if (audit) {
+                try { audit->afterImport(); }
+                catch (const std::exception& e) { report["head_row_audit"] = head_audit::finishAfterFailure(*audit, e.what()); throw; }
+                catch (...) { report["head_row_audit"] = head_audit::finishAfterFailure(*audit, "non-standard exception"); throw; }
+                phase("head_row_audit_after_import");
+            }
+            RequestHooks hooks; hooks.phase = phase; // Observers stay empty unless a dump or head audit was explicitly requested.
             if (recorder) {
                 hooks.vision = [&](const std::string& name, const Buffer& b, uint32_t rows, uint32_t width) { recorder->vision(name, b, rows, width); };
-                hooks.text = [&](const TextObservation& observation) { recorder->text(observation); };
                 hooks.merged = [&](const Buffer& b, uint32_t rows) { recorder->merged(b, rows, textWidth); };
             }
-            generate(*device, weights, in, o.diagnosticCap, o.output, report, generated, hooks);
+            if (recorder || audit) hooks.text = [&](const TextObservation& observation) { if (recorder) recorder->text(observation); if (audit) audit->observe(observation); };
+            try { generate(*device, weights, in, o.diagnosticCap, o.output, report, generated, hooks); }
+            catch (const std::exception& e) { if (audit) report["head_row_audit"] = head_audit::finishAfterFailure(*audit, e.what()); throw; }
+            catch (...) { if (audit) report["head_row_audit"] = head_audit::finishAfterFailure(*audit, "non-standard exception"); throw; }
+            if (audit) report["head_row_audit"] = audit->finish(head_audit::RunEnd::completed);
         }
         device->drain(); phase("model_buffer_release_and_drain");
         require(device->trackedBufferBytes() == 0, "Owned graph buffers did not retire to zero"); report["owned_buffer_zero"] = true;

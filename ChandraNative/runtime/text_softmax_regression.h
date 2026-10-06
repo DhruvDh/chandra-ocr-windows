@@ -257,12 +257,26 @@ inline uint32_t bf16NearestBits(double v) {
     require(double(f) == rounded && (vc::bits(f) & 0xffffu) == 0, "BF16 rounding left the float grid");
     return vc::bits(f);
 }
-// BF16 word of any nonnegative binary64 model value, including overflow and underflow (control models only).
+// BF16 word of any binary64 model value (control models only), with the shader bf()'s rounding contract:
+// nearest-even to 8 significant bits with an unbounded exponent, overflowing to infinity only when that
+// rounded magnitude reaches 2^128. So [2^127, 2^128 - 2^119) stays finite and the tie 2^128 - 2^119 goes
+// to even, which is infinity. Magnitudes below 2^-126 flush to a signed zero (D3D11 denormal flushing);
+// NaN becomes the canonical quiet NaN. Unlike bf16NearestBits, it never refuses a value.
 inline uint32_t bf16ModelBits(double v) {
     if (!(v == v)) return 0x7fc00000u;
-    if (v >= 0x1p127) return 0x7f800000u;
-    if (v < 0x1p-126) return 0;
-    return bf16NearestBits(v);
+    const uint32_t sign = std::signbit(v) ? 0x80000000u : 0u;
+    const double a = std::fabs(v);
+    if (a < 0x1p-126) return sign;
+    if (a < 0x1p127) return sign | bf16NearestBits(a);
+    if (std::isinf(a)) return sign | 0x7f800000u;
+    uint64_t u; std::memcpy(&u, &a, sizeof(u)); // Same exact binary64 rounding as bf16NearestBits.
+    constexpr unsigned drop = 52 - 7;
+    const uint64_t remainder = u & ((uint64_t(1) << drop) - 1), half = uint64_t(1) << (drop - 1);
+    u -= remainder;
+    if (remainder > half || (remainder == half && ((u >> drop) & 1u))) u += uint64_t(1) << drop;
+    double rounded; std::memcpy(&rounded, &u, sizeof(rounded));
+    if (rounded >= 0x1p128) return sign | 0x7f800000u;
+    return sign | vc::bits(float(rounded));
 }
 struct Oracle {
     // High halves of the admissible BF16 interval [low, high] and of the correctly rounded binary64
