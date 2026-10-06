@@ -7,9 +7,9 @@ call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build
 if errorlevel 1 exit /b 1
 pushd "%CHANDRA_RUNTIME_BUILD%"
 if errorlevel 1 exit /b 1
-cl /nologo /c /std:c++17 /O2 /fp:strict /EHsc /W4 "%~dp0device.cpp" "%~dp0operators.cpp" "%~dp0model_weights.cpp" "%~dp0text_model.cpp" "%~dp0vision_model.cpp"
+cl /nologo /c /std:c++17 /O2 /fp:strict /EHsc /W4 "%~dp0device.cpp" "%~dp0operators.cpp" "%~dp0model_weights.cpp" "%~dp0text_model.cpp" "%~dp0vision_model.cpp" "%~dp0diagnostics.cpp"
 if errorlevel 1 goto failed
-lib /nologo /out:chandra-runtime.lib device.obj operators.obj model_weights.obj text_model.obj vision_model.obj
+lib /nologo /out:chandra-runtime.lib device.obj operators.obj model_weights.obj text_model.obj vision_model.obj diagnostics.obj
 if errorlevel 1 goto failed
 cl /nologo /std:c++17 /O2 /fp:strict /EHsc /W4 "%~dp0operator_fixture.cpp" device.obj operators.obj /Fe:operator-fixture.exe /link d3d11.lib dxgi.lib d3dcompiler.lib bcrypt.lib gdi32.lib
 if errorlevel 1 goto failed

@@ -40,3 +40,5 @@ results/
 *.dll
 *.pdb
 *.cso
+*.f32
+*.f64
