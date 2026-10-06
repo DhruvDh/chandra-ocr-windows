@@ -8,6 +8,7 @@
 #include <dxgi1_4.h>
 #include <wrl/client.h>
 #include "../adapter_identity.h"
+#include "readback_wait.h"
 #include <array>
 #include <atomic>
 #include <chrono>
@@ -18,6 +19,7 @@
 #include <unordered_set>
 using Microsoft::WRL::ComPtr;
 namespace chandra::dc {
+static_assert(sizeof(HRESULT)==sizeof(int32_t)&&readback::okStatus==S_OK&&readback::stillDrawingStatus==DXGI_ERROR_WAS_STILL_DRAWING,"Portable Map status constants");
 static void checked(HRESULT hr,const char* action) {
  if(FAILED(hr))throw std::runtime_error(std::string(action)+" HRESULT="+std::to_string(uint32_t(hr)));
 }
@@ -46,6 +48,7 @@ struct Device::Impl {
  std::vector<Timing> timings;
  ComPtr<ID3D11Query> disjoint;
  bool profiling=false;
+ struct ReadbackMaps {uint64_t waits=0,retried=0,stillDrawing=0;std::chrono::nanoseconds longest{0};} readbackMaps;
  DXGI_QUERY_VIDEO_MEMORY_INFO memory() const {
   DXGI_QUERY_VIDEO_MEMORY_INFO info{};
   checked(adapter->QueryVideoMemoryInfo(0,DXGI_MEMORY_SEGMENT_GROUP_LOCAL,&info),"Query local video memory");
@@ -183,9 +186,18 @@ std::vector<uint32_t> Device::readWords(const Buffer& b){
  desc.Usage=D3D11_USAGE_STAGING;desc.BindFlags=0;desc.MiscFlags=0;desc.CPUAccessFlags=D3D11_CPU_ACCESS_READ;
  ComPtr<ID3D11Buffer> staging;checked(impl->device->CreateBuffer(&desc,nullptr,&staging),"Create staging");
  std::vector<uint32_t> result(b.words);
- impl->context->CopyResource(staging.Get(),b.storage->data.Get());drain();D3D11_MAPPED_SUBRESOURCE mapped{};
- checked(impl->context->Map(staging.Get(),0,D3D11_MAP_READ,D3D11_MAP_FLAG_DO_NOT_WAIT,&mapped),"Map completed readback");
- std::memcpy(result.data(),mapped.pData,b.storage->bytes);impl->context->Unmap(staging.Get(),0);return result;
+ const auto now=[]{return std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now().time_since_epoch());};
+ impl->context->CopyResource(staging.Get(),b.storage->data.Get());const auto deadline=now()+readback::postCopyBudget;drain();
+ // Map stays nonblocking. Only WAS_STILL_DRAWING polls this same staging copy again, until the one post-copy deadline.
+ const auto outcome=readback::copyWhenReady(deadline,
+  [&](void** data){D3D11_MAPPED_SUBRESOURCE mapped{};const HRESULT hr=impl->context->Map(staging.Get(),0,D3D11_MAP_READ,D3D11_MAP_FLAG_DO_NOT_WAIT,&mapped);*data=mapped.pData;return int32_t(hr);},
+  [&]{impl->context->Unmap(staging.Get(),0);},
+  [&](const void* data){std::memcpy(result.data(),data,b.storage->bytes);},
+  now,[](std::chrono::nanoseconds pause){std::this_thread::sleep_for(pause);});
+ auto& maps=impl->readbackMaps;++maps.waits;maps.retried+=uint64_t(outcome.stillDrawing>0);maps.stillDrawing+=outcome.stillDrawing;maps.longest=std::max(maps.longest,outcome.waited);
+ if(outcome.result!=readback::Result::copied)
+  throw std::runtime_error(readback::describe(outcome)+"; device removed reason HRESULT="+std::to_string(uint32_t(impl->device->GetDeviceRemovedReason())));
+ return result;
 }
 std::vector<float> Device::readFloats(const Buffer& b){
  if(b.packedBF16)throw std::runtime_error("Packed BF16 is not float storage");auto words=readWords(b);
@@ -198,7 +210,9 @@ std::string Device::memoryJson()const{
  impl->thread();auto info=impl->memory();
  return chandra::Json{{"local_budget",info.Budget},{"local_usage",info.CurrentUsage},
   {"tracked_live",impl->account->bytes.load()},{"tracked_peak",impl->account->peak.load()},
-  {"required_headroom",2ull*1024*1024*1024}}.dump();
+  {"required_headroom",2ull*1024*1024*1024},
+  {"readback_map",{{"waits",impl->readbackMaps.waits},{"waits_with_still_drawing",impl->readbackMaps.retried},
+   {"still_drawing_results",impl->readbackMaps.stillDrawing},{"longest_wait_nanoseconds",impl->readbackMaps.longest.count()}}}}.dump();
 }
 void Device::beginProfile(){
  impl->thread();if(impl->profiling||!impl->timings.empty())throw std::runtime_error("Profile window already open or uncollected");
