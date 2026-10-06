@@ -107,6 +107,10 @@ std::vector<uint32_t> imageRows(const Geometry& g) {
     std::vector<uint32_t> rows;for(uint32_t i=0;i<g.visionRowMap.size();i++)if(g.visionRowMap[i]!=UINT32_MAX)rows.push_back(i);return rows;
 }
 Json list(const std::vector<uint32_t>& v) { return Json(v); }
+// One-element schema arrays are built explicitly. Never brace-wrap a single Json value ({value}): GCC and
+// Clang build a one-element array, but MSVC copy-initializes the value itself (CWG 1467), so Build09
+// wrote bare coordinate objects. Brace lists of non-Json scalars or of key/value pairs are unaffected.
+Json one(Json value) { Json array=Json::array();array.push_back(std::move(value));return array; }
 }
 
 Sha256::Sha256():state{0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19},block{} {}
@@ -236,9 +240,11 @@ Plan resolve(const Json* requested,const Geometry& g) {
     return p;
 }
 
+// row is the single selected logical row, or -1 for a complete "all" selection; coordinate is exactly
+// one object. put() alone shapes both into the record's selected_rows and one-element coordinates array.
 struct Recorder::Spec {
     std::string stage,phase; int64_t index=-1,step=-1,row=-1,cache=-1;
-    Json logicalShape,selected,payloadShape,coordinates,cacheState,decode; bool complete=false,state=false; int64_t produces=-1;
+    Json logicalShape,payloadShape,coordinate,cacheState,decode; bool complete=false,state=false; int64_t produces=-1;
     uint64_t prefix=0; // Consumed request rows that condition a text value; 0 for vision and merged embedding.
 };
 Recorder::Recorder(Plan p,Geometry g,std::unique_ptr<Directory> d,Reader r,Json c,Json producerIdentity)
@@ -295,6 +301,7 @@ void Recorder::put(const Spec& s,const float* data,size_t count) {
     check(count&&payloadBytes+bytes<=plan.byteLimit&&written.size()<plan.records,"Diagnostic byte/record budget would be exceeded");
     uint64_t elements=1;for(const auto& d:s.payloadShape)elements*=d.get<uint64_t>();
     check(elements==count,"Diagnostic payload shape differs from its selected rows");
+    check(s.coordinate.is_object(),"Diagnostic record coordinate must be one object: "+identity);
     check(s.prefix<=consumed.size(),"Diagnostic record prefix exceeds the consumed request rows");
     char prefix[16];std::snprintf(prefix,sizeof(prefix),"%05llu",static_cast<unsigned long long>(sequence));
     std::string name=std::string(prefix)+"."+s.stage+(s.index>=0?".i"+std::to_string(s.index):"")+"."+s.phase+
@@ -317,12 +324,12 @@ void Recorder::put(const Spec& s,const float* data,size_t count) {
         {"layer_kind",s.stage.rfind("text.",0)==0&&s.index>=0?Json(s.index%4==3?"full_attention":"gated_delta_net"):Json(nullptr)},
         {"vision_block",s.stage==blockStage?Json(s.index):Json(nullptr)},
         {"decode_step",s.step>=0?Json(s.step):Json(nullptr)},{"cache_length",s.cache>=0?Json(s.cache):Json(nullptr)},
-        {"logical_shape",s.logicalShape},{"selected_axis",0},{"selected_rows",s.selected},{"payload_shape",s.payloadShape},
+        {"logical_shape",s.logicalShape},{"selected_axis",0},{"selected_rows",s.row>=0?one(s.row):Json("all")},{"payload_shape",s.payloadShape},
         {"complete_tensor",s.complete},{"storage_dtype","float32"},{"byte_order","little"},
         {"bf16_rounding",s.state?"none_fp32_state":"bf16_round_to_nearest_even_at_graph_boundary"},
         {"payload_bytes",bytes},{"payload_sha256",sha256(data,size_t(bytes))},
         {"observed",{{"nonfinite",nonfinite},{"finite_non_bf16_representable",nonBF16}}},
-        {"coordinates",s.coordinates},{"cache",s.cacheState},{"decode",s.decode},
+        {"coordinates",one(s.coordinate)},{"cache",s.cacheState},{"decode",s.decode},
         {"conditioning",s.prefix?Json{{"prefix_rows",s.prefix},{"prefix_sha256",prefixDigests[s.prefix]}}:Json(nullptr)},
         {"produces_generated_index",s.produces>=0?Json(s.produces):Json(nullptr)},
         {"commitments",commitments},{"producer",producer},{"qualified",false}};
@@ -347,8 +354,8 @@ void Recorder::vision(const std::string& name,const Buffer& b,uint32_t rows,uint
     const auto values=read(b,uint64_t(rows)*width);
     std::vector<uint32_t> image;if(merger)image=imageRows(geometry);
     for(auto r:selected) {
-        Spec s;s.stage=stage;s.index=index;s.phase="vision";s.row=r;s.logicalShape={rows,width};s.selected={r};s.payloadShape={1,width};s.complete=rows==1;
-        if(merger)s.coordinates={{{"merged_row",r},{"prompt_row",image.at(r)}}};
+        Spec s;s.stage=stage;s.index=index;s.phase="vision";s.row=r;s.logicalShape={rows,width};s.payloadShape={1,width};s.complete=rows==1;
+        if(merger)s.coordinate={{"merged_row",r},{"prompt_row",image.at(r)}};
         else {
             // Same block-major frame geometry as vision_model.cpp; metadata only.
             uint32_t first=0,frame=0;Json c;
@@ -360,7 +367,7 @@ void Recorder::vision(const std::string& name,const Buffer& b,uint32_t rows,uint
                 }
                 first+=size;
             }
-            check(!c.is_null(),"Patch row outside authenticated grid");s.coordinates={c};
+            check(!c.is_null(),"Patch row outside authenticated grid");s.coordinate=std::move(c);
         }
         put(s,values.data()+size_t(r)*width,width);
     }
@@ -372,9 +379,9 @@ void Recorder::merged(const Buffer& b,uint32_t rows,uint32_t width) {
     const auto values=read(b,uint64_t(rows)*width);const auto& pos=geometry.positions;
     for(auto r:plan.embeddingRows) {
         const bool image=geometry.visionRowMap[r]!=UINT32_MAX;
-        Spec s;s.stage=embeddingStage;s.phase="merge";s.row=r;s.logicalShape={rows,width};s.selected={r};s.payloadShape={1,width};s.complete=rows==1;
-        s.coordinates={{{"absolute_row",r},{"token_id",geometry.ids[r]},{"source",image?"vision":"text"},
-            {"merged_row",image?Json(geometry.visionRowMap[r]):Json(nullptr)},{"position",{pos.temporal[r],pos.height[r],pos.width[r]}}}};
+        Spec s;s.stage=embeddingStage;s.phase="merge";s.row=r;s.logicalShape={rows,width};s.payloadShape={1,width};s.complete=rows==1;
+        s.coordinate={{"absolute_row",r},{"token_id",geometry.ids[r]},{"source",image?"vision":"text"},
+            {"merged_row",image?Json(geometry.visionRowMap[r]):Json(nullptr)},{"position",{pos.temporal[r],pos.height[r],pos.width[r]}}};
         put(s,values.data()+size_t(r)*width,width);
     }
 }
@@ -416,16 +423,16 @@ void Recorder::text(const TextObservation& o) {
         for(auto i:local) {
             const uint32_t callRow=o.first+i;
             Spec s;s.stage=layer?layerStage:normStage;s.index=layer?int64_t(o.layer):-1;s.phase=phase;s.step=step;s.row=decode?0:callRow;
-            s.logicalShape={o.callTokens,textWidth};s.selected={s.row};s.payloadShape={1,textWidth};s.complete=o.callTokens==1;
-            s.coordinates={coordinate(callRow)};s.cacheState=cache;s.decode=decodeJson;s.prefix=uint64_t(o.tokensBefore)+callRow+1;
+            s.logicalShape={o.callTokens,textWidth};s.payloadShape={1,textWidth};s.complete=o.callTokens==1;
+            s.coordinate=coordinate(callRow);s.cacheState=cache;s.decode=decodeJson;s.prefix=uint64_t(o.tokensBefore)+callRow+1;
             put(s,values.data()+size_t(i)*o.width,o.width);
         }
     } else if(o.stage==TextStage::Logits) {
         check(o.width==vocabulary&&o.rows==1&&o.count==1&&o.first+1==o.callTokens&&o.layer==UINT32_MAX,"Only last-row complete vocabulary logits are diagnosable");
         if(!(decode?plan.decodeLogits&&contains(plan.decodeSteps,uint64_t(step)):plan.prefillLogits))return;
         const auto values=read(o.value,vocabulary);
-        Spec s;s.stage=logitsStage;s.phase=phase;s.step=step;s.row=0;s.logicalShape={1,vocabulary};s.selected={0};s.payloadShape={1,vocabulary};
-        s.complete=true;s.coordinates={coordinate(o.first)};s.cacheState=cache;s.decode=decodeJson;s.produces=decode?step+1:0;
+        Spec s;s.stage=logitsStage;s.phase=phase;s.step=step;s.row=0;s.logicalShape={1,vocabulary};s.payloadShape={1,vocabulary};
+        s.complete=true;s.coordinate=coordinate(o.first);s.cacheState=cache;s.decode=decodeJson;s.produces=decode?step+1:0;
         s.prefix=uint64_t(o.tokensBefore)+o.first+1;
         put(s,values.data(),vocabulary);
     } else {
@@ -438,14 +445,14 @@ void Recorder::text(const TextObservation& o) {
         const uint32_t last=o.first+o.count-1;
         auto base=[&](Spec& s) {
             s.stage=conv?convStage:recurrentStage;s.index=o.layer;s.phase=phase;s.step=step;s.cache=o.cacheLength;s.state=true;
-            s.coordinates={{{"last_absolute_row",o.tokensBefore+last},{"last_position",{o.positions.temporal[last],o.positions.height[last],o.positions.width[last]}}}};
+            s.coordinate={{"last_absolute_row",o.tokensBefore+last},{"last_position",{o.positions.temporal[last],o.positions.height[last],o.positions.width[last]}}};
             s.cacheState=cache;s.decode=decodeJson;s.prefix=o.cacheLength;
         };
         if(conv) {
-            Spec s;base(s);s.logicalShape={convChannels,convTaps};s.selected="all";s.payloadShape={convChannels,convTaps};s.complete=true;
+            Spec s;base(s);s.logicalShape={convChannels,convTaps};s.payloadShape={convChannels,convTaps};s.complete=true; // row -1: complete "all" selection.
             put(s,values.data(),values.size());
         } else for(auto h:selection->heads) {
-            Spec s;base(s);s.row=h;s.logicalShape={recurrentHeads,128,128};s.selected={h};s.payloadShape={1,128,128};
+            Spec s;base(s);s.row=h;s.logicalShape={recurrentHeads,128,128};s.payloadShape={1,128,128};
             put(s,values.data()+size_t(h)*recurrentHead,recurrentHead);
         }
     }

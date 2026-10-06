@@ -1,6 +1,6 @@
 # DirectCompute CPU-side timing
 
-Ordered B1 projection measured about 6.5x faster in correctness-checked public A770 calibration, yet complete tiny-model decode improved only 1.91x (533.5653 s to 279.3955 s) with all 395 scalar logit/margin/token journal rows unchanged. This instrumentation measures where the `chandra::dc::Device` owner thread spends wall time in command recording, buffer creation, drains, readiness polling and sleeps, so later Windows runs can replace guesses about the remaining decode cost with observations. It identifies no bottleneck by itself, and nothing in it has yet run on Windows or the A770.
+Ordered B1 projection measured about 6.5x faster in correctness-checked public A770 calibration, yet complete tiny-model decode improved only 1.91x (533.5653 s to 279.3955 s) with all 395 scalar logit/margin/token journal rows unchanged. This instrumentation measures where the `chandra::dc::Device` owner thread spends wall time in command recording, buffer creation, drains, readiness polling and sleeps, so later Windows runs can replace guesses about the remaining decode cost with observations. The production implementation compiled on Windows, and its [repaired portable test passed strict MSVC compilation and four inherited environment states](../benchmarks/evidence/directcompute-cpu-timing-msvc-2026-10-06.json), alongside independent GCC/Clang review. A separate original-tiny 14-token A770 host-timing observation has closed safely and awaits independent attribution review; it supplies no throughput or observer-overhead qualification.
 
 ## Boundary
 
@@ -15,6 +15,8 @@ set CHANDRA_NATIVE_CPU_TIMING=1
 chandra-inference.exe ...existing arguments...
 set CHANDRA_NATIVE_CPU_TIMING=
 ```
+
+On Windows, `set CHANDRA_NATIVE_CPU_TIMING=` in `cmd` removes the variable rather than storing an empty value, as does the CRT's `_putenv_s` with an empty value, so those routes disable timing. Whether an empty entry that a parent process places in the environment block it passes reaches the Device's `_dupenv_s` read as an empty string has not been exercised.
 
 When disabled, the Device keeps a null recorder pointer. Each instrumentation point builds a stack object that tests that pointer and does nothing else. It makes no clock read, allocates nothing, adds no D3D11 call and changes nothing about allocation, binding order, the drain cadence, query flags, the 1 ms drain sleep, staging copies, the readback sequence or error handling. The one disabled-mode difference visible outside the Device is the additive marker described below. When enabled, the only allocations are the recorder, made once at construction with its 128-row shader table and hash index reserved in advance, plus one name copy and one index node the first time each shader name succeeds, and JSON serialization inside `memoryJson`.
 
@@ -77,9 +79,9 @@ Enabled timing adds clock reads inside the intervals it measures, and their cost
 
 ## Validation
 
-[cpu_timing_test.sh](../ChandraNative/runtime/cpu_timing_test.sh) builds [cpu_timing_test.cpp](../ChandraNative/runtime/cpu_timing_test.cpp) with `-Wall -Wextra -Wpedantic -Wconversion -Wshadow -Werror` and AddressSanitizer/UndefinedBehaviorSanitizer into a fresh temporary directory and runs it. It drives the actual [cpu_timing.h](../ChandraNative/runtime/cpu_timing.h) scopes in the same lap order as [device.cpp](../ChandraNative/runtime/device.cpp), with a fake monotonic clock and a counting replacement `operator new`. It covers:
+[cpu_timing_test.sh](../ChandraNative/runtime/cpu_timing_test.sh) builds [cpu_timing_test.cpp](../ChandraNative/runtime/cpu_timing_test.cpp) with GCC or Clang, `-Wall -Wextra -Wpedantic -Wconversion -Wshadow -Werror` and AddressSanitizer/UndefinedBehaviorSanitizer into a fresh temporary directory, then runs it four times, with `CHANDRA_NATIVE_CPU_TIMING` absent, empty, `1` and `yes` beforehand. It drives the actual [cpu_timing.h](../ChandraNative/runtime/cpu_timing.h) scopes in the same lap order as [device.cpp](../ChandraNative/runtime/device.cpp), with a fake monotonic clock and a counting replacement `operator new`. It covers:
 
-- accepted and rejected settings, including environment reads on POSIX;
+- accepted and rejected settings, both through the pure `enabledBy`, including the empty string, and through live environment reads by the helper's own branch, `_dupenv_s` under MSVC or `getenv` elsewhere;
 - a disabled run of every scope, including exceptional exits, with zero clock reads and zero allocations;
 - exact dispatch, drain, readback, buffer, upload and zero partitions;
 - compile versus lookup classification;
@@ -99,13 +101,37 @@ ChandraNative/runtime/readback_wait_test.sh
 
 These tests do not compile `device.cpp` or exercise D3D11, a driver, QueryPerformanceCounter, Windows timer resolution or the GPU. The existing readback readiness test is unchanged and still passes.
 
+The environment check reads and writes the variable on the same `_MSC_VER` branch as the helper, so each compiler runs the read path it builds. It first checks that the helper reads the inherited setting exactly as `enabledBy` reads an independent copy, then removes the variable, sets `0`, `1`, `yes` and a 300-byte value, and finally restores the inherited setting and reads it back. Values are compared and measured, never printed. POSIX `setenv` can store an empty value, so the POSIX branch checks that an empty environment value is rejected as a 0-byte value. No Windows CRT call can store one, because `_putenv_s` with an empty value removes the variable, so the MSVC branch instead checks that this removal leaves the helper reporting timing disabled. On both branches the empty string itself stays covered by `enabledBy("")`. Under MSVC the test refuses an inherited empty value before changing anything, because `_putenv_s` could not restore it. Each run prints one JSON line with `checks_passed`, `environment_route` (`posix_getenv` or `msvc_dupenv_s`), `empty_environment_value` (`rejected` or `not_encodable_putenv_s_removes`) and `preexisting_variable`.
+
+Under MSVC, from a batch file run in the repository root, with `BUILD` set to a fresh directory, the CPU-only route keeps the strict flags that Build10 used:
+
+```bat
+setlocal
+call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
+if errorlevel 1 exit /b 1
+cl /nologo /std:c++17 /O2 /fp:strict /EHsc /W4 /WX "ChandraNative\runtime\cpu_timing_test.cpp" /Fe:"%BUILD%\cpu-timing-test.exe" /Fo:"%BUILD%\cpu-timing-test.obj"
+if %ERRORLEVEL% neq 0 exit /b 1
+set "CHANDRA_NATIVE_CPU_TIMING="
+"%BUILD%\cpu-timing-test.exe"
+if %ERRORLEVEL% neq 0 exit /b 1
+set "CHANDRA_NATIVE_CPU_TIMING=1"
+"%BUILD%\cpu-timing-test.exe"
+if %ERRORLEVEL% neq 0 exit /b 1
+set "CHANDRA_NATIVE_CPU_TIMING=yes"
+"%BUILD%\cpu-timing-test.exe"
+if %ERRORLEVEL% neq 0 exit /b 1
+endlocal
+```
+
+It should print three lines with `"checks_passed":10` and `"environment_route":"msvc_dupenv_s"`, the first with `"preexisting_variable":"absent"` and the others `present`. The checks use `neq 0` rather than `errorlevel 1` because a crashed process exits with a negative NTSTATUS code, which `if errorlevel 1` does not catch. The [closed MSVC point](../benchmarks/evidence/directcompute-cpu-timing-msvc-2026-10-06.json) independently passes strict compilation and all ten checks under four inherited states: absent, 0, 1 and yes. It separately observes three compiler descendants before the kill-on-close handle closes; post-close zero is unavailable. Build10's original production compile and failed test compile remain preserved; the repair replaces the GNU attribute and POSIX environment calls.
+
 ## Remaining Windows verification
 
-Build with [runtime/build.cmd](../ChandraNative/runtime/build.cmd) under MSVC `/W4` and confirm no new warnings, including the `_dupenv_s` path. Then:
+Build11 compiled the production Device and helper, and the standalone repaired test passes strict MSVC `/W4 /WX` with no new warnings. The real A770 host-timing observation has closed and awaits independent attribution review. Complete the remaining activation and observer-overhead checks before treating these measurements as a comparison:
 
 1. With the variable unset, confirm unchanged generated tokens, logits journal and readback bytes against a prior run, and the disabled marker in every observation.
-2. With `yes` or an empty value, confirm rejection before any device identity or model upload is recorded.
+2. With `yes`, confirm rejection before any device identity or model upload is recorded. An empty value cannot be set from `cmd` (see Activation).
 3. With `1`, check on real data that phase sums equal inclusive totals, `fence_wait` equals its laps, and `accounted_top_level_nanoseconds` never exceeds `elapsed_nanoseconds`.
 4. Record `query_performance_frequency_hz`, a measured per-read `steady_clock` cost, and paired enabled and disabled wall times on the same input to bound the observer effect.
 
-Only after that should drain-cadence, sleep or submission changes be proposed, and they would need their own correctness and throughput evidence.
+An opt-in event-wait experiment is in separate source implementation. It needs its own capability, lifecycle, numerical/OCR and paired timing checks before promotion; the current host waits alone establish no removable overhead or speed gain.

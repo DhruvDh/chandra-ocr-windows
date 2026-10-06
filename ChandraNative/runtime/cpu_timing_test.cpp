@@ -3,6 +3,7 @@
 // counting global operator new detects allocation. The helpers below call the
 // same scopes as device.cpp in the same lap order, but device.cpp is not compiled
 // here: D3D11, a driver, QueryPerformanceCounter and the GPU are not exercised.
+// Runners: cpu_timing_test.sh (GCC/Clang); MSVC /W4 /WX in docs/directcompute-cpu-timing.md.
 #include "cpu_timing.h"
 #include <iostream>
 #include <new>
@@ -12,14 +13,20 @@ using namespace chandra::dc::cpu_timing;
 using std::chrono::milliseconds;
 // Replacement global allocation counts every operator new and can fail the next
 // one. malloc/free stay behind non-inlined wrappers so GCC's new/delete pairing
-// analysis sees matching replacement functions.
+// analysis sees matching replacement functions. MSVC spells the attribute
+// __declspec(noinline); it rejects [[gnu::noinline]] as unknown (C5030).
+#ifdef _MSC_VER
+#define CPU_TIMING_TEST_NOINLINE __declspec(noinline)
+#else
+#define CPU_TIMING_TEST_NOINLINE [[gnu::noinline]]
+#endif
 namespace {
 size_t allocations=0;bool failNextAllocation=false;
-[[gnu::noinline]] void* obtain(std::size_t bytes){
+CPU_TIMING_TEST_NOINLINE void* obtain(std::size_t bytes){
  if(failNextAllocation){failNextAllocation=false;throw std::bad_alloc();}
  ++allocations;if(void* p=std::malloc(bytes?bytes:1))return p;throw std::bad_alloc();
 }
-[[gnu::noinline]] void release(void* p) noexcept {std::free(p);}
+CPU_TIMING_TEST_NOINLINE void release(void* p) noexcept {std::free(p);}
 }
 void* operator new(std::size_t bytes){return obtain(bytes);}
 void* operator new[](std::size_t bytes){return obtain(bytes);}
@@ -31,6 +38,47 @@ namespace {
 unsigned passed=0;
 void require(bool condition,const char* reason){if(!condition)throw std::runtime_error(reason);}
 bool contains(const std::string& text,const std::string& part){return text.find(part)!=std::string::npos;}
+// The live process environment, read and written on the branch cpu_timing.h
+// compiles (the same _MSC_VER test), so enabledByEnvironment runs its own
+// _dupenv_s or getenv path. Values are compared and measured, never printed. POSIX
+// setenv stores an empty value. No Windows CRT call does: _putenv_s with an empty
+// value removes the variable, so that is the only empty encoding checked there.
+struct Setting {
+ bool present=false;std::string value;
+ bool operator==(const Setting& other) const {return present==other.present&&value==other.value;}
+};
+#ifdef _MSC_VER
+constexpr const char* environmentRoute="msvc_dupenv_s";
+constexpr const char* emptyEnvironmentValue="not_encodable_putenv_s_removes";
+Setting environmentSetting(){
+ struct Free {void operator()(char* p) const noexcept {std::free(p);}};
+ char* value=nullptr;size_t bytes=0;
+ require(_dupenv_s(&value,&bytes,variable)==0,"_dupenv_s failed");
+ const std::unique_ptr<char,Free> owned(value);Setting s;
+ if(value){s.present=true;s.value=value;}
+ return s;
+}
+void setEnvironment(const char* value){require(value[0]!='\0'&&_putenv_s(variable,value)==0,"_putenv_s could not set a nonempty value");}
+// Removes only a present variable, so no result depends on removing an absent one.
+void removeEnvironment(){if(environmentSetting().present)require(_putenv_s(variable,"")==0,"_putenv_s could not remove the variable");}
+#else
+constexpr const char* environmentRoute="posix_getenv";
+constexpr const char* emptyEnvironmentValue="rejected";
+Setting environmentSetting(){Setting s;if(const char* value=std::getenv(variable)){s.present=true;s.value=value;}return s;}
+void setEnvironment(const char* value){require(setenv(variable,value,1)==0,"setenv failed");}
+void removeEnvironment(){require(unsetenv(variable)==0,"unsetenv failed");}
+#endif
+bool environmentRejects(size_t bytes){
+ try{enabledByEnvironment();}catch(const std::invalid_argument& e){return contains(e.what(),"rejected a "+std::to_string(bytes)+"-byte value");}
+ return false;
+}
+// enabledByEnvironment returns, or rejects with the same length, exactly as the
+// pure enabledBy does for this setting.
+bool helperAgrees(const Setting& s){
+ bool expected=false,rejects=false;
+ try{expected=enabledBy(s.present?s.value.c_str():nullptr);}catch(const std::invalid_argument&){rejects=true;}
+ return rejects?environmentRejects(s.value.size()):enabledByEnvironment()==expected;
+}
 Nanoseconds fakeTime{std::chrono::seconds(1)};uint64_t fakeReads=0;
 Nanoseconds fakeNow() noexcept {++fakeReads;return fakeTime;}
 void advance(int64_t ns){fakeTime+=Nanoseconds(ns);}
@@ -101,11 +149,32 @@ int main(){
    require(rejected,"invalid setting accepted or diagnostic differs");
   }
   ++passed;
-  {unsetenv(variable);require(!enabledByEnvironment(),"unset variable enabled timing");
-   setenv(variable,"0",1);require(!enabledByEnvironment(),"0 enabled timing");
-   setenv(variable,"1",1);require(enabledByEnvironment(),"1 did not enable timing");
-   for(const char* bad:{"","yes"}){setenv(variable,bad,1);bool rejected=false;try{enabledByEnvironment();}catch(const std::invalid_argument&){rejected=true;}require(rejected,"environment value not rejected");}
-   unsetenv(variable);++passed;}
+
+  // Environment: the inherited setting, then unset, 0, 1 and rejected values through
+  // the helper's platform branch; the inherited setting is then restored and read
+  // back. A failed check ends the process, so only the passing path restores.
+  const char* inherited="absent";
+  {const Setting preexisting=environmentSetting();
+   if(preexisting.present)inherited=preexisting.value.empty()?"empty":"present";
+   require(helperAgrees(preexisting),"inherited setting read differently from enabledBy");
+#ifdef _MSC_VER
+   // A parent's environment block can carry an empty entry; _putenv_s cannot restore it.
+   require(!preexisting.present||!preexisting.value.empty(),"an inherited empty CHANDRA_NATIVE_CPU_TIMING cannot be restored through _putenv_s; unset it and rerun");
+#endif
+   removeEnvironment();require(!environmentSetting().present&&!enabledByEnvironment(),"unset variable enabled timing");
+   setEnvironment("0");require(!enabledByEnvironment(),"0 enabled timing");
+   setEnvironment("1");require(enabledByEnvironment(),"1 did not enable timing");
+   for(const std::string& bad:{std::string("yes"),std::string(300,'1')}){
+    setEnvironment(bad.c_str());require(environmentSetting()==Setting{true,bad}&&environmentRejects(bad.size()),"environment value not rejected");
+   }
+#ifdef _MSC_VER
+   setEnvironment("1");
+   require(_putenv_s(variable,"")==0&&!environmentSetting().present&&!enabledByEnvironment(),"_putenv_s with an empty value did not remove the variable");
+#else
+   setEnvironment("");require(environmentSetting()==Setting{true,""}&&environmentRejects(0),"empty environment value not rejected");
+#endif
+   if(preexisting.present)setEnvironment(preexisting.value.c_str());else removeEnvironment();
+   require(environmentSetting()==preexisting&&helperAgrees(preexisting),"inherited setting not restored");++passed;}
 
   // Disabled: every scope and method used by device.cpp, including exceptional exits,
   // makes no clock read and no allocation; memoryJson gets only the marker object.
@@ -226,7 +295,8 @@ int main(){
    require(r.upload.calls.unavailable&&r.accountedTopLevel().is_null()&&Json::parse(r.json().dump()).at("accounted_top_level_nanoseconds").is_null(),"clock regression not reported as unavailable");++passed;}
 
   std::cout<<"{\"test\":\"directcompute_cpu_timing_accounting\",\"checks_passed\":"<<passed
-   <<",\"cpu_fakes_only\":true,\"d3d11_driver_or_gpu_exercised\":false}\n";
+   <<",\"cpu_fakes_only\":true,\"d3d11_driver_or_gpu_exercised\":false,\"environment_route\":\""<<environmentRoute
+   <<"\",\"empty_environment_value\":\""<<emptyEnvironmentValue<<"\",\"preexisting_variable\":\""<<inherited<<"\"}\n";
   return 0;
  }catch(const std::exception& e){std::cerr<<"FAILED after "<<passed<<" checks: "<<e.what()<<"\n";return 1;}
 }

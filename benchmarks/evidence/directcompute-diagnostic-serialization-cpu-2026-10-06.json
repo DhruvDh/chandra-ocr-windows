@@ -1,0 +1,68 @@
+{
+  "schema": "chandra.directcompute.diagnostic-serialization-cpu.v1",
+  "observed_utc": "2026-10-06T01:27:26.598538+00:00",
+  "scope": "Reviewed explicit one-element array producer repair and finite Windows CPU fake-Device regression; no trained values, GPU execution or OCR acceptance",
+  "reviewed_source": {
+    "ChandraNative/runtime/diagnostics.cpp": {
+      "bytes": 39647,
+      "sha256": "d87633d9678b5da03123e6930651ee1d322a784ee55640dedb5c75cc39134a8b"
+    },
+    "ChandraNative/runtime/diagnostics_serialization_test.cpp": {
+      "bytes": 31226,
+      "sha256": "1a1c9bd1e4248e7520eb7de8dccbfd625ee86ad3e25e1b12b2c8a023fe63abaf"
+    },
+    "tests/native/test_native_diagnostic_serialization.py": {
+      "bytes": 20554,
+      "sha256": "02de50156fdf376bb1ee3f7adc3281d6e89a660d810c7de024dda9790c0a9185"
+    },
+    "scripts/native/compare_diagnostics.py": {
+      "bytes": 51835,
+      "sha256": "f524583e00a47e84d1cf6b2fb90f74576fd2d3f337093f8c4b3d0737d20902c8"
+    }
+  },
+  "source_manifest_sha256": "bb1f8bd5749f3f3b6008753040f402b697cb3d6797e525b769aa9f1dc1454528",
+  "source_archive_sha256": "fadb9c0d443c4d3e022070cdd89d4b28cbf3946f6964ff24c03aeb56e3c3ea37",
+  "source_archive_members": 91,
+  "native_executable": {
+    "bytes": 1050112,
+    "sha256": "bbfdf28c4caa2a7d11fa08509dd9b1b756aba1edf1eb90b790065b80fd87521e"
+  },
+  "executable_validation": "Initial CPU review bound the remote receipt without a local executable. The later independent selected-pair audit rehashed the collected1050112-byte executable locally and verified its source/build join; the earlier review boundary remains unchanged.",
+  "build_returncode": 0,
+  "cpu_test_returncode": 0,
+  "native_build_returncode": 0,
+  "elapsed_seconds": 122.06299999999464,
+  "windows_cpu_assertions": {
+    "compiler": "msvc 194435229",
+    "schema_lines_checked": 899,
+    "trace_lines": 22107,
+    "trace_sha256": "9dc656964bfead8f5dd4010fc46d0afd1a5e486e3c96f19b18d44378b025b25a",
+    "native_gpu_execution": false
+  },
+  "fake_dump_progress_sha256": {
+    "complete": "5a1a1768a541e09f2f0067adc26f3c5485777a89a74a83dd4e3318138631c29b",
+    "early_stop": "3463b7484bc79222d1295a792b45f951e42e3a01f886ac72a442e9eea7083564",
+    "failed": "3a2574561ec61ef5a29c58e4a3fb04aee25a038cfa3f2af2d02ab61d3963fe03"
+  },
+  "evidence_archive": {
+    "files": 447,
+    "bytes": 14637886,
+    "archive_bytes": 548641,
+    "archive_sha256": "3d4d19cbc1cfc6cfd5d6f19e7d6efcdbf94419062f80b6602825ce94a76ab96f",
+    "collection_only": true,
+    "GPU_exercised": false
+  },
+  "independent_review": {
+    "all_actual_dump_files_equal_GCC_and_Clang": 436,
+    "original_capture_files_preserved": 663,
+    "CXX_test_warnings": 0,
+    "unchanged_HLSL_X3078_warnings": 4
+  },
+  "original_build09_capture": "Still refused at strict progress line6; never normalized or numerically accepted",
+  "hardware_execution": false,
+  "model_uploaded": false,
+  "qualified_trained_numerics": false,
+  "qualified_OCR": false,
+  "performance_claim": false,
+  "later_executable_audit_sha256": "bb3dee7bade7ee9fa82900aef02d95257da26d64e9a7ea2d4cb73b4112892a60"
+}
