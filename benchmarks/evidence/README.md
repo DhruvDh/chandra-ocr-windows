@@ -1,5 +1,7 @@
 # Measured evidence
 
+The [text-softmax shared-memory repair and finite A770 regression](directcompute-text-softmax-regression-2026-10-06.json) pass source review, strict Windows compilation and all 17 cases/102 dispatches. The longest GPU interval is 0.691771 ms. This is a kernel result; the rejected second original page, trained numerics, endpoint and throughput remain open.
+
 The [second original native-page failure](directcompute-native-second-page-failure-2026-10-06.json) rejects all 1,952 generated IDs: enormous and all-zero logits alternate from the first prediction, no EOS appears and none of the 18 expected content checks pass. The request drains and the owned Job closes; root cause, corpus and throughput acceptance remain open.
 
 The [CPU export-custody repair](../../docs/directcompute-cpu-export-custody.md) is independently cleared at source scope: 72 supplied tests and 17 independent tests pass under pinned Python 3.12.14. It binds the retained exporter code, rechecks retained evidence, refuses blocking or substituted payload/source reads, and no longer omits a deleted loaded-module source. The [source record](directcompute-cpu-custody-source-2026-10-06.json) preserves the original failures and honest limits. Historical weights attestation remains withheld; no fresh real-model reference or trained numerical acceptance follows from these fake tests.

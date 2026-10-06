@@ -1,0 +1,2053 @@
+{
+  "schema": "chandra.directcompute.text-softmax-regression.v1",
+  "source_base_commit": "d071c0c862fa5e5d9b4ac2cf096a2af4cfddaac4",
+  "outcome": "Uniform shared-maximum barrier and finite model-free A770 regression accepted at source/kernel scope",
+  "production_shader": {
+    "candidate_sha256": "283d3356ea3c882517e96ddff26706bae21bfe3cd04a523fc065e9aa8183169e",
+    "original_sha256": "5b6c0445dcebe2acdc8104bf1c0fd2b37e1c05665d30d960ca4a0e83d6432369",
+    "change": "Every lane completes its shared maximum read before reduction scratch reuse",
+    "included_in_this_source_change": true,
+    "runtime_service_deployed": false
+  },
+  "source_packet": {
+    "finished_manifest": {
+      "bytes": 3039,
+      "sha256": "21d33f47984d2a52c818791b92c35cbbe15c9c3bee527212d629447b2a2ad181"
+    },
+    "implementation_owner": "Claude Code",
+    "actual_model": "claude-opus-5-5",
+    "effort": "xhigh",
+    "implementation_runs_on": "Linux local source checkout",
+    "production_arithmetic_or_allocation_change_beyond_barrier": false,
+    "regression_not_in_default_runtime_build": true
+  },
+  "Windows_CPU_build": {
+    "name": "Build21",
+    "strict_MSVC": "C++17 /O2 /fp:strict /EHsc /W4 /WX",
+    "strict_fxc": "cs_5_0 /O3 /Gis",
+    "existing_X3078_warnings_retained": true,
+    "MSVC_full_version": 194435229,
+    "executable": {
+      "bytes": 760832,
+      "sha256": "154d978ed8fd943bddb66165e26256c88d39815ba07f49924915aa6c4e0dbb58"
+    },
+    "source_manifest": {
+      "bytes": 17602,
+      "sha256": "03bc204e313f7fa554a00a609d242bfaec83836f17424da177ed2cd80748dff6"
+    },
+    "build_result": {
+      "bytes": 2854,
+      "sha256": "23e84eef74540d649338f1f249be6e58516b8a2c52dac2d82da844c80f57a424"
+    },
+    "inactive_plan_sha256": "e19e8f0a82b201e769e2d60069e485dca4e9374d4b92cdf5f29717d83575d213",
+    "DXBC_difference": "One added sync_g_t; unchanged resource/signature chunks; changed instruction/barrier statistics"
+  },
+  "hardware": {
+    "model": "Intel Arc A770",
+    "API": "DirectCompute/D3D11",
+    "vendor_ID": "8086",
+    "device_ID": "56a0",
+    "UMD_driver_version": "32.0.101.8991",
+    "shader_compiler_module": {
+      "bytes": 4669440,
+      "sha256": "37c4abe91d6d888f4c7a85fe48d8088bb5cac0842f283d89871b677e10901c41"
+    },
+    "state": "TEXT_SOFTMAX_REGRESSION_PASS",
+    "plan_sha256": "e19e8f0a82b201e769e2d60069e485dca4e9374d4b92cdf5f29717d83575d213",
+    "cases": 17,
+    "repaired_repetitions_per_case": 3,
+    "original_control_repetitions_per_case": 3,
+    "dispatches_submitted": 102,
+    "dispatches_completed_and_measured": 102,
+    "maximum_GPU_milliseconds": 0.6917708333333333,
+    "strict_dispatch_gate_milliseconds": 100,
+    "tracked_after_final_drain": 0,
+    "all_repaired_full_buffer_checks_pass": true,
+    "all_repaired_repetitions_bit_identical": true,
+    "independently_rebuilt_inputs_and_oracle_metadata_cases": 17,
+    "independently_rebuilt_complete_nearest_BF16_output_hash_cases": 12,
+    "independently_rebuilt_complete_nearest_BF16_output_hash_dispatch_records": 72,
+    "adjacent_BF16_gate_cases": 5,
+    "raw_full_output_tensors_retained": false,
+    "original_control_visible_failure_cases": 0,
+    "original_control_failure_required": false,
+    "model_loaded": false
+  },
+  "case_records": [
+    {
+      "index": 0,
+      "name": "single_key_decode_c1",
+      "rows": 1,
+      "base": 0,
+      "count": 1,
+      "buffer_bytes": 576,
+      "device_plus_staging_bytes": 1152,
+      "host_forecast_bytes": 2432,
+      "groups": [
+        16,
+        1,
+        1
+      ],
+      "input_sha256": "95c54c3e586df2e1ff939f91d31b28ad1a56dd6fcf2abb6e5de681c0b1d62ac6",
+      "passed": true,
+      "oracle": {
+        "maximum_exponential_term_bound": 1.066928821757962e-05,
+        "maximum_relative_bound": 2.205409012945303e-05,
+        "minimum_probability": 1.0,
+        "seconds": 1.16e-05,
+        "two_value_gate_words": 0,
+        "valid_words": 16
+      },
+      "sensitivity": {
+        "all_applicable_refused": true,
+        "controls": [
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "next_bf16_above_admissible_interval",
+            "note": "One valid word one BF16 step above its gate",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "next_bf16_below_admissible_interval",
+            "note": "One valid word one BF16 step below its gate",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "nonfinite",
+            "name": "nan_word",
+            "note": "One valid word replaced by a quiet NaN",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "not_bf16_storage",
+            "name": "non_bf16_storage",
+            "note": "Low 16 bits of one valid word set",
+            "refused": true
+          },
+          {
+            "applicable": false,
+            "name": "masked_word_smallest_normal",
+            "note": "One causally masked word set to the smallest normal BF16"
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "guard_word_changed",
+            "name": "guard_word_overwritten",
+            "note": "First guard word after the score plane overwritten",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "longest_row_raised_one_bf16_step",
+            "note": "Every valid word of the longest row one BF16 step above nearest",
+            "refused": true
+          },
+          {
+            "applicable": false,
+            "name": "original_hazard_model_wave32_ascending",
+            "note": "Binary64 model of the 2c44182 shader when lane 0's wave overwrites tmp[0] before later waves read the maximum; not applicable when every key-owning lane is in lane 0's wave"
+          },
+          {
+            "applicable": false,
+            "name": "original_hazard_model_wave16_ascending",
+            "note": "Binary64 model of the 2c44182 shader when lane 0's wave overwrites tmp[0] before later waves read the maximum; not applicable when every key-owning lane is in lane 0's wave"
+          },
+          {
+            "applicable": false,
+            "name": "lane127_partial_dropped",
+            "note": "Binary64 model omitting lane 127's exp partial from the denominator"
+          }
+        ]
+      },
+      "output_sha256": [
+        "d0ef25d3976264183eb716205b0dc6592bd1ccd2c51826f930fab0e39067f18f",
+        "d0ef25d3976264183eb716205b0dc6592bd1ccd2c51826f930fab0e39067f18f",
+        "d0ef25d3976264183eb716205b0dc6592bd1ccd2c51826f930fab0e39067f18f"
+      ],
+      "GPU_milliseconds": [
+        0.011614583333333333,
+        0.019635416666666666,
+        0.019739583333333335
+      ],
+      "words_checked_each_repetition": 144
+    },
+    {
+      "index": 1,
+      "name": "operator_fixture_like_c5",
+      "rows": 3,
+      "base": 2,
+      "count": 5,
+      "buffer_bytes": 1472,
+      "device_plus_staging_bytes": 2944,
+      "host_forecast_bytes": 7488,
+      "groups": [
+        48,
+        1,
+        1
+      ],
+      "input_sha256": "fcc9476a03d326fbbe2fc7b86e5aa0af0d708e49fd4e6bf1f5252eeecc0b9504",
+      "passed": true,
+      "oracle": {
+        "maximum_exponential_term_bound": 2.0012459616136624e-05,
+        "maximum_relative_bound": 4.0741019635692766e-05,
+        "minimum_probability": 1.375092657204008e-12,
+        "seconds": 1.67e-05,
+        "two_value_gate_words": 0,
+        "valid_words": 192
+      },
+      "sensitivity": {
+        "all_applicable_refused": true,
+        "controls": [
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "next_bf16_above_admissible_interval",
+            "note": "One valid word one BF16 step above its gate",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "next_bf16_below_admissible_interval",
+            "note": "One valid word one BF16 step below its gate",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "nonfinite",
+            "name": "nan_word",
+            "note": "One valid word replaced by a quiet NaN",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "not_bf16_storage",
+            "name": "non_bf16_storage",
+            "note": "Low 16 bits of one valid word set",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "masked_word_not_positive_zero",
+            "name": "masked_word_smallest_normal",
+            "note": "One causally masked word set to the smallest normal BF16",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "guard_word_changed",
+            "name": "guard_word_overwritten",
+            "note": "First guard word after the score plane overwritten",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "longest_row_raised_one_bf16_step",
+            "note": "Every valid word of the longest row one BF16 step above nearest",
+            "refused": true
+          },
+          {
+            "applicable": false,
+            "name": "original_hazard_model_wave32_ascending",
+            "note": "Binary64 model of the 2c44182 shader when lane 0's wave overwrites tmp[0] before later waves read the maximum; not applicable when every key-owning lane is in lane 0's wave"
+          },
+          {
+            "applicable": false,
+            "name": "original_hazard_model_wave16_ascending",
+            "note": "Binary64 model of the 2c44182 shader when lane 0's wave overwrites tmp[0] before later waves read the maximum; not applicable when every key-owning lane is in lane 0's wave"
+          },
+          {
+            "applicable": false,
+            "name": "lane127_partial_dropped",
+            "note": "Binary64 model omitting lane 127's exp partial from the denominator"
+          }
+        ]
+      },
+      "output_sha256": [
+        "e86b4b0624da8ec3f35c1b9b7a1a0643d30b8c28c4928c1b5519349868e4b6dd",
+        "e86b4b0624da8ec3f35c1b9b7a1a0643d30b8c28c4928c1b5519349868e4b6dd",
+        "e86b4b0624da8ec3f35c1b9b7a1a0643d30b8c28c4928c1b5519349868e4b6dd"
+      ],
+      "GPU_milliseconds": [
+        0.020520833333333332,
+        0.0190625,
+        0.020052083333333335
+      ],
+      "words_checked_each_repetition": 368
+    },
+    {
+      "index": 2,
+      "name": "first_prefill_tile_c64",
+      "rows": 64,
+      "base": 0,
+      "count": 64,
+      "buffer_bytes": 262656,
+      "device_plus_staging_bytes": 525312,
+      "host_forecast_bytes": 1445888,
+      "groups": [
+        1024,
+        1,
+        1
+      ],
+      "input_sha256": "9ed1da7b8f4c76a02a4971caea0ae24eff42fc90e0c576b17c4b8280b3e71627",
+      "passed": true,
+      "oracle": {
+        "maximum_exponential_term_bound": 2.041479910097621e-05,
+        "maximum_relative_bound": 4.154573171288867e-05,
+        "minimum_probability": 7.835041780880608e-13,
+        "seconds": 0.0017866,
+        "two_value_gate_words": 103,
+        "valid_words": 33280
+      },
+      "sensitivity": {
+        "all_applicable_refused": true,
+        "controls": [
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "next_bf16_above_admissible_interval",
+            "note": "One valid word one BF16 step above its gate",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "next_bf16_below_admissible_interval",
+            "note": "One valid word one BF16 step below its gate",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "nonfinite",
+            "name": "nan_word",
+            "note": "One valid word replaced by a quiet NaN",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "not_bf16_storage",
+            "name": "non_bf16_storage",
+            "note": "Low 16 bits of one valid word set",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "masked_word_not_positive_zero",
+            "name": "masked_word_smallest_normal",
+            "note": "One causally masked word set to the smallest normal BF16",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "guard_word_changed",
+            "name": "guard_word_overwritten",
+            "note": "First guard word after the score plane overwritten",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "longest_row_raised_one_bf16_step",
+            "note": "Every valid word of the longest row one BF16 step above nearest",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "original_hazard_model_wave32_ascending",
+            "note": "Binary64 model of the 2c44182 shader when lane 0's wave overwrites tmp[0] before later waves read the maximum; not applicable when every key-owning lane is in lane 0's wave",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "original_hazard_model_wave16_ascending",
+            "note": "Binary64 model of the 2c44182 shader when lane 0's wave overwrites tmp[0] before later waves read the maximum; not applicable when every key-owning lane is in lane 0's wave",
+            "refused": true
+          },
+          {
+            "applicable": false,
+            "name": "lane127_partial_dropped",
+            "note": "Binary64 model omitting lane 127's exp partial from the denominator"
+          }
+        ]
+      },
+      "output_sha256": [
+        "43892a06a6cd674407c50b8e9e8a5175468b19c487f51724a711c3f76fb07f2f",
+        "43892a06a6cd674407c50b8e9e8a5175468b19c487f51724a711c3f76fb07f2f",
+        "43892a06a6cd674407c50b8e9e8a5175468b19c487f51724a711c3f76fb07f2f"
+      ],
+      "GPU_milliseconds": [
+        0.02375,
+        0.0246875,
+        0.0228125
+      ],
+      "words_checked_each_repetition": 65664
+    },
+    {
+      "index": 3,
+      "name": "decode_c127",
+      "rows": 1,
+      "base": 126,
+      "count": 127,
+      "buffer_bytes": 8640,
+      "device_plus_staging_bytes": 17280,
+      "host_forecast_bytes": 50816,
+      "groups": [
+        16,
+        1,
+        1
+      ],
+      "input_sha256": "9af9c0505ab9528e5d55e7a6da5d4d67ecd4a7d4d5a9e3df830db9901f910180",
+      "passed": true,
+      "oracle": {
+        "maximum_exponential_term_bound": 1.9028963779144092e-05,
+        "maximum_relative_bound": 3.877394975826398e-05,
+        "minimum_probability": 5.438596906305866e-12,
+        "seconds": 0.000107,
+        "two_value_gate_words": 5,
+        "valid_words": 2032
+      },
+      "sensitivity": {
+        "all_applicable_refused": true,
+        "controls": [
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "next_bf16_above_admissible_interval",
+            "note": "One valid word one BF16 step above its gate",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "next_bf16_below_admissible_interval",
+            "note": "One valid word one BF16 step below its gate",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "nonfinite",
+            "name": "nan_word",
+            "note": "One valid word replaced by a quiet NaN",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "not_bf16_storage",
+            "name": "non_bf16_storage",
+            "note": "Low 16 bits of one valid word set",
+            "refused": true
+          },
+          {
+            "applicable": false,
+            "name": "masked_word_smallest_normal",
+            "note": "One causally masked word set to the smallest normal BF16"
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "guard_word_changed",
+            "name": "guard_word_overwritten",
+            "note": "First guard word after the score plane overwritten",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "longest_row_raised_one_bf16_step",
+            "note": "Every valid word of the longest row one BF16 step above nearest",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "original_hazard_model_wave32_ascending",
+            "note": "Binary64 model of the 2c44182 shader when lane 0's wave overwrites tmp[0] before later waves read the maximum; not applicable when every key-owning lane is in lane 0's wave",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "original_hazard_model_wave16_ascending",
+            "note": "Binary64 model of the 2c44182 shader when lane 0's wave overwrites tmp[0] before later waves read the maximum; not applicable when every key-owning lane is in lane 0's wave",
+            "refused": true
+          },
+          {
+            "applicable": false,
+            "name": "lane127_partial_dropped",
+            "note": "Binary64 model omitting lane 127's exp partial from the denominator"
+          }
+        ]
+      },
+      "output_sha256": [
+        "b36b2088aeb01c4daf452a5af88fd7e0bec2cd172e74ff27035b60ab6b55718a",
+        "b36b2088aeb01c4daf452a5af88fd7e0bec2cd172e74ff27035b60ab6b55718a",
+        "b36b2088aeb01c4daf452a5af88fd7e0bec2cd172e74ff27035b60ab6b55718a"
+      ],
+      "GPU_milliseconds": [
+        0.019947916666666666,
+        0.020052083333333335,
+        0.02
+      ],
+      "words_checked_each_repetition": 2160
+    },
+    {
+      "index": 4,
+      "name": "decode_c128",
+      "rows": 1,
+      "base": 127,
+      "count": 128,
+      "buffer_bytes": 8704,
+      "device_plus_staging_bytes": 17408,
+      "host_forecast_bytes": 51200,
+      "groups": [
+        16,
+        1,
+        1
+      ],
+      "input_sha256": "d12eae77c4ad8ffa314b3db99701997071cddc0759066b8cfaef40bd9db6b9d7",
+      "passed": true,
+      "oracle": {
+        "maximum_exponential_term_bound": 2.041479910097621e-05,
+        "maximum_relative_bound": 4.154573171288867e-05,
+        "minimum_probability": 7.835041775620327e-13,
+        "seconds": 0.0001209,
+        "two_value_gate_words": 6,
+        "valid_words": 2048
+      },
+      "sensitivity": {
+        "all_applicable_refused": true,
+        "controls": [
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "next_bf16_above_admissible_interval",
+            "note": "One valid word one BF16 step above its gate",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "next_bf16_below_admissible_interval",
+            "note": "One valid word one BF16 step below its gate",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "nonfinite",
+            "name": "nan_word",
+            "note": "One valid word replaced by a quiet NaN",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "not_bf16_storage",
+            "name": "non_bf16_storage",
+            "note": "Low 16 bits of one valid word set",
+            "refused": true
+          },
+          {
+            "applicable": false,
+            "name": "masked_word_smallest_normal",
+            "note": "One causally masked word set to the smallest normal BF16"
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "guard_word_changed",
+            "name": "guard_word_overwritten",
+            "note": "First guard word after the score plane overwritten",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "longest_row_raised_one_bf16_step",
+            "note": "Every valid word of the longest row one BF16 step above nearest",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "original_hazard_model_wave32_ascending",
+            "note": "Binary64 model of the 2c44182 shader when lane 0's wave overwrites tmp[0] before later waves read the maximum; not applicable when every key-owning lane is in lane 0's wave",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "original_hazard_model_wave16_ascending",
+            "note": "Binary64 model of the 2c44182 shader when lane 0's wave overwrites tmp[0] before later waves read the maximum; not applicable when every key-owning lane is in lane 0's wave",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "lane127_partial_dropped",
+            "note": "Binary64 model omitting lane 127's exp partial from the denominator",
+            "refused": true
+          }
+        ]
+      },
+      "output_sha256": [
+        "3670058ddc5bec18babc265f445a8a2c485f0bf34e4fd4c4e675cf79ebdd092f",
+        "3670058ddc5bec18babc265f445a8a2c485f0bf34e4fd4c4e675cf79ebdd092f",
+        "3670058ddc5bec18babc265f445a8a2c485f0bf34e4fd4c4e675cf79ebdd092f"
+      ],
+      "GPU_milliseconds": [
+        0.019375,
+        0.02020833333333333,
+        0.020104166666666666
+      ],
+      "words_checked_each_repetition": 2176
+    },
+    {
+      "index": 5,
+      "name": "decode_c129",
+      "rows": 1,
+      "base": 128,
+      "count": 129,
+      "buffer_bytes": 8768,
+      "device_plus_staging_bytes": 17536,
+      "host_forecast_bytes": 51584,
+      "groups": [
+        16,
+        1,
+        1
+      ],
+      "input_sha256": "e1ea1d02266fea805a4d31b6179453304231cf709a63414fceec13f32f9643af",
+      "passed": true,
+      "oracle": {
+        "maximum_exponential_term_bound": 1.983364211932681e-05,
+        "maximum_relative_bound": 4.044297726890633e-05,
+        "minimum_probability": 1.7656539173699086e-12,
+        "seconds": 0.0001083,
+        "two_value_gate_words": 12,
+        "valid_words": 2064
+      },
+      "sensitivity": {
+        "all_applicable_refused": true,
+        "controls": [
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "next_bf16_above_admissible_interval",
+            "note": "One valid word one BF16 step above its gate",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "next_bf16_below_admissible_interval",
+            "note": "One valid word one BF16 step below its gate",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "nonfinite",
+            "name": "nan_word",
+            "note": "One valid word replaced by a quiet NaN",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "not_bf16_storage",
+            "name": "non_bf16_storage",
+            "note": "Low 16 bits of one valid word set",
+            "refused": true
+          },
+          {
+            "applicable": false,
+            "name": "masked_word_smallest_normal",
+            "note": "One causally masked word set to the smallest normal BF16"
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "guard_word_changed",
+            "name": "guard_word_overwritten",
+            "note": "First guard word after the score plane overwritten",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "longest_row_raised_one_bf16_step",
+            "note": "Every valid word of the longest row one BF16 step above nearest",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "original_hazard_model_wave32_ascending",
+            "note": "Binary64 model of the 2c44182 shader when lane 0's wave overwrites tmp[0] before later waves read the maximum; not applicable when every key-owning lane is in lane 0's wave",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "original_hazard_model_wave16_ascending",
+            "note": "Binary64 model of the 2c44182 shader when lane 0's wave overwrites tmp[0] before later waves read the maximum; not applicable when every key-owning lane is in lane 0's wave",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "lane127_partial_dropped",
+            "note": "Binary64 model omitting lane 127's exp partial from the denominator",
+            "refused": true
+          }
+        ]
+      },
+      "output_sha256": [
+        "dd8eb879c7a66c96b1567f7ad57235b8535943a6d73a37574055be597ff67c8d",
+        "dd8eb879c7a66c96b1567f7ad57235b8535943a6d73a37574055be597ff67c8d",
+        "dd8eb879c7a66c96b1567f7ad57235b8535943a6d73a37574055be597ff67c8d"
+      ],
+      "GPU_milliseconds": [
+        0.020520833333333332,
+        0.019635416666666666,
+        0.020260416666666666
+      ],
+      "words_checked_each_repetition": 2192
+    },
+    {
+      "index": 6,
+      "name": "ragged_tail_c129",
+      "rows": 33,
+      "base": 96,
+      "count": 129,
+      "buffer_bytes": 272960,
+      "device_plus_staging_bytes": 545920,
+      "host_forecast_bytes": 1504640,
+      "groups": [
+        528,
+        1,
+        1
+      ],
+      "input_sha256": "7790aefb496ef5d0fdfc30af3191537a7fd65aaf5f4c9d6a215f812e15aa437d",
+      "passed": true,
+      "oracle": {
+        "maximum_exponential_term_bound": 2.041479910097621e-05,
+        "maximum_relative_bound": 4.1605338915617907e-05,
+        "minimum_probability": 7.835041773690149e-13,
+        "seconds": 0.0030697,
+        "two_value_gate_words": 201,
+        "valid_words": 59664
+      },
+      "sensitivity": {
+        "all_applicable_refused": true,
+        "controls": [
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "next_bf16_above_admissible_interval",
+            "note": "One valid word one BF16 step above its gate",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "next_bf16_below_admissible_interval",
+            "note": "One valid word one BF16 step below its gate",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "nonfinite",
+            "name": "nan_word",
+            "note": "One valid word replaced by a quiet NaN",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "not_bf16_storage",
+            "name": "non_bf16_storage",
+            "note": "Low 16 bits of one valid word set",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "masked_word_not_positive_zero",
+            "name": "masked_word_smallest_normal",
+            "note": "One causally masked word set to the smallest normal BF16",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "guard_word_changed",
+            "name": "guard_word_overwritten",
+            "note": "First guard word after the score plane overwritten",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "longest_row_raised_one_bf16_step",
+            "note": "Every valid word of the longest row one BF16 step above nearest",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "original_hazard_model_wave32_ascending",
+            "note": "Binary64 model of the 2c44182 shader when lane 0's wave overwrites tmp[0] before later waves read the maximum; not applicable when every key-owning lane is in lane 0's wave",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "original_hazard_model_wave16_ascending",
+            "note": "Binary64 model of the 2c44182 shader when lane 0's wave overwrites tmp[0] before later waves read the maximum; not applicable when every key-owning lane is in lane 0's wave",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "lane127_partial_dropped",
+            "note": "Binary64 model omitting lane 127's exp partial from the denominator",
+            "refused": true
+          }
+        ]
+      },
+      "output_sha256": [
+        "23f7b9d3c35980d6537b5e8d79362b5d82d0621a0dac72d29c800e23f7f7093d",
+        "23f7b9d3c35980d6537b5e8d79362b5d82d0621a0dac72d29c800e23f7f7093d",
+        "23f7b9d3c35980d6537b5e8d79362b5d82d0621a0dac72d29c800e23f7f7093d"
+      ],
+      "GPU_milliseconds": [
+        0.021822916666666668,
+        0.021510416666666667,
+        0.021041666666666667
+      ],
+      "words_checked_each_repetition": 68240
+    },
+    {
+      "index": 7,
+      "name": "second_prefill_tile_c128",
+      "rows": 64,
+      "base": 64,
+      "count": 128,
+      "buffer_bytes": 524800,
+      "device_plus_staging_bytes": 1049600,
+      "host_forecast_bytes": 2889728,
+      "groups": [
+        1024,
+        1,
+        1
+      ],
+      "input_sha256": "4abcdd0f6bd777d0727704b56735c976871b69bd2d00b05d63e52817bd4f3397",
+      "passed": true,
+      "oracle": {
+        "maximum_exponential_term_bound": 2.041479910097621e-05,
+        "maximum_relative_bound": 4.154573171288867e-05,
+        "minimum_probability": 7.835041774243741e-13,
+        "seconds": 0.0050566,
+        "two_value_gate_words": 374,
+        "valid_words": 98816
+      },
+      "sensitivity": {
+        "all_applicable_refused": true,
+        "controls": [
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "next_bf16_above_admissible_interval",
+            "note": "One valid word one BF16 step above its gate",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "next_bf16_below_admissible_interval",
+            "note": "One valid word one BF16 step below its gate",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "nonfinite",
+            "name": "nan_word",
+            "note": "One valid word replaced by a quiet NaN",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "not_bf16_storage",
+            "name": "non_bf16_storage",
+            "note": "Low 16 bits of one valid word set",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "masked_word_not_positive_zero",
+            "name": "masked_word_smallest_normal",
+            "note": "One causally masked word set to the smallest normal BF16",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "guard_word_changed",
+            "name": "guard_word_overwritten",
+            "note": "First guard word after the score plane overwritten",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "longest_row_raised_one_bf16_step",
+            "note": "Every valid word of the longest row one BF16 step above nearest",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "original_hazard_model_wave32_ascending",
+            "note": "Binary64 model of the 2c44182 shader when lane 0's wave overwrites tmp[0] before later waves read the maximum; not applicable when every key-owning lane is in lane 0's wave",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "original_hazard_model_wave16_ascending",
+            "note": "Binary64 model of the 2c44182 shader when lane 0's wave overwrites tmp[0] before later waves read the maximum; not applicable when every key-owning lane is in lane 0's wave",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "lane127_partial_dropped",
+            "note": "Binary64 model omitting lane 127's exp partial from the denominator",
+            "refused": true
+          }
+        ]
+      },
+      "output_sha256": [
+        "65314121258589dfb862ad4b6d5542d37e9ca9ecb567b26f8e1ed8992fba5757",
+        "65314121258589dfb862ad4b6d5542d37e9ca9ecb567b26f8e1ed8992fba5757",
+        "65314121258589dfb862ad4b6d5542d37e9ca9ecb567b26f8e1ed8992fba5757"
+      ],
+      "GPU_milliseconds": [
+        0.0240625,
+        0.0240625,
+        0.6917708333333333
+      ],
+      "words_checked_each_repetition": 131200
+    },
+    {
+      "index": 8,
+      "name": "tiny_prompt_tail_c801",
+      "rows": 33,
+      "base": 768,
+      "count": 801,
+      "buffer_bytes": 1692224,
+      "device_plus_staging_bytes": 3384448,
+      "host_forecast_bytes": 9332096,
+      "groups": [
+        528,
+        1,
+        1
+      ],
+      "input_sha256": "bf2bc0f6ae2c4e5eb89644b721702ebd7d79acf9a865b1f8c39e78ef16bc4eef",
+      "passed": true,
+      "oracle": {
+        "maximum_exponential_term_bound": 2.041479910097621e-05,
+        "maximum_relative_bound": 4.190337514287101e-05,
+        "minimum_probability": 7.835041718252911e-13,
+        "seconds": 0.0211693,
+        "two_value_gate_words": 1453,
+        "valid_words": 414480
+      },
+      "sensitivity": {
+        "all_applicable_refused": true,
+        "controls": [
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "next_bf16_above_admissible_interval",
+            "note": "One valid word one BF16 step above its gate",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "next_bf16_below_admissible_interval",
+            "note": "One valid word one BF16 step below its gate",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "nonfinite",
+            "name": "nan_word",
+            "note": "One valid word replaced by a quiet NaN",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "not_bf16_storage",
+            "name": "non_bf16_storage",
+            "note": "Low 16 bits of one valid word set",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "masked_word_not_positive_zero",
+            "name": "masked_word_smallest_normal",
+            "note": "One causally masked word set to the smallest normal BF16",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "guard_word_changed",
+            "name": "guard_word_overwritten",
+            "note": "First guard word after the score plane overwritten",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "longest_row_raised_one_bf16_step",
+            "note": "Every valid word of the longest row one BF16 step above nearest",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "original_hazard_model_wave32_ascending",
+            "note": "Binary64 model of the 2c44182 shader when lane 0's wave overwrites tmp[0] before later waves read the maximum; not applicable when every key-owning lane is in lane 0's wave",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "original_hazard_model_wave16_ascending",
+            "note": "Binary64 model of the 2c44182 shader when lane 0's wave overwrites tmp[0] before later waves read the maximum; not applicable when every key-owning lane is in lane 0's wave",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "lane127_partial_dropped",
+            "note": "Binary64 model omitting lane 127's exp partial from the denominator",
+            "refused": true
+          }
+        ]
+      },
+      "output_sha256": [
+        "cb0a3884fde2c995541818ff8e414cb58c43b8bb71a4422614f75732fe81aad2",
+        "cb0a3884fde2c995541818ff8e414cb58c43b8bb71a4422614f75732fe81aad2",
+        "cb0a3884fde2c995541818ff8e414cb58c43b8bb71a4422614f75732fe81aad2"
+      ],
+      "GPU_milliseconds": [
+        0.03015625,
+        0.030989583333333334,
+        0.03197916666666667
+      ],
+      "words_checked_each_repetition": 423056
+    },
+    {
+      "index": 9,
+      "name": "recorded_full_tile_c3584",
+      "rows": 64,
+      "base": 3520,
+      "count": 3584,
+      "buffer_bytes": 14680576,
+      "device_plus_staging_bytes": 29361152,
+      "host_forecast_bytes": 80857088,
+      "groups": [
+        1024,
+        1,
+        1
+      ],
+      "input_sha256": "527ca5222fff708ee7e3c480b98de48dd740c74e5f0e1b7d2fe9a225a60d2dba",
+      "passed": true,
+      "oracle": {
+        "maximum_exponential_term_bound": 2.041479910097621e-05,
+        "maximum_relative_bound": 4.3155131177030626e-05,
+        "minimum_probability": 7.835041494093411e-13,
+        "seconds": 0.1834518,
+        "two_value_gate_words": 13649,
+        "valid_words": 3637760
+      },
+      "sensitivity": {
+        "all_applicable_refused": true,
+        "controls": [
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "next_bf16_above_admissible_interval",
+            "note": "One valid word one BF16 step above its gate",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "next_bf16_below_admissible_interval",
+            "note": "One valid word one BF16 step below its gate",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "nonfinite",
+            "name": "nan_word",
+            "note": "One valid word replaced by a quiet NaN",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "not_bf16_storage",
+            "name": "non_bf16_storage",
+            "note": "Low 16 bits of one valid word set",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "masked_word_not_positive_zero",
+            "name": "masked_word_smallest_normal",
+            "note": "One causally masked word set to the smallest normal BF16",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "guard_word_changed",
+            "name": "guard_word_overwritten",
+            "note": "First guard word after the score plane overwritten",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "longest_row_raised_one_bf16_step",
+            "note": "Every valid word of the longest row one BF16 step above nearest",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "original_hazard_model_wave32_ascending",
+            "note": "Binary64 model of the 2c44182 shader when lane 0's wave overwrites tmp[0] before later waves read the maximum; not applicable when every key-owning lane is in lane 0's wave",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "original_hazard_model_wave16_ascending",
+            "note": "Binary64 model of the 2c44182 shader when lane 0's wave overwrites tmp[0] before later waves read the maximum; not applicable when every key-owning lane is in lane 0's wave",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "lane127_partial_dropped",
+            "note": "Binary64 model omitting lane 127's exp partial from the denominator",
+            "refused": true
+          }
+        ]
+      },
+      "output_sha256": [
+        "cd407492935aa76e812d862199fa3b223610d801af2bdc8ed1bce77d5948cdb7",
+        "cd407492935aa76e812d862199fa3b223610d801af2bdc8ed1bce77d5948cdb7",
+        "cd407492935aa76e812d862199fa3b223610d801af2bdc8ed1bce77d5948cdb7"
+      ],
+      "GPU_milliseconds": [
+        0.11494791666666666,
+        0.11666666666666667,
+        0.11458333333333333
+      ],
+      "words_checked_each_repetition": 3670144
+    },
+    {
+      "index": 10,
+      "name": "recorded_tail_c3617",
+      "rows": 33,
+      "base": 3584,
+      "count": 3617,
+      "buffer_bytes": 7639616,
+      "device_plus_staging_bytes": 15279232,
+      "host_forecast_bytes": 42132864,
+      "groups": [
+        528,
+        1,
+        1
+      ],
+      "input_sha256": "52cb2ff4706304a8a0997bcc0cac7c4bb68421f3a949c631074eb846c7f47357",
+      "passed": true,
+      "oracle": {
+        "maximum_exponential_term_bound": 2.041479910097621e-05,
+        "maximum_relative_bound": 4.321473876345294e-05,
+        "minimum_probability": 7.835041490184016e-13,
+        "seconds": 0.129355,
+        "two_value_gate_words": 7033,
+        "valid_words": 1901328
+      },
+      "sensitivity": {
+        "all_applicable_refused": true,
+        "controls": [
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "next_bf16_above_admissible_interval",
+            "note": "One valid word one BF16 step above its gate",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "next_bf16_below_admissible_interval",
+            "note": "One valid word one BF16 step below its gate",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "nonfinite",
+            "name": "nan_word",
+            "note": "One valid word replaced by a quiet NaN",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "not_bf16_storage",
+            "name": "non_bf16_storage",
+            "note": "Low 16 bits of one valid word set",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "masked_word_not_positive_zero",
+            "name": "masked_word_smallest_normal",
+            "note": "One causally masked word set to the smallest normal BF16",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "guard_word_changed",
+            "name": "guard_word_overwritten",
+            "note": "First guard word after the score plane overwritten",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "longest_row_raised_one_bf16_step",
+            "note": "Every valid word of the longest row one BF16 step above nearest",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "original_hazard_model_wave32_ascending",
+            "note": "Binary64 model of the 2c44182 shader when lane 0's wave overwrites tmp[0] before later waves read the maximum; not applicable when every key-owning lane is in lane 0's wave",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "original_hazard_model_wave16_ascending",
+            "note": "Binary64 model of the 2c44182 shader when lane 0's wave overwrites tmp[0] before later waves read the maximum; not applicable when every key-owning lane is in lane 0's wave",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "lane127_partial_dropped",
+            "note": "Binary64 model omitting lane 127's exp partial from the denominator",
+            "refused": true
+          }
+        ]
+      },
+      "output_sha256": [
+        "8ce331de0eca18a261f7c3e2cb38548e11132fa4b89241889e6cc1d74de1ddae",
+        "8ce331de0eca18a261f7c3e2cb38548e11132fa4b89241889e6cc1d74de1ddae",
+        "8ce331de0eca18a261f7c3e2cb38548e11132fa4b89241889e6cc1d74de1ddae"
+      ],
+      "GPU_milliseconds": [
+        0.08614583333333334,
+        0.08515625,
+        0.08432291666666666
+      ],
+      "words_checked_each_repetition": 1909904
+    },
+    {
+      "index": 11,
+      "name": "recorded_last_row_c3617",
+      "rows": 1,
+      "base": 3616,
+      "count": 3617,
+      "buffer_bytes": 232000,
+      "device_plus_staging_bytes": 464000,
+      "host_forecast_bytes": 1390976,
+      "groups": [
+        16,
+        1,
+        1
+      ],
+      "input_sha256": "44d220b938386b6c711a9211ff94226cdfd5af51545963d6c6239be2dba7853a",
+      "passed": true,
+      "oracle": {
+        "maximum_exponential_term_bound": 1.9923050863734915e-05,
+        "maximum_relative_bound": 4.223120027058158e-05,
+        "minimum_probability": 1.5581840019505797e-12,
+        "seconds": 0.004213,
+        "two_value_gate_words": 230,
+        "valid_words": 57872
+      },
+      "sensitivity": {
+        "all_applicable_refused": true,
+        "controls": [
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "next_bf16_above_admissible_interval",
+            "note": "One valid word one BF16 step above its gate",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "next_bf16_below_admissible_interval",
+            "note": "One valid word one BF16 step below its gate",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "nonfinite",
+            "name": "nan_word",
+            "note": "One valid word replaced by a quiet NaN",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "not_bf16_storage",
+            "name": "non_bf16_storage",
+            "note": "Low 16 bits of one valid word set",
+            "refused": true
+          },
+          {
+            "applicable": false,
+            "name": "masked_word_smallest_normal",
+            "note": "One causally masked word set to the smallest normal BF16"
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "guard_word_changed",
+            "name": "guard_word_overwritten",
+            "note": "First guard word after the score plane overwritten",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "longest_row_raised_one_bf16_step",
+            "note": "Every valid word of the longest row one BF16 step above nearest",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "original_hazard_model_wave32_ascending",
+            "note": "Binary64 model of the 2c44182 shader when lane 0's wave overwrites tmp[0] before later waves read the maximum; not applicable when every key-owning lane is in lane 0's wave",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "original_hazard_model_wave16_ascending",
+            "note": "Binary64 model of the 2c44182 shader when lane 0's wave overwrites tmp[0] before later waves read the maximum; not applicable when every key-owning lane is in lane 0's wave",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "lane127_partial_dropped",
+            "note": "Binary64 model omitting lane 127's exp partial from the denominator",
+            "refused": true
+          }
+        ]
+      },
+      "output_sha256": [
+        "3bc2686243a487c962daddbef6bb9a0dc70f95bb1dabb099611f373a3e7cddd1",
+        "3bc2686243a487c962daddbef6bb9a0dc70f95bb1dabb099611f373a3e7cddd1",
+        "3bc2686243a487c962daddbef6bb9a0dc70f95bb1dabb099611f373a3e7cddd1"
+      ],
+      "GPU_milliseconds": [
+        0.054947916666666666,
+        0.05479166666666667,
+        0.055
+      ],
+      "words_checked_each_repetition": 58000
+    },
+    {
+      "index": 12,
+      "name": "recorded_decode0_c3618",
+      "rows": 1,
+      "base": 3617,
+      "count": 3618,
+      "buffer_bytes": 232064,
+      "device_plus_staging_bytes": 464128,
+      "host_forecast_bytes": 1391360,
+      "groups": [
+        16,
+        1,
+        1
+      ],
+      "input_sha256": "90137ee400029cd8c3375539edce8b5f9fa1e19af8753012ff03526eded2b4c8",
+      "passed": true,
+      "oracle": {
+        "maximum_exponential_term_bound": 1.9610120293167554e-05,
+        "maximum_relative_bound": 4.16053128944327e-05,
+        "minimum_probability": 2.4133624946782777e-12,
+        "seconds": 0.0029909,
+        "two_value_gate_words": 181,
+        "valid_words": 57888
+      },
+      "sensitivity": {
+        "all_applicable_refused": true,
+        "controls": [
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "next_bf16_above_admissible_interval",
+            "note": "One valid word one BF16 step above its gate",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "next_bf16_below_admissible_interval",
+            "note": "One valid word one BF16 step below its gate",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "nonfinite",
+            "name": "nan_word",
+            "note": "One valid word replaced by a quiet NaN",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "not_bf16_storage",
+            "name": "non_bf16_storage",
+            "note": "Low 16 bits of one valid word set",
+            "refused": true
+          },
+          {
+            "applicable": false,
+            "name": "masked_word_smallest_normal",
+            "note": "One causally masked word set to the smallest normal BF16"
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "guard_word_changed",
+            "name": "guard_word_overwritten",
+            "note": "First guard word after the score plane overwritten",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "longest_row_raised_one_bf16_step",
+            "note": "Every valid word of the longest row one BF16 step above nearest",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "original_hazard_model_wave32_ascending",
+            "note": "Binary64 model of the 2c44182 shader when lane 0's wave overwrites tmp[0] before later waves read the maximum; not applicable when every key-owning lane is in lane 0's wave",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "original_hazard_model_wave16_ascending",
+            "note": "Binary64 model of the 2c44182 shader when lane 0's wave overwrites tmp[0] before later waves read the maximum; not applicable when every key-owning lane is in lane 0's wave",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "lane127_partial_dropped",
+            "note": "Binary64 model omitting lane 127's exp partial from the denominator",
+            "refused": true
+          }
+        ]
+      },
+      "output_sha256": [
+        "d2383f1b3be7a2353480a4fa0235a4e3aad1849939eca46ffe4e9184fd3a8b0d",
+        "d2383f1b3be7a2353480a4fa0235a4e3aad1849939eca46ffe4e9184fd3a8b0d",
+        "d2383f1b3be7a2353480a4fa0235a4e3aad1849939eca46ffe4e9184fd3a8b0d"
+      ],
+      "GPU_milliseconds": [
+        0.053697916666666665,
+        0.055260416666666666,
+        0.055364583333333335
+      ],
+      "words_checked_each_repetition": 58016
+    },
+    {
+      "index": 13,
+      "name": "recorded_decode4_c3622",
+      "rows": 1,
+      "base": 3621,
+      "count": 3622,
+      "buffer_bytes": 232320,
+      "device_plus_staging_bytes": 464640,
+      "host_forecast_bytes": 1392896,
+      "groups": [
+        16,
+        1,
+        1
+      ],
+      "input_sha256": "5474ed7d8a72f413d33a1cefe60906d9e9290ce116cf40fd9ef99a6413ba37ee",
+      "passed": true,
+      "oracle": {
+        "maximum_exponential_term_bound": 1.9744233382912313e-05,
+        "maximum_relative_bound": 4.187355026963324e-05,
+        "minimum_probability": 2.0007478186920813e-12,
+        "seconds": 0.0032827,
+        "two_value_gate_words": 221,
+        "valid_words": 57952
+      },
+      "sensitivity": {
+        "all_applicable_refused": true,
+        "controls": [
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "next_bf16_above_admissible_interval",
+            "note": "One valid word one BF16 step above its gate",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "next_bf16_below_admissible_interval",
+            "note": "One valid word one BF16 step below its gate",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "nonfinite",
+            "name": "nan_word",
+            "note": "One valid word replaced by a quiet NaN",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "not_bf16_storage",
+            "name": "non_bf16_storage",
+            "note": "Low 16 bits of one valid word set",
+            "refused": true
+          },
+          {
+            "applicable": false,
+            "name": "masked_word_smallest_normal",
+            "note": "One causally masked word set to the smallest normal BF16"
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "guard_word_changed",
+            "name": "guard_word_overwritten",
+            "note": "First guard word after the score plane overwritten",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "longest_row_raised_one_bf16_step",
+            "note": "Every valid word of the longest row one BF16 step above nearest",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "original_hazard_model_wave32_ascending",
+            "note": "Binary64 model of the 2c44182 shader when lane 0's wave overwrites tmp[0] before later waves read the maximum; not applicable when every key-owning lane is in lane 0's wave",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "original_hazard_model_wave16_ascending",
+            "note": "Binary64 model of the 2c44182 shader when lane 0's wave overwrites tmp[0] before later waves read the maximum; not applicable when every key-owning lane is in lane 0's wave",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "lane127_partial_dropped",
+            "note": "Binary64 model omitting lane 127's exp partial from the denominator",
+            "refused": true
+          }
+        ]
+      },
+      "output_sha256": [
+        "b41f8b16dc88437b9abb0dd19773e34c75d02384f422c195f38a0edce7d4372b",
+        "b41f8b16dc88437b9abb0dd19773e34c75d02384f422c195f38a0edce7d4372b",
+        "b41f8b16dc88437b9abb0dd19773e34c75d02384f422c195f38a0edce7d4372b"
+      ],
+      "GPU_milliseconds": [
+        0.054010416666666665,
+        0.05364583333333333,
+        0.054375
+      ],
+      "words_checked_each_repetition": 58080
+    },
+    {
+      "index": 14,
+      "name": "normal_allowance_last_c16000",
+      "rows": 1,
+      "base": 15999,
+      "count": 16000,
+      "buffer_bytes": 1024512,
+      "device_plus_staging_bytes": 2049024,
+      "host_forecast_bytes": 6146048,
+      "groups": [
+        16,
+        1,
+        1
+      ],
+      "input_sha256": "afb2052f720052e20860bea1cd92fa6e074c76005ab16544c7f9983addf6aa08",
+      "passed": true,
+      "oracle": {
+        "maximum_exponential_term_bound": 2.0280685921303387e-05,
+        "maximum_relative_bound": 4.866889378973838e-05,
+        "minimum_probability": 9.450862558974702e-13,
+        "seconds": 0.0129352,
+        "two_value_gate_words": 1489,
+        "valid_words": 256000
+      },
+      "sensitivity": {
+        "all_applicable_refused": true,
+        "controls": [
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "next_bf16_above_admissible_interval",
+            "note": "One valid word one BF16 step above its gate",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "next_bf16_below_admissible_interval",
+            "note": "One valid word one BF16 step below its gate",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "nonfinite",
+            "name": "nan_word",
+            "note": "One valid word replaced by a quiet NaN",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "not_bf16_storage",
+            "name": "non_bf16_storage",
+            "note": "Low 16 bits of one valid word set",
+            "refused": true
+          },
+          {
+            "applicable": false,
+            "name": "masked_word_smallest_normal",
+            "note": "One causally masked word set to the smallest normal BF16"
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "guard_word_changed",
+            "name": "guard_word_overwritten",
+            "note": "First guard word after the score plane overwritten",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "longest_row_raised_one_bf16_step",
+            "note": "Every valid word of the longest row one BF16 step above nearest",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "original_hazard_model_wave32_ascending",
+            "note": "Binary64 model of the 2c44182 shader when lane 0's wave overwrites tmp[0] before later waves read the maximum; not applicable when every key-owning lane is in lane 0's wave",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "original_hazard_model_wave16_ascending",
+            "note": "Binary64 model of the 2c44182 shader when lane 0's wave overwrites tmp[0] before later waves read the maximum; not applicable when every key-owning lane is in lane 0's wave",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "lane127_partial_dropped",
+            "note": "Binary64 model omitting lane 127's exp partial from the denominator",
+            "refused": true
+          }
+        ]
+      },
+      "output_sha256": [
+        "c1113d8c009295355cfa03cd22e5d48e248ed1e8575ef3ec66977ef109cad504",
+        "c1113d8c009295355cfa03cd22e5d48e248ed1e8575ef3ec66977ef109cad504",
+        "c1113d8c009295355cfa03cd22e5d48e248ed1e8575ef3ec66977ef109cad504"
+      ],
+      "GPU_milliseconds": [
+        0.1546875,
+        0.15479166666666666,
+        0.15369791666666666
+      ],
+      "words_checked_each_repetition": 256128
+    },
+    {
+      "index": 15,
+      "name": "context_bound_tail_c16384",
+      "rows": 2,
+      "base": 16382,
+      "count": 16384,
+      "buffer_bytes": 2097664,
+      "device_plus_staging_bytes": 4195328,
+      "host_forecast_bytes": 12060672,
+      "groups": [
+        32,
+        1,
+        1
+      ],
+      "input_sha256": "cdfad47843b1a5d61ca25d8588c8f7e19fe092748779936f818a5fa41b956db2",
+      "passed": true,
+      "oracle": {
+        "maximum_exponential_term_bound": 2.014657275983822e-05,
+        "maximum_relative_bound": 4.8579481290556004e-05,
+        "minimum_probability": 1.1399915745652606e-12,
+        "seconds": 0.0264547,
+        "two_value_gate_words": 1963,
+        "valid_words": 524272
+      },
+      "sensitivity": {
+        "all_applicable_refused": true,
+        "controls": [
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "next_bf16_above_admissible_interval",
+            "note": "One valid word one BF16 step above its gate",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "next_bf16_below_admissible_interval",
+            "note": "One valid word one BF16 step below its gate",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "nonfinite",
+            "name": "nan_word",
+            "note": "One valid word replaced by a quiet NaN",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "not_bf16_storage",
+            "name": "non_bf16_storage",
+            "note": "Low 16 bits of one valid word set",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "masked_word_not_positive_zero",
+            "name": "masked_word_smallest_normal",
+            "note": "One causally masked word set to the smallest normal BF16",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "guard_word_changed",
+            "name": "guard_word_overwritten",
+            "note": "First guard word after the score plane overwritten",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "longest_row_raised_one_bf16_step",
+            "note": "Every valid word of the longest row one BF16 step above nearest",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "original_hazard_model_wave32_ascending",
+            "note": "Binary64 model of the 2c44182 shader when lane 0's wave overwrites tmp[0] before later waves read the maximum; not applicable when every key-owning lane is in lane 0's wave",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "original_hazard_model_wave16_ascending",
+            "note": "Binary64 model of the 2c44182 shader when lane 0's wave overwrites tmp[0] before later waves read the maximum; not applicable when every key-owning lane is in lane 0's wave",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "lane127_partial_dropped",
+            "note": "Binary64 model omitting lane 127's exp partial from the denominator",
+            "refused": true
+          }
+        ]
+      },
+      "output_sha256": [
+        "7887c2caf03994297fee96ea37f3c7065744a49f3499881429300dd217686427",
+        "7887c2caf03994297fee96ea37f3c7065744a49f3499881429300dd217686427",
+        "7887c2caf03994297fee96ea37f3c7065744a49f3499881429300dd217686427"
+      ],
+      "GPU_milliseconds": [
+        0.16119791666666666,
+        0.16135416666666666,
+        0.15817708333333333
+      ],
+      "words_checked_each_repetition": 524416
+    },
+    {
+      "index": 16,
+      "name": "context_bound_decode_c16384",
+      "rows": 1,
+      "base": 16383,
+      "count": 16384,
+      "buffer_bytes": 1049088,
+      "device_plus_staging_bytes": 2098176,
+      "host_forecast_bytes": 6293504,
+      "groups": [
+        16,
+        1,
+        1
+      ],
+      "input_sha256": "a26b993252ff246d5b3e26caa324ea9d016fd91f81b772591ef207b12f4c7029",
+      "passed": true,
+      "oracle": {
+        "maximum_exponential_term_bound": 2.037009470567952e-05,
+        "maximum_relative_bound": 4.90265469994533e-05,
+        "minimum_probability": 8.340357102048973e-13,
+        "seconds": 0.0170347,
+        "two_value_gate_words": 1190,
+        "valid_words": 262144
+      },
+      "sensitivity": {
+        "all_applicable_refused": true,
+        "controls": [
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "next_bf16_above_admissible_interval",
+            "note": "One valid word one BF16 step above its gate",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "next_bf16_below_admissible_interval",
+            "note": "One valid word one BF16 step below its gate",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "nonfinite",
+            "name": "nan_word",
+            "note": "One valid word replaced by a quiet NaN",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "not_bf16_storage",
+            "name": "non_bf16_storage",
+            "note": "Low 16 bits of one valid word set",
+            "refused": true
+          },
+          {
+            "applicable": false,
+            "name": "masked_word_smallest_normal",
+            "note": "One causally masked word set to the smallest normal BF16"
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "guard_word_changed",
+            "name": "guard_word_overwritten",
+            "note": "First guard word after the score plane overwritten",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "longest_row_raised_one_bf16_step",
+            "note": "Every valid word of the longest row one BF16 step above nearest",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "original_hazard_model_wave32_ascending",
+            "note": "Binary64 model of the 2c44182 shader when lane 0's wave overwrites tmp[0] before later waves read the maximum; not applicable when every key-owning lane is in lane 0's wave",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "original_hazard_model_wave16_ascending",
+            "note": "Binary64 model of the 2c44182 shader when lane 0's wave overwrites tmp[0] before later waves read the maximum; not applicable when every key-owning lane is in lane 0's wave",
+            "refused": true
+          },
+          {
+            "applicable": true,
+            "first_violation_kind": "outside_admissible_bf16_interval",
+            "name": "lane127_partial_dropped",
+            "note": "Binary64 model omitting lane 127's exp partial from the denominator",
+            "refused": true
+          }
+        ]
+      },
+      "output_sha256": [
+        "327afee8be0315b5c9ce664313367f678e761cbb8a51e6e601e3202af70b9976",
+        "327afee8be0315b5c9ce664313367f678e761cbb8a51e6e601e3202af70b9976",
+        "327afee8be0315b5c9ce664313367f678e761cbb8a51e6e601e3202af70b9976"
+      ],
+      "GPU_milliseconds": [
+        0.1590625,
+        0.1603125,
+        0.1584375
+      ],
+      "words_checked_each_repetition": 262272
+    }
+  ],
+  "closure": {
+    "native_process": {
+      "started_utc": "2026-10-06T10:54:24.621583+00:00",
+      "elapsed_seconds": 12.453000000008615,
+      "returncode": 0,
+      "native_process_wait_completed": true,
+      "model_loaded": false,
+      "available_ram_before": 19787636736
+    },
+    "owned_Job": {
+      "peak_process_commit_bytes": 205164544,
+      "peak_job_commit_bytes": 213770240,
+      "process_commit_limit_bytes": 805306368,
+      "job_commit_limit_bytes": 1073741824,
+      "affinity_mask": 1,
+      "priority_class": 16384,
+      "total_job_processes": 2,
+      "active_job_processes_before_retirement": 0,
+      "active_job_processes_after_retirement": 0,
+      "returncode": 0,
+      "kill_on_job_close": true
+    },
+    "channel": {
+      "utc": "2026-10-06T10:54:39.653941+00:00",
+      "returncode": 0,
+      "elapsed_seconds": 16.707606585000576,
+      "automatic_replay": false
+    },
+    "ordinary_historical_service_restored_cold_at_receipt": true
+  },
+  "current_runtime_integration": {
+    "base_commit": "d071c0c862fa5e5d9b4ac2cf096a2af4cfddaac4",
+    "GCC_exact_input_tests": 12,
+    "upstream_geometry_tests": 3,
+    "actual_logs_and_result": {
+      "result.json": {
+        "bytes": 1276,
+        "sha256": "36171b04a9844991ace38bef46243b06914bf5ffb205748bd47695a74b6a2a86"
+      },
+      "test_exact_input_correctness.py.log": {
+        "bytes": 1664,
+        "sha256": "9948b12f80e9324ce69b8c364a52f4127c92b90e481133d6233dc7020bc4586d"
+      },
+      "test_recorded_geometry_upstream.py.log": {
+        "bytes": 519,
+        "sha256": "44b2b4f8db5c207bad491ec669a3f49f99573b96135af7a82b712cf866fb70a1"
+      }
+    },
+    "root_setup_failure_retained": "Initial unittest-module invocation imported no tests because systemd working directory was unspecified; fresh corrected direct-script invocations passed"
+  },
+  "independent_reviews": {
+    "source_and_CPU_build": {
+      "seal": {
+        "bytes": 34813,
+        "sha256": "31ff1e1326760946f88cc108b0fb97539a0e991981d61241881b5466902b4d7a"
+      },
+      "review": {
+        "bytes": 10447,
+        "sha256": "99be3f6884a34893995c3047009e434fc87c5ed5e3c63463b7f49a067c3143d2"
+      }
+    },
+    "hardware": {
+      "seal": {
+        "bytes": 4345,
+        "sha256": "21e86de0bd3f51a1d5dfb197c8a7be0cd03fd9f878a77b5f2de563d02258893f"
+      },
+      "review": {
+        "bytes": 14030,
+        "sha256": "db5875bbec41f0c75844fdb68c8ba7ea0c1340ded0283b720299ab3529700b14"
+      }
+    }
+  },
+  "artifact_commitments": {
+    "result.json": {
+      "bytes": 268293,
+      "sha256": "95a4d58faccd04fc9651b4d93526c50f0d10fc72ec7256920859308fbcfb6126"
+    },
+    "process.json": {
+      "bytes": 280,
+      "sha256": "4b78f0475a851932fb638109a6c334cd52ae42adba802ee2bfd6c8e223e2450e"
+    },
+    "job.json": {
+      "bytes": 397,
+      "sha256": "d9785339c6605c5b6f8d1313412f14f7dbc66fe84829d7184863225ac538a019"
+    },
+    "channel-result.json": {
+      "bytes": 137,
+      "sha256": "51c57ee06a31fee89e8cb0ad963c6e4edafb9bd66fae907a3abadecdeb818add"
+    },
+    "ordinary-worker-restored.json": {
+      "bytes": 634,
+      "sha256": "3cb309154e8640dec7daef653bd610ab211b7beb7ba40ed1a077bf88ef5e3306"
+    },
+    "execution-inputs.json": {
+      "bytes": 386,
+      "sha256": "da3a8fbd6b124bee72ee6fc64e8ca61fc585be1940b4c1defb212af715d44b1d"
+    }
+  },
+  "known_P3": {
+    "location": "ChandraNative/runtime/text_softmax_regression.h:263",
+    "defect": "Control-only bf16ModelBits incorrectly treats finite 2^127 as infinity",
+    "current_cases_affected": false,
+    "general_reuse_requires_correction": true
+  },
+  "acceptance": {
+    "source_shared_memory_repair": true,
+    "finite_model_free_kernel_regression": true,
+    "fresh_trained_numerics": false,
+    "original_second_page_OCR": false,
+    "complete_corpus": false,
+    "native_HTTP": false,
+    "sustained_throughput": false,
+    "sole_cause_of_first_page_recovery": false
+  },
+  "limits": [
+    "The original shader need not fail under a physical schedule; a clean control does not disprove the CPU-demonstrated hazard.",
+    "The 100 ms gate checks completed dispatches; external Job and deadline remain necessary bounds.",
+    "Five cases admit adjacent BF16 words under a derived arithmetic bound; in-process full-buffer checks and hashes are retained, without raw output tensors.",
+    "The original second page remains rejected from its first prediction; no cause or trained-model repair is established by this kernel result.",
+    "Windows Job commit is not resident RAM; tracked buffers are not driver-wide VRAM.",
+    "Cold service restoration is a receipt-cutoff fact, not a current-state claim."
+  ]
+}
