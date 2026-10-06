@@ -15,7 +15,11 @@ cl /nologo /std:c++17 /O2 /fp:strict /EHsc /W4 "%~dp0operator_fixture.cpp" devic
 if errorlevel 1 goto failed
 cl /nologo /std:c++17 /O2 /fp:strict /EHsc /W4 "%~dp0dispatch_calibration.cpp" device.obj operators.obj /Fe:dispatch-calibration.exe /link d3d11.lib dxgi.lib d3dcompiler.lib bcrypt.lib gdi32.lib
 if errorlevel 1 goto failed
-cl /nologo /std:c++17 /O2 /fp:strict /EHsc /W4 "%~dp0inference.cpp" chandra-runtime.lib /Fe:chandra-inference.exe /link d3d11.lib dxgi.lib d3dcompiler.lib bcrypt.lib gdi32.lib
+cl /nologo /c /std:c++17 /O2 /fp:strict /EHsc /W4 "%~dp0inference_core.cpp"
+if errorlevel 1 goto failed
+cl /nologo /std:c++17 /O2 /fp:strict /EHsc /W4 "%~dp0inference.cpp" inference_core.obj chandra-runtime.lib /Fe:chandra-inference.exe /link d3d11.lib dxgi.lib d3dcompiler.lib bcrypt.lib gdi32.lib
+if errorlevel 1 goto failed
+cl /nologo /std:c++17 /O2 /fp:strict /EHsc /W4 "%~dp0worker.cpp" inference_core.obj chandra-runtime.lib /Fe:chandra-worker.exe /link d3d11.lib dxgi.lib d3dcompiler.lib bcrypt.lib gdi32.lib
 if errorlevel 1 goto failed
 cl /nologo /std:c++17 /O2 /fp:strict /EHsc /W4 "%~dp0shader_compile.cpp" /Fe:shader-compile.exe /link d3dcompiler.lib
 if errorlevel 1 goto failed
