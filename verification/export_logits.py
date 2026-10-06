@@ -10,7 +10,10 @@ try:
     import resource
 except ImportError:
     resource = None
+import stat
+import sys
 import time
+import types
 
 os.environ.setdefault("OMP_NUM_THREADS", "8")
 import torch
@@ -20,6 +23,11 @@ from transformers import AutoProcessor, Qwen3_5ForConditionalGeneration
 
 REVISION = "af93b47dba1b47b6640c86ccf487ed2260ab9a09"
 PROFILE = {"size": {"shortest_edge": 3136, "longest_edge": 3145728}}
+MODEL = "datalab-to/chandra-ocr-2"
+INVENTORY = Path(__file__).resolve().parents[1] / "provenance/model.json"
+INVENTORY_SHA256 = "5cb10cc7ecd5fa31055ec9f18da92fd8bb0bb0c75803c095f336428fa84e2ee4"  # provenance/model.json (eol=lf): the --custody trust root
+EXPORTER, HELPER = "verification/export_logits.py", "verification/cpu_custody.py"
+MODULE_CODE = sys._getframe(0).f_code if hasattr(sys, "_getframe") else None  # This module as Python compiled it; --custody binds it to retained bytes.
 
 def peak_rss_kib():
     if resource is not None:
@@ -74,6 +82,79 @@ def states(cache):
                     records[f"{i}.{name}.{j}"] = tensor_record(tensor)
     return records
 
+def read_helper(path):
+    """The custody helper's bytes, read before any custody code exists: a regular file of at most 4 MiB, opened without following a final link or blocking on a FIFO."""
+    fd = os.open(path, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0) | getattr(os, "O_CLOEXEC", 0) | getattr(os, "O_NOCTTY", 0))
+    try:
+        info = os.fstat(fd)
+        if not stat.S_ISREG(info.st_mode) or info.st_size > 4 * 1024 * 1024:
+            raise OSError(f"{path} is not a regular file of at most 4 MiB")
+        data = os.read(fd, info.st_size + 1)
+    finally:
+        os.close(fd)
+    if len(data) != info.st_size:
+        raise OSError(f"{path} changed while it was read")
+    return data
+
+def open_custody(a):
+    """--custody: execute the exact helper bytes it records and refuse, before any output exists, a run the checked route cannot cover."""
+    def refused(error):
+        print(json.dumps({"phase": "custody_refused", "error": error, "output_created": False}), flush=True)
+        raise SystemExit(2)
+    here = Path(__file__).resolve().parent
+    helper_path = here / "cpu_custody.py"
+    try:
+        helper_bytes = read_helper(helper_path)
+        helper = types.ModuleType("chandra_cpu_custody")
+        helper.__file__ = str(helper_path)
+        exec(compile(helper_bytes, str(helper_path), "exec", dont_inherit=True), helper.__dict__)
+    except (OSError, SyntaxError, ValueError) as error:
+        refused(f"The custody helper cannot be read and compiled: {type(error).__name__}: {error}")
+    try:
+        helper.require(a.device == "cpu" and a.precision in (None, "float32"), "--custody covers CPU FP32 exports only")
+        helper.require(not a.activation_fixture, "--custody does not cover --activation-fixture, whose activation.json is accepted before the post-load pass")
+        helper.require(not a.greedy_max_tokens, "--custody covers teacher-logit exports; --greedy-max-tokens free generation is outside the checked route")
+        exporter_path = Path(__file__).resolve()
+        snapshot = helper.read_regular(str(exporter_path), helper.PRODUCER_LIMIT, f"The exporter {exporter_path}")
+        producer = {EXPORTER: (exporter_path, snapshot), HELPER: (helper_path, helper_bytes)}
+        session = helper.Session(a.model, INVENTORY, a.output, producer, 1800.0 if a.custody_hash_seconds is None else a.custody_hash_seconds,
+                                 model=MODEL, revision=REVISION, inventory_sha256=INVENTORY_SHA256, inventory_name="provenance/model.json")
+    except helper.CustodyError as error:
+        refused(str(error))
+    return helper, session
+
+def bootstrap(helper, custody):
+    """--custody: require the retained exporter and helper bytes to compile to the code this process is already executing, then return a fresh module executed from the retained exporter compilation, which performs the export."""
+    code = custody.bind_execution({EXPORTER: MODULE_CODE, HELPER: helper.MODULE_CODE})[EXPORTER]
+    retained = types.ModuleType("chandra_export_logits_retained")
+    retained.__file__ = custody.producer[EXPORTER]["path"]
+    exec(code, retained.__dict__)
+    return retained
+
+def torch_libraries():
+    return [Path(torch.__file__).parent / "lib"]
+
+def computation_classes(processor):
+    """Classes whose module sources configure, model, process and tokenize this export."""
+    classes = {"model": Qwen3_5ForConditionalGeneration, "model_config": getattr(Qwen3_5ForConditionalGeneration, "config_class", None), "auto_processor": AutoProcessor,
+               "processor": type(processor), "tokenizer": type(processor.tokenizer), "image_processor": type(processor.image_processor),
+               "video_processor": type(getattr(processor, "video_processor", None))}
+    def source(c):
+        try:
+            return inspect.getsourcefile(c)
+        except TypeError:  # A class without Python source is named with a null source rather than aborting the run.
+            return None
+    return {label: (f"{c.__module__}.{c.__qualname__}", source(c)) for label, c in classes.items() if c not in (None, type(None))}
+
+def write_metadata(outdir, meta, custody, payloads, model):
+    """Final metadata; under --custody only after the post-load pass matches, through the session's acceptance."""
+    if custody is None:
+        (outdir / "metadata.json").write_text(json.dumps(meta,indent=2))
+        return
+    reported = {"model.name_or_path": str(getattr(model, "name_or_path", None)), "model.config._name_or_path": str(getattr(model.config, "_name_or_path", None)), "model.dtype": str(getattr(model, "dtype", None))}
+    custody.accept(outdir, meta, payloads, custody.loaded_sources(sys.modules, torch_libraries()), reported)
+    print(json.dumps({"phase": "custody_accepted", "metadata_sha256": custody.metadata_sha256, "receipt_sha256": custody.receipt_sha256, "evidence": custody.evidence}), flush=True)
+
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--model", required=True)
@@ -90,14 +171,39 @@ def main():
     p.add_argument("--attention", choices=["eager","sdpa","hybrid"],default="eager")
     p.add_argument("--greedy-max-tokens", type=int, help="Independent complete greedy response, explicit bounded output allowance")
     p.add_argument("--precision", choices=["float32","bfloat16"], help="Explicit precision; defaults CPU FP32 / XPU BF16")
+    p.add_argument("--custody", action="store_true", help="Checked route: verify --model against provenance/model.json before loading and again before metadata.json; CPU FP32 only; evidence in <output>.custody")
+    p.add_argument("--custody-hash-seconds", type=float, help="Monotonic deadline of each custody hashing pass (default 1800, at most 3600)")
     a = p.parse_args()
+    if a.custody_hash_seconds is not None and not a.custody:
+        p.error("--custody-hash-seconds requires --custody")
+    if not a.custody:
+        return run(a, None)
+    helper, custody = open_custody(a)
+    try:
+        custody.begin()
+        bootstrap(helper, custody).run(a, custody)
+    except BaseException as error:
+        custody.refuse(error)
+        if isinstance(error, helper.CustodyError):
+            print(json.dumps({"phase": "custody_refused", "error": str(error), "evidence": custody.evidence, "metadata_written": os.path.lexists(Path(a.output) / "metadata.json")}), flush=True)
+            raise SystemExit(2)
+        raise
+
+def run(a, custody):
     torch.set_num_threads(8)
     torch.set_num_interop_threads(1)
     outdir = Path(a.output)
     outdir.mkdir(parents=True, exist_ok=False)
     modeldir = Path(a.model)
     dtype = getattr(torch,a.precision) if a.precision else torch.float32 if a.device == "cpu" else torch.bfloat16
-    processor = AutoProcessor.from_pretrained(modeldir, local_files_only=True)
+    attention = {"vision_config":"sdpa","text_config":"eager"} if a.attention=="hybrid" else a.attention
+    load = custody.load if custody else lambda role, loader, path, **kwargs: loader(path, **kwargs)
+    if custody:
+        before = custody.verify_before_load()
+        custody.declare("processor", AutoProcessor.from_pretrained, modeldir, local_files_only=True)
+        custody.declare("model", Qwen3_5ForConditionalGeneration.from_pretrained, modeldir, dtype=dtype, device_map=a.device, local_files_only=True, attn_implementation=attention)
+        print(json.dumps({"phase": "custody_verified_before_load", "members": len(before["members"]), "bytes_hashed": before["bytes_hashed"], "elapsed_seconds": before["elapsed_seconds"]}), flush=True)
+    processor = load("processor", AutoProcessor.from_pretrained, modeldir, local_files_only=True)
     processor.image_processor.size = PROFILE["size"]
     prompt = Path(a.prompt).read_text()
     image = Image.open(a.image).convert("RGB")
@@ -110,14 +216,24 @@ def main():
         pass
     targets = processor.tokenizer.encode(response, add_special_tokens=False)[:a.steps]
     prefix = inputs["input_ids"][0].tolist()
-    meta = {"schema_version": 1, "context": {"vocabulary_size": 248320, "model_revision": REVISION, "tokenizer_sha256": sha(modeldir / "tokenizer.json"), "config_sha256": sha(modeldir / "config.json"), "image_sha256": sha(a.image), "prompt_sha256": sha(a.prompt), "processor_profile": PROFILE, "positions": list(range(len(prefix)-1, len(prefix)+len(targets))), "prefix_token_ids": prefix, "target_token_ids": targets}, "inputs": {k: tensor_record(v) for k,v in inputs.items()}, "runtime": {"torch": torch.__version__, "transformers": transformers.__version__, "python": platform.python_version(), "device": a.device, "dtype": str(dtype), "threads": 8, "attention": a.attention, "model_source_sha256": sha(inspect.getfile(Qwen3_5ForConditionalGeneration)), "script_sha256": sha(__file__)}, "response_sha256": sha(a.response), "states": []}
-    (outdir / "admission.json").write_text(json.dumps(meta, indent=2))
+    digest = custody.file_sha256 if custody else sha  # Under --custody, the same digests read only regular files, without blocking and within the deadline.
+    payload_digest = (lambda name: custody.payload_sha256(outdir, name)) if custody else lambda name: sha(outdir / name)  # Under --custody, read as acceptance reads payloads: in the admitted --output directory, never through a link.
+    meta = {"schema_version": 1, "context": {"vocabulary_size": 248320, "model_revision": REVISION, "tokenizer_sha256": digest(modeldir / "tokenizer.json"), "config_sha256": digest(modeldir / "config.json"), "image_sha256": digest(a.image), "prompt_sha256": digest(a.prompt), "processor_profile": PROFILE, "positions": list(range(len(prefix)-1, len(prefix)+len(targets))), "prefix_token_ids": prefix, "target_token_ids": targets}, "inputs": {k: tensor_record(v) for k,v in inputs.items()}, "runtime": {"torch": torch.__version__, "transformers": transformers.__version__, "python": platform.python_version(), "device": a.device, "dtype": str(dtype), "threads": 8, "attention": a.attention, "model_source_sha256": digest(inspect.getfile(Qwen3_5ForConditionalGeneration)), "script_sha256": digest(__file__)}, "response_sha256": digest(a.response), "states": []}
+    if custody:
+        custody.require_digest("tokenizer.json", meta["context"]["tokenizer_sha256"], "context tokenizer_sha256")
+        custody.require_digest("config.json", meta["context"]["config_sha256"], "context config_sha256")
+        custody.require_producer(EXPORTER, meta["runtime"]["script_sha256"], "runtime script_sha256")
+        custody.record_sources(custody.loaded_sources(sys.modules, torch_libraries()), computation_classes(processor))
+        custody.require_source("model", meta["runtime"]["model_source_sha256"], "runtime model_source_sha256")
+        meta["runtime"]["custody"] = custody.admission_record()
+        custody.write_admission(outdir, meta)
+    else:
+        (outdir / "admission.json").write_text(json.dumps(meta, indent=2))
     print(json.dumps({"phase": "prepared", "input_shapes": {k:list(v.shape) for k,v in inputs.items()}, "targets": targets}), flush=True)
     start = time.monotonic()
     if a.device == "cpu":
         meta["memory_admission"] = cpu_memory(admission=True)
-    attention = {"vision_config":"sdpa","text_config":"eager"} if a.attention=="hybrid" else a.attention
-    model = Qwen3_5ForConditionalGeneration.from_pretrained(modeldir, dtype=dtype, device_map=a.device, local_files_only=True, attn_implementation=attention).eval()
+    model = load("model", Qwen3_5ForConditionalGeneration.from_pretrained, modeldir, dtype=dtype, device_map=a.device, local_files_only=True, attn_implementation=attention).eval()
     meta["runtime"]["attention_config"] = {"vision":model.config.vision_config._attn_implementation,"text":model.config.text_config._attn_implementation}
     expected_attention = {"vision":"sdpa","text":"eager"} if a.attention=="hybrid" else {"vision":a.attention,"text":a.attention}
     if meta["runtime"]["attention_config"] != expected_attention:
@@ -159,7 +275,7 @@ def main():
         meta["peak_rss_kib"] = peak_rss_kib()
         if a.device == "cpu":
             meta["memory_completion"] = cpu_memory()
-        (outdir / "metadata.json").write_text(json.dumps(meta,indent=2))
+        write_metadata(outdir, meta, custody, {"greedy.txt": meta["greedy"]["text_sha256"]}, model)
         print(json.dumps({"phase":"complete_greedy","elapsed_seconds":meta["elapsed_seconds"],"generated_tokens":len(generated_ids),"ended_with_eos":meta["greedy"]["ended_with_eos"]}),flush=True)
         return
     if a.full_teacher or a.all_teacher:
@@ -180,12 +296,12 @@ def main():
         meta["context"]["target_token_ids"] = [teacher[i] for i in offsets]
         meta["states"] = [states(result.past_key_values)]
         rows.numpy().astype("<f4").tofile(outdir / "logits.f32")
-        meta["logits"] = {"file":"logits.f32","shape":list(rows.shape),"dtype":"float32","byte_order":"little","sha256":sha(outdir / "logits.f32")}
+        meta["logits"] = {"file":"logits.f32","shape":list(rows.shape),"dtype":"float32","byte_order":"little","sha256":payload_digest("logits.f32")}
         meta["elapsed_seconds"] = time.monotonic()-start
         meta["peak_rss_kib"] = peak_rss_kib()
         if a.device == "cpu":
             meta["memory_completion"] = cpu_memory()
-        (outdir / "metadata.json").write_text(json.dumps(meta,indent=2))
+        write_metadata(outdir, meta, custody, {"logits.f32": meta["logits"]["sha256"]}, model)
         print(json.dumps({"phase":"complete_sparse","elapsed_seconds":meta["elapsed_seconds"],"peak_rss_kib":meta["peak_rss_kib"],"teacher_tokens":len(teacher),"offsets":offsets}),flush=True)
         return
     rows = []
@@ -241,10 +357,10 @@ def main():
             final = model(**uncached, use_cache=False, logits_to_keep=1).logits[0,-1].float().cpu()
             meta["cache_equivalence"] = {"max_abs":float((final-rows[-1]).abs().max()), "rmse":float((final-rows[-1]).square().mean().sqrt()), "argmax_equal":bool(final.argmax()==rows[-1].argmax()), "finite":bool(torch.isfinite(final).all())}
     torch.stack(rows).numpy().astype("<f4").tofile(outdir / "logits.f32")
-    meta["logits"] = {"file":"logits.f32", "shape":[len(rows),248320], "dtype":"float32", "byte_order":"little", "sha256":sha(outdir / "logits.f32")}
+    meta["logits"] = {"file":"logits.f32", "shape":[len(rows),248320], "dtype":"float32", "byte_order":"little", "sha256":payload_digest("logits.f32")}
     meta["elapsed_seconds"] = time.monotonic()-start
     meta["peak_rss_kib"] = peak_rss_kib()
-    (outdir / "metadata.json").write_text(json.dumps(meta,indent=2))
+    write_metadata(outdir, meta, custody, {"logits.f32": meta["logits"]["sha256"], "logits.partial.f32": meta["logits"]["sha256"]}, model)
     print(json.dumps({"phase":"complete", "elapsed_seconds":meta["elapsed_seconds"], "peak_rss_kib":meta["peak_rss_kib"]}),flush=True)
 
 if __name__ == "__main__":

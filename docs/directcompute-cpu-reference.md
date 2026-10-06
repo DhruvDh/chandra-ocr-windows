@@ -1,5 +1,7 @@
 # DirectCompute CPU reference import
 
+The [CPU export-custody repair](directcompute-cpu-export-custody.md) is independently cleared at source scope: 72 supplied tests and 17 independent tests pass under pinned Python 3.12.14. It binds the retained exporter code, rechecks retained evidence, refuses blocking or substituted payload/source reads, and no longer omits a deleted loaded-module source. The [source record](../benchmarks/evidence/directcompute-cpu-custody-source-2026-10-06.json) preserves the original failures and honest limits. Historical weights attestation remains withheld; no fresh real-model reference or trained numerical acceptance follows from these fake tests.
+
 [import_cpu_diagnostics.py](../scripts/native/import_cpu_diagnostics.py) converts selected complete full-vocabulary logits rows of a retained `verification/export_logits.py` CPU FP32 teacher export into the diagnostic v2 dump format that [compare_diagnostics.py](../scripts/native/compare_diagnostics.py) loads, so root can compare native trained rows with actual CPU rows. It uses only the Python standard library and never imports Torch, loads a model, uses a GPU or contacts a service. It computes no values: each selected 248,320-word row is copied word for word from the single stream whose SHA-256 the producer metadata names, declares no BF16 boundary (`bf16_rounding: none`), repairs no NaN and fits no tolerance. An import qualifies nothing; it only makes an honest reference available to the existing comparator.
 
 ## What a retained export records
