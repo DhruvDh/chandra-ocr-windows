@@ -1,4 +1,6 @@
-# Measured synthetic acceptance
+# Measured evidence
+
+The [October 6 native checkpoint](directcompute-2026-10-06.json) records the readback-fixed original tiny caller-EOS run and opt-in ordered B1 GEMV comparison: 616.094 versus 358.750 seconds, with all 395 IDs and complete scalar journals identical. It also records synthetic GPU calibration, original content checks, geometry differences and closed resource bounds. These are experimental native observations; full-vector, AMD/exact-client, broader-corpus, endpoint and sustained-throughput qualification remain open. The [October 5 native checkpoint](directcompute-2026-10-05.json) retains the initial nine-token diagnostic and failed normal request. The older endpoint evidence below keeps its XPU/AMD scope.
 
 The [October 3 summary](2026-10-03-summary.json) curates the retained `northstone-01`, `waystone-01`, `recorded-cli-northstone-01` and `recorded-cli-waystone-01` acceptance records. It records observed endpoint and CLI behavior with SHA-256 commitments to 198 retained raw artifacts. The raw records remain in the owner's private task evidence; the commitments identify their exact bytes without publishing private paths, runtime credentials or adapter UUIDs. Independent curation checked every original endpoint receipt inventory, both recording proxies' request and response bytes, decoded request pixels, raw completion stop reasons and counts, and CLI output and stream hashes.
 

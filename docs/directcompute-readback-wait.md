@@ -2,7 +2,7 @@
 
 ## Observation and scope
 
-At commit 888ab33 the complete D3D11 graph ran on the Intel Arc A770 and its first nine free greedy tokens matched the retained CPU FP32 reference. Root's later full tiny-page attempt stopped after 40 tokens when `Device::readWords` failed with HRESULT 2289696778 (0x887A000A, `DXGI_ERROR_WAS_STILL_DRAWING`). The request was marked failed and retired, the final drain completed, tracked buffers returned to zero, the process exited 1, the Windows Job closed and the ordinary service was restored cold; nothing was replayed. Complete OCR remains unqualified. This change addresses only that readback status; it does not reproduce the failure, change arithmetic or establish that a full page now completes.
+At commit 888ab33 the complete D3D11 graph ran on the Intel Arc A770 and its first nine free greedy tokens matched the retained CPU FP32 reference. Root's later full tiny-page attempt stopped after 40 tokens when `Device::readWords` failed with HRESULT 2289696778 (0x887A000A, `DXGI_ERROR_WAS_STILL_DRAWING`). The request was marked failed and retired, the final drain completed, tracked buffers returned to zero, the process exited 1, the Windows Job closed and the ordinary service was restored cold; nothing was replayed. Complete OCR remains unqualified. The implementation addresses only that readback status and preserves arithmetic. The later closed tiny result below supplies its separately bounded recovery and caller-EOS evidence.
 
 ## Cause
 
@@ -53,6 +53,8 @@ cl /nologo /std:c++17 /O2 /fp:strict /EHsc /W4 ChandraNative\runtime\readback_wa
 "%CHANDRA_FRESH_BUILD_DIRECTORY%\readback-wait-test.exe"
 ```
 
-## Remaining Windows and GPU validation
+## Closed Windows and GPU validation
 
-Root must still build [runtime/build.cmd](../ChandraNative/runtime/build.cmd) with MSVC `/W4` and compile and run the CPU test above under MSVC. Root should then rerun the operator fixture and dispatch calibration to confirm exact unchanged outputs, and rerun the tiny page under the external Job to compare tokens against the retained CPU FP32 reference and read the `readback_map` counters. Whether the retry clears the observed failure, how long real readiness takes and whether a timeout ever happens are all unmeasured. Complete OCR, full-graph numerical qualification and throughput remain unqualified.
+Build07 compiled the full native graph with MSVC and all runtime shaders with fxc; all 27 portable wait tests passed under MSVC. The next normal tiny request completed 395 tokens through caller EOS, retained the failed request’s first 40 scalar records exactly and retired owned buffers to zero. One readback invocation encountered and recovered from a real WAS_STILL_DRAWING result on the same copy. The longest recorded wait across all invocations was 9.608 ms; the affected token and its individual elapsed time are not available. Native exit 0, Job active 0 and ordinary cold-worker restoration were independently checked. The [October 6 closed-point checkpoint](../benchmarks/evidence/directcompute-2026-10-06.json) records source/build/input/model/device identities and resource limits.
+
+That observation supports real recovery without request replay; it does not explain the driver’s initial post-drain status or establish that all readiness failures recover. Full trained numerical comparison, AMD/exact-client acceptance, broader OCR, native serving and sustained throughput remain open. The original failed attempt remains retained separately.

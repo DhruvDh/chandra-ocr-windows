@@ -1,0 +1,326 @@
+{
+  "schema": "chandra.directcompute.closed-points.v1",
+  "cutoff_utc": "2026-10-06T00:28:46.501745+00:00",
+  "scope": "Closed original tiny generation, transient-readback recovery and experimental ordered B1 GEMV; not a deployed endpoint or concurrency-plateau throughput qualification",
+  "model_revision": "af93b47dba1b47b6640c86ccf487ed2260ab9a09",
+  "context_limit": 16384,
+  "normal_output_allowance": 12384,
+  "input_manifest_sha256": "6e5df5e8b33a7fbee2414fafab5b2212fb5a4a80b40b34b390ae829326116a36",
+  "original_tiny_input": {
+    "prompt_tokens": 801,
+    "patch_rows": 832,
+    "grid_thw": [
+      1,
+      32,
+      26
+    ],
+    "recorded_Zotero_CLI_workload": false
+  },
+  "builds": {
+    "build-07": {
+      "source_archive": {
+        "bytes": 263189,
+        "sha256": "83300072a78ac21df36be6329b60d7b04ca00610cae0cc681851d3cbe0fe1596"
+      },
+      "source_manifest": {
+        "bytes": 11600,
+        "sha256": "720db2b31eeeedd8c5ad042870dd02f0d256899e997a818748e9f754e9be6c45"
+      },
+      "source_members": 75,
+      "build_receipt": {
+        "bytes": 2630,
+        "sha256": "8dec97ba86f34e386c518c5ad386ee3519a659b48c0d9031cba2d37a0a75f721"
+      },
+      "native_compile_returncode": 0,
+      "portable_MSVC_checks": 27,
+      "portable_MSVC_returncode": 0,
+      "native_executable": {
+        "bytes": 784384,
+        "sha256": "ba95f14c64d038b6380c4ac558d64c875ef7cf2a468bb97acbe2448d9532624c"
+      }
+    },
+    "build-08": {
+      "source_archive": {
+        "bytes": 288905,
+        "sha256": "011422b8c60d68c437de054aaeb950a563ff6da7d983705ee8f0c6b3ebd66e69"
+      },
+      "source_manifest": {
+        "bytes": 12405,
+        "sha256": "df7ab2bee604c75a84a6c79f562eae136ce2a4aeb12bbf16f38fc16871d3ff46"
+      },
+      "source_members": 80,
+      "build_receipt": {
+        "bytes": 2945,
+        "sha256": "ecce0db9cd83ba17aced64bfa72d668fb2cdf9920e502dfd00ccb3a268bbbe23"
+      },
+      "native_compile_returncode": 0,
+      "portable_MSVC_checks": 27,
+      "portable_MSVC_returncode": 0,
+      "native_executable": {
+        "bytes": 792064,
+        "sha256": "7aa1e1dc41251c7136af0c726d770221e10f818ce9f30d1e141872d1a7aef3bf"
+      }
+    }
+  },
+  "readback_fixed_baseline": {
+    "report": {
+      "bytes": 265716,
+      "sha256": "efc672e43e9b455e13cb1b18eae099d4ca71416feef1723773207436df87e8ad"
+    },
+    "scalar_token_journal": {
+      "bytes": 106736,
+      "sha256": "539f8a7e4983a775cc7ba7e073334ac4bd3e77cfbc60882dd5bfeef3ccada1e4"
+    },
+    "process_receipt": {
+      "bytes": 421,
+      "sha256": "c870c9deb0501ee41863b663a2a487c06e5014d20db87b3561246e7b68bce507"
+    },
+    "job_receipt": {
+      "bytes": 350,
+      "sha256": "9aa1d5a43017579ff471571fe92dc0632bca759e5119cc241848568479cd9c40"
+    },
+    "cold_restoration_receipt": {
+      "bytes": 634,
+      "sha256": "794da131da6a37f3d4d81cd60f082cd021fe84cbdf22319bad206710a2470a17"
+    },
+    "prompt_tokens": 801,
+    "generated_tokens_including_stop": 395,
+    "normal_output_allowance": 12384,
+    "diagnostic_cap": null,
+    "stop_reason": "stop_token",
+    "stop_token_id": 248046,
+    "wrapper_seconds": 616.0940000000119,
+    "phases": [
+      {
+        "name": "device_creation",
+        "wall_seconds": 0.0758842
+      },
+      {
+        "name": "authenticated_model_import_upload",
+        "wall_seconds": 26.5969687
+      },
+      {
+        "name": "complete_vision_forward",
+        "wall_seconds": 15.9722963
+      },
+      {
+        "name": "text_embedding",
+        "wall_seconds": 0.0064899
+      },
+      {
+        "name": "ordered_multimodal_merge",
+        "wall_seconds": 0.0251887
+      },
+      {
+        "name": "text_request_cache_creation",
+        "wall_seconds": 0.0360987
+      },
+      {
+        "name": "text_prefill",
+        "wall_seconds": 34.9723147
+      },
+      {
+        "name": "greedy_cached_decode_and_token_readback",
+        "wall_seconds": 533.5652965
+      },
+      {
+        "name": "request_retirement_and_drain",
+        "wall_seconds": 0.0105858
+      },
+      {
+        "name": "model_buffer_release_and_drain",
+        "wall_seconds": 0.0971592
+      }
+    ],
+    "owned_buffer_zero": true,
+    "memory_end": {
+      "local_budget": 16241393664,
+      "local_usage": 61603840,
+      "readback_map": {
+        "longest_wait_nanoseconds": 9608000,
+        "still_drawing_results": 1,
+        "waits": 395,
+        "waits_with_still_drawing": 1
+      },
+      "required_headroom": 2147483648,
+      "tracked_live": 0,
+      "tracked_peak": 10247911168
+    },
+    "minimum_available_host_ram_bytes": 19618566144,
+    "process_commit_peak_bytes": 10559946752,
+    "job_commit_peak_bytes": 10568364032,
+    "process_commit_limit_bytes": 12884901888,
+    "job_commit_limit_bytes": 13153337344,
+    "job_active_processes_after_wait": 0,
+    "guard_stop_reason": null,
+    "no_replay": true
+  },
+  "ordered_GEMV_candidate": {
+    "report": {
+      "bytes": 265715,
+      "sha256": "32c3bf01c0a28f643b0b7677cc28798638f84f04de80c9faa9b56996b85868a7"
+    },
+    "scalar_token_journal": {
+      "bytes": 106736,
+      "sha256": "539f8a7e4983a775cc7ba7e073334ac4bd3e77cfbc60882dd5bfeef3ccada1e4"
+    },
+    "process_receipt": {
+      "bytes": 410,
+      "sha256": "e2c39c517cc5739f583ed3e39f684631b5dd9402859c841f0fad5e4616f459d3"
+    },
+    "job_receipt": {
+      "bytes": 350,
+      "sha256": "03da22a5cb85528b97fe1d578e761d9ee61b2b38e8820300a6ae1db629ceafee"
+    },
+    "cold_restoration_receipt": {
+      "bytes": 634,
+      "sha256": "bbc7f66c7f4e95c1d4b3ff898f88a5821fd7dfec0c41136f007deb8473eb6766"
+    },
+    "prompt_tokens": 801,
+    "generated_tokens_including_stop": 395,
+    "normal_output_allowance": 12384,
+    "diagnostic_cap": null,
+    "stop_reason": "stop_token",
+    "stop_token_id": 248046,
+    "wrapper_seconds": 358.75,
+    "phases": [
+      {
+        "name": "device_creation",
+        "wall_seconds": 0.0731413
+      },
+      {
+        "name": "authenticated_model_import_upload",
+        "wall_seconds": 25.8473564
+      },
+      {
+        "name": "complete_vision_forward",
+        "wall_seconds": 15.4805876
+      },
+      {
+        "name": "text_embedding",
+        "wall_seconds": 0.0056382
+      },
+      {
+        "name": "ordered_multimodal_merge",
+        "wall_seconds": 0.0249383
+      },
+      {
+        "name": "text_request_cache_creation",
+        "wall_seconds": 0.0372674
+      },
+      {
+        "name": "text_prefill",
+        "wall_seconds": 37.3846201
+      },
+      {
+        "name": "greedy_cached_decode_and_token_readback",
+        "wall_seconds": 279.3955321
+      },
+      {
+        "name": "request_retirement_and_drain",
+        "wall_seconds": 0.0159543
+      },
+      {
+        "name": "model_buffer_release_and_drain",
+        "wall_seconds": 0.0988804
+      }
+    ],
+    "owned_buffer_zero": true,
+    "memory_end": {
+      "local_budget": 16241393664,
+      "local_usage": 59703296,
+      "readback_map": {
+        "longest_wait_nanoseconds": 237800,
+        "still_drawing_results": 0,
+        "waits": 395,
+        "waits_with_still_drawing": 0
+      },
+      "required_headroom": 2147483648,
+      "tracked_live": 0,
+      "tracked_peak": 10247911168
+    },
+    "minimum_available_host_ram_bytes": 19768356864,
+    "process_commit_peak_bytes": 10584326144,
+    "job_commit_peak_bytes": 10593173504,
+    "process_commit_limit_bytes": 12884901888,
+    "job_commit_limit_bytes": 13153337344,
+    "job_active_processes_after_wait": 0,
+    "guard_stop_reason": null,
+    "no_replay": true
+  },
+  "original_tiny_content": {
+    "required_text_equations_tables_and_end_marker_pass": true,
+    "six_block_contents_equal_CPU214_FP32_first_turn": true,
+    "geometry_coordinates_differ": 4,
+    "maximum_normalized_coordinate_delta": 2,
+    "geometry_tolerance_accepted": false,
+    "CPU_reference_run_used_wrong_checkpoint_only_stop": "Length512; only its original first turn through caller im_end is compared",
+    "independent_assessment": {
+      "bytes": 7487,
+      "sha256": "9df312a94c4f98f71bf5532a20132dd15689210d09889b4025affb68101d2bdc"
+    }
+  },
+  "GEMV_synthetic_calibration": {
+    "report": {
+      "bytes": 478034,
+      "sha256": "886b6b04d6f6fc2a0db1ac383d22774ae19e9b2e8da2bed3f9274f2a1c3accc7"
+    },
+    "selector": "ordered",
+    "default_enabled": false,
+    "six_phases_pass": true,
+    "complete_output_words_independently_checked": 9446,
+    "invalid_admissions_refused": 9,
+    "dispatches": 26,
+    "readback_calls": 14,
+    "maximum_dispatch_milliseconds": 1.30734375,
+    "dispatch_stop_threshold_milliseconds": 100,
+    "full_width_dyadic_milliseconds": [
+      0.5466145833333333,
+      0.5446875
+    ],
+    "predecessor_separate_session_full_width_B1_milliseconds": [
+      3.5608333333333335,
+      3.5602604166666665
+    ],
+    "trained_values_not_used": true,
+    "independent_audit": {
+      "bytes": 9193,
+      "sha256": "76074b52a0fa29def73350d5666583c1046fe2042b22a0d629ac7344d4e83fb1"
+    }
+  },
+  "trained_output_comparison": {
+    "all_395_IDs_and_complete_scalar_journals_identical": true,
+    "complete_vocabulary_vectors_compared": false,
+    "CPU_conditioning_diverges_at_index": 13,
+    "independent_audit": {
+      "bytes": 9067,
+      "sha256": "db5aaea8039966f7df413c4ec84056fe8be204135a504c47ac9c9672e83d8123"
+    }
+  },
+  "timing_observation": {
+    "method": "One sequential cold original tiny request per route; no image preprocessing, saturation sweep, repetition or uncertainty interval",
+    "wrapper_ratio": 1.7173351916376638,
+    "cached_decode_ratio": 1.9097130597959193,
+    "sustained_pages_per_second_claim": false,
+    "qualified_node_speedup": 0
+  },
+  "holds": {
+    "full_vector_numerics_accepted": false,
+    "AMD_acceptance": false,
+    "exact_Zotero_client_acceptance": false,
+    "complete_broader_corpus": false,
+    "native_endpoint_deployed": false,
+    "concurrency_plateau_throughput": false
+  },
+  "source_review": {
+    "readback_clearance": {
+      "bytes": 2399,
+      "sha256": "b77fd082a2f7a23e6a7bfb4900cb279fe6d4e66ea0a5fd20e4db441988148b7b"
+    },
+    "GEMV_source_assessment": {
+      "bytes": 1099,
+      "sha256": "5cf52b26e443708e39cc20f94afdd51636bc6a0931d1ffe89813889281507799"
+    }
+  },
+  "AMD_service_actions": []
+}

@@ -1,6 +1,6 @@
 # DirectCompute B1 GEMV candidate
 
-This is an experimental, inactive-by-default projection kernel for batch-row-1 `linear()` calls on the Windows Intel Arc A770. It has not been compiled with fxc or MSVC, has not executed on any GPU, and carries no numerical, OCR or throughput qualification; qualified speedup remains zero. The immutable predecessor is commit `888ab33`, whose complete original graph produced nine greedy tokens matching the CPU FP32 reference. With the selector unset, this source issues the same dispatches as that commit.
+This is an experimental, inactive-by-default projection kernel for batch-row-1 `linear()` calls on the Windows Intel Arc A770. The [October 6 checkpoint](../benchmarks/evidence/directcompute-2026-10-06.json) records successful MSVC/fxc compilation, native synthetic calibration and an original tiny caller-EOS run. All 395 token IDs and the complete scalar journal match the readback-fixed baseline; the observed cold interval fell from 616 to 359 seconds. This is one sequential point per route, without full trained vectors or sustained-throughput qualification. The immutable predecessor is commit `888ab33`, whose complete original graph produced nine greedy tokens matching the CPU FP32 reference. With the selector unset, this source issues the same dispatches as that commit.
 
 ## Selector
 
@@ -14,7 +14,7 @@ The predecessor schedules 16 output columns × 16 batch rows per group. For B1, 
 
 [linear_gemv.hlsl](../ChandraNative/shaders/runtime/linear_gemv.hlsl) uses 256-thread `cs_5_0` groups owning 8 consecutive outputs, so it needs at most 128 groups per ≤1,024-output dispatch. For each 512-element K tile, 32 lanes per output row load consecutive 32-bit weight words. All loads are issued into registers before any groupshared store, together with the FP32 input slice. The loaded data is expanded into a padded `8 × 513` float tile (18,464 bytes of groupshared memory with the input tile), and then lanes 0–7 continue their own sums. The sum is the predecessor's operation sequence unchanged: `precise` FP32 `sum` from +0, `sum = sum + a[k] * w[k]` in ascending k for the complete K, bias after the complete dot, then the same explicit BF16 RNE (NaN quieting, signed-zero and Inf preservation). Packed BF16 rows may start at odd elements; word `j` of a tile supplies positions `2j - parity` and `2j + 1 - parity`. FP32 weights stage one word per element. The kernel uses the same 32-byte cbuffer, SRV/UAV bindings, shard offsets, ≤1,024 outputs and complete-K dispatch boundary as the predecessor. It uses no FP16, split-K, reassociation, wave intrinsics, DirectML, transposition or prepacking.
 
-I chose complete ascending order over a K-lane groupshared reduction. The B1 bottleneck is exposed memory latency and barriers, not arithmetic. An ordered tile kernel removes the wasted rows and most barriers while keeping each output bit-identical to the predecessor's arithmetic by construction, so qualification can compare against the predecessor exactly. Its cost is one serial chain of up to 9,216 dependent FP32 additions per output, with only 8 of 256 lanes summing between barriers. A 32-lane split with a groupshared tree would stream more parallel loads but changes FP32 results (below), so it would need higher precision, trained and complete OCR qualification. The CPU harness evaluates that split only as a rejected alternative; it is not implemented on the GPU.
+I chose complete ascending order over a K-lane groupshared reduction. The predecessor exposes strided weight loads, inactive rows and frequent barriers; the ordered tile design addresses those costs. Their individual contribution to trained decode time has not been measured. An ordered tile kernel removes the wasted rows and most barriers while keeping each output bit-identical to the predecessor's arithmetic by construction, so qualification can compare against the predecessor exactly. Its cost is one serial chain of up to 9,216 dependent FP32 additions per output, with only 8 of 256 lanes summing between barriers. A 32-lane split with a groupshared tree would stream more parallel loads but changes FP32 results (below), so it would need higher precision, trained and complete OCR qualification. The CPU harness evaluates that split only as a rejected alternative; it is not implemented on the GPU.
 
 ## Forecasts for one decode token
 
@@ -80,14 +80,10 @@ On 64 representative outputs per K, the CPU observations compare ascending FP32 
 
 The tree is usually closer to binary64 but changes predecessor bits, flips BF16 outputs near ties and under cancellation, and can turn an overflow +Inf into NaN. Taking it would be a numerical change requiring qualification, not an equivalent schedule.
 
-## Remaining work
+## Validation and remaining work
 
-Pending, in order:
+Build08 compiled the source and all runtime shaders with MSVC/fxc. Native calibration passed six phases, nine malformed admissions and all 9446 independent output-word checks across 26 dispatches. The full-width dyadic dispatches measured 0.5466 and 0.5447 ms; the maximum across all candidate dispatches was 1.3073 ms, below the 100 ms admission gate. The earlier separate-session predecessor B1 dyadic measurements were about 3.56 ms. This synthetic kernel comparison is not a paired page-throughput result. The normal tiny request preserved output allowance 12384 and all 395 baseline tokens/scalar records, with clean owned closure. See the [closed-point checkpoint](../benchmarks/evidence/directcompute-2026-10-06.json) for identities, resources and exact measurements.
 
-1. Windows MSVC compilation and fxc `cs_5_0` compilation, including groupshared size and unroll behavior.
-2. Native execution of the calibration on the A770.
-3. A predecessor-versus-candidate bitwise comparison of trained projection outputs and complete decode histories.
-4. Per-dispatch and decode GPU timing.
-5. Complete OCR, then sustained pages per sustained interval against NorthStone's AMD 7900 XTX reference.
+Full trained projection/logit vectors, complete original corpus and AMD/exact-client acceptance remain pending. Device CPU accounting is being implemented to locate costs outside this kernel. Repeated uninstrumented sustained page measurements at safe concurrency are required before promoting a node throughput gain. Geometry differences inherited from the baseline, native endpoint integration and lifecycle qualification remain open.
 
 The serial chain, input re-staging, 8-output groups and 512-element tiles are untuned; if native timing is poor, change the tile shape before admitting any reassociated order. If hardware were to contract `precise` multiply-add or treat subnormals differently from the D3D11 rule, the order-sensitive phase is designed to expose it rather than hide it.
