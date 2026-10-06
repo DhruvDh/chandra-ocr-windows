@@ -2,8 +2,11 @@
 #include "api.h"
 #include <algorithm>
 #include <cmath>
+#include <cstdlib>
+#include <cstring>
 #include <limits>
 #include <stdexcept>
+#include <string>
 
 namespace chandra::dc {
 namespace {
@@ -58,10 +61,51 @@ struct NormParams {
 struct ElementParams { uint32_t count, first, operation, flags; uint32_t secondCount, reserved0, reserved1, reserved2; };
 static_assert(sizeof(LinearParams) == 32 && sizeof(EmbeddingParams) == 32 &&
               sizeof(NormParams) == 32 && sizeof(ElementParams) == 32, "HLSL cbuffer ABI");
+// Experimental B1 projection selector, captured once during this translation unit's static
+// initialization (before main) and never re-read. Unset or "0" keeps the predecessor route;
+// "ordered" admits linear_gemv.hlsl for rows == 1. Any other value, including an empty value,
+// is refused by every linear() call before validation or allocation; there is no fallback.
+enum class GemvB1 { predecessor, ordered, invalid };
+struct GemvSelection { GemvB1 mode; char observed[33]; };
+GemvSelection readGemvSelection() noexcept {
+    GemvSelection result{GemvB1::predecessor, {}};
+    const char* value = nullptr;
+#ifdef _MSC_VER
+    char* owned = nullptr; size_t length = 0;
+    if (_dupenv_s(&owned, &length, "CHANDRA_EXPERIMENTAL_GEMV_B1") != 0) { result.mode = GemvB1::invalid; return result; }
+    value = owned;
+#else
+    value = std::getenv("CHANDRA_EXPERIMENTAL_GEMV_B1");
+#endif
+    if (value) {
+        result.mode = std::strcmp(value, "0") == 0 ? GemvB1::predecessor
+                    : std::strcmp(value, "ordered") == 0 ? GemvB1::ordered : GemvB1::invalid;
+        for (size_t i = 0; i + 1 < sizeof(result.observed) && value[i]; ++i)
+            result.observed[i] = value[i] > 31 && value[i] < 127 ? value[i] : '?';
+    }
+#ifdef _MSC_VER
+    std::free(owned);
+#endif
+    return result;
+}
+const GemvSelection gemvSelection = readGemvSelection();
+bool orderedGemvB1() {
+    if (gemvSelection.mode == GemvB1::invalid)
+        throw std::invalid_argument(std::string("CHANDRA_EXPERIMENTAL_GEMV_B1 must be unset, \"0\" or \"ordered\"; observed \"") +
+                                    gemvSelection.observed + "\"");
+    return gemvSelection.mode == GemvB1::ordered;
+}
+constexpr uint32_t gemvOutputsPerGroup = 8; // linear_gemv.hlsl ROWS
+}
+
+namespace experimental {
+// Not part of api.h: calibration and candidate tests declare this accessor themselves.
+const char* gemvB1Selection() { return orderedGemvB1() ? "ordered" : "predecessor"; }
 }
 
 Buffer linear(Device& d, const Buffer& input, const Weight& w, uint32_t rows,
               bool roundOutputBF16, const Weight* bias) {
+    const bool gemv = orderedGemvB1() && rows == 1;
     weight(w);
     if (w.cols > 9216) throw std::invalid_argument("Linear input width exceeds pinned graph maximum 9216");
     activation(input, uint64_t(rows) * w.cols);
@@ -73,6 +117,16 @@ Buffer linear(Device& d, const Buffer& input, const Weight& w, uint32_t rows,
         uint32_t totalShardRows = static_cast<uint32_t>(w.shards[s].logicalElements / w.cols);
         for (uint32_t weightFirst = 0; weightFirst < totalShardRows;) {
             uint32_t currentOutputs = std::min<uint32_t>(totalShardRows-weightFirst,1024);
+            if (gemv) {
+                // Same <=1024-output, complete-K bound as the predecessor; 8 outputs per group.
+                LinearParams p{w.cols,w.rows,1,w.shardFirstRows[s]+weightFirst,currentOutputs,0,
+                    uint32_t(w.bf16) | (uint32_t(roundOutputBF16)<<1) | (uint32_t(bias!=nullptr)<<2) |
+                    (uint32_t(bias && bias->bf16)<<3),weightFirst};
+                d.dispatch("runtime/linear_gemv.hlsl",{&input,&w.shards[s],biasBuffer},{&output},
+                           &p,sizeof(p),(currentOutputs+gemvOutputsPerGroup-1)/gemvOutputsPerGroup);
+                weightFirst+=currentOutputs;
+                continue;
+            }
             for (uint32_t first = 0; first < rows;) {
                 uint32_t current = std::min<uint32_t>(rows-first,32);
                 LinearParams p{w.cols,w.rows,current,w.shardFirstRows[s]+weightFirst,currentOutputs,first,
