@@ -37,7 +37,8 @@ int wmain(int argc, wchar_t** argv) {
             std::wstring name = argv[i];
             if (name == L"--execute") { require(!execute, "Duplicate execute flag"); execute = true; }
             else {
-                require(name == L"--shader-root" || name == L"--pci" || name == L"--luid" || name == L"--output", "Unknown calibration option");
+                require(name == L"--shader-root" || name == L"--pci" || name == L"--luid" || name == L"--output" || name == L"--variant",
+                        "Unknown calibration option");
                 require(i + 1 < argc, "Option value absent");
                 require(args.emplace(name, argv[++i]).second, "Duplicate calibration option");
             }
@@ -50,19 +51,23 @@ int wmain(int argc, wchar_t** argv) {
                               {"gemv_b1_selection", selection}}.dump() << "\n";
             return 0;
         }
-        require(selection == "ordered", "Execution requires CHANDRA_EXPERIMENTAL_GEMV_B1=ordered at process start");
+        const Shape& shape = orderedRoute(selection);
+        // Optional confirmation: a stated --variant must equal the selector captured at process start.
+        const bool confirmed = args.count(L"--variant") != 0;
+        if (confirmed) require(ascii(args.at(L"--variant")) == selection, "--variant differs from CHANDRA_EXPERIMENTAL_GEMV_B1");
         for (const auto* name : {L"--shader-root", L"--pci", L"--luid", L"--output"})
             require(args.count(name) && !args.at(name).empty(), "Explicit shader root, PCI, LUID and fresh output required");
         std::filesystem::path root(args.at(L"--shader-root"));
         require(root.is_absolute() && std::filesystem::is_directory(root) &&
-                std::filesystem::is_regular_file(root / L"runtime" / L"linear_gemv.hlsl"),
+                std::filesystem::is_regular_file(root / std::filesystem::u8path(shape.shader)),
                 "Absolute existing shader root and candidate shader required");
         std::string pci = ascii(args.at(L"--pci")), luid = ascii(args.at(L"--luid"));
         std::filesystem::path output(args.at(L"--output"));
         require(output.is_absolute() && std::filesystem::is_directory(output.parent_path()), "Absolute fresh task-owned result path required");
         receipt = CreateFileW(output.c_str(), GENERIC_WRITE, FILE_SHARE_READ, nullptr, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, nullptr);
         require(receipt != INVALID_HANDLE_VALUE, "Fresh task-owned calibration receipt required");
-        report["gemv_b1_selection"] = selection;
+        report["gemv_b1_selection"] = selection; report["variant_confirmed_by_argument"] = confirmed;
+        describeRoute(report, shape);
         report["shader_root"] = root.u8string(); report["requested_pci"] = pci; report["requested_luid"] = luid;
         writeFresh(receipt, report);
         Deadline deadline;
@@ -71,7 +76,7 @@ int wmain(int argc, wchar_t** argv) {
             report["native_executed"] = true;
             report["device_identity"] = Json::parse(device.identityJson());
             report["memory_before"] = Json::parse(device.memoryJson());
-            run(device, report, deadline);
+            run(device, report, deadline, shape);
             device.drain(); deadline.check();
             require(device.trackedBufferBytes() == 0, "Completed calibration left owned buffers live");
             report["memory_after"] = Json::parse(device.memoryJson());

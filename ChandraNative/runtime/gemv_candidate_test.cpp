@@ -1,8 +1,9 @@
 // New ChandraNative code, MPL-2.0. CPU-only B1 GEMV candidate harness; no GPU, model or network.
-// A fake Device executes C++ transliterations of linear.hlsl and linear_gemv.hlsl with D3D11 float32
+// A fake Device executes C++ transliterations of linear.hlsl and linear_gemv.hlsl, and a C++ model of
+// the ordered32/ordered64 schedule built on gemv_variants.h staging::stage(), with D3D11 float32
 // rules (sign-preserving flush of subnormal operands/results) and checks every buffer and
-// groupshared access. Transliterations are evidence about the algorithm, addressing and host
-// integration, not about fxc, the Intel driver or A770 execution. Run gemv_candidate_test.sh.
+// groupshared access. None of this executes HLSL: it is evidence about the algorithm, addressing and
+// host integration, not about fxc, the Intel driver or A770 execution. Run gemv_candidate_test.sh.
 #include "api.h"
 #include "gemv_candidate_calibration.h"
 #include <cstdio>
@@ -173,6 +174,89 @@ void emulateGemv(const Params& p, uint32_t gx, uint32_t gy, uint32_t gz, const R
         }
     }
 }
+// C++ model of linear_gemv_ordered32.hlsl/linear_gemv_ordered64.hlsl (not an HLSL execution). Each
+// tile: all threads stage through gemv_variants::staging::stage() and arrive at the first barrier,
+// owners extend their sequential sums, all threads arrive at the second barrier. Same epoch checks
+// as emulateGemv, plus equal barrier arrivals for every thread of every group.
+uint64_t variantGroupsEmulated = 0;
+void emulateRowMajor(const chandra::gemv_variants::Shape& shape, const Params& p, uint32_t gx, uint32_t gy, uint32_t gz,
+                     const Raw& input, const Raw& weight, const Raw& bias, std::vector<uint32_t>& output, std::set<uint32_t>& stored) {
+    namespace staging = chandra::gemv_variants::staging;
+    check(staging::rowMajor(shape), "row-major variant shape");
+    check(gy == 1 && gz == 1 && p.batchRows == 1 && p.rowFirst == 0, "GEMV host contract: one group row, batchRows 1, rowFirst 0");
+    const uint32_t rows = shape.outputsPerGroup, threads = shape.threads, tile = shape.tile, stride = shape.stride;
+    std::vector<float> tileWeight(size_t(rows) * stride), tileInput(tile);
+    std::vector<uint64_t> weightEpoch(tileWeight.size(), 0), inputEpoch(tile, 0);
+    uint64_t epoch = 0;
+    const bool bf16 = (p.flags & 1) != 0;
+    for (uint32_t gid = 0; gid < gx; ++gid) {
+        ++variantGroupsEmulated;
+        const uint32_t groupFirst = gid * rows;
+        std::vector<float> sums(rows, 0.0f);
+        std::vector<uint32_t> arrivals(threads, 0);
+        for (uint32_t begin = 0; begin < p.inputWidth; begin += tile) {
+            ++epoch;
+            const uint32_t n = std::min(tile, p.inputWidth - begin);
+            for (uint32_t thread = 0; thread < threads; ++thread) {
+                uint32_t staged[staging::slots + 1];
+                for (uint32_t i = 0; i <= staging::slots; ++i) {
+                    auto s = staging::stage(shape, p.inputWidth, p.shardRows, p.weightRowFirst, groupFirst, thread, i, begin, n, bf16);
+                    staged[i] = 0;
+                    if (s.word < s.count) staged[i] = weight.load((s.base + s.word) * 4);
+                }
+                float a = 0.0f;
+                if (thread < n) a = fromBits(input.load((begin + thread) * 4));
+                for (uint32_t m = 0; m <= staging::slots; ++m) {
+                    auto s = staging::stage(shape, p.inputWidth, p.shardRows, p.weightRowFirst, groupFirst, thread, m, begin, n, bf16);
+                    if (!(s.word < s.count)) continue;
+                    check(s.row < rows, "staged row outside the group");
+                    auto store = [&](uint32_t position, uint32_t value) {
+                        check(position < n && position < stride, "staged weight position outside the tile row");
+                        const size_t at = size_t(s.row) * stride + position;
+                        check(weightEpoch[at] != epoch, "groupshared weight store race");
+                        tileWeight[at] = fromBits(value); weightEpoch[at] = epoch;
+                    };
+                    if (!bf16) store(s.word, staged[m]);
+                    else {
+                        if (2 * s.word >= s.parity) store(2 * s.word - s.parity, staged[m] << 16);
+                        if (2 * s.word + 1 - s.parity < n) store(2 * s.word + 1 - s.parity, staged[m] & 0xffff0000u);
+                    }
+                }
+                if (thread < n) {
+                    check(inputEpoch[thread] != epoch, "groupshared input store race");
+                    tileInput[thread] = a; inputEpoch[thread] = epoch;
+                }
+                ++arrivals[thread];
+            }
+            for (uint32_t thread = 0; thread < rows; ++thread) {
+                if (!(groupFirst + thread < p.shardRows)) continue;
+                const size_t row = size_t(thread) * stride;
+                for (uint32_t k = 0; k < n; ++k) {
+                    check(inputEpoch[k] == epoch && weightEpoch[row + k] == epoch, "owner read an unstaged or stale groupshared slot");
+                    sums[thread] = add32(sums[thread], mul32(tileInput[k], tileWeight[row + k]));
+                }
+            }
+            for (uint32_t thread = 0; thread < threads; ++thread) ++arrivals[thread];
+        }
+        for (uint32_t count : arrivals) check(count == 2 * shape.tiles(p.inputWidth), "every thread reaches every group barrier");
+        for (uint32_t thread = 0; thread < rows; ++thread) {
+            const uint32_t localOut = groupFirst + thread;
+            if (!(localOut < p.shardRows)) continue;
+            const uint32_t column = p.firstOutput + localOut;
+            float sum = sums[thread];
+            if (p.flags & 4) sum = add32(sum, packedValue(bias, column, (p.flags & 8) != 0));
+            if (p.flags & 2) sum = bf16Rne(sum);
+            check(column < output.size() && column < p.outputWidth, "variant GEMV out-of-bounds store");
+            check(stored.insert(column).second, "two GEMV threads stored the same output column");
+            output[column] = bits(sum);
+        }
+    }
+}
+const chandra::gemv_variants::Shape* rowMajorShader(const std::string& name) {
+    for (const auto& shape : chandra::gemv_variants::shapes)
+        if (name == shape.shader && chandra::gemv_variants::staging::rowMajor(shape)) return &shape;
+    return nullptr;
+}
 // Output columns stored by GEMV threads, per output buffer id: detects duplicate or missing stores.
 std::map<uint64_t, std::set<uint32_t>> gemvStored;
 }
@@ -205,6 +289,8 @@ void Device::dispatch(const std::string& name, const std::vector<const Buffer*>&
     if (name == "runtime/linear.hlsl") emulateLinear(p, x, y, in, w, b, outputs[0]->storage->data);
     else if (name == "runtime/linear_gemv.hlsl") {
         emulateGemv(p, x, y, z, in, w, b, outputs[0]->storage->data, gemvStored[outputs[0]->storage->id]);
+    } else if (const auto* shape = rowMajorShader(name)) {
+        emulateRowMajor(*shape, p, x, y, z, in, w, b, outputs[0]->storage->data, gemvStored[outputs[0]->storage->id]);
     } else throw std::runtime_error("Unemulated shader " + name);
     impl->log.push_back(record); dispatchLog.push_back(record);
     if (impl->profiling) impl->timings.push_back(std::move(record));
@@ -239,6 +325,15 @@ namespace {
 #ifndef GEMV_TEST_PREDECESSOR
 const char* selection() { return chandra::dc::experimental::gemvB1Selection(); }
 #endif
+// Expected B1 routes, stated independently of gemv_variants.h so the helper table is checked too.
+struct Expectation { const char* selector; const char* shader; uint32_t outputsPerGroup; };
+constexpr Expectation expectations[] = {{"ordered", "runtime/linear_gemv.hlsl", 8},
+                                        {"ordered32", "runtime/linear_gemv_ordered32.hlsl", 32},
+                                        {"ordered64", "runtime/linear_gemv_ordered64.hlsl", 64}};
+[[maybe_unused]] const Expectation* expectationFor(const std::string& selector) {
+    for (const auto& e : expectations) if (selector == e.selector) return &e;
+    return nullptr;
+}
 struct Case {
     std::string name; uint32_t rows, cols, batch; std::vector<uint32_t> shards; bool bf16; int bias; // 0 none, 1 bf16, 2 fp32
     int values; // 0 order-sensitive finite, 1 dyadic, 2 specials-rich
@@ -328,7 +423,7 @@ std::vector<Case> cases() {
 
 // Runs every case through the real linear() and checks outputs against the independent reference.
 // Returns a deterministic dispatch/output transcript for comparison with the predecessor build.
-std::string callable(bool expectGemv, bool verbose) {
+std::string callable(const Expectation* expect, bool verbose) {
     std::ostringstream transcript; uint64_t calls = 0, dispatches = 0;
     Device d(L"unused", "fake:00.0", "");
     for (const auto& c : cases()) {
@@ -342,7 +437,7 @@ std::string callable(bool expectGemv, bool verbose) {
             for (size_t i = 0; i < expected.size(); ++i)
                 check(same(observed[i], expected[i]), c.name + " output " + std::to_string(i) + " differs from ascending FP32 reference");
             const std::vector<DispatchRecord> log(dispatchLog.begin() + std::ptrdiff_t(before), dispatchLog.end());
-            bool gemvCall = expectGemv && c.batch == 1;
+            bool gemvCall = expect && c.batch == 1;
             if (gemvCall) check(gemvStored[out.storage->id].size() == c.rows, c.name + " GEMV did not store every output exactly once");
             // Independent geometry forecast for the candidate route.
             size_t index = 0; uint32_t first = 0;
@@ -354,7 +449,8 @@ std::string callable(bool expectGemv, bool verbose) {
                         const auto& r = log[index++];
                         uint32_t flags = uint32_t(c.bf16) | (uint32_t(rounded) << 1) | (uint32_t(c.bias != 0) << 2) | (uint32_t(c.bias == 1) << 3);
                         std::vector<uint32_t> want{c.cols, c.rows, 1, first + chunk, current, 0, flags, chunk};
-                        check(r.shader == "runtime/linear_gemv.hlsl" && r.params == want && r.x == (current + 7) / 8 && r.y == 1 && r.z == 1,
+                        check(r.shader == expect->shader && r.params == want &&
+                              r.x == (current + expect->outputsPerGroup - 1) / expect->outputsPerGroup && r.y == 1 && r.z == 1,
                               c.name + " GEMV dispatch shader/params/geometry");
                     } else {
                         for (uint32_t row = 0; row < c.batch; row += 32) {
@@ -425,6 +521,16 @@ float orderedGemv(const std::vector<float>& a, const std::vector<float>& w) {
     emulateGemv(p, 1, 1, 1, Raw{in, "input"}, Raw{packed, "weight"}, Raw{biasWords, "bias"}, out, stored);
     return fromBits(out[0]);
 }
+// The row-major variant models through the same single-output problem.
+float rowMajorGemv(const chandra::gemv_variants::Shape& shape, const std::vector<float>& a, const std::vector<float>& w) {
+    std::vector<uint32_t> in(a.size()), wb(w.size());
+    for (size_t k = 0; k < a.size(); ++k) { in[k] = bits(a[k]); wb[k] = bits(w[k]); check((wb[k] & 0xffffu) == 0, "BF16 weight"); }
+    auto packed = chandra::gemv_calibration::pack(wb, true);
+    std::vector<uint32_t> biasWords(1, 0), out(1, 0); std::set<uint32_t> stored;
+    Params p{uint32_t(a.size()), 1, 1, 0, 1, 0, 1, 0};
+    emulateRowMajor(shape, p, 1, 1, 1, Raw{in, "input"}, Raw{packed, "weight"}, Raw{biasWords, "bias"}, out, stored);
+    return fromBits(out[0]);
+}
 float bf16Value(uint64_t r, int lowExponent, int span) {
     uint32_t exponent = uint32_t(127 + lowExponent + int((r >> 40) % uint64_t(span)));
     return fromBits(uint32_t((r >> 63) << 31) | (exponent << 23) | (uint32_t(r) & 0x7f0000u));
@@ -452,6 +558,10 @@ Json observe(const char* name, uint32_t outputs, const std::function<Vectors(uin
         auto v = make(o);
         float asc = ascending(v.a, v.w), ord = orderedGemv(v.a, v.w), spl = split32(v.a, v.w);
         orderedMismatch += !same(bits(ord), bits(asc)) || ((bits(asc) & 0x7fffffffu) <= 0x7f800000u && bits(ord) != bits(asc));
+        for (const char* selector : {"ordered32", "ordered64"}) {
+            float variant = rowMajorGemv(*chandra::gemv_variants::shape(selector), v.a, v.w);
+            orderedMismatch += !same(bits(variant), bits(asc)) || ((bits(asc) & 0x7fffffffu) <= 0x7f800000u && bits(variant) != bits(asc));
+        }
         splitDiffers += bits(spl) != bits(asc);
         bf16Differs += roundedBF16Bits(bits(spl)) != roundedBF16Bits(bits(asc));
         if (!std::isfinite(asc) || !std::isfinite(spl)) {
@@ -467,8 +577,9 @@ Json observe(const char* name, uint32_t outputs, const std::function<Vectors(uin
         if (h.magnitude > 0) { ordRel = std::max(ordRel, ea / h.magnitude); splitRel = std::max(splitRel, es / h.magnitude); }
         splitCloser += es < ea; ascendingCloser += ea < es;
     }
-    check(orderedMismatch == 0, std::string(name) + ": ordered GEMV transliteration differs from ascending FP32");
+    check(orderedMismatch == 0, std::string(name) + ": ordered GEMV transliteration or variant model differs from ascending FP32");
     return {{"scenario", name}, {"outputs", outputs}, {"ordered_gemv_bit_equal_to_ascending_fp32", orderedMismatch == 0},
+            {"ordered32_ordered64_models_bit_equal_to_ascending_fp32", orderedMismatch == 0},
             {"split32_fp32_bits_differ_from_ascending", splitDiffers}, {"split32_bf16_rounded_differs_from_ascending", bf16Differs},
             {"nonfinite_outputs", nonfinite}, {"nonfinite_examples", nonfiniteExamples},
             {"ascending_max_abs_error_vs_higher", ordAbs}, {"split32_max_abs_error_vs_higher", splitAbs},
@@ -520,22 +631,48 @@ Json numerics() {
 }
 
 // ---- Process-level modes, selected by gemv_candidate_test.sh. ----
-int runCandidate() {
-    check(std::string(selection()) == "ordered", "candidate mode requires CHANDRA_EXPERIMENTAL_GEMV_B1=ordered");
-    callable(true, true);
+// The calibration plan with `shape`'s expectations must refuse the dispatches of the selected route.
+void planRefuses(const chandra::gemv_variants::Shape& shape, const char* route) {
     Device d(L"unused", "fake:00.0", "");
     Json report = chandra::gemv_calibration::initialReport();
     chandra::gemv_calibration::Deadline deadline;
+    std::string message;
+    try { chandra::gemv_calibration::run(d, report, deadline, shape); } catch (const std::exception& error) { message = error.what(); }
+    check(message.find("no silent fallback") != std::string::npos, std::string("plan for ") + shape.selector + " refuses " + route + ": " + message);
+    std::cout << "calibration plan for " << shape.selector << " refuses the " << route << " route: " << message << "\n";
+}
+int runCandidate() {
+    const std::string selected = selection();
+    const Expectation* expect = expectationFor(selected);
+    check(expect != nullptr, "candidate mode requires CHANDRA_EXPERIMENTAL_GEMV_B1=ordered, ordered32 or ordered64");
+    callable(expect, true);
+    const auto& shape = chandra::gemv_calibration::orderedRoute(selected);
+    check(std::string(shape.shader) == expect->shader && shape.outputsPerGroup == expect->outputsPerGroup, "helper route equals test expectation");
+    Device d(L"unused", "fake:00.0", "");
+    Json report = chandra::gemv_calibration::initialReport();
+    chandra::gemv_calibration::describeRoute(report, shape);
+    chandra::gemv_calibration::Deadline deadline;
     const size_t before = dispatchLog.size();
-    chandra::gemv_calibration::run(d, report, deadline);
+    chandra::gemv_calibration::run(d, report, deadline, shape);
     const uint64_t planDispatches = dispatchLog.size() - before;
     check(report.at("passed") == true && report.at("invalid_admission").at("cases").size() == 9, "calibration plan on emulator");
-    uint64_t phaseDispatches = 0;
+    check(report.at("shader") == expect->shader && report.at("route_geometry").at("outputs_per_group") == expect->outputsPerGroup, "receipt route");
+    uint64_t phaseDispatches = 0, words = 0, originalWords = 0;
     for (const auto& phase : report.at("phases")) {
         check(phase.at("passed") == true && phase.at("complete_reads") == true, "plan phase passed");
         phaseDispatches += phase.at("timing_summary").at("dispatches").get<uint64_t>();
+        for (const auto& result : phase.at("results")) {
+            check(result.at("passed") == true && result.at("mismatch_indices").empty(), "every compared word matched");
+            words += result.at("elements").get<uint64_t>();
+            if (phase.at("name") != "odd_k1001_order_sensitive_two_shards_bf16_bias" && phase.at("name") != "full_chunk_k2560_order_sensitive")
+                originalWords += result.at("elements").get<uint64_t>();
+        }
     }
+    check(report.at("phases").size() == 8 && originalWords == 9446 && words == 9446 + 260 + 2048,
+          "eight phases; the six v1 phases still compare 9446 words, plus 260 and 2048");
     check(phaseDispatches == planDispatches, "plan dispatch count equals profiled dispatch count");
+    for (const auto& other : chandra::gemv_variants::shapes)
+        if (&other != &shape) planRefuses(other, expect->selector);
     check(report.dump().size() < 8 * 1024 * 1024, "plan receipt bounded");
     Json summary = Json::array();
     for (const auto& phase : report.at("phases"))
@@ -544,23 +681,17 @@ int runCandidate() {
                            {"forecast_bytes", phase.at("forecast_tracked_plus_readback_bytes")},
                            {"expected_bf16_ties", phase.at("expected_bf16_ties_in_fp32_dots")},
                            {"cpu_observations", phase.contains("cpu_observations") ? phase.at("cpu_observations") : Json()}});
-    std::cout << "calibration plan on emulated device: PASS, receipt bytes " << report.dump(2).size()
+    std::cout << "calibration plan on emulated device for " << expect->selector << ": PASS, " << words << " output words compared, receipt bytes " << report.dump(2).size()
               << ", maximum forecast bytes " << report.at("maximum_phase_tracked_plus_readback_bytes") << "\n"
               << summary.dump(1) << "\n";
-    std::cout << "GEMV workgroups emulated: " << gemvGroupsEmulated << "\n";
+    std::cout << "GEMV workgroups emulated: ordered8 transliteration " << gemvGroupsEmulated << ", row-major model " << variantGroupsEmulated << "\n";
     return 0;
 }
 int runPredecessor() {
     check(std::string(selection()) == "predecessor", "default mode requires CHANDRA_EXPERIMENTAL_GEMV_B1 unset or 0");
-    callable(false, true);
-    // The candidate calibration must detect that no candidate dispatch occurred.
-    Device d(L"unused", "fake:00.0", "");
-    Json report = chandra::gemv_calibration::initialReport();
-    chandra::gemv_calibration::Deadline deadline;
-    std::string message;
-    try { chandra::gemv_calibration::run(d, report, deadline); } catch (const std::exception& error) { message = error.what(); }
-    check(message.find("no silent fallback") != std::string::npos, "calibration refuses predecessor dispatches: " + message);
-    std::cout << "calibration plan refuses predecessor route: " << message << "\n";
+    callable(nullptr, true);
+    // The calibration must detect that no candidate dispatch occurred, whichever route it expects.
+    for (const auto& shape : chandra::gemv_variants::shapes) planRefuses(shape, "predecessor");
     return 0;
 }
 int runInvalid() {
@@ -588,12 +719,13 @@ int runInvalid() {
 int main(int argc, char** argv) {
     try {
         std::string mode = argc == 2 ? argv[1] : "";
-        if (mode == "--transcript") { std::cout << callable(false, false); return 0; }
+        if (mode == "--transcript") { std::cout << callable(nullptr, false); return 0; }
 #ifndef GEMV_TEST_PREDECESSOR
         if (mode == "--candidate") return runCandidate();
         if (mode == "--candidate-transcript") {
-            check(std::string(selection()) == "ordered", "candidate transcript requires the ordered selector");
-            std::cout << callable(true, false); return 0;
+            const Expectation* expect = expectationFor(selection());
+            check(expect != nullptr, "candidate transcript requires an ordered selector");
+            std::cout << callable(expect, false); return 0;
         }
         if (mode == "--predecessor") return runPredecessor();
         if (mode == "--invalid") return runInvalid();

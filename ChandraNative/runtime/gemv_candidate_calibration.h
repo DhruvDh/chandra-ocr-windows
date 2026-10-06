@@ -1,8 +1,10 @@
 // New ChandraNative code, MPL-2.0. Portable core of the public, model-free B1 GEMV candidate
 // calibration. Windows entry: gemv_candidate_calibration.cpp; CPU harness: gemv_candidate_test.cpp.
 // Root owns the external Job, CPU affinity/priority, process commit cap, device admission and runs.
+// One plan serves every ordered route (gemv_variants.h); only the expected shader and groups differ.
 #pragma once
 #include "api.h"
+#include "gemv_variants.h"
 #include "../vendor/nlohmann/json.hpp"
 #include <algorithm>
 #include <cfloat>
@@ -25,9 +27,11 @@ using chandra::dc::Buffer;
 using chandra::dc::Device;
 using chandra::dc::Weight;
 
-constexpr const char* schema = "private.chandra.directcompute.gemv-b1-candidate-calibration.v1";
-constexpr const char* shaderName = "runtime/linear_gemv.hlsl";
-constexpr uint32_t outputsPerGroup = 8, maximumDispatchOutputs = 1024, maximumInputWidth = 9216;
+using chandra::gemv_variants::Shape;
+// v2: the selected ordered route (ordered, ordered32 or ordered64) sets the expected shader and groups;
+// two phases were added to the six of v1, which keep their names, operands and order.
+constexpr const char* schema = "private.chandra.directcompute.gemv-b1-candidate-calibration.v2";
+constexpr uint32_t maximumDispatchOutputs = 1024, maximumInputWidth = 9216;
 constexpr uint64_t allocationCap = 256ull * 1024 * 1024;
 constexpr double dispatchLimitMilliseconds = 100.0;
 constexpr uint32_t deadlineSeconds = 120;
@@ -111,7 +115,12 @@ inline std::vector<PhaseSpec> phases() {
         {"specials_signed_zero_inf_nan_ties", Generator::specials, 4, 7, {7}, true, BiasKind::bf16},
         {"ragged_odd_k_bf16_three_shards_bf16_bias", Generator::dyadic, 37, 21, {6, 9, 6}, true, BiasKind::bf16},
         {"odd_k_fp32_weights_two_shards_fp32_bias", Generator::dyadic, 67, 40, {17, 23}, false, BiasKind::fp32},
+        // Order-sensitive odd K: odd-parity full tiles and K tails for every ordered tile, one-output
+        // group tails for 8, 32 and 64 outputs per group, and a half-used final packed word per shard.
+        {"odd_k1001_order_sensitive_two_shards_bf16_bias", Generator::order, 1001, 130, {65, 65}, true, BiasKind::bf16},
         {"multi_chunk_k1001_two_shards", Generator::dyadic, 1001, 2600, {1500, 1100}, true, BiasKind::none},
+        // The most frequent decode input width (hidden size 2560), one complete 1024-output chunk.
+        {"full_chunk_k2560_order_sensitive", Generator::order, 2560, 1024, {1024}, true, BiasKind::none},
         {"full_width_k9216_dyadic", Generator::dyadic, 9216, 1024, {1024}, true, BiasKind::none},
         {"full_width_k9216_order_sensitive_fp32", Generator::order, 9216, 1024, {1024}, true, BiasKind::none}};
 }
@@ -120,11 +129,11 @@ inline std::vector<Call> calls(const PhaseSpec& spec) {
     if (spec.generator == Generator::specials) return {{false, false}, {true, false}, {false, true}, {true, true}};
     return {{false, spec.bias != BiasKind::none}, {true, spec.bias != BiasKind::none}};
 }
-inline std::vector<uint32_t> expectedGroups(const PhaseSpec& spec) {
+inline std::vector<uint32_t> expectedGroups(const PhaseSpec& spec, const Shape& shape) {
     std::vector<uint32_t> groups;
     for (uint32_t rows : spec.shardRows)
         for (uint32_t first = 0; first < rows; first += maximumDispatchOutputs)
-            groups.push_back((std::min(rows - first, maximumDispatchOutputs) + outputsPerGroup - 1) / outputsPerGroup);
+            groups.push_back((std::min(rows - first, maximumDispatchOutputs) + shape.outputsPerGroup - 1) / shape.outputsPerGroup);
     return groups;
 }
 inline uint64_t shardWords(const PhaseSpec& spec, uint32_t rows) {
@@ -282,7 +291,7 @@ inline Operands operands(Device& device, const PhaseSpec& spec, const Deadline& 
     }
     return result;
 }
-inline bool profileCheck(const Json& profile, const std::vector<uint32_t>& groups, size_t callCount, Json& summary) {
+inline bool profileCheck(const Json& profile, const Shape& shape, const std::vector<uint32_t>& groups, size_t callCount, Json& summary) {
     require(profile.is_object() && profile.at("disjoint") == false && profile.at("frequency").is_number_unsigned() &&
             profile.at("frequency").get<uint64_t>() > 0, "Invalid or disjoint GPU timing window");
     const auto& dispatches = profile.at("dispatches");
@@ -291,7 +300,7 @@ inline bool profileCheck(const Json& profile, const std::vector<uint32_t>& group
     bool below = true; double maximum = 0, total = 0;
     for (size_t i = 0; i < dispatches.size(); ++i) {
         const auto& dispatch = dispatches[i];
-        require(dispatch.at("shader") == shaderName && dispatch.at("groups") == Json::array({groups[i % groups.size()], 1, 1}),
+        require(dispatch.at("shader") == shape.shader && dispatch.at("groups") == Json::array({groups[i % groups.size()], 1, 1}),
                 "Unexpected candidate dispatch shader or geometry; no silent fallback is admitted");
         double ms = dispatch.at("gpu_milliseconds").get<double>();
         require(std::isfinite(ms) && ms >= 0.0, "Invalid completed dispatch duration");
@@ -354,11 +363,25 @@ inline void invalidAdmission(Device& device, Json& report, const Deadline& deadl
     report["invalid_admission"] = {{"cases", std::move(cases)}, {"dispatches", 0}, {"passed", true}};
 }
 
-inline void run(Device& device, Json& report, const Deadline& deadline) {
+// The ordered route named by the process selector; anything else is refused before any device exists.
+inline const Shape& orderedRoute(const std::string& selection) {
+    const Shape* shape = chandra::gemv_variants::shape(selection.c_str());
+    require(shape != nullptr, "Execution requires CHANDRA_EXPERIMENTAL_GEMV_B1=ordered, ordered32 or ordered64 at process start");
+    return *shape;
+}
+inline void describeRoute(Json& report, const Shape& shape) {
+    report["candidate"] = std::string("CHANDRA_EXPERIMENTAL_GEMV_B1=") + shape.selector;
+    report["shader"] = shape.shader;
+    report["route_geometry"] = {{"outputs_per_group", shape.outputsPerGroup}, {"threads_per_group", shape.threads},
+                                {"k_tile", shape.tile}, {"groupshared_row_stride_floats", shape.stride},
+                                {"groupshared_bytes", shape.groupsharedBytes()}};
+}
+
+inline void run(Device& device, Json& report, const Deadline& deadline, const Shape& shape) {
     invalidAdmission(device, report, deadline);
     require(device.trackedBufferBytes() == 0, "Invalid-admission buffers were not released");
     for (const auto& spec : phases()) {
-        const auto groups = expectedGroups(spec); const auto plannedCalls = calls(spec);
+        const auto groups = expectedGroups(spec, shape); const auto plannedCalls = calls(spec);
         const uint64_t forecast = phaseForecastBytes(spec);
         report["phases"].push_back({{"name", spec.name}, {"input_width", spec.inputWidth}, {"outputs", spec.outputs},
                                     {"shard_rows", spec.shardRows}, {"bf16_weights", spec.bf16Weights},
@@ -404,7 +427,7 @@ inline void run(Device& device, Json& report, const Deadline& deadline) {
             }
             phase["complete_reads"] = true;
             phase["gpu_profile"] = Json::parse(device.finishProfile());
-            Json timing; bool below = profileCheck(phase.at("gpu_profile"), groups, plannedCalls.size(), timing);
+            Json timing; bool below = profileCheck(phase.at("gpu_profile"), shape, groups, plannedCalls.size(), timing);
             phase["timing_summary"] = timing;
             phase["all_dispatches_strictly_below_100_ms"] = below;
             phase["memory_after"] = Json::parse(device.memoryJson());
@@ -422,7 +445,7 @@ inline void run(Device& device, Json& report, const Deadline& deadline) {
 }
 inline Json initialReport() {
     return {{"schema", schema}, {"state", "PREPARING"}, {"native_executed", false}, {"passed", false},
-            {"candidate", "CHANDRA_EXPERIMENTAL_GEMV_B1=ordered"}, {"shader", shaderName},
+            {"candidate", nullptr}, {"shader", nullptr},
             {"full_model_accepted", false}, {"trained_numerics_accepted", false}, {"ocr_accepted", false},
             {"end_to_end_performance_accepted", false}, {"automatic_rerun", false},
             {"dispatch_limit_milliseconds", dispatchLimitMilliseconds}, {"source_deadline_seconds", deadlineSeconds},
