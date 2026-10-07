@@ -1,0 +1,76 @@
+{
+  "schema": "chandra.directcompute.watched-import-public-summary.v1",
+  "observed_utc": "2026-10-07T10:38:06.808915+00:00",
+  "scope": "One staged import-only candidate on Intel Arc A770; no inference arithmetic or token generation",
+  "public_source_contains_this_candidate": false,
+  "checkpoint": {
+    "model": "datalab-to/chandra-ocr-2",
+    "revision": "af93b47dba1b47b6640c86ccf487ed2260ab9a09",
+    "weights_bytes": 10591220088,
+    "weights_sha256": "0804568be9f099d6479fad9ed77a4da4611f3c1e7bc6e009af7dce45e8aa3847"
+  },
+  "original_input": {
+    "manifest_bytes": 36558,
+    "manifest_sha256": "0aa588473930f110cc359ba369623f29765a85f4e05ffcbca2ac509933b787ae",
+    "pixels": [1624, 2100],
+    "prompt_tokens": 3617,
+    "context_limit": 16384,
+    "normal_output_allowance": 12384
+  },
+  "staged_source": {
+    "files": 129,
+    "bytes": 2382586,
+    "manifest_bytes": 23404,
+    "manifest_sha256": "94afedffd7825f5c52213fdd288205a5ddfb0b3d6132fa5cf88bebfbc8dcb555",
+    "independent_review_sha256": "445c930cfe97d496b266d6fbc518a4176c5f826f3564456e099e87348f9748a7",
+    "strict_CPU_build_accepted": true,
+    "CPU_build_seconds": 94.766,
+    "accepted_build_sha256": "21a7e74a626365fbeeeaf7355672e39b5a43bb8cac35570d24e078da2a6a7988",
+    "runtime_manifest_sha256": "fa4ccc2ef60a79558ae94f3d3ca6449cb5e51ba87c6a24203241a8e078ba2831",
+    "runtime_independent_clearance_sha256": "4c2ac247b5d1fbfc0a132e2bd4dad9d0ecb32568d8df79226f689e3601475d29"
+  },
+  "actual_point": {
+    "outcome": "no_fault_completed_import",
+    "original_upload_operations": 732,
+    "original_upload_bytes": 9078531072,
+    "selected_row_samples": 733,
+    "row": 26213,
+    "shard": 0,
+    "row_bytes": 5120,
+    "row_sha256": "e696b6bda9b22dba3ad2a49132d6353302f5b20ad2627909ae5474586a46c07f",
+    "all_selected_row_cutoffs_match_CPU_source": true,
+    "same_original_Storage_after_constructor": true,
+    "source_maps_released_before_final_sample": true,
+    "native_child_seconds": 57.42200000002049,
+    "peak_process_commit_bytes": 9311825920,
+    "peak_Job_commit_bytes": 9325957120,
+    "collected_files_authenticated": 14,
+    "collected_bytes_authenticated": 2809252,
+    "transport_calls": 26,
+    "independent_qualifier_reproduced": true,
+    "result_sha256": "3b5692f66b536ab38e340bd9af73c50b5d4366d526aa0f906ce2b3e38fd80ef9",
+    "journal_sha256": "ffa200976caa0bce19b1b81ea9dd080433b058d6891af5ba93f39caddd8f6516",
+    "root_disposition_sha256": "8063eccec987087122d1a96886c4522e02073b5d13f5d28b9ab7060b68b8f95a",
+    "root_closure_sha256": "c50ef73a7f7a453ae80a6a9120d2175547a606bac9e3ce5e43dca42594b150a3"
+  },
+  "retirement": {
+    "Windows_Job_empty_and_handles_closed": true,
+    "marked_original_owner_exited": true,
+    "local_channel_joined_and_group_absent": true,
+    "root_point_unit_closed": true,
+    "historical_worker_restored_cold": true,
+    "automatic_replay": false,
+    "AMD_actions": []
+  },
+  "limitations": {
+    "observer_can_change_order_or_residency": true,
+    "whole_imported_model_byte_equality_established": false,
+    "API_or_driver_cause_established": false,
+    "production_fix_established": false,
+    "inference_arithmetic_executed": false,
+    "trained_numerical_correctness_accepted": false,
+    "complete_OCR_accepted": false,
+    "native_endpoint_qualified": false,
+    "sustained_page_throughput_gain_accepted": false
+  }
+}
