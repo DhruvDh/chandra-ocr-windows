@@ -1,5 +1,7 @@
 # Measured evidence
 
+The [interrupted October 7 watched-model diagnostic](directcompute-interrupted-watch-arithmetic-2026-10-07.json) preserves the lease transport failure, 15 authenticated recovered files and affirmative Job, supervisor, SSH-forward and local-unit closure. Its [guide](../../docs/directcompute-interrupted-watch-arithmetic-2026-10-07.md) distinguishes partial import observations from the absent final numerical report and explains the separate RAM/commit guards. No inference was replayed, and no correctness or throughput acceptance follows.
+
 The [October 7 exact-input reference and compiled forecast](directcompute-reference-and-forecast-2026-10-07.json) record two authenticated CPU FP32 vocabulary rows, strict compilation of the watched model's path into original inference and a closed CPU-only forecast. The [guide](../../docs/directcompute-reference-2026-10-07.md) explains the rejected historical native comparison and the conservative RAM refusal before GPU submission. Neither a numerical tolerance nor native OCR, endpoint or sustained-throughput acceptance follows.
 
 The [text-softmax shared-memory repair and finite A770 regression](directcompute-text-softmax-regression-2026-10-06.json) pass source review, strict Windows compilation and all 17 cases/102 dispatches. The longest GPU interval is 0.691771 ms. This is a kernel result; the rejected second original page, trained numerics, endpoint and throughput remain open.
