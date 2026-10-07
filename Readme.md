@@ -15,6 +15,7 @@ The PyTorch XPU endpoint on Intel Arc A770 has retained functional OCR and clien
 | Authenticate model weights | [Model manifest](provenance/model.json), [native importer](ChandraNative/runtime/model_weights.cpp), [inventory verifier](scripts/model_inventory.py) |
 | Review operator oracles and prior primitive results | [CPU oracle](ChandraNative/oracle.h), [primitive guide and evidence](ChandraNative/README.md) |
 | Freeze inputs and qualify complete OCR | [Benchmark workflow](benchmarks/README.md), [numerical workflow](verification/README.md) |
+| Inspect the fresh exact-input numerical reference | [October 7 reference and preparation boundary](docs/directcompute-reference-2026-10-07.md) |
 | Inspect opt-in native HTTP source | [Native endpoint guide](docs/directcompute-native-endpoint.md) |
 | Inspect historical endpoint behavior | [XPU runtime guide](runtime/waystone/README.md), [service package](chandra_service), [operations](docs/operations.md) |
 | Recover earlier work and failures | [Retained work history](docs/work-record-history-2026-10-05.md), [evidence index](benchmarks/evidence/hillclimb-2026-10-04.json), [agent guidance](AGENTS.md) |
