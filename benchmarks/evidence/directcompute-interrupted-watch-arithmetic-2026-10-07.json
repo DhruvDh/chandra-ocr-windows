@@ -104,6 +104,39 @@
     "complete_native_report_qualification": false,
     "direct_byte_equality_proves_full_model_correctness": false
   },
+  "later_offline_row_comparison": {
+    "recorded_utc": "2026-10-07T15:49:57.791015+00:00",
+    "source_sha256": "475f088507deae1fbe3508c641e74beb85b475bfeace937457b17dbf5264cc8e",
+    "checkpoint_fresh_full_file_hash_checked": true,
+    "checkpoint_head_and_embedding_rows_equal": true,
+    "rows": [
+      {
+        "row": 26213,
+        "capture_route": "direct_resource_copy",
+        "bytes": 5120,
+        "checkpoint_row_sha256": "e696b6bda9b22dba3ad2a49132d6353302f5b20ad2627909ae5474586a46c07f",
+        "capture_sha256": "e696b6bda9b22dba3ad2a49132d6353302f5b20ad2627909ae5474586a46c07f",
+        "BF16_word_mismatches": 0,
+        "byte_equal": true
+      },
+      {
+        "row": 52427,
+        "capture_route": "SRV_word_copy",
+        "bytes": 5120,
+        "checkpoint_row_sha256": "0575f9588d644d6b669a29517b1dda97ea56b4831b5578edffb99913df8e4ab7",
+        "capture_sha256": "4a5af26c4281200de3dab495a919f6233e106f9b86ae636425f14116f4347283",
+        "BF16_word_mismatches": 128,
+        "first_mismatching_BF16_word": 1536,
+        "last_mismatching_BF16_word": 1663,
+        "byte_equal": false,
+        "direct_copy_counterpart_available": false
+      }
+    ],
+    "GPU_inference_or_replay": false,
+    "whole_model_byte_integrity": false,
+    "resident_byte_or_SRV_read_cause_established": false,
+    "earlier_second_page_cause_established": false
+  },
   "closure": {
     "Windows_Job_retired": true,
     "Windows_Job_active_processes_after_retirement": 0,
