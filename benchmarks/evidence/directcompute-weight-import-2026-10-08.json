@@ -1,0 +1,243 @@
+{
+  "schema": "chandra.directcompute.weight-import.oct08.publication.v1",
+  "recorded_utc": "2026-10-08T06:17:19.285544+00:00",
+  "verdict": "CLEAR_FAILURE_OBSERVATIONS_ONLY",
+  "source_scope": {
+    "unpromoted_experimental_source": true,
+    "current_Git_runtime_qualified_by_these_points": false,
+    "source_manifest": {
+      "bytes": 24678,
+      "sha256": "d3befbc33b83520f4c9faadd9c6ac7291c1d30bf0d87da94f9ce2703c4cee408"
+    },
+    "source_file_count": 136,
+    "source_bytes": 2480351,
+    "executable": {
+      "bytes": 1614336,
+      "sha256": "2494629097c45b01afc826a2c6aae56f8bfbebf612efddae77cff662e772aad8"
+    },
+    "canonical_documentation_base_commit": "77863573f4662c66d07a9b17c10eec816fd9766c"
+  },
+  "unchanged_model_and_input": {
+    "model_name": "datalab-to/chandra-ocr-2",
+    "revision": "af93b47dba1b47b6640c86ccf487ed2260ab9a09",
+    "original_checkpoint_bytes": 10591220088,
+    "original_checkpoint_sha256": "0804568be9f099d6479fad9ed77a4da4611f3c1e7bc6e009af7dce45e8aa3847",
+    "authentication_scope": "native held-file importer metadata; this publication does not read or rehash the checkpoint",
+    "input_manifest": {
+      "bytes": 36558,
+      "sha256": "0aa588473930f110cc359ba369623f29765a85f4e05ffcbca2ac509933b787ae"
+    },
+    "prompt_tokens": 3617,
+    "prepared_patch_rows": 12096,
+    "context_limit": 16384,
+    "normal_output_allowance": 12384,
+    "both_arms_identical_model_and_input": true
+  },
+  "device": {
+    "name": "Intel Arc A770",
+    "same_physical_adapter_both_arms": true,
+    "original_driver_version": "32.0.101.8991"
+  },
+  "common_observation": {
+    "original_import_operations_per_arm": 732,
+    "original_import_storage_bytes_per_arm": 9078531072,
+    "original_drains_per_arm": 732,
+    "CPU_source_rows_per_arm": 10,
+    "early_GPU_observations": 0,
+    "constructor_return_observed": true,
+    "first_fault_shard": 0,
+    "first_fault_global_row": 26213,
+    "different_u32_words": 64,
+    "u32_word_interval_inclusive": [
+      768,
+      831
+    ],
+    "different_bytes": 256,
+    "row_byte_interval_half_open": [
+      3072,
+      3328
+    ],
+    "CPU_source_row_bytes": 5120,
+    "CPU_source_row_sha256": "e696b6bda9b22dba3ad2a49132d6353302f5b20ad2627909ae5474586a46c07f",
+    "post_constructor_tails_observed_per_arm": 1,
+    "later_tails_unobserved_per_arm": 9,
+    "arithmetic_executed": false,
+    "tokens_generated": false
+  },
+  "arms": {
+    "default-initial": {
+      "API": "DEFAULT CreateBuffer with initial data",
+      "API_operations_admitted": 732,
+      "API_operations_returned": 732,
+      "original_drains_completed": 732,
+      "CPU_source_snapshots_completed": 10,
+      "post_constructor_tails_observed": 1,
+      "later_tails_unobserved": 9,
+      "selected_tail_integrity_passed": false,
+      "bad_GPU_row": {
+        "bytes": 5120,
+        "sha256": "1d6a0176335a45e91838f1f191313f1c5d8f226c36c0d655b7970a2962e5c9c0"
+      },
+      "all_ten_CPU_source_rows": {
+        "bytes": 51200,
+        "sha256": "c265331b44a3e2ef7c433091c7a1fbbe8484c8e1937e88139fc1a3f283ac8243"
+      },
+      "import_observer_process_wall_seconds": 27.2874934,
+      "native_qualification_metadata": {
+        "bytes": 8562,
+        "sha256": "aa293f182af6573fb82b807bfaea7e624724014bc094771c756ece0b2d172362"
+      },
+      "root_disposition_metadata": {
+        "bytes": 3956,
+        "sha256": "2136c97a3249ba293994e7ede27c860aef7107fedbdfbe2eda12f1042cb719af"
+      },
+      "root_external_closure_metadata": {
+        "bytes": 4907,
+        "sha256": "548476f43fcf13a44e214e5cc17b2b89b75d565a4f745b228d443114a24f567e"
+      },
+      "retained_collection_metadata": {
+        "bytes": 4859,
+        "sha256": "683650fe1323b4f8f30de5a0e6490e35c10ba43710d2dc76600a10a9baadb0c4"
+      }
+    },
+    "update-subresource": {
+      "API": "UpdateSubresource",
+      "API_operations_admitted": 732,
+      "API_operations_returned": 732,
+      "original_drains_completed": 732,
+      "CPU_source_snapshots_completed": 10,
+      "post_constructor_tails_observed": 1,
+      "later_tails_unobserved": 9,
+      "selected_tail_integrity_passed": false,
+      "bad_GPU_row": {
+        "bytes": 5120,
+        "sha256": "080a812f28a44ff44de946ba02a302df72fc3b70c884845eb2ac4ebc84cd9d8a"
+      },
+      "all_ten_CPU_source_rows": {
+        "bytes": 51200,
+        "sha256": "c265331b44a3e2ef7c433091c7a1fbbe8484c8e1937e88139fc1a3f283ac8243"
+      },
+      "import_observer_process_wall_seconds": 30.1368176,
+      "native_qualification_metadata": {
+        "bytes": 8565,
+        "sha256": "00f75fe576615c90e60b1bb256cfa0a8ecb64654ac64f1108e3aac56228abc32"
+      },
+      "root_disposition_metadata": {
+        "bytes": 3959,
+        "sha256": "c9498f7bc5de6ce736bb6ed5961550cb43ffb7b1fcf707e055f4d0a4d74ba431"
+      },
+      "root_external_closure_metadata": {
+        "bytes": 3887,
+        "sha256": "1b5784b5e28248063949c06ee1c6c0a98bb33825a87cb96cf06aa50e94d9b8fd"
+      },
+      "retained_collection_metadata": {
+        "bytes": 4859,
+        "sha256": "1ea8e20a9bee03cdee32bde384a591887be59190c0b0cb3ec16467092bb97ec2"
+      }
+    }
+  },
+  "custody_acceptance": {
+    "observations_and_physical_custody_only": true,
+    "both_natural_Jobs_and_exact_owners_retired": true,
+    "transport_and_local_Guardian_processes_closed": true,
+    "historical_endpoint_cold_restoration_separately_authenticated": true,
+    "root_review_consumers_after_return_closed": true,
+    "closure_does_not_accept_byte_equality": true
+  },
+  "acceptance_limits": {
+    "selected_tail_integrity": false,
+    "whole_imported_model_byte_integrity": false,
+    "production_fix": false,
+    "strict_API_or_driver_cause": false,
+    "corruption_onset_localized": false,
+    "inference_or_numerical_correctness": false,
+    "complete_OCR": false,
+    "statistically_qualified_speed": false,
+    "sustained_pages_per_second": false,
+    "deployment": false,
+    "current_Git_runtime_qualification": false,
+    "new_hardware_execution_admission": false
+  },
+  "observation_limits": {
+    "source_view_release": "constructor/RAII-scope evidence only; individual Win32 unmap/close success not independently verified",
+    "observer_changes_timing_or_residency": true,
+    "matched_API_before_view_or_mapping_timing": false,
+    "padded_scratch_drain_lifetime_equivalence": false,
+    "nine_later_tails_unobserved": true,
+    "process_wall_seconds_are_import_observer_only": true,
+    "component_timing_does_not_qualify_statistical_or_page_speed_gain": true
+  },
+  "preserved_admission_boundaries": {
+    "original_pre_target_refusal_and_retired_marker_preserved": true,
+    "local_initialization_refused_before_admission": {
+      "actual_CPU_cap_seconds": 20,
+      "reviewed_caller_profile_CPU_seconds": 45,
+      "native_or_service_failure_inferred": false
+    },
+    "corrected_source_profile_validation_preserved": true,
+    "genuine_caller_and_actual_CPU_forecast_clearance_consumed": true,
+    "original_API_points_replayed": false,
+    "source_deadlines_extended": false
+  },
+  "prior_page4096_failure": {
+    "retained_in_completed_source_memo": true,
+    "shard": 0,
+    "global_row": 26213,
+    "different_u32_words": 64,
+    "first_differing_word": 768,
+    "last_differing_word": null,
+    "last_index_not_rederived": true,
+    "old_observer": "SRV/checksum",
+    "current_observer": "final-only direct-copy",
+    "observer_cutoff_confound_preserved": true,
+    "new_padding_repair_accepted": false,
+    "accepted_capture_metadata": {
+      "bytes": 3272,
+      "sha256": "d3e6fb9b9a4fa4b5ba53e9e5f084fd2ffae1d2ad5646bd16fbb642e27ed54964"
+    },
+    "retained_report_identity": {
+      "bytes": 365140,
+      "sha256": "b4595d3f85c69025ea07aa97b391cb0b710a5739bf415d760586fde97dceabbd"
+    }
+  },
+  "next_hypothesis": {
+    "description": "weight-only DEFAULT raw SRV storage without a UAV",
+    "status_at_publication_cutoff": "source implementation only",
+    "built": false,
+    "run": false,
+    "qualified_fix": false,
+    "source_memo_cutoff_was_proposal_only": true
+  },
+  "logical_evidence_identities": {
+    "actual_pair_finished_review": {
+      "bytes": 16857,
+      "sha256": "d587535894f0d1b669540d6553da31eb5834da36cc70c62b815aeae9db01c25a"
+    },
+    "root_finished_review_consumption": {
+      "bytes": 12236,
+      "sha256": "188dd8af4d05845bd3d7e7255c1b94b953d76d3c6b1d500ec24faff6b57a0f9f"
+    },
+    "root_review_consumers_after_return": {
+      "bytes": 1390,
+      "sha256": "32f407091cc2a48d560ca03ca553335bbd447debc0e2e0fd0e76703846070cc3"
+    },
+    "completed_source_memo": {
+      "bytes": 7759,
+      "sha256": "117e36348b6b8043d3189aa15797a2ad6a0ede962b134af2eaec0065334f5db5"
+    },
+    "completed_source_memo_seal": {
+      "bytes": 3898,
+      "sha256": "7b002a38dce59f5ee58288760a543d9dd9f17ada3fae762df0e2c6ce0054ecc8"
+    },
+    "default_initial_provenance": {
+      "bytes": 5669,
+      "sha256": "0f1f223a19bf6f3488bac2d40038c714fafc7a5424e643c6c082c39c17b197fc"
+    },
+    "update_subresource_provenance": {
+      "bytes": 5669,
+      "sha256": "ee15a341516a01f8a9af96b39bcc37f41103dca156a62edab669e60ba51c9a96"
+    }
+  },
+  "earlier_results_preserved": true,
+  "raw_or_model_payloads_published": false
+}
