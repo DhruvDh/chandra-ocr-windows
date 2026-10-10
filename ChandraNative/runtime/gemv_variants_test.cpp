@@ -27,7 +27,7 @@ void check(bool ok, const std::string& message) { if (!ok) throw std::runtime_er
 void selectorTable() {
     check(gv::parse(nullptr) == gv::Route::predecessor && gv::parse("0") == gv::Route::predecessor, "unset and 0 are the predecessor");
     check(gv::parse("ordered") == gv::Route::ordered && gv::parse("ordered32") == gv::Route::ordered32 &&
-          gv::parse("ordered64") == gv::Route::ordered64, "exact ordered selectors");
+          gv::parse("ordered64") == gv::Route::ordered64 && gv::parse("parallel32") == gv::Route::parallel32, "exact experimental selectors");
     for (const char* bad : {"", "1", "00", "ORDERED", "Ordered32", " ordered32", "ordered32 ", "ordered 32", "ordered16",
                             "ordered8", "ordered128", "ordered320", "ordered6", "predecessor", "true", "ordered\t"})
         check(gv::parse(bad) == gv::Route::invalid, std::string("invalid selector accepted: \"") + bad + "\"");
@@ -38,8 +38,9 @@ void selectorTable() {
     struct Want { const char* selector; const char* shader; uint32_t rows, tile, stride, bytes; };
     const Want want[] = {{"ordered", "runtime/linear_gemv.hlsl", 8, 512, 513, 18464},
                          {"ordered32", "runtime/linear_gemv_ordered32.hlsl", 32, 128, 129, 17024},
-                         {"ordered64", "runtime/linear_gemv_ordered64.hlsl", 64, 64, 65, 16896}};
-    check(gv::shapeCount == 3, "exactly three ordered routes");
+                         {"ordered64", "runtime/linear_gemv_ordered64.hlsl", 64, 64, 65, 16896},
+                         {"parallel32", "runtime/linear_gemv_parallel32.hlsl", 8, 512, 513, 18464}};
+    check(gv::shapeCount == 4, "three ordered routes and explicit reassociated parallel32");
     for (const auto& w : want) {
         const gv::Shape* s = gv::shape(w.selector);
         check(s && std::string(s->selector) == w.selector && std::string(s->shader) == w.shader && s->outputsPerGroup == w.rows &&
@@ -52,7 +53,8 @@ void selectorTable() {
             check(s->tiles(k) == (k + w.tile - 1) / w.tile, "tile count");
         check(s->groups(1024) <= 65535, "dispatch X within the SM5 limit");
     }
-    std::cout << "selector table: exact selectors, " << 16 << " invalid spellings refused, 3 shapes\n";
+    check(!gv::staging::rowMajor(*gv::shape("parallel32")), "parallel32 uses ordered8 staging, not the ordered32/64 layout");
+    std::cout << "selector table: exact selectors, " << 16 << " invalid spellings refused, 4 shapes\n";
 }
 
 // ---- 2. Staging and owner index algebra ----
@@ -338,6 +340,9 @@ void forecast(bool print) {
         rows.push_back(r);
     }
     for (const gv::Shape& s : gv::shapes) {
+        // This legacy forecast models the ordered chains only. The parallel32 tree, extra barriers
+        // and shared reduction traffic are modelled in the candidate's separate source report.
+        if (s.route == gv::Route::parallel32) continue;
         Row r{s.selector, 0, 0, 0, 0, 0, 0, s.outputsPerGroup, s.threads};
         for (const auto& c : chunks) {
             uint64_t g = s.groups(c.outputs);
@@ -364,9 +369,11 @@ void forecast(bool print) {
     for (const auto& c : chunks) { ++byOutputs[c.outputs]; bytesByWidth[c.inputWidth] += uint64_t(c.inputWidth) * c.outputs * 2; }
     std::cout << "dispatches by outputs:"; for (auto [o, count] : byOutputs) std::cout << " " << o << "x" << count; std::cout << "\n";
     std::cout << "weight bytes by K:"; for (auto [k, b] : bytesByWidth) std::cout << " K" << k << "=" << b; std::cout << "\n";
-    for (const gv::Shape& s : gv::shapes)
+    for (const gv::Shape& s : gv::shapes) {
+        if (s.route == gv::Route::parallel32) continue;
         std::cout << s.selector << " at K9216xN1024: groups " << s.groups(1024) << ", tiles " << s.tiles(9216) << ", barriers per group "
                   << 2 * s.tiles(9216) << ", owner steps per barrier pair " << s.tile << ", input bytes " << uint64_t(s.groups(1024)) * 9216 * 4 << "\n";
+    }
 }
 } // namespace
 

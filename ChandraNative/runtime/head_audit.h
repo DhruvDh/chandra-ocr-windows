@@ -233,11 +233,12 @@ public:
     }
     // Streams every authenticated head row once (checksums and FP64 norms), reads the final-norm gain,
     // then screens all GPU row checksums. Call after ModelWeights construction, before any request.
-    Json afterImport() {
+    Json afterImport(bool directCopy = false) {
         admit("import audit");
         if (importStarted) throw std::logic_error("Import audit already started");
         importStarted = true; Json checkpoint = {{"name", "after_import"}, {"complete", false}};
         try {
+            if (directCopy) directKnownRow(checkpoint); // Before every checksum dispatch and source-table stream.
             sourceChecksums.assign(weight.rows, 0); sourceNorms.assign(weight.rows, 0); sourceL1.assign(weight.rows, 0);
             const uint32_t rowBytes = rowWords * 4, chunkRows = uint32_t(std::max<uint64_t>(1, sourceChunkBytes / rowBytes));
             std::vector<uint32_t> chunk(size_t(chunkRows) * rowWords);
@@ -329,6 +330,45 @@ private:
     std::pair<size_t, uint32_t> locate(uint32_t row) const {
         for (size_t s = weight.shards.size(); s-- > 0;) if (row >= weight.shardFirstRows[s]) return {s, row - weight.shardFirstRows[s]};
         throw std::out_of_range("Head audit row outside the vocabulary");
+    }
+    void directKnownRow(Json& checkpoint) {
+        using namespace direct_head_row;
+        Json& out = checkpoint["direct_copy"];
+        out = {{"schema", "chandra.directcompute.head-row-direct-copy.v1"}, {"requested", true}, {"complete", false},
+            {"at", "after_import_before_checksum"}, {"row", row}, {"shard", 0}, {"local_row", row},
+            {"file", file}, {"bytes", rowBytes}, {"raw_file_written", false}, {"affects_existing_classification", false},
+            {"scope", "One CopySubresourceRegion from the underlying imported buffer to staging; no SRV, shader, cast or arithmetic; may change residency; no cause or numerical/OCR acceptance"}};
+        Observation observed;
+        auto record = [&] {
+            const auto& r = observed.transport;
+            out["raw_file_written"] = observed.rawFileWritten; out["source_read_completed"] = observed.sourceReadCompleted;
+            out["complete"] = observed.complete;
+            if (!observed.gpuSha256.empty()) out["gpu_sha256"] = observed.gpuSha256;
+            if (!observed.sourceSha256.empty()) out["source_sha256"] = observed.sourceSha256;
+            if (observed.complete) {
+                out["differing_words"] = observed.differingWords; out["exact_match"] = observed.differingWords == 0;
+                out["first_differing_word"] = observed.firstDifferingWord == UINT32_MAX ? Json(nullptr) : Json(observed.firstDifferingWord);
+            }
+            out["transport"] = {{"api", "ID3D11DeviceContext::CopySubresourceRegion"}, {"source_first_byte", r.extent.firstByte}, {"copy_bytes", r.extent.bytes},
+                {"source_logical_bytes", r.extent.logicalBytes}, {"source_physical_bytes", r.extent.physicalBytes}, {"staging_bytes", r.extent.bytes},
+                {"source_descriptor", {{"usage", r.sourceUsage}, {"bind_flags", r.sourceBindFlags}, {"misc_flags", r.sourceMiscFlags}, {"cpu_access_flags", r.sourceCPUAccess}, {"structure_byte_stride", r.sourceStride}}},
+                {"copies_submitted", r.copiesSubmitted}, {"copy_resubmitted", false}, {"before_copy_drain_completed", r.beforeCopyDrainCompleted}, {"after_copy_drain_completed", r.afterCopyDrainCompleted},
+                {"drain_timeout_ms", 10000}, {"post_copy_readiness_budget_ms", 10000}, {"map_attempted", r.mapAttempted},
+                {"map_status", r.mapAttempted ? Json(uint32_t(r.readiness.status)) : Json(nullptr)}, {"map_attempts", r.readiness.attempts}, {"still_drawing_results", r.readiness.stillDrawing},
+                {"map_wait_nanoseconds", r.readiness.waited.count()}, {"map_copied", r.mapAttempted && r.readiness.result == readback::Result::copied},
+                {"unmapped", r.unmapped}, {"staging_created", r.stagingCreated}, {"staging_released", r.stagingReleased},
+                {"device_removed_reason_queried", r.deviceRemovedReasonQueried}, {"device_removed_reason", r.deviceRemovedReasonQueried ? Json(uint32_t(r.deviceRemovedReason)) : Json(nullptr)},
+                {"operation_nanoseconds", r.operationNanoseconds},
+                {"retirement_scope", "Local observer staging reference release only; request/worker/Job retirement requires external ownership receipts"}};
+        };
+        try {
+            const auto& b = weight.shards.at(0);
+            requireKnown(weight.rows, weight.cols, weight.shardFirstRows.at(0), b.logicalElements, b.words, b.packedBF16);
+            capture([&](Receipt& r) { return device.readWordsRange(b, firstWord, rowWords, r); }, write, read, sha,
+                headTensor.payloadBegin + uint64_t(row) * rowBytes, observed);
+            record();
+        } catch (const std::exception& e) { record(); out["error"] = e.what(); throw; }
+        catch (...) { record(); out["error"] = "non-standard exception"; throw; }
     }
     std::vector<uint32_t> gpuChecksums() {
         struct Params { uint32_t wordsPerRow, rows, firstRow, outputFirst, reserved0, reserved1, reserved2, reserved3; };

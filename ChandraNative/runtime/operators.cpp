@@ -1,6 +1,7 @@
 // New code, MPL-2.0. See api.h: R32_FLOAT activations, explicit BF16 boundaries.
 #include "api.h"
 #include "gemv_variants.h"
+#include "padded32_opt_in.h"
 #include <algorithm>
 #include <cmath>
 #include <cstdlib>
@@ -64,7 +65,8 @@ static_assert(sizeof(LinearParams) == 32 && sizeof(EmbeddingParams) == 32 &&
               sizeof(NormParams) == 32 && sizeof(ElementParams) == 32, "HLSL cbuffer ABI");
 // Experimental B1 projection selector, captured once during this translation unit's static
 // initialization (before main) and never re-read. Unset or "0" keeps the predecessor route;
-// "ordered" admits linear_gemv.hlsl and "ordered32"/"ordered64" their own shaders for rows == 1
+// "ordered" admits linear_gemv.hlsl and "ordered32"/"ordered64" their own shaders for rows == 1;
+// "parallel32" explicitly changes the FP32 summation order, keeping ordered8 geometry/storage
 // (gemv_variants.h). Any other value, including an empty value, is refused by every linear() call
 // before validation or allocation; there is no fallback.
 using GemvB1 = gemv_variants::Route;
@@ -90,10 +92,12 @@ GemvSelection readGemvSelection() noexcept {
     return result;
 }
 const GemvSelection gemvSelection = readGemvSelection();
+bool padded32Enabled = false, linearHasRun = false;
+experimental::GemmPadded32Counts padded32Counts;
 // Null for the predecessor route.
 const gemv_variants::Shape* gemvB1Shape() {
     if (gemvSelection.mode == GemvB1::invalid)
-        throw std::invalid_argument(std::string("CHANDRA_EXPERIMENTAL_GEMV_B1 must be unset, \"0\", \"ordered\", \"ordered32\" or \"ordered64\"; observed \"") +
+        throw std::invalid_argument(std::string("CHANDRA_EXPERIMENTAL_GEMV_B1 must be unset, \"0\", \"ordered\", \"ordered32\", \"ordered64\" or \"parallel32\"; observed \"") +
                                     gemvSelection.observed + "\"");
     return gemv_variants::shape(gemvSelection.mode);
 }
@@ -102,18 +106,27 @@ const gemv_variants::Shape* gemvB1Shape() {
 namespace experimental {
 // Not part of api.h: calibration and candidate tests declare this accessor themselves.
 const char* gemvB1Selection() { const auto* gemv = gemvB1Shape(); return gemv ? gemv->selector : "predecessor"; }
+void enableGemmPadded32() {
+    if (padded32Enabled || linearHasRun)
+        throw std::invalid_argument("Padded32 must be explicitly enabled once before any linear call");
+    padded32Enabled = true;
+}
+bool gemmPadded32Enabled() noexcept { return padded32Enabled; }
+GemmPadded32Counts gemmPadded32Counts() noexcept { return padded32Counts; }
 }
 
 Buffer linear(Device& d, const Buffer& input, const Weight& w, uint32_t rows,
               bool roundOutputBF16, const Weight* bias) {
     const gemv_variants::Shape* selected = gemvB1Shape(); // Throws for an invalid selector, whatever rows is.
+    linearHasRun = true;
     const gemv_variants::Shape* gemv = rows == 1 ? selected : nullptr;
     weight(w);
     if (w.cols > 9216) throw std::invalid_argument("Linear input width exceeds pinned graph maximum 9216");
     activation(input, uint64_t(rows) * w.cols);
     const Buffer* biasBuffer = bias ? &vectorWeight(*bias, w.rows) : &w.shards.front();
     Buffer output = d.floats(elements(uint64_t(rows) * w.rows));
-    // Conservative TDR baseline: no split-K, so each dot keeps its complete order.
+    // Conservative TDR baseline: each dot stays within one dispatch; only opt-in parallel32
+    // partitions its K accumulation among lanes and changes the FP32 summation order.
     // At K=9216 this bounds one call to 1024*32*9216 = 301,989,888 terms.
     for (size_t s = 0; s < w.shards.size(); ++s) {
         uint32_t totalShardRows = static_cast<uint32_t>(w.shards[s].logicalElements / w.cols);
@@ -134,8 +147,12 @@ Buffer linear(Device& d, const Buffer& input, const Weight& w, uint32_t rows,
                 LinearParams p{w.cols,w.rows,current,w.shardFirstRows[s]+weightFirst,currentOutputs,first,
                     uint32_t(w.bf16) | (uint32_t(roundOutputBF16)<<1) | (uint32_t(bias!=nullptr)<<2) |
                     (uint32_t(bias && bias->bf16)<<3),weightFirst};
-                d.dispatch("runtime/linear.hlsl",{&input,&w.shards[s],biasBuffer},{&output},
+                const bool padded = padded32Enabled && padded32_opt_in::supported(current,w.cols,w.bf16);
+                d.dispatch(padded ? padded32_opt_in::shader : padded32_opt_in::fallbackShader,{&input,&w.shards[s],biasBuffer},{&output},
                            &p,sizeof(p),(currentOutputs+15)/16,(current+15)/16);
+                if (padded32Enabled && rows > 1) {
+                    if (padded) ++padded32Counts.padded32; else ++padded32Counts.fallback;
+                }
                 first+=current;
             }
             weightFirst+=currentOutputs;

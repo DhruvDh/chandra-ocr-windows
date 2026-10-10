@@ -8,7 +8,7 @@
 namespace chandra::gemv_variants {
 // CHANDRA_EXPERIMENTAL_GEMV_B1: unset or "0" is the predecessor (linear.hlsl for every batch);
 // each other route replaces only batch-row-1 calls. Matching is exact and case-sensitive.
-enum class Route { predecessor, ordered, ordered32, ordered64, invalid };
+enum class Route { predecessor, ordered, ordered32, ordered64, parallel32, invalid };
 
 struct Shape {
     Route route; const char* selector; const char* shader;
@@ -24,6 +24,9 @@ inline constexpr Shape shapes[] = {
     {Route::ordered, "ordered", "runtime/linear_gemv.hlsl", 8, 256, 512, 513},
     {Route::ordered32, "ordered32", "runtime/linear_gemv_ordered32.hlsl", 32, 256, 128, 129},
     {Route::ordered64, "ordered64", "runtime/linear_gemv_ordered64.hlsl", 64, 256, 64, 65},
+    // Opt-in reassociation: the ordered8 staging/geometry is unchanged, but all 32 lanes per row
+    // accumulate disjoint ascending-K subsequences and reduce through a fixed five-stage tree.
+    {Route::parallel32, "parallel32", "runtime/linear_gemv_parallel32.hlsl", 8, 256, 512, 513},
 };
 constexpr uint32_t shapeCount = sizeof(shapes) / sizeof(shapes[0]);
 
@@ -71,6 +74,10 @@ inline Slot stage(const Shape& s, uint32_t inputWidth, uint32_t shardRows, uint3
 } // namespace staging
 
 static_assert(shapes[0].route == Route::ordered && shapes[0].groupsharedBytes() == 18464, "ordered8 geometry is immutable");
+static_assert(shapes[3].groupsharedBytes() == shapes[0].groupsharedBytes() &&
+              shapes[3].outputsPerGroup == shapes[0].outputsPerGroup && shapes[3].threads == shapes[0].threads &&
+              shapes[3].tile == shapes[0].tile && shapes[3].stride == shapes[0].stride,
+              "parallel32 reuses ordered8 geometry and retired input-tile reduction storage");
 static_assert(staging::rowMajor(shapes[1]) && staging::rowMajor(shapes[2]), "row-major variant geometry");
 static_assert(shapes[1].groupsharedBytes() == 17024 && shapes[2].groupsharedBytes() == 16896, "variant groupshared bytes");
 static_assert(shapes[0].groupsharedBytes() < 32768 && shapes[1].groupsharedBytes() < 32768 && shapes[2].groupsharedBytes() < 32768,

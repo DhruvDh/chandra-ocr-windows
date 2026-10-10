@@ -119,4 +119,13 @@ struct RequestHooks {
 // outcome and rethrows. Device and weights stay owned by the caller.
 void generate(Device& device, ModelWeights& weights, const Input& in, uint32_t diagnosticCap, const std::filesystem::path& output,
     Json& report, std::vector<uint32_t>& generated, const RequestHooks& hooks);
+// Explicit two-owner native operation; serial independent vision/prefill, shared stateless B2 decode.
+// Inputs/outputs/hooks are in stable slot order. Both full-size inputs must already authenticate.
+// No diagnostic cap, scheduler or per-slot cancellation. The caller owns `requests` beyond failure:
+// on failed drain their poisoned caches are retained and mandatory worker retirement is reported.
+// Successful return or a proven cleanup drain retires both caches; the original exception is rethrown.
+void generateCohort(Device&, ModelWeights&, const std::array<const Input*,2>&,
+    const std::array<std::filesystem::path,2>&, std::array<Json,2>&,
+    std::array<std::vector<uint32_t>,2>&, std::array<TextRequest,2>&,
+    const std::array<RequestHooks,2>&, bool explicitOrderedB2=false,uint32_t pageCount=2);
 }

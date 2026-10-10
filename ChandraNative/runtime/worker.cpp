@@ -1,8 +1,8 @@
 // New code, MPL-2.0. Resident native Chandra worker: one Device and one authenticated complete
 // ModelWeights per process, B1 requests executed serially on the Device-owning thread through the
 // same request path as chandra-inference.exe (inference_core.cpp), over a versioned, bounded
-// newline-JSON stdin/stdout protocol. Inactive by default. No batching, concurrent GPU execution,
-// model reload, engine/CPU fallback or request replay. A bounded stdin reader thread performs
+// newline-JSON stdin/stdout protocol. Inactive by default. The separately explicit static B2 mode
+// batches decode only; one Device thread owns all dispatches. No model reload, engine/CPU fallback or request replay. A bounded stdin reader thread performs
 // admission, cancellation notification and status only; it never touches the Device or GPU buffers.
 // Input ends at EOF, at a read failure (reported, exit 3) or at the protocol-error ceiling (exit 3 whichever
 // cause closed the worker first); at exit the worker cancels a still-pending read and joins the reader before
@@ -13,6 +13,8 @@
 #define NOMINMAX
 #define PSAPI_VERSION 2
 #include "inference_core.h"
+#include "padded32_opt_in.h"
+#include "final_import_arithmetic_gate.h"
 #include <algorithm>
 #include <atomic>
 #include <cctype>
@@ -42,7 +44,7 @@ constexpr const char* obligations = "Source guards bound input, admission, buffe
     "The owner must supply a finite kill-on-close Windows Job, a live parent holding the stdin lease, private input/output roots, adapter admission and closure evidence.";
 
 struct Options {
-    bool execute = false, plan = false; uint32_t leaseMilliseconds = 0;
+    bool execute = false, plan = false, experimentalPadded32 = false, experimentalB2 = false; uint32_t leaseMilliseconds = 0;
     std::filesystem::path model, shaders, inputRoot, outputRoot; std::string pci, luid;
 };
 Options options(int argc, wchar_t** argv) {
@@ -51,6 +53,8 @@ Options options(int argc, wchar_t** argv) {
         std::wstring name = argv[i]; require(seen.insert(name).second, "Duplicate worker option");
         if (name == L"--execute") { o.execute = true; continue; }
         if (name == L"--plan") { o.plan = true; continue; }
+        if (name == L"--experimental-padded32") { o.experimentalPadded32 = true; continue; }
+        if (name == L"--experimental-b2-decode") { o.experimentalB2 = true; continue; }
         require(i + 1 < argc, "Worker option value is missing"); std::wstring value = argv[++i];
         if (name == L"--model-dir") o.model = value;
         else if (name == L"--shader-root") o.shaders = value;
@@ -64,6 +68,7 @@ Options options(int argc, wchar_t** argv) {
         } else throw std::runtime_error("Unknown worker option: " + utf8(name));
     }
     require(!(o.execute && o.plan), "Choose exactly one of --execute or --plan");
+    require(o.experimentalPadded32 == o.experimentalB2, "Dedicated cohort mode requires both explicit padded32 and B2 flags");
     return o;
 }
 // Every component of an absolute root, from the volume root down, must exist without reparse/symlink aliasing.
@@ -152,12 +157,95 @@ std::string writeReceipt(const std::filesystem::path& directory, const Json& val
     NewOutput receipt(directory / L"result.json"); receipt.line(value); return sha256Text(value.dump() + "\n");
 }
 
+
+// One fresh, private directory per worker lifetime. The leading dot is already refused by
+// safeComponent(), so no submit message can use this directory as request output.
+std::filesystem::path residentImportDirectory(const std::filesystem::path& root) {
+    const auto name = L".resident-import-" + std::to_wstring(GetCurrentProcessId()) + L"-" + std::to_wstring(Clock::now().time_since_epoch().count());
+    const auto directory = root / name;
+    require(CreateDirectoryW(directory.c_str(), nullptr), "Fresh private resident-import directory required");
+    const DWORD a = GetFileAttributesW(directory.c_str());
+    require(a != INVALID_FILE_ATTRIBUTES && (a & FILE_ATTRIBUTE_DIRECTORY) && !(a & FILE_ATTRIBUTE_REPARSE_POINT), "Resident-import directory must be plain");
+    return directory;
+}
+Json persistResidentMetadata(const std::filesystem::path& path, const Json& value) {
+    const auto bytes = value.dump() + "\n";
+    require(bytes.size() <= manifestByteLimit, "Resident import metadata exceeds unchanged 1 MiB bound");
+    { NewOutput file(path); file.line(value); }
+    return {{"file", utf8(path.filename().wstring())}, {"bytes", bytes.size()}, {"sha256", sha256Text(bytes)}};
+}
+std::unique_ptr<import_row::FinalTailObserver> residentFinalTailObserver(const std::filesystem::path& directory,
+        std::unique_ptr<NewOutput>& journal, uint32_t& records, uint64_t& bytes) {
+    journal = std::make_unique<NewOutput>(directory / L"progress.jsonl");
+    return std::make_unique<import_row::FinalTailObserver>(WeightImportAPI::defaultInitial,
+        [directory](const std::string& name, const void* data, size_t count) {
+            require(((name == import_row::finalTailSourceFile || name == import_row::finalTailGoodFile) && count > 0 && count <= import_row::final_tails::rowArrayBytes && count % import_row::tails::rowBytes == 0) ||
+                (name == import_row::finalTailBadFile && count == import_row::tails::rowBytes), "Fixed resident final-tail payload name/extent required");
+            Handle file(CreateFileW((directory / std::filesystem::u8path(name)).c_str(), GENERIC_WRITE, 0, nullptr, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, nullptr));
+            DWORD wrote = 0;
+            require(WriteFile(file.value, data, DWORD(count), &wrote, nullptr) && wrote == count, "Writing resident final-tail payload failed");
+            require(FlushFileBuffers(file.value), "Flushing resident final-tail payload failed");
+        }, [](const void* data, size_t count) { Sha256 hash; hash.update(data, uint32_t(count)); return hash.finish(); },
+        [&journal, &records, &bytes](const Json& record) {
+            const auto count = record.dump().size() + 1;
+            require(count <= 4096 && records < 32 && bytes + count <= 128 * 1024, "Resident final-tail journal exceeds unchanged full-page tail profile");
+            journal->line(record); ++records; bytes += count;
+        }, true);
+}
+void requireResidentImportProvenance(const Json& provenance) {
+    auto number = [](const Json& v, uint64_t n) { return v.is_number_unsigned() && v.get<uint64_t>() == n; };
+    require(provenance.at("schema") == "chandra.directcompute.model-weights.v2" && provenance.at("model") == "datalab-to/chandra-ocr-2" && provenance.at("revision") == modelRevision &&
+        provenance.at("model_sha256") == "0804568be9f099d6479fad9ed77a4da4611f3c1e7bc6e009af7dce45e8aa3847" && number(provenance.at("model_bytes"), 10591220088ull) &&
+        provenance.at("config_sha256") == "e26f17b70463de21fd68f1ef6d8f67f8e33e65d55a7a6895242130a18db60587" && number(provenance.at("config_bytes"), 2773) &&
+        provenance.at("full_graph_requested") == true && provenance.at("omitted_graph_tensors").empty() && provenance.at("tie_byte_equality_performed") == true && provenance.at("tie_byte_equality") == true && provenance.at("implicit_cast_or_dequantization") == false &&
+        provenance.at("weight_import_api") == "default-initial" && provenance.at("weight_srv_only") == import_row::FinalTailObserver::forecast(WeightImportAPI::defaultInitial, true).at("weight_srv_only") &&
+        number(provenance.at("API_operations_completed"), 732) && number(provenance.at("UpdateSubresource_calls"), 0) && number(provenance.at("DEFAULT_initial_data_Device_creations"), 732) &&
+        number(provenance.at("uploaded_storage_bytes"), 9078531072ull), "Resident import provenance differs from the fixed original DEFAULT-initial SRV-only graph");
+}
+
+bool cohortManifestAllowed(const std::string& sha) {
+    return sha=="0aa588473930f110cc359ba369623f29765a85f4e05ffcbca2ac509933b787ae" ||
+        sha=="aab97d615f7e3181b9a3ef814f8784030f17fb186a31964df0a2a6063512e8d1" ||
+        sha=="62c362251b128392f3cb3fcff6e8e25531b585038d12391ecaa1a153d6979081" ||
+        sha=="df67a54b1d43b83f178b8b7c6627480d114bf07e68ddee2ba08b137f34307c04";
+}
+void requireCohortInput(const Input& in,const std::string& manifestSha) {
+    if(cohortManifestAllowed(manifestSha)) {
+        require(in.ids.size()==3617 && in.manifest.at("image").at("dimensions")==Json({1624,2100}),"Exact full-size diagnostic corpus page and 3617-token prompt required");
+        return;
+    }
+    // Only after original authenticateInput has checked the actual manifest and all raw tensor/caller bytes.
+    require(in.manifest.at("source")=="chandra.native-endpoint.request.v1" &&
+        in.manifest.at("processor_profile")=="northstone-serving" &&
+        in.manifest.at("processor_kwargs")==Json({{"size",{{"shortest_edge",3136},{"longest_edge",3145728}}}}) &&
+        in.manifest.at("processor_files")==Json::parse("{\"chat_template.jinja\":\"0d158f349ca965f7eea9db0eb45cd177b85bb0e4ae05dcdd0f060da8f7d41812\",\"config.json\":\"e26f17b70463de21fd68f1ef6d8f67f8e33e65d55a7a6895242130a18db60587\",\"generation_config.json\":\"0c35bb39fbaed1ac0656baabc4f4e9bda20214e12336d0e4e8755aac1f487c2e\",\"preprocessor_config.json\":\"957eb01d1ea45341a92d543daec95857a7cbeff5803834bc0603b27ba7b41b3f\",\"processor_config.json\":\"14932921ca485d458a04dafd8069fbb0a4505622a48208d19ed247115801385b\",\"tokenizer.json\":\"87a7830d63fcf43bf241c3c5242e96e62dd3fdc29224ca26fed8ea333db72de4\",\"tokenizer_config.json\":\"316230d6a809701f4db5ea8f8fc862bc3a6f3229c937c174e674ff3ca0a64ac8\",\"video_preprocessor_config.json\":\"de7ba2c4528aa3c92754dc61ae83f1871369cbf7ab4298dcaa99c2f5a7c80848\"}"),
+        "Exact production endpoint source and pinned processor/profile required");
+    require(in.patchRows<=12288 && in.grids.size()==1 && in.grids[0].temporal==1,
+        "Production cohort retains the existing serving patch ceiling and one still image");
+    for(const char* name:{"attention_mask","mm_token_type_ids","text_position_ids","rope_deltas"})
+        require(in.descriptors.count(name)!=0,"Complete production package tensor inventory required");
+}
+Json cohortSelection(const Options& o,const std::string& b1) {
+    require(o.experimentalB2 && o.experimentalPadded32 && b1=="ordered", "Cohort mode requires both explicit flags and captured ordered B1");
+    for(const auto& entry:std::array<std::pair<const char*,std::pair<uint32_t,const char*>>,2>{{
+        {chandra::padded32_opt_in::shader,{3356,chandra::padded32_opt_in::shaderSha256}},
+        {chandra::padded32_opt_in::fallbackShader,{2444,chandra::padded32_opt_in::fallbackSha256}}}}) {
+        const auto path=localFile(o.shaders,entry.first);std::vector<char> bytes(entry.second.first);
+        authenticatedRead(path,bytes.data(),bytes.size(),entry.second.second);
+    }
+    return {{"schema","chandra.directcompute.worker-ordered-padded32-b2-selection.v1"},{"explicit_B2",true},{"max_decode_slots",2},
+        {"B1_selector","ordered"},{"multirow_shader",chandra::padded32_opt_in::shader},{"multirow_shader_sha256",chandra::padded32_opt_in::shaderSha256},
+        {"fallback_shader",chandra::padded32_opt_in::fallbackShader},{"fallback_shader_sha256",chandra::padded32_opt_in::fallbackSha256},
+        {"shader_bytes_authenticated_before_Device",true},{"unsupported_multirow_shapes_use_original_fallback",true},
+        {"parallel32_excluded",true},{"trained_numerical_OCR_PPS_acceptance",false}};
+}
 struct Canceled : std::runtime_error {
     std::string boundary;
     explicit Canceled(std::string b) : std::runtime_error("Request canceled at safe boundary " + b), boundary(std::move(b)) {}
 };
 struct Request {
     std::string id; std::filesystem::path manifest, output; std::string manifestSha, outputName; uint32_t cap = 0; uint64_t index = 0;
+    bool cohort = false; std::vector<std::shared_ptr<Request>> pages;
     std::atomic<bool> cancel{false};
     bool started = false, cancelRequested = false; std::string cancelOrigin, phase; // Guarded by Shared::lock.
 };
@@ -171,20 +259,43 @@ class Worker {
 public:
     Worker(Options o, std::string selection, Json observedJob) : options(std::move(o)), gemvSelection(std::move(selection)), job(std::move(observedJob)) {
         output = GetStdHandle(STD_OUTPUT_HANDLE);
+        if(options.experimentalB2){cohortArithmetic=cohortSelection(options,gemvSelection);chandra::dc::experimental::enableGemmPadded32();}
     }
     // Startup: Device and the complete authenticated model exist only in execute mode, created on this thread.
     bool start() {
+        std::unique_ptr<import_row::FinalTailObserver> finalTails; std::unique_ptr<NewOutput> progress;
+        uint32_t tailRecords = 0; uint64_t tailBytes = 0; std::filesystem::path auditDirectory;
         try {
             if (options.execute) {
+                require(gemvSelection == "ordered", "Resident SRV-only execution requires explicit ordered B1 selection");
+                auditDirectory = residentImportDirectory(options.outputRoot);
+                finalTails = residentFinalTailObserver(auditDirectory, progress, tailRecords, tailBytes);
+                heldModel = std::make_unique<Handle>(CreateFileW((options.model / L"model.safetensors").c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr));
+                heldConfig = std::make_unique<Handle>(CreateFileW((options.model / L"config.json").c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr));
                 device = std::make_unique<Device>(options.shaders.wstring(), options.pci, options.luid);
                 identity = Json::parse(device->identityJson());
-                weights = std::make_unique<ModelWeights>(*device, options.model.wstring());
+                weights = std::make_unique<ModelWeights>(*device, options.model.wstring(), 12ull * 1024 * 1024 * 1024, std::vector<std::string>{}, WeightStorageExperiment::exact,
+                    nullptr, nullptr, nullptr, nullptr, WeightImportAPI::defaultInitial, finalTails.get(), true);
                 provenance = Json::parse(weights->provenanceJson());
-                require(provenance.at("full_graph_requested") == true && provenance.at("omitted_graph_tensors").empty() && provenance.at("tie_byte_equality") == true, "Full original graph and authenticated tied output head required");
+                finalTails->afterImport(*device, weights->at("model.language_model.embed_tokens.weight"), weights->at("lm_head.weight"));
+                requireCleanFinalImportForArithmetic(*finalTails, WeightImportAPI::defaultInitial, false);
+                finalTails->releaseTargets();
+                requireCleanFinalImportForArithmetic(*finalTails, WeightImportAPI::defaultInitial, true);
+                requireResidentImportProvenance(provenance);
+                const auto provenanceFile = persistResidentMetadata(auditDirectory / L"model-provenance.json", provenance);
+                const auto auditFile = persistResidentMetadata(auditDirectory / L"audit.json", finalTails->report());
+                residentImport = {{"weight_import_api", "default-initial"}, {"weight_srv_only", true}, {"clean_final_import_gate_completed", true},
+                    {"audit_directory", utf8(auditDirectory.filename().wstring())}, {"audit", auditFile}, {"full_model_provenance", provenanceFile}};
                 residentBytes = device->trackedBufferBytes();
+                require(residentBytes == provenance.at("tracked_buffer_bytes_after") && residentBytes == 9078531072ull, "Resident ownership baseline differs after observer reference release");
             }
         } catch (const std::exception& e) {
-            std::lock_guard<std::mutex> guard(lock); emitLocked({{"event", "fatal"}, {"stage", "startup"}, {"error", bounded(e.what())}, {"device_created", device != nullptr}, {"model_loaded", weights != nullptr}});
+            if (finalTails) {
+                if (!finalTails->completed()) finalTails->failure(e.what());
+                finalTails->releaseTargets();
+                try { persistResidentMetadata(auditDirectory / L"startup-failure.json", {{"error", bounded(e.what())}, {"final_import_tail_audit", finalTails->report()}, {"accepting", false}}); } catch (const std::exception&) {}
+            }
+            std::lock_guard<std::mutex> guard(lock); emitLocked({{"event", "fatal"}, {"stage", "startup"}, {"error", bounded(e.what())}, {"device_created", device != nullptr}, {"model_loaded", false}});
             poisoned = true; closing = true; closeReason = "startup_failed"; return false;
         }
         std::lock_guard<std::mutex> guard(lock);
@@ -194,14 +305,17 @@ public:
         Json resident = nullptr;
         if (weights) resident = {{"revision", provenance.value("revision", Json(nullptr))}, {"model_sha256", provenance.value("model_sha256", Json(nullptr))},
             {"config_sha256", provenance.value("config_sha256", Json(nullptr))}, {"uploaded_storage_bytes", provenance.value("uploaded_storage_bytes", Json(nullptr))},
-            {"tie_byte_equality", true}, {"full_graph_requested", true}, {"provenance_sha256", sha256Text(provenance.dump())}, {"resident_tracked_bytes", residentBytes}, {"imports", 1}};
-        emitLocked({{"event", "ready"}, {"mode", options.execute ? "execute" : "plan"}, {"accepting", true},
+            {"tie_byte_equality", true}, {"full_graph_requested", true}, {"provenance_sha256", sha256Text(provenance.dump())}, {"resident_tracked_bytes", residentBytes}, {"imports", 1}, {"import", residentImport}};
+        Json ready = {{"event", "ready"}, {"mode", options.execute ? "execute" : "plan"}, {"accepting", true},
             {"protocol", {{"request_schema", requestSchema}, {"max_line_bytes", maxLineBytes}, {"max_event_bytes", maxEventBytes}, {"active_slots", 1}, {"waiting_slots", 1},
                 {"max_lifetime_requests", maxLifetimeRequests}, {"max_protocol_errors", maxProtocolErrors},
                 {"execution", "Serial B1 requests on the Device-owning thread; no batching or concurrent GPU execution"}}},
             {"model", model}, {"resident_model", resident}, {"device_identity", identity}, {"device_created", device != nullptr}, {"model_loaded", weights != nullptr},
             {"gemv_b1_selection", gemvSelection}, {"job", job}, {"lease_ms", options.leaseMilliseconds ? Json(options.leaseMilliseconds) : Json(nullptr)},
-            {"obligations", obligations}, {"qualified_full_graph", false}, {"qualified_OCR", false}, {"performance_claim", false}});
+            {"obligations", obligations}, {"qualified_full_graph", false}, {"qualified_OCR", false}, {"performance_claim", false}};
+        if(options.experimentalB2){ready["protocol"]["active_slots"]=2;ready["protocol"]["waiting_slots"]=0;ready["protocol"]["execution"]="Explicit static one/two-page cohort: independent serial vision/prefill; one page uses original advance, two pages use ordered B1 plus padded32 B2 decode";ready["cohort_arithmetic"]=cohortArithmetic;ready["cohort_cancel_scope"]="whole_cohort_only";}
+        if(device)ready["drain_wait"]=Json::parse(device->memoryJson()).at("drain_wait");
+        emitLocked(std::move(ready));
         return true;
     }
     // Starts the stdin reader. finish() cancels its pending read and waits for it, bounded, before the exit event.
@@ -232,13 +346,14 @@ public:
                 }
             }
             if (!next) break;
-            run(*next);
+            if(next->cohort)runCohort(*next);else run(*next);
         }
         return finish();
     }
 private:
     Options options; std::string gemvSelection; Json job; HANDLE output = INVALID_HANDLE_VALUE;
-    std::unique_ptr<Device> device; std::unique_ptr<ModelWeights> weights; Json identity = nullptr, provenance = nullptr; uint64_t residentBytes = 0;
+    std::unique_ptr<Device> device; std::unique_ptr<ModelWeights> weights; std::unique_ptr<Handle> heldModel, heldConfig; Json identity = nullptr, provenance = nullptr, residentImport = nullptr, cohortArithmetic = nullptr; uint64_t residentBytes = 0;
+    std::array<TextRequest,2> cohortRequests; bool cohortOwnersHeld = false; // Device thread; retained through failed drain until worker retirement.
     std::mutex lock; std::condition_variable wake;
     std::shared_ptr<Request> active, waiting; std::set<std::string> admitted;
     bool closing = false, poisoned = false, finished = false, channelBroken = false, deviceLive = false, modelLive = false; std::string closeReason; // Guarded by lock.
@@ -250,6 +365,7 @@ private:
     // Owned by the worker (not a function-local static) so a reader left blocked at exit never sees it destroyed.
     const std::map<std::string, std::set<std::string>> fields = {
         {"submit", {"schema", "type", "id", "model", "input_manifest", "input_sha256", "output", "diagnostic_token_cap"}},
+        {"submit_cohort", {"schema", "type", "id", "model", "requests"}},
         {"cancel", {"schema", "type", "id"}}, {"status", {"schema", "type"}}, {"lease", {"schema", "type"}}, {"shutdown", {"schema", "type"}}};
 
     Clock::time_point leaseDeadline() const { return Clock::time_point(Clock::duration(leaseTicks.load())); }
@@ -389,7 +505,7 @@ private:
         if (options.leaseMilliseconds && !closing) renewLeaseLocked(); // Any well-formed versioned message renews the parent lease.
         Json submittedId = message.contains("id") && message.at("id").is_string() && safeId(message.at("id").get<std::string>()) ? message.at("id") : Json(nullptr);
         for (auto it = message.begin(); it != message.end(); ++it) if (!allowed->second.count(it.key())) {
-            if (kind == "submit") rejectLocked(submittedId, "unknown_field", "Unknown field " + it.key());
+            if (kind == "submit" || kind == "submit_cohort") rejectLocked(submittedId, "unknown_field", "Unknown field " + it.key());
             else if (kind == "cancel") emitLocked({{"event", "cancel_rejected"}, {"submitted_id", submittedId}, {"reason", "unknown_field"}, {"detail", bounded("Unknown field " + it.key())}});
             else protocolErrorLocked("unknown_field", "Unknown field " + it.key());
             return;
@@ -398,12 +514,13 @@ private:
         if (kind == "lease") return;
         if (kind == "shutdown") { closeLocked("shutdown_requested"); return; }
         if (kind == "cancel") { cancelLocked(message, submittedId); return; }
-        submitLocked(message, submittedId);
+        if(kind=="submit_cohort")submitCohortLocked(message,submittedId);else submitLocked(message, submittedId);
     }
     void cancelLocked(const Json& message, const Json& submittedId) {
         auto refuse = [&](const char* reason) { emitLocked({{"event", "cancel_rejected"}, {"submitted_id", submittedId}, {"reason", reason}}); };
         if (submittedId.is_null()) { refuse("invalid_id"); return; }
         const std::string id = message.at("id").get<std::string>();
+        if(active && active->cohort)for(const auto& page:active->pages)if(page->id==id){refuse("cohort_member_cancel_not_supported");return;}
         if (waiting && waiting->id == id) {
             auto r = waiting; waiting.reset(); r->cancelRequested = true; r->cancelOrigin = "client";
             emitLocked({{"event", "cancel_requested"}, {"id", id}, {"state", "waiting"}, {"origin", "client"}, {"released", false}});
@@ -418,6 +535,7 @@ private:
         refuse(admitted.count(id) ? "already_terminal" : "unknown_id");
     }
     void submitLocked(const Json& m, const Json& submittedId) {
+        if(options.experimentalB2){rejectLocked(submittedId,"cohort_mode_only","Dedicated B2 mode accepts submit_cohort only; default single-page worker is unchanged");return;}
         for (auto name : {"id", "model", "input_manifest", "input_sha256", "output"}) if (!m.contains(name)) { rejectLocked(submittedId, "missing_field", std::string("Missing field ") + name); return; }
         if (submittedId.is_null()) { rejectLocked(nullptr, "invalid_id", "Request id must be 1-64 characters of [A-Za-z0-9._:-]"); return; }
         const std::string id = m.at("id").get<std::string>();
@@ -456,10 +574,53 @@ private:
             {"diagnostic_token_cap", r->cap ? Json(r->cap) : Json(nullptr)}, {"output_allowance", r->cap ? r->cap : normalOutputLimit}});
         wake.notify_all();
     }
+    void submitCohortLocked(const Json& m,const Json& submittedId) {
+        if(!options.experimentalB2){rejectLocked(submittedId,"explicit_cohort_mode_required","Both explicit padded32 and B2 worker flags required");return;}
+        if(submittedId.is_null()){rejectLocked(nullptr,"invalid_id","A bounded cohort id is required");return;}
+        if(!m.contains("model") || m.at("model")!="chandra" || !m.contains("requests") || !m.at("requests").is_array() || (m.at("requests").empty() || m.at("requests").size()>2)){rejectLocked(submittedId,"invalid_cohort","One or two page descriptors and model chandra required");return;}
+        if(closing){rejectLocked(submittedId,poisoned?"worker_poisoned":"closing","Worker is not accepting a cohort");return;}
+        if(active || waiting){rejectLocked(submittedId,"busy","A static cohort requires both native capacity slots idle");return;}
+        if(admitted.size()>maxLifetimeRequests-1-m.at("requests").size()){rejectLocked(submittedId,"lifetime_limit","Fresh group/page IDs must fit the unchanged history bound");return;}
+        auto group=std::make_shared<Request>();group->id=submittedId.get<std::string>();group->cohort=true;group->pages.resize(m.at("requests").size());
+        std::set<std::string> ids={group->id},owners;
+        try {
+            require(!admitted.count(group->id),"Cohort id was already admitted");
+            for(uint32_t slot=0;slot<group->pages.size();++slot) {
+                const auto& item=m.at("requests").at(slot);require(item.is_object() && item.size()==4,"Each page has exactly id,input_manifest,input_sha256,output; no diagnostic cap");
+                for(const char* key:{"id","input_manifest","input_sha256","output"})require(item.contains(key),std::string("Missing cohort page field ")+key);
+                require(item.at("id").is_string() && safeId(item.at("id").get<std::string>()),"Bounded distinct page id required");
+                auto page=std::make_shared<Request>();page->id=item.at("id").get<std::string>();
+                require(ids.insert(page->id).second && !admitted.count(page->id),"Group/page IDs collide or were already admitted");
+                page->manifestSha=digestText(item.at("input_sha256")); // Original authenticateInput and requireCohortInput admit exact diagnostic or production packages on the Device thread.
+                require(item.at("input_manifest").is_string(),"Relative page manifest string required");const auto path=item.at("input_manifest").get<std::string>();
+                require(!path.empty() && path.size()<=512,"Bounded relative manifest required");size_t start=0;
+                while(start<=path.size()){size_t end=path.find('/',start);if(end==std::string::npos)end=path.size();require(safeComponent(path.substr(start,end-start),maxComponentBytes),"Safe local manifest components required");start=end+1;}
+                page->manifest=localFile(options.inputRoot,item.at("input_manifest"));
+                require(item.at("output").is_string() && safeComponent(item.at("output").get<std::string>(),maxOutputNameBytes),"Safe fresh page output name required");
+                page->outputName=item.at("output").get<std::string>();std::string folded=page->outputName;
+                std::transform(folded.begin(),folded.end(),folded.begin(),[](unsigned char c){return char(std::tolower(c));});
+                require(owners.insert(folded).second,"Page output owners alias after Windows case folding");
+                page->output=options.outputRoot/std::filesystem::u8path(page->outputName);
+                require(GetFileAttributesW(page->output.c_str())==INVALID_FILE_ATTRIBUTES,"Page output already exists");
+                group->pages[slot]=std::move(page);
+            }
+            // Both descriptors and owner collisions are admitted before either fresh directory is reserved.
+            for(const auto& page:group->pages){require(CreateDirectoryW(page->output.c_str(),nullptr),"Fresh cohort output reservation failed; no page model work submitted");
+                DWORD a=GetFileAttributesW(page->output.c_str());require(a!=INVALID_FILE_ATTRIBUTES && (a&FILE_ATTRIBUTE_DIRECTORY) && !(a&FILE_ATTRIBUTE_REPARSE_POINT),"Created cohort output must be a plain directory");}
+        } catch(const std::exception& e){rejectLocked(submittedId,"invalid_cohort",e.what());return;}
+        admitted.insert(group->id);group->index=admitted.size();
+        for(const auto& page:group->pages){admitted.insert(page->id);page->index=admitted.size();}
+        active=group;
+        for(uint32_t slot=0;slot<group->pages.size();++slot){const auto& page=*group->pages[slot];emitLocked({{"event","admitted"},{"id",page.id},{"cohort_id",group->id},{"cohort_slot",slot},{"slot","active_cohort"},
+            {"request_index",page.index},{"output",page.outputName},{"input_sha256",page.manifestSha},{"diagnostic_token_cap",nullptr},{"output_allowance",normalOutputLimit}});}
+        wake.notify_all();
+    }
     Json status() {
         auto describe = [&](const std::shared_ptr<Request>& r) -> Json {
             if (!r) return nullptr;
-            return {{"id", r->id}, {"started", r->started}, {"phase", r->phase.empty() ? Json(nullptr) : Json(r->phase)}, {"cancel_requested", r->cancelRequested}};
+            Json result={{"id", r->id}, {"started", r->started}, {"phase", r->phase.empty() ? Json(nullptr) : Json(r->phase)}, {"cancel_requested", r->cancelRequested}};
+            if(r->cohort){result["cohort_pages"]=Json::array();for(uint32_t slot=0;slot<r->pages.size();++slot)result["cohort_pages"].push_back({{"id",r->pages[slot]->id},{"slot",slot},{"output",r->pages[slot]->outputName}});result["cancel_scope"]="whole_cohort_only";}
+            return result;
         };
         Json lease = nullptr;
         if (options.leaseMilliseconds) lease = {{"ms", options.leaseMilliseconds}, {"remaining_ms", std::max<int64_t>(0, std::chrono::duration_cast<std::chrono::milliseconds>(leaseDeadline() - Clock::now()).count())}};
@@ -516,6 +677,95 @@ private:
         } else { active = waiting; waiting.reset(); }
         wake.notify_all();
     }
+    void runCohort(Request& group) {
+        std::array<Terminal,2> terminal;
+        std::array<Json,2> reports;
+        std::array<Input,2> inputs;
+        {std::lock_guard<std::mutex> guard(lock);for(const auto& page:group.pages)page->started=true;emitLocked({{"event","cohort_started"},{"id",group.id},{"mode",options.execute?"execute":"plan"},{"slots",group.pages.size()}});}
+        uint32_t authenticating=0;bool executionEntered=false;
+        try {
+            checkpoint(group,"before_cohort_input_authentication");
+            for(uint32_t slot=0;slot<group.pages.size();++slot){authenticating=slot;const auto& page=*group.pages[slot];inputs[slot]=authenticateInput(page.manifest,page.manifestSha);
+                require(std::set<uint32_t>(inputs[slot].stopIds.begin(),inputs[slot].stopIds.end())==callerStops,"Exact authenticated caller stop IDs required");
+                requireCohortInput(inputs[slot],page.manifestSha);}
+            checkpoint(group,"after_cohort_input_authentication");
+            if(options.execute){executionEntered=true;executeCohort(group,inputs,terminal,reports);}
+            else for(uint32_t slot=0;slot<group.pages.size();++slot){reports[slot]=forecastReport(inputs[slot],group.pages[slot]->manifestSha,0);terminal[slot].status="planned";terminal[slot].retired=terminal[slot].released=true;}
+        } catch(const Canceled& c){for(uint32_t slot=0;slot<group.pages.size();++slot){auto& t=terminal[slot];t.status="canceled";t.boundary=c.boundary;t.error=c.what();t.retired=t.drained=t.released=!executionEntered;t.poisoned=executionEntered;}if(executionEntered)cohortOwnersHeld=true;}
+        catch(const std::exception& e){for(uint32_t slot=0;slot<group.pages.size();++slot){auto& t=terminal[slot];t.status="failed";t.failureClass=executionEntered?"cohort_execution_failure":slot==authenticating?"input_refused":"cohort_input_refused";t.error=utf8Safe(e.what());t.retired=t.drained=t.released=!executionEntered;t.poisoned=executionEntered;}if(executionEntered)cohortOwnersHeld=true;}
+        for(uint32_t slot=0;slot<group.pages.size();++slot) {
+            auto& t=terminal[slot];const auto& page=*group.pages[slot];
+            {std::lock_guard<std::mutex> guard(lock);t.origin=group.cancelOrigin;}
+            if(reports[slot].is_null())reports[slot]=receipt(page,t);
+            auto& report=reports[slot];
+            report["schema"]="chandra.directcompute.worker-b2-page-result.v1";
+            report["mode"]=options.execute?"resident_ordered_B1_padded32_B2_page":"resident_B2_cohort_plan";
+            report["cohort_page_count"]=group.pages.size();report["decode_arithmetic"]=group.pages.size()==1?"original_single_row_advance":"advanceCohort_1_or_2_active_rows";
+            report["request_retired"]=t.retired;report["drained"]=t.drained;report["request_buffers_released"]=t.released;
+            report["worker"]={{"schema","chandra.directcompute.worker-b2-page-owner.v1"},{"request_id",page.id},{"request_index",page.index},
+                {"cohort_id",group.id},{"cohort_slot",slot},{"cohort_page_count",group.pages.size()},{"terminal_status",t.status},{"resident_model",options.execute},{"model_imports_this_process",options.execute?1:0},
+                {"cohort_arithmetic",cohortArithmetic},{"cancel_scope","whole_cohort_only"},{"cancel_origin",t.origin.empty()?Json(nullptr):Json(t.origin)},
+                {"cancel_boundary",t.boundary.empty()?Json(nullptr):Json(t.boundary)},{"released",t.released},{"worker_poisoned",t.poisoned},{"request_replayed",false}};
+            try{t.resultSha=writeReceipt(page.output,report);}catch(const std::exception& e){if(t.status=="completed"||t.status=="planned"){t.status="failed";t.failureClass="receipt_write_failed";}t.error=(t.error.empty()?std::string():t.error+"; ")+"Receipt write failed: "+e.what();}
+        }
+        std::lock_guard<std::mutex> guard(lock);
+        Json pages=Json::array();bool workerFailed=false,bothReleased=true;std::string status=options.execute?"completed":"planned";
+        for(uint32_t slot=0;slot<group.pages.size();++slot){const auto& t=terminal[slot];const auto& page=*group.pages[slot];
+            terminals[t.status]=terminals[t.status].get<uint64_t>()+1;auto event=terminalEvent(page,t);event["cohort_id"]=group.id;event["cohort_slot"]=slot;emitLocked(std::move(event));
+            pages.push_back({{"id",page.id},{"slot",slot},{"status",t.status},{"released",t.released},{"result_sha256",t.resultSha.empty()?Json(nullptr):Json(t.resultSha)}});
+            workerFailed=workerFailed||t.poisoned;bothReleased=bothReleased&&t.released;
+            if(t.status=="failed")status="failed";else if(t.status=="canceled" && status!="failed")status="canceled";
+        }
+        emitLocked({{"event","cohort_terminal"},{"id",group.id},{"status",status},{"pages",pages},{"released",bothReleased},{"worker_poisoned",workerFailed},{"request_replayed",false}});
+        active.reset();
+        if(workerFailed){poisoned=true;closeLocked("worker_poisoned");}
+        wake.notify_all();
+    }
+    void executeCohort(Request& group,const std::array<Input,2>& inputs,std::array<Terminal,2>& terminal,std::array<Json,2>& reports) {
+        if(cohortOwnersHeld || device->trackedBufferBytes()!=residentBytes){for(uint32_t slot=0;slot<group.pages.size();++slot){auto& t=terminal[slot];t.status="failed";t.failureClass="ownership_accounting_failure";t.error="Cohort owners or tracked buffers differ from resident baseline before dispatch";t.poisoned=true;}return;}
+        const auto begun=Clock::now();std::array<Clock::time_point,2> stamp={begun,begun};
+        std::array<Json,2> phases={Json::array(),Json::array()},memories={Json::array(),Json::array()};
+        std::array<std::vector<uint32_t>,2> generated;
+        std::array<RequestHooks,2> hooks;
+        std::array<const Input*,2> ownedInputs={&inputs[0],group.pages.size()==2?&inputs[1]:nullptr};
+        std::array<std::filesystem::path,2> outputs={group.pages[0]->output,group.pages.size()==2?group.pages[1]->output:std::filesystem::path{}};
+        for(uint32_t slot=0;slot<group.pages.size();++slot){const auto& page=*group.pages[slot];reports[slot]=executionReport(inputs[slot],page.manifestSha,0);
+            reports[slot]["device_identity"]=identity;reports[slot]["model_provenance"]=provenance;reports[slot]["resident_import"]=residentImport;
+            reports[slot]["cohort_arithmetic"]=cohortArithmetic;
+            hooks[slot].phase=[&,slot](const char* name){auto now=Clock::now();double seconds=std::chrono::duration<double>(now-stamp[slot]).count();stamp[slot]=now;
+                phases[slot].push_back({{"name",name},{"wall_seconds",seconds}});Json memory=Json::parse(device->memoryJson());memories[slot].push_back({{"phase",name},{"observed",memory},{"host_process",hostMemory()}});
+                std::lock_guard<std::mutex> guard(lock);group.pages[slot]->phase=name;group.phase=name;emitLocked({{"event","phase"},{"id",group.pages[slot]->id},{"cohort_id",group.id},{"cohort_slot",slot},{"name",name},{"wall_seconds",seconds},{"device_memory",memory}});};
+            hooks[slot].checkpoint=[&](const char* name){checkpoint(group,name);};
+            hooks[slot].vision=[&](const std::string& name,const Buffer&,uint32_t,uint32_t){if(visionBoundary(name))checkpoint(group,"vision."+name);};
+            hooks[slot].text=[&](const TextObservation& o){if(o.stage==TextStage::LayerOutput)checkpoint(group,"text.layer."+std::to_string(o.layer));else if(o.stage==TextStage::Logits)checkpoint(group,"text.logits");};
+            hooks[slot].token=[&,slot](uint32_t index,const Json& row){std::lock_guard<std::mutex> guard(lock);emitLocked({{"event","token"},{"id",group.pages[slot]->id},{"cohort_id",group.id},{"cohort_slot",slot},
+                {"index",index},{"token_id",row.at("token_id")},{"stop",row.at("stop")},{"best_logit",row.at("best_logit")},{"runner_up_logit",row.at("runner_up_logit")},{"top_margin",row.at("top_margin")},{"maximum_tie_count",row.at("maximum_tie_count")}});};
+            terminal[slot].dispatched=true;
+        }
+        cohortOwnersHeld=true;bool canceled=false,failed=false;std::string error,boundary;
+        try{generateCohort(*device,*weights,ownedInputs,outputs,reports,generated,cohortRequests,hooks,true,uint32_t(group.pages.size()));}
+        catch(const Canceled& c){canceled=true;error=c.what();boundary=c.boundary;}
+        catch(const std::exception& e){failed=true;error=utf8Safe(e.what());}
+        bool released=true;for(uint32_t slot=0;slot<group.pages.size();++slot)released=released && reports[slot].value("request_retired",false) && reports[slot].value("drained",false);
+        uint64_t after=0;try{after=device->trackedBufferBytes();released=released && after==residentBytes;}catch(...){released=false;}
+        cohortOwnersHeld=!released;
+        if(!released && error.empty())error="Cohort buffers did not retire to the resident baseline after drain";
+        const bool workerFailed=failed || !released;
+        for(uint32_t slot=0;slot<group.pages.size();++slot){auto& t=terminal[slot];auto& report=reports[slot];
+            const bool ownComplete=report.value("generation_completed",false) && released;
+            t.status=ownComplete?"completed":canceled?"canceled":"failed";
+            t.failureClass=t.status=="failed"?(failed?"device_or_graph_failure":"ownership_accounting_failure"):"";
+            t.error=ownComplete?std::string():error;t.boundary=t.status=="canceled"?boundary:std::string();t.poisoned=workerFailed;
+            t.retired=report.value("request_retired",false);t.drained=report.value("drained",false);t.released=released;t.tracked=after;t.generated=generated[slot].size();
+            t.stopReason=report.value("stop_reason",std::string());t.stopToken=report.value("stop_token_id",Json(nullptr));
+            report["passed"]=t.status=="completed";report["request_buffers_released"]=released;report["tracked_buffer_bytes_after"]=after;report["resident_model_bytes"]=residentBytes;
+            report["owned_worker_retirement_required"]=workerFailed;report["cohort_error"]=error.empty()?Json(nullptr):Json(error);
+            if(t.status=="completed")report["passed_scope"]="This page journal completed with finite greedy tokens and proven cohort retirement; trained numerical/full-OCR qualification is pending";
+            else report["error"]=t.error;
+            finishExecutionReport(report,inputs[slot],generated[slot],phases[slot],memories[slot],begun);
+            report["timing_scope"]="One static one/two-page cohort interval; one page uses original single-row advance, two use shared decode; phase intervals include cohort waiting and prove no sustained pages/s";
+        }
+    }
     void execute(Request& r, const Input& in, Terminal& t, Json& report) {
         uint64_t before = device->trackedBufferBytes();
         if (before != residentBytes) { t.status = "failed"; t.failureClass = "ownership_accounting_failure"; t.error = "Tracked buffers differ from the resident model before dispatch"; t.poisoned = true; return; }
@@ -561,12 +811,18 @@ private:
         Json release = {{"event", "exit"}, {"device_created", device != nullptr}, {"model_released", false}, {"drained", nullptr}, {"tracked_buffer_bytes_after_release", nullptr}, {"device_destroyed", false}};
         bool clean = true;
         if (device) {
+            if(cohortOwnersHeld){
+                try{device->drain();for(auto& request:cohortRequests){request.failed=true;request.retired=true;request.layers={};}cohortOwnersHeld=false;release["cohort_cache_retirement_drain_completed"]=true;}
+                catch(const std::exception& e){clean=false;release["cohort_cache_retirement_drain_completed"]=false;release["cohort_cache_owners_retained_until_worker_retirement"]=true;release["cohort_cache_drain_error"]=bounded(e.what());}
+            }
             try { weights.reset(); { std::lock_guard<std::mutex> guard(lock); modelLive = false; } release["model_released"] = true; device->drain(); release["drained"] = true; }
             catch (const std::exception& e) { clean = false; release["drained"] = false; release["drain_error"] = bounded(e.what()); }
             try { uint64_t tracked = device->trackedBufferBytes(); release["tracked_buffer_bytes_after_release"] = tracked; clean = clean && tracked == 0; }
             catch (const std::exception& e) { clean = false; release["tracking_error"] = bounded(e.what()); }
+            heldConfig.reset(); heldModel.reset();
             device.reset(); release["device_destroyed"] = true; std::lock_guard<std::mutex> guard(lock); deviceLive = false;
         }
+        heldConfig.reset(); heldModel.reset(); // Also closes partial startup handles if Device creation failed.
         std::unique_lock<std::mutex> guard(lock);
         stopReaderLocked(guard);
         // The first close reason is kept, but EOF or shutdown exits 0 only if no channel fact was recorded meanwhile:

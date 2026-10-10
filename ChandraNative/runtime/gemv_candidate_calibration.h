@@ -366,7 +366,8 @@ inline void invalidAdmission(Device& device, Json& report, const Deadline& deadl
 // The ordered route named by the process selector; anything else is refused before any device exists.
 inline const Shape& orderedRoute(const std::string& selection) {
     const Shape* shape = chandra::gemv_variants::shape(selection.c_str());
-    require(shape != nullptr, "Execution requires CHANDRA_EXPERIMENTAL_GEMV_B1=ordered, ordered32 or ordered64 at process start");
+    require(shape != nullptr && shape->route != chandra::gemv_variants::Route::parallel32,
+            "Sequential bit-equality calibration requires CHANDRA_EXPERIMENTAL_GEMV_B1=ordered, ordered32 or ordered64; parallel32 needs independent numerical admission");
     return *shape;
 }
 inline void describeRoute(Json& report, const Shape& shape) {
@@ -378,6 +379,8 @@ inline void describeRoute(Json& report, const Shape& shape) {
 }
 
 inline void run(Device& device, Json& report, const Deadline& deadline, const Shape& shape) {
+    require(shape.route != chandra::gemv_variants::Route::parallel32,
+            "Sequential bit-equality calibration refuses reassociated parallel32 before allocation or dispatch");
     invalidAdmission(device, report, deadline);
     require(device.trackedBufferBytes() == 0, "Invalid-admission buffers were not released");
     for (const auto& spec : phases()) {

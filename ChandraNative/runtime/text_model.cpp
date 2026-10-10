@@ -1,7 +1,11 @@
 // New code, MPL-2.0. Source reference Transformers 5.18 Qwen3.5.
 #include "text_model.h"
+#include "padded32_opt_in.h"
 #include <stdexcept>
 #include <algorithm>
+#include <cstring>
+#include <unordered_set>
+namespace chandra::dc::experimental { const char* gemvB1Selection(); }
 namespace chandra::dc {
 namespace {
 struct P { uint32_t rows,width,offset,stride,base,count,mode,pad; };
@@ -50,4 +54,124 @@ TextResult TextModel::prefill(TextRequest& r,const Buffer& input,const TextPosit
 TextResult TextModel::forward(TextRequest& r,const Buffer& input,const TextPositions& pos,bool last,const TextObserver& observer,const std::vector<uint32_t>* ids){if(pos.temporal.size()>16384)throw std::runtime_error("Input token count exceeds fixed context");uint32_t n=uint32_t(pos.temporal.size());positions(pos,n);if(r.failed||r.retired)throw std::runtime_error("Failed/retired request cannot be reused");if(r.contextLimit!=16384||r.outputLimit!=12384||!n||r.tokens>16384||n>16384-r.tokens||!input.storage||input.packedBF16||input.logicalElements!=uint64_t(n)*2560||input.words!=n*2560)throw std::runtime_error("Explicit full context/embedding shape required");for(uint32_t l=0;l<32;l++){const auto& c=r.layers[l];if(c.failed||c.length!=r.tokens||(l%4==3?(!c.keys.storage||!c.values.storage||c.keys.words!=16384*1024||c.values.words!=16384*1024||c.keys.packedBF16||c.values.packedBF16):(!c.conv.storage||!c.recurrent.storage||c.conv.words!=8192*4||c.recurrent.words!=32*128*128||c.conv.packedBF16||c.recurrent.packedBF16)))throw std::runtime_error("Request cache identity/length/shape inconsistent");}const uint32_t before=r.tokens,generated=r.generated;try{Buffer final;for(uint32_t start=0;start<n;start+=64){uint32_t count=std::min(64u,n-start);auto h=slice(device,input,count,2560,start*2560,2560);TextPositions pp;for(auto pair:{std::pair{&pp.temporal,&pos.temporal},std::pair{&pp.height,&pos.height},std::pair{&pp.width,&pos.width}})pair.first->assign(pair.second->begin()+start,pair.second->begin()+start+count);for(uint32_t l=0;l<32;l++){h=layer(l,h,count,pp,r.layers[l]);if(observer)observeLayer(observer,l,h,r.layers[l],before,generated,n,start,count,pos,ids);}h=rmsNorm(device,h,weights.at(root+"norm.weight"),count,2560,1e-6f,true);if(last)final=slice(device,h,1,2560,(count-1)*2560,2560);else{if(!final.storage)final=device.floats(n*2560);P p{count,2560,0,0,start,0,0,0};device.dispatch("text_copy",{&h},{&final},&p,sizeof(p),(count*2560+127)/128);}device.drain();if(observer)observer({TextStage::FinalNorm,UINT32_MAX,h,count,2560,before,generated,n,start,count,r.layers[31].length,pos,ids});}r.tokens+=n;auto logits=linear(device,final,weights.at(root+"embed_tokens.weight"),last?1:n,true);device.drain();if(observer)observer({TextStage::Logits,UINT32_MAX,logits,last?1:n,248320,before,generated,n,last?n-1:0,last?1:n,r.tokens,pos,ids});return {final,logits,last?1:n};}catch(...){r.failed=true;for(auto& c:r.layers)c.failed=true;throw;}}
 TextResult TextModel::prefill(TextRequest& r,const std::vector<uint32_t>& ids,const TextPositions& p,bool last,const TextObserver& observer){if(r.failed||r.retired)throw std::runtime_error("Failed/retired request cannot be reused");for(auto id:ids)if(id>=248320)throw std::runtime_error("Token outside pinned vocabulary");positions(p,uint32_t(ids.size()));auto h=embedding(device,weights.at(root+"embed_tokens.weight"),ids);return forward(r,h,p,last,observer,&ids);}
 TextResult TextModel::advance(TextRequest& r,uint32_t id,const TextPositions& p,const TextObserver& observer){if(r.generated>=r.outputLimit||p.temporal.size()!=1)throw std::runtime_error("Retained output allowance exhausted");auto result=prefill(r,std::vector<uint32_t>{id},p,true,observer);r.generated++;return result;}
+TextDecodeCohortResult TextModel::advanceCohort(const std::array<TextDecodeSlot,2>& slots,
+ bool explicitOrderedB2,const std::array<TextObserver,2>& observers) {
+ if(!explicitOrderedB2 || !experimental::gemmPadded32Enabled() ||
+    std::strcmp(experimental::gemvB1Selection(),"ordered")!=0)
+  throw std::invalid_argument("B2 decode requires explicit opt-in, padded32 and captured ordered B1; parallel32 excluded");
+ const auto call=slots;
+ const auto observe=observers;
+ TextDecodeCohortResult result;
+ std::array<uint32_t,2> mapping{},before{},generated{};
+ std::array<std::vector<uint32_t>,2> ids;
+ std::unordered_set<const TextRequest*> owners;
+ std::unordered_set<const Storage*> backing;
+ uint32_t count=0;
+ // Include inactive owners in alias admission: advancing an active row cannot mutate a purportedly
+ // inactive request through a shared backing buffer. Empty/retired inactive slots are allowed.
+ for(uint32_t slot=0;slot<2;++slot) {
+  const auto& s=call[slot];
+  if(s.request) {
+   if(!owners.insert(s.request).second)throw std::invalid_argument("Decode slots alias one request");
+   for(const auto& c:s.request->layers)for(const Buffer* b:{&c.keys,&c.values,&c.conv,&c.recurrent})
+    if(b->storage&&!backing.insert(b->storage.get()).second)
+     throw std::invalid_argument("Decode slots/layers alias cache backing storage");
+  }
+  if(!s.active)continue;
+  if(!s.request)throw std::invalid_argument("Active decode slot requires its own request");
+  const auto& r=*s.request;
+  positions(s.position,1);
+  if(s.tokenId>=248320 || r.failed || r.retired || r.contextLimit!=16384 ||
+     r.outputLimit!=12384 || r.generated>=r.outputLimit || r.tokens>=16384)
+   throw std::invalid_argument("Active decode token/request/capacity invalid");
+  for(uint32_t l=0;l<32;++l) {
+   const auto& c=r.layers[l];
+   if(c.failed||c.length!=r.tokens||(l%4==3?
+      (!c.keys.storage||!c.values.storage||c.keys.words!=16384*1024||c.values.words!=16384*1024||
+       c.keys.logicalElements!=uint64_t(16384)*1024||c.values.logicalElements!=uint64_t(16384)*1024||c.keys.packedBF16||c.values.packedBF16):
+      (!c.conv.storage||!c.recurrent.storage||c.conv.words!=8192*4||c.recurrent.words!=32*128*128||
+       c.conv.logicalElements!=8192*4||c.recurrent.logicalElements!=32*128*128||c.conv.packedBF16||c.recurrent.packedBF16)))
+    throw std::invalid_argument("Active decode cache length/shape/storage invalid");
+  }
+  mapping[count++]=slot;before[slot]=r.tokens;generated[slot]=r.generated;ids[slot]={s.tokenId};result.active[slot]=true;
+ }
+ if(!count)throw std::invalid_argument("Decode cohort requires one or two active slots");
+ try {
+  if(count==1) {
+   const auto slot=mapping[0];const auto& s=call[slot];
+   result.slots[slot]=advance(*s.request,s.tokenId,s.position,observe[slot]);return result;
+  }
+  std::array<Buffer,2> hidden;
+  for(uint32_t row=0;row<count;++row) {
+   const auto slot=mapping[row];hidden[slot]=embedding(device,weights.at(root+"embed_tokens.weight"),ids[slot]);
+  }
+  // Gather/scatter are raw FP32 copies. Every submitted row belongs to exactly one stable slot.
+  auto gather=[&](const std::array<Buffer,2>& values,uint32_t width) {
+   Buffer packed=device.floats(count*width);
+   for(uint32_t row=0;row<count;++row) {
+    const auto slot=mapping[row];P p{1,width,0,0,row,0,0,0};
+    device.dispatch("text_copy",{&values[slot]},{&packed},&p,sizeof(p),(width+127)/128);
+   }
+   return packed;
+  };
+  auto scatter=[&](const Buffer& packed,uint32_t width) {
+   std::array<Buffer,2> values;
+   for(uint32_t row=0;row<count;++row)values[mapping[row]]=slice(device,packed,1,width,row*width,width);
+   device.drain();return values;
+  };
+  for(uint32_t l=0;l<32;++l) {
+   const auto b=root+"layers."+std::to_string(l)+".";
+   std::array<Buffer,2> residual;
+   for(uint32_t row=0;row<count;++row) {
+    const auto slot=mapping[row];const auto& s=call[slot];
+    auto h=rmsNorm(device,hidden[slot],weights.at(b+"input_layernorm.weight"),1,2560,1e-6f,true);
+    h=mix(l,h,1,s.position,s.request->layers[l]);
+    residual[slot]=binary(device,hidden[slot],h,2560,0);
+   }
+   device.drain(); // Both independent state updates complete before sharing stateless work.
+   auto packed=gather(residual,2560);
+   auto norm=rmsNorm(device,packed,weights.at(b+"post_attention_layernorm.weight"),count,2560,1e-6f,true);
+   auto gate=linear(device,norm,weights.at(b+"mlp.gate_proj.weight"),count);
+   auto up=linear(device,norm,weights.at(b+"mlp.up_proj.weight"),count);
+   auto act=unary(device,gate,count*9216,0);
+   auto product=binary(device,act,up,count*9216,1);
+   auto down=linear(device,product,weights.at(b+"mlp.down_proj.weight"),count);
+   auto combined=binary(device,packed,down,count*2560,0);
+   device.drain(); // Completed batched values before scattering or replacing per-slot hidden.
+   hidden=scatter(combined,2560);
+   for(uint32_t row=0;row<count;++row) {
+    const auto slot=mapping[row];const auto& s=call[slot];
+    if(observe[slot])observeLayer(observe[slot],l,hidden[slot],s.request->layers[l],before[slot],generated[slot],1,0,1,s.position,&ids[slot]);
+   }
+  }
+  auto packed=gather(hidden,2560);
+  auto norm=rmsNorm(device,packed,weights.at(root+"norm.weight"),count,2560,1e-6f,true);
+  device.drain();
+  auto normalized=scatter(norm,2560);
+  for(uint32_t row=0;row<count;++row) {
+   const auto slot=mapping[row];const auto& s=call[slot];
+   if(observe[slot])observe[slot]({TextStage::FinalNorm,UINT32_MAX,normalized[slot],1,2560,before[slot],generated[slot],1,0,1,s.request->layers[31].length,s.position,&ids[slot]});
+  }
+  auto logits=linear(device,norm,weights.at(root+"embed_tokens.weight"),count,true);
+  device.drain();
+  auto separated=scatter(logits,248320);
+  for(uint32_t row=0;row<count;++row)++call[mapping[row]].request->tokens;
+  for(uint32_t row=0;row<count;++row) {
+   const auto slot=mapping[row];const auto& s=call[slot];
+   if(observe[slot])observe[slot]({TextStage::Logits,UINT32_MAX,separated[slot],1,248320,before[slot],generated[slot],1,0,1,s.request->tokens,s.position,&ids[slot]});
+  }
+  for(uint32_t row=0;row<count;++row) {
+   const auto slot=mapping[row];++call[slot].request->generated;
+   result.slots[slot]={normalized[slot],separated[slot],1};
+  }
+  return result;
+ } catch(...) {
+  // Device retains pending Storage references. Caller retains these poisoned caches and the
+  // original exception; it must drain successfully (or retire the worker) before dropping them.
+  for(uint32_t row=0;row<count;++row) {
+   auto& r=*call[mapping[row]].request;r.failed=true;for(auto& c:r.layers)c.failed=true;
+  }
+  throw;
+ }
+}
 }

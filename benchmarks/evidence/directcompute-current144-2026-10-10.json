@@ -1,0 +1,359 @@
+{
+  "schema": "chandra.directcompute.current144-progress.v1",
+  "recorded_date_UTC": "2026-10-10",
+  "scope": "Four public synthetic fixture CLI captures and narrow trained-B2 differential observations; no endpoint, sustained throughput or deployment acceptance",
+  "publication": "Redacted aggregate metadata; digests identify owner-retained evidence without private paths or raw artifacts",
+  "model": {
+    "name": "datalab-to/chandra-ocr-2",
+    "revision": "af93b47dba1b47b6640c86ccf487ed2260ab9a09",
+    "original_BF16_weights_preserved": true
+  },
+  "workload": {
+    "public_fixtures": [
+      "benchmarks/cli-inputs-v1/native.pdf",
+      "benchmarks/cli-inputs-v1/scanned.pdf"
+    ],
+    "decoded_RGB_dimensions": [
+      1624,
+      2100
+    ],
+    "prompt_tokens": 3617,
+    "context_limit": 16384,
+    "normal_output_allowance": 12384,
+    "diagnostic_token_cap": null
+  },
+  "execution": {
+    "device": "Intel Arc A770",
+    "API": "DirectCompute/D3D11",
+    "B1_selection": "ordered",
+    "multirow_selection": "padded32",
+    "weight_import": "DEFAULT initial data; raw SRV-only weights",
+    "drain_wait": "fence_event",
+    "default_drain_wait": "query_sleep",
+    "fence_opt_in_environment": "CHANDRA_EXPERIMENTAL_DRAIN_WAIT",
+    "tested_source_file_count": 144,
+    "tested_source_manifest": {
+      "bytes": 26483,
+      "sha256": "65f3aa686d55d1eeb4782d169cd5b653cc5eac66d98ad15cff7ec12da4b6e46f"
+    },
+    "source_publication_is_not_deployment_or_executable_attestation": true
+  },
+  "four_fixture_CLI": {
+    "review_status": "CLEAR_SCOPED_FOUR_FIXTURE_CAPTURE_CONTENT",
+    "review": {
+      "bytes": 21965,
+      "sha256": "307b92252fe371d99fd84fa845befeb4d7247b6283501d204389dd758b18d68e"
+    },
+    "cases": [
+      {
+        "case": "native-0",
+        "generated_tokens_including_stop": 556,
+        "natural_EOS": 248046,
+        "native_wall_seconds": 357.2820925,
+        "content_exact": true,
+        "substantive_markup_exact_excluding_only_data_bbox": true,
+        "geometry_changed_blocks": 5,
+        "geometry_max_absolute_coordinate_delta": 1,
+        "geometry_coordinate_scale": [
+          0,
+          1000
+        ],
+        "original_exit_status": {
+          "native": 0,
+          "controller": 0,
+          "Guardian": 0
+        },
+        "original_Windows_Job_owner_channel_retirement": true,
+        "root_acceptance": {
+          "bytes": 15873,
+          "sha256": "d3ea594a1228b61ce4a87322f12c13281a5da30cb561f6446202ebd4c231c40d"
+        },
+        "native_result": {
+          "bytes": 224817,
+          "sha256": "fe120a6854f194fffcb0125c68842a044b8ce4f768423bf744753e7a5944a934"
+        },
+        "original_tool_returns": {
+          "bytes": 8727,
+          "sha256": "60b3992d2d7dc16852996c2d30b1fcc63b1295db0f07af9a689ab9ee17920ba4"
+        },
+        "decoded_output": {
+          "bytes": 1355,
+          "sha256": "8aa6b30096f811d579ea4dd0b514a0321aeaf5723a6e74424234f42c3220cbad"
+        }
+      },
+      {
+        "case": "native-1",
+        "generated_tokens_including_stop": 560,
+        "natural_EOS": 248046,
+        "native_wall_seconds": 352.2190611,
+        "content_exact": true,
+        "substantive_markup_exact_excluding_only_data_bbox": true,
+        "geometry_changed_blocks": 8,
+        "geometry_max_absolute_coordinate_delta": 2,
+        "geometry_coordinate_scale": [
+          0,
+          1000
+        ],
+        "original_exit_status": {
+          "native": 0,
+          "controller": 0,
+          "Guardian": 0
+        },
+        "original_Windows_Job_owner_channel_retirement": true,
+        "root_acceptance": {
+          "bytes": 8899,
+          "sha256": "8be2eeac32ee647606e6a6c78eae9dcefd6d2b54a0874c02d8726d66f4d8cc9a"
+        },
+        "native_result": {
+          "bytes": 224880,
+          "sha256": "4b74e5186635795fbd8449a12dc1523bc59aaa855a8d387be7bfb309df670e8f"
+        },
+        "original_tool_returns": {
+          "bytes": 4279,
+          "sha256": "ee85772a66b8c7d9abac06d429b0f0fed5fb2606354570a46f41f4434decbd43"
+        },
+        "decoded_output": {
+          "bytes": 1359,
+          "sha256": "eea94c57db6938f77a9c10804350e0f7f9b922591ac4fe8ec03b89202aea44fe"
+        }
+      },
+      {
+        "case": "scanned-0",
+        "generated_tokens_including_stop": 556,
+        "natural_EOS": 248046,
+        "native_wall_seconds": 345.1408175,
+        "content_exact": true,
+        "substantive_markup_exact_excluding_only_data_bbox": true,
+        "geometry_changed_blocks": 1,
+        "geometry_max_absolute_coordinate_delta": 1,
+        "geometry_coordinate_scale": [
+          0,
+          1000
+        ],
+        "original_exit_status": {
+          "native": 0,
+          "controller": 0,
+          "Guardian": 2
+        },
+        "original_Windows_Job_owner_channel_retirement": true,
+        "root_acceptance": {
+          "bytes": 5992,
+          "sha256": "142188b4d4047e8592b2391fe714681273d18ecb97504cf578151d45e3a70bf8"
+        },
+        "native_result": {
+          "bytes": 224891,
+          "sha256": "1805059547ae893ea804bca56a96d4adc38348db9e89800eaeb4e3464f250ef9"
+        },
+        "original_tool_returns": {
+          "bytes": 5450,
+          "sha256": "0869385b58776d1d70f05b0b83d85e548b8ccaf31b4936b404eea9a2131c2486"
+        },
+        "decoded_output": {
+          "bytes": 1355,
+          "sha256": "822a5a3e29d3f4e113eeb3d2ead74801882fa819cfc74ae01c855aeba4ec35bb"
+        }
+      },
+      {
+        "case": "scanned-1",
+        "generated_tokens_including_stop": 560,
+        "natural_EOS": 248046,
+        "native_wall_seconds": 347.5015754,
+        "content_exact": true,
+        "substantive_markup_exact_excluding_only_data_bbox": true,
+        "geometry_changed_blocks": 9,
+        "geometry_max_absolute_coordinate_delta": 8,
+        "geometry_coordinate_scale": [
+          0,
+          1000
+        ],
+        "original_exit_status": {
+          "native": 0,
+          "controller": 0,
+          "Guardian": 0
+        },
+        "original_Windows_Job_owner_channel_retirement": true,
+        "root_acceptance": {
+          "bytes": 9447,
+          "sha256": "616ec18fe10d47645f48d6adae28b1c6dfea028b57db9389455e6b4f8855701a"
+        },
+        "native_result": {
+          "bytes": 224801,
+          "sha256": "a67f744c925f08ccf1e26e33809ecba8c27e6cbcff12e9823af3573420fbfe9d"
+        },
+        "original_tool_returns": {
+          "bytes": 4453,
+          "sha256": "4ff0228223022e2e8dd42ec02219f3cb18b36d6bc74e289a5c9ef833b01b8d69"
+        },
+        "decoded_output": {
+          "bytes": 1359,
+          "sha256": "6cf18551c714098c09a9d56d499e71ae579ebbc4a17b091cbe343bdb94a2aecd"
+        }
+      }
+    ],
+    "accepted_scope": [
+      "four exact synthetic fixture page content captures",
+      "complete prose and both columns",
+      "exact printed numerical cells/equations and order",
+      "exact substantive markup excluding only data-bbox",
+      "natural EOS and complete token-history association",
+      "current144 source/build1424 and exact input/model capture binding",
+      "original native process and Windows Job/owner/channel final physical closure"
+    ],
+    "geometry_tolerance": null,
+    "scanned0_monitoring_failure": {
+      "original_Guardian_status": 2,
+      "final_exact_sampler_query_timed_out": true,
+      "later_readonly_exact_sampler_retirement_verified": true,
+      "inference_replayed": false
+    },
+    "matched_native0_pair": {
+      "fence_wall_seconds": 357.2820925,
+      "query_wall_seconds": 712.0278342,
+      "observed_single_pair_ratio": 1.992900985374743,
+      "prompt_and_generated_IDs_exact": true,
+      "journal_bytes_exact": true,
+      "repeatability_or_sustained_speed_accepted": false
+    }
+  },
+  "trained_B2": {
+    "review_status": "CLEAR_NARROW_NUMERICAL_OBSERVATION",
+    "review": {
+      "bytes": 43576,
+      "sha256": "75ba56aa6b28e871b5c30ab2c087376bd6b8511dffd0baaacc4d1cc8ea5d58f9"
+    },
+    "capture_result": {
+      "bytes": 156646,
+      "sha256": "46a9f54c08d069b523a62fca53970a42da3b60489e9cf82e702fd3eae63f1984"
+    },
+    "offline_report": {
+      "bytes": 21456,
+      "sha256": "a8f55c21cd991bec4eab18210c8b925f1d13f1c0f88824816311900cb677217a"
+    },
+    "persisted_final_norm_rows": 7,
+    "norm_words_per_row": 2560,
+    "persisted_full_vocabulary_logit_rows": 7,
+    "vocabulary_size": 248320,
+    "persisted_selected_state_payloads": 6,
+    "selected_state_words_per_payload": 18496,
+    "paired_singleton_differentials": [
+      {
+        "candidate": "pair.b",
+        "reference": "ref_a0.a",
+        "retained_raw_equal": {
+          "final_norm": true,
+          "logits": true,
+          "selected_state": true
+        },
+        "producer_complete_state_commitments_equal": true
+      },
+      {
+        "candidate": "pair.a",
+        "reference": "ref_b1.b",
+        "retained_raw_equal": {
+          "final_norm": true,
+          "logits": true,
+          "selected_state": true
+        },
+        "producer_complete_state_commitments_equal": true
+      },
+      {
+        "candidate": "inactive_a2.a",
+        "reference": "ref_b2.b",
+        "retained_raw_equal": {
+          "final_norm": true,
+          "logits": true,
+          "selected_state": true
+        },
+        "producer_complete_state_commitments_equal": true
+      }
+    ],
+    "predecessor_norm_logit_comparisons": [
+      {
+        "capture": "prefill.a",
+        "kind": "final_norm",
+        "words": 2560,
+        "exact_bits": true
+      },
+      {
+        "capture": "prefill.a",
+        "kind": "logits",
+        "words": 248320,
+        "exact_bits": true
+      },
+      {
+        "capture": "ref_a0.a",
+        "kind": "final_norm",
+        "words": 2560,
+        "exact_bits": true
+      },
+      {
+        "capture": "ref_a0.a",
+        "kind": "logits",
+        "words": 248320,
+        "exact_bits": true
+      }
+    ],
+    "CPU_FP32_descriptive": [
+      {
+        "capture": "prefill.a",
+        "causal_position": 3616,
+        "max_abs": 0.14206790924072266,
+        "rmse": 0.02898162177753303,
+        "argmax": 2539,
+        "candidate_margin": 12.125,
+        "CPU249_margin": 12.189008712768555,
+        "reference_margin_exceeds_twice_max_abs_error": true
+      },
+      {
+        "capture": "ref_a0.a",
+        "causal_position": 3617,
+        "max_abs": 0.1039435863494873,
+        "rmse": 0.020284988702985497,
+        "argmax": 795,
+        "candidate_margin": 9.625,
+        "CPU249_margin": 9.536399841308594,
+        "reference_margin_exceeds_twice_max_abs_error": true
+      }
+    ],
+    "CPU_reference_is_independent_higher_precision_whole_graph_oracle": false,
+    "complete_state_hashes_are_native_producer_observations": true,
+    "numerical_tolerance": null,
+    "physical_original_retirement_verified": true,
+    "tracked_allocation_peak_bytes": 11438569216,
+    "tracked_allocation_after_bytes": 0,
+    "tracked_allocation_is_global_free_VRAM": false,
+    "limits": [
+      "Two staggered native0 owners, one paired advance and one inactive-neighbour advance only; no complete natural-EOS pages or throughput timing.",
+      "Unpersisted prefill.b vector equality remains native-producer reported.",
+      "Complete effective KV/GDN carried-state hashes and inactive B before/after equality remain producer observations; only selected-state bytes were persisted and independently checked.",
+      "Native847 equality is predecessor equivalence at causal3616/3617, not independent numerical truth.",
+      "CPU249 is retained FP32 Torch/SDPA logits, not AMD BF16 activation oracle or higher-precision whole graph; original source/model custody and source-derived positions limits persist.",
+      "No trained vision/block/whole-graph numerical oracle, all-layer state dump, full corpus, endpoint or PPS qualification.",
+      "AMD7900XTX substantive OCR and separate geometry differences are existing complete-page evidence, not re-established by this diagnostic.",
+      "Model checksum is native held-file provenance; selected ten GPU weight tails do not prove every GPU-imported value."
+    ]
+  },
+  "native_HTTP": {
+    "CPU_environment_accepted": true,
+    "same_context_resident_preflight": "Failed before HTTP with STATUS_QUOTA_EXCEEDED",
+    "process_and_Job_peak_commit_bytes": 328056832,
+    "specific_quota_cause": "Unresolved; CPU-time totals absent and requested raw readback missing",
+    "retirement_verified_separately": true,
+    "endpoint_accepted": false
+  },
+  "qualification": {
+    "arbitrary_document_OCR": false,
+    "geometry_tolerance": false,
+    "independent_higher_precision_whole_graph_accuracy": false,
+    "complete_B2_OCR_pages": false,
+    "native_HTTP_client": false,
+    "repeated_speed": false,
+    "sustained_PPS": false,
+    "deployment": false
+  },
+  "documentation_refresh": {
+    "performed_new_GPU_or_model_runs": false,
+    "reran_prior_test_suites": false,
+    "created_operational_commands_or_build_provenance": false
+  }
+}

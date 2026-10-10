@@ -637,8 +637,13 @@ void planRefuses(const chandra::gemv_variants::Shape& shape, const char* route) 
     Json report = chandra::gemv_calibration::initialReport();
     chandra::gemv_calibration::Deadline deadline;
     std::string message;
+    const size_t before = dispatchLog.size();
     try { chandra::gemv_calibration::run(d, report, deadline, shape); } catch (const std::exception& error) { message = error.what(); }
-    check(message.find("no silent fallback") != std::string::npos, std::string("plan for ") + shape.selector + " refuses " + route + ": " + message);
+    if (shape.route == chandra::gemv_variants::Route::parallel32)
+        check(message.find("refuses reassociated parallel32") != std::string::npos && dispatchLog.size() == before && d.trackedBufferBytes() == 0,
+              "Legacy sequential calibration must refuse parallel32 before buffer allocation or dispatch");
+    else
+        check(message.find("no silent fallback") != std::string::npos, std::string("plan for ") + shape.selector + " refuses " + route + ": " + message);
     std::cout << "calibration plan for " << shape.selector << " refuses the " << route << " route: " << message << "\n";
 }
 int runCandidate() {

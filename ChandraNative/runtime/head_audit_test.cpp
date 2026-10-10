@@ -52,6 +52,15 @@ std::vector<uint32_t> Device::readWords(const Buffer& b) {
     fake::readbackBytes += b.storage->data.size() * 4; fake::largestReadback = std::max<uint64_t>(fake::largestReadback, b.storage->data.size() * 4);
     return b.storage->data;
 }
+// Link support for the new opt-in branch; old controls never call this method.
+std::vector<uint32_t> Device::readWordsRange(const Buffer& b, uint32_t first, uint32_t count, direct_head_row::Receipt& r) {
+    r = {}; r.extent = direct_head_row::range(b.words, uint32_t(b.storage->data.size() * 4), first, count);
+    if (fake::readbacksUntilFailure >= 0 && fake::readbacksUntilFailure-- == 0) throw std::runtime_error("Injected fake direct readback failure");
+    fake::readbackBytes += uint64_t(count) * 4; fake::largestReadback = std::max<uint64_t>(fake::largestReadback, uint64_t(count) * 4);
+    r.beforeCopyDrainCompleted = r.afterCopyDrainCompleted = r.stagingCreated = r.stagingReleased = r.mapAttempted = r.unmapped = true;
+    r.copiesSubmitted = r.readiness.attempts = 1; r.readiness.result = readback::Result::copied;
+    return std::vector<uint32_t>(b.storage->data.begin() + first, b.storage->data.begin() + first + count);
+}
 std::vector<float> Device::readFloats(const Buffer& b) {
     auto w = readWords(b); std::vector<float> f(w.size()); std::memcpy(f.data(), w.data(), w.size() * 4); return f;
 }

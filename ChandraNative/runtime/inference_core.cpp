@@ -1,12 +1,16 @@
 // New code, MPL-2.0. Connected native page path; unqualified until actual graph/OCR checks.
 // Moved from inference.cpp so the CLI and the resident worker share one authenticated request path.
 #include "inference_core.h"
+#include "padded32_opt_in.h"
 #include <psapi.h>
 #include <algorithm>
 #include <climits>
 #include <cmath>
 #include <cstring>
+#include <exception>
 #include <set>
+
+namespace chandra::dc::experimental { const char* gemvB1Selection(); }
 
 namespace chandra::dc::inference {
 void require(bool value, const std::string& reason) { if (!value) throw std::runtime_error(reason); }
@@ -319,6 +323,115 @@ void generate(Device& device, ModelWeights& weights, const Input& in, uint32_t d
         embeddings = {}; logits = {};
         try { device.drain(); report["drained"] = true; } catch (const std::exception& e) { report["drained"] = false; report["drain_error"] = e.what(); report["owned_worker_retirement_required"] = true; }
         throw;
+    }
+}
+void generateCohort(Device& device, ModelWeights& weights, const std::array<const Input*,2>& inputs,
+    const std::array<std::filesystem::path,2>& outputs, std::array<Json,2>& reports,
+    std::array<std::vector<uint32_t>,2>& generated, std::array<TextRequest,2>& requests,
+    const std::array<RequestHooks,2>& hooks, bool explicitOrderedB2, uint32_t pageCount) {
+    require(explicitOrderedB2 && experimental::gemmPadded32Enabled() &&
+        std::strcmp(experimental::gemvB1Selection(), "ordered") == 0,
+        "Cohort requires explicit B2, padded32 and captured ordered B1 before model work");
+    require(pageCount>=1 && pageCount<=2 && inputs[0] && (pageCount==1 || (inputs[1] && outputs[0]!=outputs[1])), "One or two input owners and distinct paired outputs required");
+    for (uint32_t slot=0; slot<pageCount; ++slot) {
+        const auto& in=*inputs[slot];
+        require((in.manifest.value("source",Json(nullptr))=="chandra.native-endpoint.request.v1" ||
+            (in.ids.size()==3617 && in.manifest.at("image").at("dimensions")==Json({1624,2100}))) &&
+            in.manifest.at("generation").at("context_limit")==contextLimit &&
+            in.manifest.at("generation").at("max_output_tokens")==normalOutputLimit,
+            "Cohort retains original diagnostic inputs or authenticated production input and normal capacities");
+        for (const auto& c:requests[slot].layers)
+            require(!c.keys.storage && !c.values.storage && !c.conv.storage && !c.recurrent.storage,
+                "Cohort owner still holds a prior cache; no reuse after failure");
+        require(generated[slot].empty(), "Fresh generated history owner required");
+    }
+    TextModel text(device, weights); VisionModel vision(device, weights);
+    std::array<Buffer,2> embeddings;
+    std::array<TextResult,2> logits;
+    std::array<std::unique_ptr<NewOutput>,2> journals;
+    auto phase=[&](uint32_t slot,const char* name){if(hooks[slot].phase)hooks[slot].phase(name);};
+    auto checkpoint=[&](uint32_t slot,const char* name){if(hooks[slot].checkpoint)hooks[slot].checkpoint(name);};
+    try {
+        // Both CREATE_NEW journal owners are opened before the first per-page model operation.
+        for (uint32_t slot=0; slot<pageCount; ++slot) {
+            journals[slot]=std::make_unique<NewOutput>(outputs[slot]/L"generated-tokens.jsonl");
+            generated[slot].reserve(normalOutputLimit);
+        }
+        for (uint32_t slot=0; slot<pageCount; ++slot) {
+            const auto& in=*inputs[slot];
+            checkpoint(slot,"before_vision_forward");
+            auto visual=vision.forward(in.pixels.data(),in.patchRows,in.grids,hooks[slot].vision);
+            phase(slot,"complete_vision_forward");checkpoint(slot,"complete_vision_forward");
+            auto tokens=embedding(device,weights.at("model.language_model.embed_tokens.weight"),in.ids);
+            phase(slot,"text_embedding");checkpoint(slot,"text_embedding");
+            embeddings[slot]=merge(device,in,tokens,visual.poolerOutput);
+            if(hooks[slot].merged)hooks[slot].merged(embeddings[slot],uint32_t(in.ids.size()));
+            phase(slot,"ordered_multimodal_merge");tokens={};visual={};device.drain();checkpoint(slot,"ordered_multimodal_merge");
+            requests[slot]=text.newRequest();phase(slot,"text_request_cache_creation");checkpoint(slot,"text_request_cache_creation");
+            logits[slot]=text.prefill(requests[slot],embeddings[slot],in.positions,true,hooks[slot].text);
+            phase(slot,"text_prefill");embeddings[slot]={};device.drain();checkpoint(slot,"text_prefill");
+        }
+        std::array<bool,2> active={true,pageCount==2};
+        while(active[0] || active[1]) {
+            std::array<TextDecodeSlot,2> call;
+            std::array<TextObserver,2> observers;
+            for(uint32_t slot=0;slot<pageCount;++slot) {
+                call[slot].request=&requests[slot];
+                if(!active[slot])continue;
+                const auto& in=*inputs[slot];auto next=greedy(device,logits[slot]);
+                const uint32_t index=uint32_t(generated[slot].size());
+                const bool stop=std::find(in.stopIds.begin(),in.stopIds.end(),next.token)!=in.stopIds.end();
+                generated[slot].push_back(next.token);
+                Json row={{"generated_index",index},{"token_id",next.token},{"stop",stop},{"best_logit",next.best},{"runner_up_logit",next.second},
+                    {"top_margin",double(next.best)-double(next.second)},{"maximum_tie_count",next.ties},{"argmax_tie_policy","first vocabulary index"},
+                    {"logit_storage","full 248320-value FP32 readback; graph cast boundaries remain explicit"}};
+                journals[slot]->line(row);if(hooks[slot].token)hooks[slot].token(index,row);
+                if(stop || generated[slot].size()==normalOutputLimit) {
+                    active[slot]=false;
+                    reports[slot]["stop_reason"]=stop?"stop_token":"normal_output_length";
+                    reports[slot]["stop_token_id"]=stop?Json(next.token):Json(nullptr);
+                    reports[slot]["producer_stop_token_observed"]=stop;
+                    reports[slot]["generation_completed"]=true;
+                    continue;
+                }
+                uint32_t coordinate=in.maximumPosition+index+1;
+                call[slot].tokenId=next.token;call[slot].position={{coordinate},{coordinate},{coordinate}};
+                call[slot].active=true;observers[slot]=hooks[slot].text;
+            }
+            if(!active[0] && !active[1])break;
+            // Cancellation is group-scoped and observed only at these host/observer boundaries.
+            for(uint32_t slot=0;slot<pageCount;++slot)checkpoint(slot,"decode_step");
+            if(pageCount==1)logits[0]=text.advance(requests[0],call[0].tokenId,call[0].position,observers[0]);
+            else {auto next=text.advanceCohort(call,true,observers);
+                for(uint32_t slot=0;slot<pageCount;++slot)if(next.active[slot])logits[slot]=std::move(next.slots[slot]);}
+        }
+        for(uint32_t slot=0;slot<pageCount;++slot) {
+            phase(slot,"greedy_cached_decode_and_token_readback");
+            auto& report=reports[slot];report["generation_completed"]=true;report["complete_page_claim"]=false;
+            report["normal_output_allowance_preserved"]=true;report["request_cache_tokens_before_retirement"]=requests[slot].tokens;
+            report["cached_advances_before_retirement"]=requests[slot].generated;
+            report["all_vocabulary_finite_observations"]=generated[slot].size();report["argmax_tie_policy"]="first vocabulary index";
+        }
+        device.drain(); // Prove completion before any cache/result owner is released.
+        embeddings={};logits={};
+        for(uint32_t slot=0;slot<pageCount;++slot)text.retire(requests[slot]);
+        device.drain();
+        for(uint32_t slot=0;slot<pageCount;++slot) {
+            reports[slot]["request_failed"]=false;reports[slot]["request_retired"]=true;reports[slot]["drained"]=true;
+            phase(slot,"request_retirement_and_drain");
+        }
+    } catch(...) {
+        const auto original=std::current_exception();
+        for(uint32_t slot=0;slot<pageCount;++slot){auto& r=requests[slot];r.failed=true;for(auto& c:r.layers)c.failed=true;}
+        bool drained=false;std::exception_ptr drainFailure;
+        try {device.drain();drained=true;}catch(...){drainFailure=std::current_exception();}
+        if(drained){embeddings={};logits={};for(uint32_t slot=0;slot<pageCount;++slot)text.retire(requests[slot]);}
+        // Reporting cannot replace the original graph/journal/cancellation exception.
+        try {for(uint32_t slot=0;slot<pageCount;++slot){reports[slot]["request_failed"]=true;reports[slot]["request_retired"]=requests[slot].retired;
+            reports[slot]["drained"]=drained;reports[slot]["owned_worker_retirement_required"]=!drained;
+            if(!drained){try{std::rethrow_exception(drainFailure);}catch(const std::exception& e){reports[slot]["drain_error"]=e.what();}catch(...){reports[slot]["drain_error"]="Non-standard drain failure";}}}}
+        catch(...) {}
+        std::rethrow_exception(original);
     }
 }
 }

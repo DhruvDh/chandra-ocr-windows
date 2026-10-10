@@ -11,6 +11,10 @@ struct TextRequest {
  uint32_t contextLimit=16384,outputLimit=12384; bool failed=false,retired=false;
 };
 struct TextResult { Buffer hidden,logits; uint32_t rows=0; };
+// Explicit fixed two-slot decode call. An inactive slot is not submitted and stays untouched.
+// Pointers/positions are copied at call entry; requests must remain alive on this Device thread.
+struct TextDecodeSlot { TextRequest* request=nullptr; uint32_t tokenId=0; TextPositions position; bool active=false; };
+struct TextDecodeCohortResult { std::array<TextResult,2> slots; std::array<bool,2> active{}; };
 // Diagnostic view of an existing value after the graph's own drain. value is [rows,width].
 // LayerOutput/FinalNorm/Logits row i is call row first+i, absolute causal row tokensBefore+first+i;
 // positions/tokenIds are indexed by call row (tokenIds is null for embedding prefill).
@@ -40,6 +44,14 @@ public:
  TextResult prefill(TextRequest&,const Buffer& embeddings,const TextPositions&,bool logitsLastOnly=true,const TextObserver& = {});
  TextResult prefill(TextRequest&,const std::vector<uint32_t>& ids,const TextPositions&,bool logitsLastOnly=true,const TextObserver& = {});
  TextResult advance(TextRequest&,uint32_t tokenId,const TextPositions&,const TextObserver& = {});
+ // Experimental ordered B1 + separately enabled padded32 only; no endpoint or cancellation policy.
+ // Requires 1–2 active, disjoint requests/caches. Results preserve slot identity and are drained.
+ // Observers see each request's own one-row tensors/positions and retain the original no-write contract.
+ // Graph/observer failure poisons ALL active caches, preserves the original exception and keeps
+ // cache ownership with the caller. Before retire()/dropping those caches, the owner MUST prove
+ // Device::drain() completion; if it cannot, retire the owning worker. No replay/resume is permitted.
+ TextDecodeCohortResult advanceCohort(const std::array<TextDecodeSlot,2>&,
+     bool explicitOrderedB2=false,const std::array<TextObserver,2>& = {});
  // Own cache supplied explicitly: this operation makes no whole-graph claim.
  Buffer diagnosticLayer(uint32_t,const Buffer&,uint32_t,const TextPositions&,TextLayerCache&);
 };

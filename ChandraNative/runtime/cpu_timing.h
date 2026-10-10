@@ -87,11 +87,11 @@ template<size_t N> struct Operation {
  }
 };
 enum DispatchPhase:size_t {dispatchPrepare,dispatchShaderLookup,dispatchShaderCompile,dispatchRetain,dispatchRecord,dispatchExit,dispatchPhases};
-enum DrainPhase:size_t {drainQueryCreate,drainEndFlush,drainGetData,drainDeadlineCheck,drainSleep,drainRelease,drainExit,drainPhases};
+enum DrainPhase:size_t {drainQueryCreate,drainEndFlush,drainGetData,drainDeadlineCheck,drainSleep,drainRelease,drainFencePrepare,drainFenceRegistration,drainFenceCheck,drainEventWait,drainExit,drainPhases};
 enum ReadbackPhase:size_t {readbackBeforeCopyDrain,readbackStagingPrepare,readbackCopyRecord,readbackAfterCopyDrain,readbackMapReady,readbackExit,readbackPhases};
 enum BufferPhase:size_t {bufferBudgetQuery,bufferCreate,bufferExit,bufferPhases};
 constexpr std::array<const char*,dispatchPhases> dispatchNames{"prepare","shader_lookup","shader_compile","retain","record","exit"};
-constexpr std::array<const char*,drainPhases> drainNames{"query_create","end_flush","get_data","deadline_check","sleep","release","exit"};
+constexpr std::array<const char*,drainPhases> drainNames{"query_create","end_flush","get_data","deadline_check","sleep","release","fence_prepare","fence_registration","fence_check","event_wait","exit"};
 constexpr std::array<const char*,readbackPhases> readbackNames{"before_copy_drain","staging_prepare","copy_record","after_copy_drain","map_ready","exit"};
 constexpr std::array<const char*,bufferPhases> bufferNames{"budget_query","create","exit"};
 constexpr std::array<const char*,1> callNames{"exit"};
@@ -239,6 +239,15 @@ public:
  void polled(bool ready,bool failedStatus) noexcept {
   if(!open)return;
   mark(drainGetData);
+  if(!polledOnce&&!failedStatus)(ready?stats->firstPollReady:stats->firstPollNotReady).add(1);
+  polledOnce=true;
+  if(ready){stats->pollsReady.add(1);stats->fenceWait.add(previous-flushedAt);}
+  else (failedStatus?stats->pollsFailed:stats->pollsNotReady).add(1);
+ }
+ // Same completion classification, with its own host phase for the event route.
+ void fenceChecked(bool ready,bool failedStatus) noexcept {
+  if(!open)return;
+  mark(drainFenceCheck);
   if(!polledOnce&&!failedStatus)(ready?stats->firstPollReady:stats->firstPollNotReady).add(1);
   polledOnce=true;
   if(ready){stats->pollsReady.add(1);stats->fenceWait.add(previous-flushedAt);}
