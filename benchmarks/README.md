@@ -2,7 +2,7 @@
 
 The current performance target is [sustained throughput on each node](../docs/sustained-throughput.md): completed correct pages per second at the best safe concurrency, guided by a phase-specific roofline model. Short burst latency and routing gains do not establish that ceiling.
 
-The [offline roofline model](roofline.md) estimates vision, prefill and decode arithmetic, ideal shared weight traffic and persistent state as batch size changes. Run `python benchmarks/roofline.py --batch 15` to inspect that hypothetical scenario. It loads no model and leaves empirical hardware ceilings, peak memory and measured pages/sec unknown.
+The [offline roofline model](roofline.md) separates native serial B1 geometry from hypothetical true batching and client queue demand. `python benchmarks/roofline.py --queue-concurrency 15` keeps B1 work unchanged; `--batch 15` models an engine batch the current native source does not implement. Its named fields expose the 1,127,219,200-byte fixed request cache and the original native0 prompt's 57 chunks with a 33-token tail. The [scenario guide](../docs/roofline-scenarios.md) distinguishes conditional repeated weight sweeps from ideal whole-prefix reuse and unknown DRAM traffic. This stdlib tool loads no model and establishes no observed fit, timing, hardware ceiling, sustained PPS or speedup.
 
 The [preparation receipt](evidence/throughput-preparation-2026-10-04.json) records 31 passing focused CPU tests, source hashes and the remaining live-measurement work. Offline replay tests exercise the scheduler and accounting; they do not qualify GPU throughput.
 

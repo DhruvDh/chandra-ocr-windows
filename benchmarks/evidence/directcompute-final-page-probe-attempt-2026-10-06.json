@@ -1,0 +1,48 @@
+{
+  "schema": "chandra.directcompute.model-free-probe-attempt.v1",
+  "date": "2026-10-06",
+  "purpose": "Model-free direct-copy/SRV final-row comparison; no full-model execution",
+  "source14_manifest_sha256": "42b7358e23d22f603e09cc1e78f6831e355fe508587e75ce7ce92ed8436e9265",
+  "source14_review_seal_sha256": "4b630e1a9f35a3bb2faf2e95a76e4e8ee094c78f8d423ceb91e815c4d91d1b0c",
+  "strict_build25_review_seal_sha256": "8993031032c42859204419dff31ff1c4abc7e143e6267de35abb76d497dadda2",
+  "strict_compile": "MSVC /W4 /WX /fp:strict and two FXC cs_5_0 builds passed",
+  "inactive_modes": {
+    "default_Device_created": false,
+    "direct_only_Device_created": false
+  },
+  "probe_executable_sha256": "81535ea2deb3d01ff5f6bd132f7db0821172dd90c5957b21f33ca9e51d97c46f",
+  "hardware_attempt": {
+    "channel_started_utc": "2026-10-06T14:06:20.605+00:00",
+    "channel_elapsed_seconds": 1.4063935229969502,
+    "returncode": 1,
+    "reported_reason": "Owned worker lease ended: lease EOF",
+    "synthetic_result": null,
+    "process_completion_receipt": null,
+    "job_accounting_receipt": null,
+    "native_work_may_have_started": true,
+    "automatic_replay": false,
+    "cause": "unassigned"
+  },
+  "later_process_snapshot": {
+    "utc": "2026-10-06T14:13:37.857404+00:00",
+    "method": "Toolhelp32",
+    "named_native_probes": 0,
+    "Python_candidates": "only the read-only snapshot helper",
+    "qualification": "No remaining named probe or Python wrapper/lease at this cutoff; not replacement Job accounting or physical VRAM reclamation proof"
+  },
+  "CPU_only_control_path_observations": {
+    "normal_canary": "passed; two Job processes, zero active after retirement",
+    "normal_peak_process_commit_bytes": 7950336,
+    "normal_peak_job_commit_bytes": 13565952,
+    "delayed_canary": "Injected 1.25-second acknowledgement delay produced client TimeoutError after its one-second read budget, connection close and remote EOF retirement",
+    "original_attempt_cause_established": false,
+    "GPU_actions": [],
+    "service_actions": []
+  },
+  "other_owner_service_boundary": "OCR remained stopped for a separate memory-heavy benchmark block; no root restart",
+  "full_model_progression": "held",
+  "trained_numerical_acceptance": false,
+  "OCR_acceptance": false,
+  "native_endpoint_acceptance": false,
+  "throughput_improvement": null
+}

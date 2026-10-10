@@ -1,0 +1,180 @@
+{
+  "schema": "chandra.directcompute.reference-and-forecast-boundary.v1",
+  "recorded_utc": "2026-10-07T13:44:22.108608+00:00",
+  "scope": "Fresh CPU FP32 teacher reference and physically closed compiled native forecast; no new GPU inference submission or production promotion.",
+  "model": {
+    "id": "datalab-to/chandra-ocr-2",
+    "revision": "af93b47dba1b47b6640c86ccf487ed2260ab9a09",
+    "safetensors_bytes": 10591220088,
+    "safetensors_sha256": "0804568be9f099d6479fad9ed77a4da4611f3c1e7bc6e009af7dce45e8aa3847"
+  },
+  "conditioning": {
+    "input_manifest_sha256": "0aa588473930f110cc359ba369623f29765a85f4e05ffcbca2ac509933b787ae",
+    "decoded_pixels": [
+      1624,
+      2100
+    ],
+    "prompt_tokens": 3617,
+    "context_limit": 16384,
+    "normal_output_allowance": 12384,
+    "all_five_processed_tensors_match": true
+  },
+  "CPU_reference": {
+    "qualified_reference_artifact": true,
+    "root_acceptance": {
+      "bytes": 5261,
+      "sha256": "885fc400ea092383536bf86fa62a3648c703eada6abe07eb6fd5563dfc7d98c9"
+    },
+    "custody_receipt": {
+      "bytes": 23555,
+      "sha256": "62648b96b3a75f9ae1f51160bbb6c90a792990d239b39009de7fc99c57c1a386"
+    },
+    "logits": {
+      "bytes": 1986560,
+      "sha256": "59084b8744606272de44de72b04532f02456a36fc2b0a42844e776cc55efb4bb",
+      "dtype": "float32-little-endian",
+      "shape": [
+        2,
+        248320
+      ]
+    },
+    "positions": [
+      3616,
+      3617
+    ],
+    "argmax_tokens": [
+      2539,
+      795
+    ],
+    "graph": {
+      "device": "CPU",
+      "precision": "FP32",
+      "torch": "2.14.1+cpu",
+      "transformers": "5.18.0",
+      "attention": "SDPA",
+      "python": "3.12.14"
+    },
+    "graph_seconds": 114.32393257699732,
+    "guardian_seconds": 127.68520384500152,
+    "peak_RSS_bytes": 31701540864,
+    "minimum_host_available_bytes": 31142514688,
+    "CPU_model_run_and_guardian_closed": true,
+    "native_numerical_acceptance": false
+  },
+  "historical_native_comparison": {
+    "comparison_record": {
+      "bytes": 5834,
+      "sha256": "0b2b9861d836fefcbda973544e461349f79360e04cffc47aeeca8aa9eb11fa57"
+    },
+    "known_pre_arithmetic_weight_fault_retained": true,
+    "prefill_RMSE": 0.028472717618405686,
+    "prefill_max_absolute_error": 0.4407374858856201,
+    "decode_RMSE": 0.022129555385085112,
+    "decode_max_absolute_error": 0.12781119346618652,
+    "both_largest_errors_at_known_row": 26213,
+    "both_top10_token_sets_match": true,
+    "tolerances_changed": false,
+    "native_accepted": false
+  },
+  "watched_import_cap2_build": {
+    "accepted": true,
+    "root_acceptance": {
+      "bytes": 5588,
+      "sha256": "761cd601fe363ac3a51c924ca1df2a4114294d9acdf304b9ee15016fbd20506b"
+    },
+    "root_closure": {
+      "bytes": 1881,
+      "sha256": "f71806f77d59573e9c13ef15e9e763d04cb718e2ca37c5bc167495018ed87a86"
+    },
+    "source_manifest": {
+      "bytes": 23407,
+      "sha256": "009bac020693c728d38d30f651533536e08e5be542a015d58935e94ea840edff"
+    },
+    "source_files": 129,
+    "compiled_translation_units": 9,
+    "executables": 2,
+    "authenticated_outputs": 17,
+    "authenticated_output_bytes": 46296970,
+    "elapsed_seconds": 96.32800000003772,
+    "compiler_seconds": 93.98399999999674,
+    "inference_executable": {
+      "bytes": 1370624,
+      "sha256": "8447261d4a328a75f56b63e36dc2a322fcf6338c55a843562331c16b916c25c3"
+    },
+    "worker_executable": {
+      "bytes": 1086976,
+      "sha256": "dd15dc4b5769e13d7355764394f86784e2ed00e244c5721935f85f8fb0b4cdc0"
+    },
+    "strict_floating_point_and_warnings_retained": true,
+    "GPU_model_or_shader_execution": false,
+    "all_compiler_owners_closed": true
+  },
+  "compiled_CPU_forecast": {
+    "accepted": true,
+    "root_acceptance": {
+      "bytes": 2465,
+      "sha256": "229287186c8fc1329f58317f997ffcac26daac9f7e46b714a666a4e19cc50562"
+    },
+    "root_closure": {
+      "bytes": 1592,
+      "sha256": "68ab23911b93f1b223868fb492f18dc6193d2638e7d412a941dc90e1c2088aa2"
+    },
+    "result": {
+      "bytes": 22118,
+      "sha256": "da8466778218a8fc78a1f276e84eb8267c4320ca455fd541bd244757c9ee06a6"
+    },
+    "source_family": "watched_import_cap2",
+    "observed_Windows_limits_and_peaks": {
+      "peak_process_commit_bytes": 76292096,
+      "peak_job_commit_bytes": 91938816,
+      "process_commit_limit_bytes": 1610612736,
+      "job_commit_limit_bytes": 2147483648,
+      "active_process_limit": 2,
+      "affinity_mask": 1,
+      "priority_class": 16384,
+      "kill_on_job_close": true
+    },
+    "device_created": false,
+    "model_uploaded": false,
+    "inference_executed": false,
+    "forecast_exercises_watch_or_arithmetic": false,
+    "Job_owner_channel_and_root_unit_closed": true
+  },
+  "next_GPU_point": {
+    "prepared_scope": "Clean watched import followed by original cap2 vision/prefill/decode using the same live model, Device and original Storage; no reupload or fallback.",
+    "root_preparation_refusal": {
+      "bytes": 484,
+      "sha256": "83fb925bc76ca0c4be8d1882bb703f06f1dbd627b252ba3f85859b84c2b02ce7"
+    },
+    "refusal_utc": "2026-10-07T13:38:51.976284+00:00",
+    "available_host_ram_bytes": 18839150592,
+    "minimum_spare_host_ram_bytes": 21474836480,
+    "stricter_root_RAM_guard_basis": "Unchanged 12 GiB native process ceiling plus 8 GiB for existing work.",
+    "native_or_channel_submission_attempted": false,
+    "other_work_stopped_to_free_RAM": false
+  },
+  "upload_synchronization_source_finding": {
+    "record": {
+      "bytes": 6056,
+      "sha256": "79bd6e3856662f0e947cc2a5764f9f8fd0da6ddf09261f8b7fdd18c8128c2f17"
+    },
+    "per_original_upload_drain_already_present": true,
+    "additional_flag_or_patch_created": false,
+    "watcher_adds_selected_Storage_reference_and_readbacks": true,
+    "physical_cause_or_fix_established": false
+  },
+  "limitations": [
+    "Reference custody binds named producer/checkpoint/library files before and after explicit loads; it cannot detect a fully reverted change or prove all bytes the loader executed.",
+    "The CPU FP32 SDPA reference and native BF16 storage/rounding contracts differ; no numerical tolerance or whole-model acceptance was inferred from matching predicted tokens.",
+    "Two teacher-forced rows do not qualify freely generated complete OCR, all pages or a native endpoint.",
+    "The compiled CPU forecast creates no GPU device and exercises neither watched import nor inference arithmetic.",
+    "Resource observations and the RAM refusal describe their recorded cutoff; they are not current-state or global-free-VRAM guarantees.",
+    "No new GPU inference, native numerical/full-OCR/endpoint/PPS acceptance, qualified speedup, AMD action, driver/clock change or Claude delegation follows from this record."
+  ],
+  "native_numerical_accepted": false,
+  "complete_OCR_accepted": false,
+  "native_endpoint_deployed": false,
+  "qualified_native_throughput_speedup": null,
+  "Claude_delegation_disabled": true,
+  "new_GPU_inference_or_AMD_actions": []
+}

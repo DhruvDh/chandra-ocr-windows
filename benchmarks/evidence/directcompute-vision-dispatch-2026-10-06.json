@@ -1,0 +1,880 @@
+{
+  "schema": "chandra.directcompute.vision_dispatch_evidence.v1",
+  "recorded_date_utc": "2026-10-06",
+  "disposition": "closed model-free production-shape GPU calibration accepted",
+  "sources": {
+    "ChandraNative/runtime/vision_dispatch_calibration.cpp": {
+      "bytes": 5955,
+      "sha256": "a722a14dd6aa7b31e444cb4d7ea0b4b49fa711b35304442380de93daeaebfcb4"
+    },
+    "ChandraNative/runtime/vision_dispatch_calibration.h": {
+      "bytes": 71324,
+      "sha256": "05e08c107c9c96856a84604dbd594087df9987ca2330a90d1f20bea33e5a78ef"
+    },
+    "ChandraNative/runtime/device.cpp": {
+      "bytes": 17439,
+      "sha256": "0fff6aa94cfe41f0738682718b1fedec5ef547a9fbfeab470114554e12e36d73"
+    },
+    "ChandraNative/runtime/api.h": {
+      "bytes": 3008,
+      "sha256": "563c7555da0b5c06c7a17cadc0722b8e252b7c9b867283dfe1a684e14bf5f9d1"
+    },
+    "ChandraNative/shaders/runtime/vision_attention_scores.hlsl": {
+      "bytes": 992,
+      "sha256": "a3fd9a786a69f12882ecebd528becb66fa4fb89d8deb9592f2eb0e3b0e519e30"
+    },
+    "ChandraNative/shaders/runtime/vision_attention_softmax.hlsl": {
+      "bytes": 1420,
+      "sha256": "257c2c1105db27c85f9f7fc8238e66793b11ac37379d2f599819a53b0c95f2dc"
+    },
+    "ChandraNative/shaders/runtime/vision_attention_values.hlsl": {
+      "bytes": 875,
+      "sha256": "3ae108c8bef2d17dcbb214ef1ef5dd684e791d5dc35a468dc47c666da434183c"
+    },
+    "ChandraNative/shaders/runtime/vision_attention_reduce.hlsl": {
+      "bytes": 528,
+      "sha256": "368516015a95d2e6196d2672a5f9ed6510545aa7d5a0fde72df423524ef383e1"
+    },
+    "ChandraNative/shaders/runtime/vision_common.hlsl": {
+      "bytes": 410,
+      "sha256": "442da3bfcebe567fdb1f5f97b392557ceba0b9f71505435012dc615e565988c5"
+    }
+  },
+  "windows_build": {
+    "compile_returncode": 0,
+    "inactive_refusal_cases": 14,
+    "source_manifest": {
+      "bytes": 17101,
+      "sha256": "3e6ff81447661c10b5fcdcbbcede86a1a66ffe0d05f9d5f833eab224285c352a"
+    },
+    "build_result": {
+      "bytes": 101680,
+      "sha256": "56474a05d2bd632c7bdb959721014f4c8bb7f0554ddddc5eba06393c7e8a310d"
+    },
+    "standalone_link": "calibration plus unchanged device.obj only",
+    "offline_listings_retained": true,
+    "actual_runtime_DXBC_retained": false,
+    "executable": {
+      "bytes": 734720,
+      "sha256": "a50b8351db67b3557716d41e08d56684cbffca144373cd20722c19c98d3107c1"
+    }
+  },
+  "GPU_point": {
+    "dispatches": 16,
+    "phases": [
+      {
+        "name": "tail_two_frame_L200_q192_nonuniform",
+        "fixture": "nonuniform_dyadic_scores",
+        "grid_thw": [
+          [
+            1,
+            4,
+            6
+          ],
+          [
+            1,
+            10,
+            20
+          ]
+        ],
+        "sequence_length": 200,
+        "queries": 8,
+        "query_start": 192,
+        "key_tiles": 2,
+        "tile_gpu_milliseconds": 0.15380208333333334,
+        "passed": true,
+        "tracked_after_phase_release": 0,
+        "stages": [
+          {
+            "name": "scores",
+            "shader": "runtime/vision_attention_scores.hlsl",
+            "groups": [
+              2,
+              128,
+              1
+            ],
+            "gpu_milliseconds": 0.0153125,
+            "host_submit_to_drained_milliseconds": 34.7372,
+            "host_readback_milliseconds": 32.0267,
+            "strictly_below_gate": true,
+            "check": {
+              "elements": 25600,
+              "expected_sha256": "071eef8f550fdd644fbe0e80a8cf1234e152cfdcdc8bcde0938bf5e10e448c58",
+              "first_mismatches": [],
+              "kind": "exact",
+              "mismatches": 0,
+              "observed_sha256": "071eef8f550fdd644fbe0e80a8cf1234e152cfdcdc8bcde0938bf5e10e448c58",
+              "passed": true,
+              "rule": "bit-exact: integer dot of BF16-exact dyadic Q/K over 64 columns, times 0.125",
+              "score_integer_range": [
+                -756,
+                801
+              ]
+            },
+            "counts": {
+              "additions": 0,
+              "dispatch_unique_bytes": 954368,
+              "divisions": 0,
+              "exponentials": 0,
+              "issued_load_bytes": 6619136,
+              "issued_store_bytes": 102400,
+              "multiply_adds": 1638400,
+              "threads": 32768
+            },
+            "derived": {
+              "dispatch_unique_gigabytes_per_second": 62.32607346938775,
+              "giga_multiply_adds_per_second": 106.99755102040817,
+              "issued_gigabytes_per_second": 438.9574530612245
+            }
+          },
+          {
+            "name": "softmax",
+            "shader": "runtime/vision_attention_softmax.hlsl",
+            "groups": [
+              128,
+              1,
+              1
+            ],
+            "gpu_milliseconds": 0.020625,
+            "host_submit_to_drained_milliseconds": 31.0684,
+            "host_readback_milliseconds": 31.536,
+            "strictly_below_gate": true,
+            "check": {
+              "elements": 25600,
+              "first_violations": [],
+              "kind": "screen",
+              "maximum_error_to_screen_ratio": 0.15691920619831154,
+              "maximum_relative_error": 5.322671728344014e-07,
+              "maximum_relative_screen": 4.297134839514882e-06,
+              "observed_equal_to_rounded_binary64": 6945,
+              "observed_sha256": "717a374e0e80f53867cdabdb0040adb41880cf1f8059dc9b66c5bfc8f520c4e5",
+              "passed": true,
+              "rule": "|p_observed - p_binary64| <= (B_k + 2^-36) p_binary64; B_k from exp/sum/division bounds",
+              "sum_roundings_per_term": 8,
+              "violations": 0
+            },
+            "counts": {
+              "additions": 25600,
+              "dispatch_unique_bytes": 204800,
+              "divisions": 25600,
+              "exponentials": 25600,
+              "issued_load_bytes": 307200,
+              "issued_store_bytes": 204800,
+              "multiply_adds": 0,
+              "threads": 16384
+            },
+            "derived": {
+              "dispatch_unique_gigabytes_per_second": 9.929696969696968,
+              "giga_multiply_adds_per_second": 0.0,
+              "issued_gigabytes_per_second": 24.82424242424242
+            }
+          },
+          {
+            "name": "values",
+            "shader": "runtime/vision_attention_values.hlsl",
+            "groups": [
+              2,
+              128,
+              1
+            ],
+            "gpu_milliseconds": 0.10328125,
+            "host_submit_to_drained_milliseconds": 16.4948,
+            "host_readback_milliseconds": 31.1398,
+            "strictly_below_gate": true,
+            "check": {
+              "d3d11_subnormal_flushes": 0,
+              "elements": 16384,
+              "expected_sha256": "2de4e1aa5420bd9ed718f572d45a51b268384b59120f6317d4176b315a018759",
+              "first_mismatches": [],
+              "kind": "exact",
+              "mismatches": 0,
+              "observed_sha256": "2de4e1aa5420bd9ed718f572d45a51b268384b59120f6317d4176b315a018759",
+              "passed": true,
+              "rule": "bit-exact given observed probabilities: ascending FP32 p*v from +0 per 128-key tile"
+            },
+            "counts": {
+              "additions": 0,
+              "dispatch_unique_bytes": 987136,
+              "divisions": 0,
+              "exponentials": 0,
+              "issued_load_bytes": 13107200,
+              "issued_store_bytes": 65536,
+              "multiply_adds": 1638400,
+              "threads": 16384
+            },
+            "derived": {
+              "dispatch_unique_gigabytes_per_second": 9.557746444780634,
+              "giga_multiply_adds_per_second": 15.863479576399392,
+              "issued_gigabytes_per_second": 127.54237579425113
+            }
+          },
+          {
+            "name": "reduce",
+            "shader": "runtime/vision_attention_reduce.hlsl",
+            "groups": [
+              32,
+              1,
+              1
+            ],
+            "gpu_milliseconds": 0.014583333333333334,
+            "host_submit_to_drained_milliseconds": 15.599,
+            "host_readback_milliseconds": 31.5512,
+            "strictly_below_gate": true,
+            "check": {
+              "d3d11_subnormal_flushes": 0,
+              "elements": 229376,
+              "expected_sha256": "f99523b001713f57fed253e472eb83831fbd727a65160616ced02f9ea2c745b7",
+              "first_mismatches": [],
+              "kind": "exact",
+              "mismatches": 0,
+              "observed_sha256": "f99523b001713f57fed253e472eb83831fbd727a65160616ced02f9ea2c745b7",
+              "passed": true,
+              "rows_outside_tile_with_sentinel_words": 221184,
+              "rule": "bit-exact given observed partials: ascending FP32 tile sum from +0, vision_bf16; other rows keep sentinel"
+            },
+            "counts": {
+              "additions": 16384,
+              "dispatch_unique_bytes": 98304,
+              "divisions": 0,
+              "exponentials": 0,
+              "issued_load_bytes": 65536,
+              "issued_store_bytes": 32768,
+              "multiply_adds": 0,
+              "threads": 8192
+            },
+            "derived": {
+              "dispatch_unique_gigabytes_per_second": 6.740845714285714,
+              "giga_multiply_adds_per_second": 0.0,
+              "issued_gigabytes_per_second": 6.740845714285714
+            }
+          }
+        ]
+      },
+      {
+        "name": "tiny_L832_q416_nonuniform",
+        "fixture": "nonuniform_dyadic_scores",
+        "grid_thw": [
+          [
+            1,
+            32,
+            26
+          ]
+        ],
+        "sequence_length": 832,
+        "queries": 32,
+        "query_start": 416,
+        "key_tiles": 7,
+        "tile_gpu_milliseconds": 0.35208333333333336,
+        "passed": true,
+        "tracked_after_phase_release": 0,
+        "stages": [
+          {
+            "name": "scores",
+            "shader": "runtime/vision_attention_scores.hlsl",
+            "groups": [
+              7,
+              512,
+              1
+            ],
+            "gpu_milliseconds": 0.135,
+            "host_submit_to_drained_milliseconds": 16.1083,
+            "host_readback_milliseconds": 32.0604,
+            "strictly_below_gate": true,
+            "check": {
+              "elements": 425984,
+              "expected_sha256": "cad42ed4eabc1ff63f5a311c27462747b9dd645d31dcf907d72889d651e6b460",
+              "first_mismatches": [],
+              "kind": "exact",
+              "mismatches": 0,
+              "observed_sha256": "cad42ed4eabc1ff63f5a311c27462747b9dd645d31dcf907d72889d651e6b460",
+              "passed": true,
+              "rule": "bit-exact: integer dot of BF16-exact dyadic Q/K over 64 columns, times 0.125",
+              "score_integer_range": [
+                -932,
+                903
+              ]
+            },
+            "counts": {
+              "additions": 0,
+              "dispatch_unique_bytes": 5242880,
+              "divisions": 0,
+              "exponentials": 0,
+              "issued_load_bytes": 109969408,
+              "issued_store_bytes": 1703936,
+              "multiply_adds": 27262976,
+              "threads": 458752
+            },
+            "derived": {
+              "dispatch_unique_gigabytes_per_second": 38.83614814814815,
+              "giga_multiply_adds_per_second": 201.94797037037034,
+              "issued_gigabytes_per_second": 827.2099555555554
+            }
+          },
+          {
+            "name": "softmax",
+            "shader": "runtime/vision_attention_softmax.hlsl",
+            "groups": [
+              512,
+              1,
+              1
+            ],
+            "gpu_milliseconds": 0.029583333333333333,
+            "host_submit_to_drained_milliseconds": 16.1039,
+            "host_readback_milliseconds": 47.4466,
+            "strictly_below_gate": true,
+            "check": {
+              "elements": 425984,
+              "first_violations": [],
+              "kind": "screen",
+              "maximum_error_to_screen_ratio": 0.15356253700320208,
+              "maximum_relative_error": 7.371104728332438e-07,
+              "maximum_relative_screen": 5.198661103156255e-06,
+              "observed_equal_to_rounded_binary64": 101760,
+              "observed_sha256": "c2028fae2600f52b1f232aa248c386c0469c7af892e0a7ce62833b2791effdeb",
+              "passed": true,
+              "rule": "|p_observed - p_binary64| <= (B_k + 2^-36) p_binary64; B_k from exp/sum/division bounds",
+              "sum_roundings_per_term": 13,
+              "violations": 0
+            },
+            "counts": {
+              "additions": 425984,
+              "dispatch_unique_bytes": 3407872,
+              "divisions": 425984,
+              "exponentials": 425984,
+              "issued_load_bytes": 5111808,
+              "issued_store_bytes": 3407872,
+              "multiply_adds": 0,
+              "threads": 65536
+            },
+            "derived": {
+              "dispatch_unique_gigabytes_per_second": 115.19567323943662,
+              "giga_multiply_adds_per_second": 0.0,
+              "issued_gigabytes_per_second": 287.9891830985915
+            }
+          },
+          {
+            "name": "values",
+            "shader": "runtime/vision_attention_values.hlsl",
+            "groups": [
+              7,
+              512,
+              1
+            ],
+            "gpu_milliseconds": 0.16802083333333334,
+            "host_submit_to_drained_milliseconds": 16.0922,
+            "host_readback_milliseconds": 32.1149,
+            "strictly_below_gate": true,
+            "check": {
+              "d3d11_subnormal_flushes": 0,
+              "elements": 229376,
+              "expected_sha256": "154ed7a03b8213b98f0541d79436ed7f63eef38c21b32cde6113c4a5da375ee6",
+              "first_mismatches": [],
+              "kind": "exact",
+              "mismatches": 0,
+              "observed_sha256": "154ed7a03b8213b98f0541d79436ed7f63eef38c21b32cde6113c4a5da375ee6",
+              "passed": true,
+              "rule": "bit-exact given observed probabilities: ascending FP32 p*v from +0 per 128-key tile"
+            },
+            "counts": {
+              "additions": 0,
+              "dispatch_unique_bytes": 6029312,
+              "divisions": 0,
+              "exponentials": 0,
+              "issued_load_bytes": 218103808,
+              "issued_store_bytes": 917504,
+              "multiply_adds": 27262976,
+              "threads": 229376
+            },
+            "derived": {
+              "dispatch_unique_gigabytes_per_second": 35.88431196528208,
+              "giga_multiply_adds_per_second": 162.25949758214506,
+              "issued_gigabytes_per_second": 1303.5366368257903
+            }
+          },
+          {
+            "name": "reduce",
+            "shader": "runtime/vision_attention_reduce.hlsl",
+            "groups": [
+              128,
+              1,
+              1
+            ],
+            "gpu_milliseconds": 0.019479166666666665,
+            "host_submit_to_drained_milliseconds": 15.5816,
+            "host_readback_milliseconds": 31.8395,
+            "strictly_below_gate": true,
+            "check": {
+              "d3d11_subnormal_flushes": 0,
+              "elements": 851968,
+              "expected_sha256": "34f093e7fcd096ed768a91903e4b5f763fac0160a4912649dff98e3cc1430a48",
+              "first_mismatches": [],
+              "kind": "exact",
+              "mismatches": 0,
+              "observed_sha256": "34f093e7fcd096ed768a91903e4b5f763fac0160a4912649dff98e3cc1430a48",
+              "passed": true,
+              "rows_outside_tile_with_sentinel_words": 819200,
+              "rule": "bit-exact given observed partials: ascending FP32 tile sum from +0, vision_bf16; other rows keep sentinel"
+            },
+            "counts": {
+              "additions": 229376,
+              "dispatch_unique_bytes": 1048576,
+              "divisions": 0,
+              "exponentials": 0,
+              "issued_load_bytes": 917504,
+              "issued_store_bytes": 131072,
+              "multiply_adds": 0,
+              "threads": 32768
+            },
+            "derived": {
+              "dispatch_unique_gigabytes_per_second": 53.83063957219252,
+              "giga_multiply_adds_per_second": 0.0,
+              "issued_gigabytes_per_second": 53.83063957219252
+            }
+          }
+        ]
+      },
+      {
+        "name": "tiny_L832_q800_uniform",
+        "fixture": "uniform_constant_nonzero_dyadic_scores",
+        "grid_thw": [
+          [
+            1,
+            32,
+            26
+          ]
+        ],
+        "sequence_length": 832,
+        "queries": 32,
+        "query_start": 800,
+        "key_tiles": 7,
+        "tile_gpu_milliseconds": 0.3605208333333333,
+        "passed": true,
+        "tracked_after_phase_release": 0,
+        "stages": [
+          {
+            "name": "scores",
+            "shader": "runtime/vision_attention_scores.hlsl",
+            "groups": [
+              7,
+              512,
+              1
+            ],
+            "gpu_milliseconds": 0.14234375,
+            "host_submit_to_drained_milliseconds": 15.6498,
+            "host_readback_milliseconds": 31.6395,
+            "strictly_below_gate": true,
+            "check": {
+              "elements": 425984,
+              "expected_sha256": "318fe56ecb02132594058bad6cabcdc28d87170b15beee4e8d28c0a7aa513377",
+              "first_mismatches": [],
+              "kind": "exact",
+              "mismatches": 0,
+              "observed_sha256": "318fe56ecb02132594058bad6cabcdc28d87170b15beee4e8d28c0a7aa513377",
+              "passed": true,
+              "rule": "bit-exact: integer dot of BF16-exact dyadic Q/K over 64 columns, times 0.125",
+              "score_integer_range": [
+                -136,
+                118
+              ]
+            },
+            "counts": {
+              "additions": 0,
+              "dispatch_unique_bytes": 5242880,
+              "divisions": 0,
+              "exponentials": 0,
+              "issued_load_bytes": 109969408,
+              "issued_store_bytes": 1703936,
+              "multiply_adds": 27262976,
+              "threads": 458752
+            },
+            "derived": {
+              "dispatch_unique_gigabytes_per_second": 36.8325268935236,
+              "giga_multiply_adds_per_second": 191.52913984632275,
+              "issued_gigabytes_per_second": 784.5328228320527
+            }
+          },
+          {
+            "name": "softmax",
+            "shader": "runtime/vision_attention_softmax.hlsl",
+            "groups": [
+              512,
+              1,
+              1
+            ],
+            "gpu_milliseconds": 0.029791666666666668,
+            "host_submit_to_drained_milliseconds": 15.5818,
+            "host_readback_milliseconds": 31.6979,
+            "strictly_below_gate": true,
+            "check": {
+              "elements": 425984,
+              "first_violations": [],
+              "kind": "screen",
+              "maximum_error_to_screen_ratio": 0.029411511312595007,
+              "maximum_relative_error": 5.960464483090178e-08,
+              "maximum_relative_screen": 2.026560832035784e-06,
+              "observed_equal_to_rounded_binary64": 0,
+              "observed_sha256": "3c3e5c057e766c033e9fcfbf465d863ede57cfb1870aecd65e8be0d664d1aa34",
+              "passed": true,
+              "rule": "|p_observed - p_binary64| <= (B_k + 2^-36) p_binary64; B_k from exp/sum/division bounds",
+              "sum_roundings_per_term": 13,
+              "uniform": {
+                "correctly_rounded_reciprocal_bits": 983402969,
+                "differing_words": 0,
+                "passed": true,
+                "probability_bits": 983402968,
+                "rule": "bit-exact: every probability word identical",
+                "ulp_distance_from_correctly_rounded_reciprocal": 1
+              },
+              "violations": 0
+            },
+            "counts": {
+              "additions": 425984,
+              "dispatch_unique_bytes": 3407872,
+              "divisions": 425984,
+              "exponentials": 425984,
+              "issued_load_bytes": 5111808,
+              "issued_store_bytes": 3407872,
+              "multiply_adds": 0,
+              "threads": 65536
+            },
+            "derived": {
+              "dispatch_unique_gigabytes_per_second": 114.39010909090909,
+              "giga_multiply_adds_per_second": 0.0,
+              "issued_gigabytes_per_second": 285.9752727272727
+            }
+          },
+          {
+            "name": "values",
+            "shader": "runtime/vision_attention_values.hlsl",
+            "groups": [
+              7,
+              512,
+              1
+            ],
+            "gpu_milliseconds": 0.17010416666666667,
+            "host_submit_to_drained_milliseconds": 16.0433,
+            "host_readback_milliseconds": 32.0784,
+            "strictly_below_gate": true,
+            "check": {
+              "d3d11_subnormal_flushes": 0,
+              "elements": 229376,
+              "expected_sha256": "54c42420985382cc7ce51ff5461168292f01f206b285fc5a3e18b3be574bb019",
+              "first_mismatches": [],
+              "kind": "exact",
+              "mismatches": 0,
+              "observed_sha256": "54c42420985382cc7ce51ff5461168292f01f206b285fc5a3e18b3be574bb019",
+              "passed": true,
+              "rule": "bit-exact given observed probabilities: ascending FP32 p*v from +0 per 128-key tile"
+            },
+            "counts": {
+              "additions": 0,
+              "dispatch_unique_bytes": 6029312,
+              "divisions": 0,
+              "exponentials": 0,
+              "issued_load_bytes": 218103808,
+              "issued_store_bytes": 917504,
+              "multiply_adds": 27262976,
+              "threads": 229376
+            },
+            "derived": {
+              "dispatch_unique_gigabytes_per_second": 35.444822535211266,
+              "giga_multiply_adds_per_second": 160.27224102878137,
+              "issued_gigabytes_per_second": 1287.5717055725656
+            }
+          },
+          {
+            "name": "reduce",
+            "shader": "runtime/vision_attention_reduce.hlsl",
+            "groups": [
+              128,
+              1,
+              1
+            ],
+            "gpu_milliseconds": 0.01828125,
+            "host_submit_to_drained_milliseconds": 15.6501,
+            "host_readback_milliseconds": 31.146,
+            "strictly_below_gate": true,
+            "check": {
+              "d3d11_subnormal_flushes": 0,
+              "elements": 851968,
+              "expected_sha256": "f6ee48aea4f11e6cfb98f03f267a9a7fc138c975358ee21401b3dbf71f1eeec6",
+              "first_mismatches": [],
+              "kind": "exact",
+              "mismatches": 0,
+              "observed_sha256": "f6ee48aea4f11e6cfb98f03f267a9a7fc138c975358ee21401b3dbf71f1eeec6",
+              "passed": true,
+              "rows_outside_tile_with_sentinel_words": 819200,
+              "rule": "bit-exact given observed partials: ascending FP32 tile sum from +0, vision_bf16; other rows keep sentinel"
+            },
+            "counts": {
+              "additions": 229376,
+              "dispatch_unique_bytes": 1048576,
+              "divisions": 0,
+              "exponentials": 0,
+              "issued_load_bytes": 917504,
+              "issued_store_bytes": 131072,
+              "multiply_adds": 0,
+              "threads": 32768
+            },
+            "derived": {
+              "dispatch_unique_gigabytes_per_second": 57.35800341880342,
+              "giga_multiply_adds_per_second": 0.0,
+              "issued_gigabytes_per_second": 57.35800341880342
+            }
+          }
+        ]
+      },
+      {
+        "name": "cli_L12096_q12064_uniform",
+        "fixture": "uniform_constant_nonzero_dyadic_scores",
+        "grid_thw": [
+          [
+            1,
+            126,
+            96
+          ]
+        ],
+        "sequence_length": 12096,
+        "queries": 32,
+        "query_start": 12064,
+        "key_tiles": 95,
+        "tile_gpu_milliseconds": 4.3062499999999995,
+        "passed": true,
+        "tracked_after_phase_release": 0,
+        "stages": [
+          {
+            "name": "scores",
+            "shader": "runtime/vision_attention_scores.hlsl",
+            "groups": [
+              95,
+              512,
+              1
+            ],
+            "gpu_milliseconds": 1.9453645833333333,
+            "host_submit_to_drained_milliseconds": 16.0809,
+            "host_readback_milliseconds": 32.4582,
+            "strictly_below_gate": true,
+            "check": {
+              "elements": 6193152,
+              "expected_sha256": "aa1da0abcf96227afffb64ec414d8e1249e14db38e2b1724a74840d878abcd45",
+              "first_mismatches": [],
+              "kind": "exact",
+              "mismatches": 0,
+              "observed_sha256": "aa1da0abcf96227afffb64ec414d8e1249e14db38e2b1724a74840d878abcd45",
+              "passed": true,
+              "rule": "bit-exact: integer dot of BF16-exact dyadic Q/K over 64 columns, times 0.125",
+              "score_integer_range": [
+                -130,
+                118
+              ]
+            },
+            "counts": {
+              "additions": 0,
+              "dispatch_unique_bytes": 74448896,
+              "divisions": 0,
+              "exponentials": 0,
+              "issued_load_bytes": 1597898752,
+              "issued_store_bytes": 24772608,
+              "multiply_adds": 396361728,
+              "threads": 6225920
+            },
+            "derived": {
+              "dispatch_unique_gigabytes_per_second": 38.269893796685494,
+              "giga_multiply_adds_per_second": 203.74675852319882,
+              "issued_gigabytes_per_second": 834.1219809911381
+            }
+          },
+          {
+            "name": "softmax",
+            "shader": "runtime/vision_attention_softmax.hlsl",
+            "groups": [
+              512,
+              1,
+              1
+            ],
+            "gpu_milliseconds": 0.34140625,
+            "host_submit_to_drained_milliseconds": 14.1127,
+            "host_readback_milliseconds": 33.2167,
+            "strictly_below_gate": true,
+            "check": {
+              "elements": 6193152,
+              "first_violations": [],
+              "kind": "screen",
+              "maximum_error_to_screen_ratio": 0.00794046970403543,
+              "maximum_relative_error": 5.774199968167082e-08,
+              "maximum_relative_screen": 7.2718474202204675e-06,
+              "observed_equal_to_rounded_binary64": 0,
+              "observed_sha256": "1960224ce6e273ab6416792847953f5dbd7c81e07da277ee0c8f7b4b7b1cc65d",
+              "passed": true,
+              "rule": "|p_observed - p_binary64| <= (B_k + 2^-36) p_binary64; B_k from exp/sum/division bounds",
+              "sum_roundings_per_term": 101,
+              "uniform": {
+                "correctly_rounded_reciprocal_bits": 950886443,
+                "differing_words": 0,
+                "passed": true,
+                "probability_bits": 950886444,
+                "rule": "bit-exact: every probability word identical",
+                "ulp_distance_from_correctly_rounded_reciprocal": 1
+              },
+              "violations": 0
+            },
+            "counts": {
+              "additions": 6193152,
+              "dispatch_unique_bytes": 49545216,
+              "divisions": 6193152,
+              "exponentials": 6193152,
+              "issued_load_bytes": 74317824,
+              "issued_store_bytes": 49545216,
+              "multiply_adds": 0,
+              "threads": 65536
+            },
+            "derived": {
+              "dispatch_unique_gigabytes_per_second": 145.12099881006864,
+              "giga_multiply_adds_per_second": 0.0,
+              "issued_gigabytes_per_second": 362.80249702517153
+            }
+          },
+          {
+            "name": "values",
+            "shader": "runtime/vision_attention_values.hlsl",
+            "groups": [
+              95,
+              512,
+              1
+            ],
+            "gpu_milliseconds": 1.9663541666666666,
+            "host_submit_to_drained_milliseconds": 12.1814,
+            "host_readback_milliseconds": 32.268,
+            "strictly_below_gate": true,
+            "check": {
+              "d3d11_subnormal_flushes": 0,
+              "elements": 3112960,
+              "expected_sha256": "06b268927137028d76224d30fc3a828d27b631ad9241616657d42e7bc6bfc990",
+              "first_mismatches": [],
+              "kind": "exact",
+              "mismatches": 0,
+              "observed_sha256": "06b268927137028d76224d30fc3a828d27b631ad9241616657d42e7bc6bfc990",
+              "passed": true,
+              "rule": "bit-exact given observed probabilities: ascending FP32 p*v from +0 per 128-key tile"
+            },
+            "counts": {
+              "additions": 0,
+              "dispatch_unique_bytes": 86769664,
+              "divisions": 0,
+              "exponentials": 0,
+              "issued_load_bytes": 3170893824,
+              "issued_store_bytes": 12451840,
+              "multiply_adds": 396361728,
+              "threads": 3112960
+            },
+            "derived": {
+              "dispatch_unique_gigabytes_per_second": 44.127179869682685,
+              "giga_multiply_adds_per_second": 201.571891126768,
+              "issued_gigabytes_per_second": 1618.9075792975577
+            }
+          },
+          {
+            "name": "reduce",
+            "shader": "runtime/vision_attention_reduce.hlsl",
+            "groups": [
+              128,
+              1,
+              1
+            ],
+            "gpu_milliseconds": 0.053125,
+            "host_submit_to_drained_milliseconds": 15.6008,
+            "host_readback_milliseconds": 65.6338,
+            "strictly_below_gate": true,
+            "check": {
+              "d3d11_subnormal_flushes": 0,
+              "elements": 12386304,
+              "expected_sha256": "77471544a03d8c59a71b1c4d7908f002389d11e25782f49aa8f79db6e9a864ea",
+              "first_mismatches": [],
+              "kind": "exact",
+              "mismatches": 0,
+              "observed_sha256": "77471544a03d8c59a71b1c4d7908f002389d11e25782f49aa8f79db6e9a864ea",
+              "passed": true,
+              "rows_outside_tile_with_sentinel_words": 12353536,
+              "rule": "bit-exact given observed partials: ascending FP32 tile sum from +0, vision_bf16; other rows keep sentinel"
+            },
+            "counts": {
+              "additions": 3112960,
+              "dispatch_unique_bytes": 12582912,
+              "divisions": 0,
+              "exponentials": 0,
+              "issued_load_bytes": 12451840,
+              "issued_store_bytes": 131072,
+              "multiply_adds": 0,
+              "threads": 32768
+            },
+            "derived": {
+              "dispatch_unique_gigabytes_per_second": 236.85481411764704,
+              "giga_multiply_adds_per_second": 0.0,
+              "issued_gigabytes_per_second": 236.85481411764704
+            }
+          }
+        ]
+      }
+    ],
+    "elapsed_seconds": 12.7062707,
+    "tracked_live_after": 0,
+    "tracked_peak": 235405312,
+    "process_commit_peak_bytes": 579592192,
+    "job_commit_peak_bytes": 588206080,
+    "active_job_after_retirement": 0,
+    "ordinary_worker_restored_cold": true,
+    "native_receipt": {
+      "bytes": 76685,
+      "sha256": "039506520d6d2e772481ad56b9490e053b8bf8c02d4c6bd18fa02f02e7a46537"
+    },
+    "job_receipt": {
+      "bytes": 397,
+      "sha256": "1db299b26c27c64cfc966604cc5f7539b8e30803d8cae4d9631a084d20019f4b"
+    },
+    "restoration_receipt": {
+      "bytes": 634,
+      "sha256": "1d7e4a23571d4dd3e92a7f55b66a0fec510bf9d32a9744b83567065f556be286"
+    }
+  },
+  "resource_policy": {
+    "source_deadline_seconds": 120,
+    "external_root_timer_seconds": 180,
+    "remote_absolute_timer_independently_retained": false,
+    "owner_heartbeat_seconds": 15,
+    "maximum_dispatch_milliseconds_exclusive": 100,
+    "process_commit_cap_bytes": 805306368,
+    "job_commit_cap_bytes": 1073741824,
+    "maximum_processes": 2,
+    "CPU": "one core, below normal",
+    "preadmission_RAM_floor_bytes": 8589934592,
+    "maximum_device_plus_readback_forecast_bytes": 284950528,
+    "AMD_actions": []
+  },
+  "projection": {
+    "measured_tile_gpu_milliseconds": 4.3062499999999995,
+    "projected_24_block_gpu_milliseconds": 39066.299999999996,
+    "projected_block_gpu_milliseconds": 1627.7624999999998,
+    "query_tiles_per_block": 378.0,
+    "scope": "Linear projection of one measured tile; excludes per-tile allocation, submission, drain polling, inter-dispatch gaps, other vision operators, text decode and concurrency. Not a pages/sec measurement"
+  },
+  "independent_review": {
+    "disposition": "CLEAR",
+    "seal": {
+      "bytes": 650,
+      "sha256": "9ac976bf706c3ccf54bef086796a78d4c5c2d8d698f80e8bac845ee3f861b77d"
+    },
+    "assessment": {
+      "bytes": 5801,
+      "sha256": "32cc95a28d7679ebcf5cb223d1da53846878736c42bd4811ef0ff0d15eb09761"
+    },
+    "source_clearance_scope": "standalone calibration, API/Device and pinned production vision shaders only"
+  },
+  "qualification": {
+    "trained_model_numerics": false,
+    "full_model_fit": false,
+    "complete_OCR": false,
+    "exact_client_OCR": false,
+    "endpoint_deployment": false,
+    "sustained_completed_pages_per_second": false
+  }
+}

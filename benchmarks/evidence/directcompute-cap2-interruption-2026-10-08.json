@@ -1,0 +1,100 @@
+{
+  "attempt": {
+    "Guardian_resource_query_timeout_observed": true,
+    "Windows_lease_connection_reset_observed": true,
+    "accepted_complete_arithmetic_return": false,
+    "automatic_inference_replay": false,
+    "complete_four_operand_capture": false,
+    "elapsed_intervals_have_different_origins": true,
+    "initiator_or_failure_cause_established": false,
+    "one_explicit_guarded_GPU_submission": true,
+    "original_controller_qualification_not_completed_after_signal_stop": true
+  },
+  "backend": "native DirectCompute/D3D11",
+  "commitments": {
+    "actual_CPU_forecast_finished_review": {
+      "bytes": 10150,
+      "sha256": "06272a07de648a02eb18ff04cd2defedd84588bf0aeaadc2eb248d90e7a33957"
+    },
+    "build_result": {
+      "bytes": 61900,
+      "sha256": "8ad6b7a86f26c8850058be59e49d4b307bc53e9a5b86116867aebe0eace485a2"
+    },
+    "failed_diagnostic_root_record": {
+      "bytes": 23173,
+      "sha256": "68c691b347ad2fbe11a23dbdc4da1185aff68bcccbe6c1788dd19c48089f3997"
+    },
+    "native_executable": {
+      "bytes": 1686528,
+      "sha256": "1db8c3d194887aa3b863c77f6360f15fce0b0a9a3414acbe130ceeeb2f55fa0f"
+    },
+    "root_after_return": {
+      "bytes": 2491,
+      "sha256": "d622dede9c72d3cde40415095ff612d85cb515d329e444a38dbedb75e1e5be81"
+    },
+    "runtime_finished_source_review": {
+      "bytes": 3434,
+      "sha256": "d5448d526b6cce932e922b3993c1074a8da6f7450cc21abdba0ca0f6efbc5c7f"
+    },
+    "separate_root_retirement": {
+      "bytes": 5451,
+      "sha256": "e3e08829dc1a87a85a254d63566a82179e7d4172b93ee31e3f045430e1818140"
+    },
+    "source_manifest": {
+      "bytes": 25286,
+      "sha256": "09c9cbf715ce24cdd7655cfcf2ea2eda94fe71de2b8413b7aa905954870a935a"
+    }
+  },
+  "date": "2026-10-08",
+  "gpu": "Intel Arc A770",
+  "limits": [
+    "Incomplete native arithmetic and no numerical comparison; independent source/forecast review is not native capture acceptance.",
+    "Resource-query timeout and lease reset have no established causal ordering; shutdown-induced reset remains possible.",
+    "A narrow Windows System event query was denied; no absent TDR or driver-fault finding is asserted.",
+    "No subsequent GPU replay, paid-agent workflow, Claude invocation or AMD throughput work."
+  ],
+  "preflight": {
+    "CPU_forecast_Device_model_or_arithmetic_execution": false,
+    "context_limit": 16384,
+    "diagnostic_token_cap": 2,
+    "fresh_actual_CPU_forecast_independently_reviewed": true,
+    "input_model_precision_and_native_build_unchanged": true,
+    "matching_runtime_source_independently_reviewed": true,
+    "normal_output_allowance": 12384,
+    "one_argument_CPU_forecast_config_repair": true
+  },
+  "qualification": {
+    "complete_OCR_accepted": false,
+    "native_endpoint_accepted": false,
+    "performance_speedup_deployed": false,
+    "sustained_pages_per_second_accepted": false,
+    "trained_numerical_accepted": false,
+    "whole_model_integrity_accepted": false
+  },
+  "resources": {
+    "Job_commit_limit_bytes": 13153337344,
+    "minimum_sampled_physical_available_bytes": 17812393984,
+    "minimum_sampled_system_commit_headroom_bytes": 17500393472,
+    "observed_floor_or_commit_limit_breach": false,
+    "peak_Job_commit_bytes": 9879240704,
+    "peak_process_commit_bytes": 9863426048,
+    "physical_and_commit_stop_floor_bytes": 8589934592,
+    "process_commit_limit_bytes": 12884901888,
+    "scope": "Completed samples and exact owned-Job accounting; not a global VRAM reservation or proof of no driver fault"
+  },
+  "retirement": {
+    "active_owned_members_after": 0,
+    "all_five_handles_closed": true,
+    "exact_original_owner_exited": true,
+    "forced_owned_members": 2,
+    "local_controller_and_Guardian_closed": true,
+    "natural_retirement": false,
+    "positive_Windows_Job_and_exact_owner_retirement": true,
+    "previous_worker_restored_cold": true,
+    "restored_worker_model_loaded": false,
+    "restored_worker_pending_or_active": 0,
+    "root_owner_rescue_termination_requested": false,
+    "watchdog_joined": true
+  },
+  "schema": "chandra.directcompute.original-cap2-interruption.public-receipt.v1"
+}

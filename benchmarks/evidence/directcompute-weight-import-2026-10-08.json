@@ -1,0 +1,496 @@
+{
+  "schema": "chandra.directcompute.weight-import.oct08.publication.v1",
+  "recorded_utc": "2026-10-08T06:17:19.285544+00:00",
+  "verdict": "CLEAR_FAILURE_OBSERVATIONS_ONLY",
+  "source_scope": {
+    "unpromoted_experimental_source": true,
+    "current_Git_runtime_qualified_by_these_points": false,
+    "source_manifest": {
+      "bytes": 24678,
+      "sha256": "d3befbc33b83520f4c9faadd9c6ac7291c1d30bf0d87da94f9ce2703c4cee408"
+    },
+    "source_file_count": 136,
+    "source_bytes": 2480351,
+    "executable": {
+      "bytes": 1614336,
+      "sha256": "2494629097c45b01afc826a2c6aae56f8bfbebf612efddae77cff662e772aad8"
+    },
+    "canonical_documentation_base_commit": "77863573f4662c66d07a9b17c10eec816fd9766c"
+  },
+  "unchanged_model_and_input": {
+    "model_name": "datalab-to/chandra-ocr-2",
+    "revision": "af93b47dba1b47b6640c86ccf487ed2260ab9a09",
+    "original_checkpoint_bytes": 10591220088,
+    "original_checkpoint_sha256": "0804568be9f099d6479fad9ed77a4da4611f3c1e7bc6e009af7dce45e8aa3847",
+    "authentication_scope": "native held-file importer metadata; this publication does not read or rehash the checkpoint",
+    "input_manifest": {
+      "bytes": 36558,
+      "sha256": "0aa588473930f110cc359ba369623f29765a85f4e05ffcbca2ac509933b787ae"
+    },
+    "prompt_tokens": 3617,
+    "prepared_patch_rows": 12096,
+    "context_limit": 16384,
+    "normal_output_allowance": 12384,
+    "both_arms_identical_model_and_input": true
+  },
+  "device": {
+    "name": "Intel Arc A770",
+    "same_physical_adapter_both_arms": true,
+    "original_driver_version": "32.0.101.8991"
+  },
+  "common_observation": {
+    "original_import_operations_per_arm": 732,
+    "original_import_storage_bytes_per_arm": 9078531072,
+    "original_drains_per_arm": 732,
+    "CPU_source_rows_per_arm": 10,
+    "early_GPU_observations": 0,
+    "constructor_return_observed": true,
+    "first_fault_shard": 0,
+    "first_fault_global_row": 26213,
+    "different_u32_words": 64,
+    "u32_word_interval_inclusive": [
+      768,
+      831
+    ],
+    "different_bytes": 256,
+    "row_byte_interval_half_open": [
+      3072,
+      3328
+    ],
+    "CPU_source_row_bytes": 5120,
+    "CPU_source_row_sha256": "e696b6bda9b22dba3ad2a49132d6353302f5b20ad2627909ae5474586a46c07f",
+    "post_constructor_tails_observed_per_arm": 1,
+    "later_tails_unobserved_per_arm": 9,
+    "arithmetic_executed": false,
+    "tokens_generated": false
+  },
+  "arms": {
+    "default-initial": {
+      "API": "DEFAULT CreateBuffer with initial data",
+      "API_operations_admitted": 732,
+      "API_operations_returned": 732,
+      "original_drains_completed": 732,
+      "CPU_source_snapshots_completed": 10,
+      "post_constructor_tails_observed": 1,
+      "later_tails_unobserved": 9,
+      "selected_tail_integrity_passed": false,
+      "bad_GPU_row": {
+        "bytes": 5120,
+        "sha256": "1d6a0176335a45e91838f1f191313f1c5d8f226c36c0d655b7970a2962e5c9c0"
+      },
+      "all_ten_CPU_source_rows": {
+        "bytes": 51200,
+        "sha256": "c265331b44a3e2ef7c433091c7a1fbbe8484c8e1937e88139fc1a3f283ac8243"
+      },
+      "import_observer_process_wall_seconds": 27.2874934,
+      "native_qualification_metadata": {
+        "bytes": 8562,
+        "sha256": "aa293f182af6573fb82b807bfaea7e624724014bc094771c756ece0b2d172362"
+      },
+      "root_disposition_metadata": {
+        "bytes": 3956,
+        "sha256": "2136c97a3249ba293994e7ede27c860aef7107fedbdfbe2eda12f1042cb719af"
+      },
+      "root_external_closure_metadata": {
+        "bytes": 4907,
+        "sha256": "548476f43fcf13a44e214e5cc17b2b89b75d565a4f745b228d443114a24f567e"
+      },
+      "retained_collection_metadata": {
+        "bytes": 4859,
+        "sha256": "683650fe1323b4f8f30de5a0e6490e35c10ba43710d2dc76600a10a9baadb0c4"
+      }
+    },
+    "update-subresource": {
+      "API": "UpdateSubresource",
+      "API_operations_admitted": 732,
+      "API_operations_returned": 732,
+      "original_drains_completed": 732,
+      "CPU_source_snapshots_completed": 10,
+      "post_constructor_tails_observed": 1,
+      "later_tails_unobserved": 9,
+      "selected_tail_integrity_passed": false,
+      "bad_GPU_row": {
+        "bytes": 5120,
+        "sha256": "080a812f28a44ff44de946ba02a302df72fc3b70c884845eb2ac4ebc84cd9d8a"
+      },
+      "all_ten_CPU_source_rows": {
+        "bytes": 51200,
+        "sha256": "c265331b44a3e2ef7c433091c7a1fbbe8484c8e1937e88139fc1a3f283ac8243"
+      },
+      "import_observer_process_wall_seconds": 30.1368176,
+      "native_qualification_metadata": {
+        "bytes": 8565,
+        "sha256": "00f75fe576615c90e60b1bb256cfa0a8ecb64654ac64f1108e3aac56228abc32"
+      },
+      "root_disposition_metadata": {
+        "bytes": 3959,
+        "sha256": "c9498f7bc5de6ce736bb6ed5961550cb43ffb7b1fcf707e055f4d0a4d74ba431"
+      },
+      "root_external_closure_metadata": {
+        "bytes": 3887,
+        "sha256": "1b5784b5e28248063949c06ee1c6c0a98bb33825a87cb96cf06aa50e94d9b8fd"
+      },
+      "retained_collection_metadata": {
+        "bytes": 4859,
+        "sha256": "1ea8e20a9bee03cdee32bde384a591887be59190c0b0cb3ec16467092bb97ec2"
+      }
+    }
+  },
+  "custody_acceptance": {
+    "observations_and_physical_custody_only": true,
+    "both_natural_Jobs_and_exact_owners_retired": true,
+    "transport_and_local_Guardian_processes_closed": true,
+    "historical_endpoint_cold_restoration_separately_authenticated": true,
+    "root_review_consumers_after_return_closed": true,
+    "closure_does_not_accept_byte_equality": true
+  },
+  "acceptance_limits": {
+    "selected_tail_integrity": false,
+    "whole_imported_model_byte_integrity": false,
+    "production_fix": false,
+    "strict_API_or_driver_cause": false,
+    "corruption_onset_localized": false,
+    "inference_or_numerical_correctness": false,
+    "complete_OCR": false,
+    "statistically_qualified_speed": false,
+    "sustained_pages_per_second": false,
+    "deployment": false,
+    "current_Git_runtime_qualification": false,
+    "new_hardware_execution_admission": false
+  },
+  "observation_limits": {
+    "source_view_release": "constructor/RAII-scope evidence only; individual Win32 unmap/close success not independently verified",
+    "observer_changes_timing_or_residency": true,
+    "matched_API_before_view_or_mapping_timing": false,
+    "padded_scratch_drain_lifetime_equivalence": false,
+    "nine_later_tails_unobserved": true,
+    "process_wall_seconds_are_import_observer_only": true,
+    "component_timing_does_not_qualify_statistical_or_page_speed_gain": true
+  },
+  "preserved_admission_boundaries": {
+    "original_pre_target_refusal_and_retired_marker_preserved": true,
+    "local_initialization_refused_before_admission": {
+      "actual_CPU_cap_seconds": 20,
+      "reviewed_caller_profile_CPU_seconds": 45,
+      "native_or_service_failure_inferred": false
+    },
+    "corrected_source_profile_validation_preserved": true,
+    "genuine_caller_and_actual_CPU_forecast_clearance_consumed": true,
+    "original_API_points_replayed": false,
+    "source_deadlines_extended": false
+  },
+  "prior_page4096_failure": {
+    "retained_in_completed_source_memo": true,
+    "shard": 0,
+    "global_row": 26213,
+    "different_u32_words": 64,
+    "first_differing_word": 768,
+    "last_differing_word": null,
+    "last_index_not_rederived": true,
+    "old_observer": "SRV/checksum",
+    "current_observer": "final-only direct-copy",
+    "observer_cutoff_confound_preserved": true,
+    "new_padding_repair_accepted": false,
+    "accepted_capture_metadata": {
+      "bytes": 3272,
+      "sha256": "d3e6fb9b9a4fa4b5ba53e9e5f084fd2ffae1d2ad5646bd16fbb642e27ed54964"
+    },
+    "retained_report_identity": {
+      "bytes": 365140,
+      "sha256": "b4595d3f85c69025ea07aa97b391cb0b710a5739bf415d760586fde97dceabbd"
+    }
+  },
+  "next_hypothesis": {
+    "description": "weight-only DEFAULT raw SRV storage without a UAV",
+    "status_at_publication_cutoff": "source implementation only",
+    "built": false,
+    "run": false,
+    "qualified_fix": false,
+    "source_memo_cutoff_was_proposal_only": true
+  },
+  "logical_evidence_identities": {
+    "actual_pair_finished_review": {
+      "bytes": 16857,
+      "sha256": "d587535894f0d1b669540d6553da31eb5834da36cc70c62b815aeae9db01c25a"
+    },
+    "root_finished_review_consumption": {
+      "bytes": 12236,
+      "sha256": "188dd8af4d05845bd3d7e7255c1b94b953d76d3c6b1d500ec24faff6b57a0f9f"
+    },
+    "root_review_consumers_after_return": {
+      "bytes": 1390,
+      "sha256": "32f407091cc2a48d560ca03ca553335bbd447debc0e2e0fd0e76703846070cc3"
+    },
+    "completed_source_memo": {
+      "bytes": 7759,
+      "sha256": "117e36348b6b8043d3189aa15797a2ad6a0ede962b134af2eaec0065334f5db5"
+    },
+    "completed_source_memo_seal": {
+      "bytes": 3898,
+      "sha256": "7b002a38dce59f5ee58288760a543d9dd9f17ada3fae762df0e2c6ce0054ecc8"
+    },
+    "default_initial_provenance": {
+      "bytes": 5669,
+      "sha256": "0f1f223a19bf6f3488bac2d40038c714fafc7a5424e643c6c082c39c17b197fc"
+    },
+    "update_subresource_provenance": {
+      "bytes": 5669,
+      "sha256": "ee15a341516a01f8a9af96b39bcc37f41103dca156a62edab669e60ba51c9a96"
+    }
+  },
+  "earlier_results_preserved": true,
+  "raw_or_model_payloads_published": false,
+  "srv_only_default_initial_follow_up": {
+    "schema": "chandra.directcompute.weight-import.srv-only-follow-up.v1",
+    "recorded_utc": "2026-10-08T12:46:43.474622+00:00",
+    "verdict": "SELECTED_TAIL_IMPORT_OBSERVATION_AND_CUSTODY_ACCEPTED",
+    "source_scope": {
+      "unpromoted_experimental_source": true,
+      "current_Git_runtime_qualified_by_this_point": false,
+      "source_manifest": {
+        "bytes": 25476,
+        "sha256": "e167a1a00096fab0bbdc27e2b12dbf1db4d11f8f1028b71f84095df92cec47a2"
+      },
+      "source_file_count": 137,
+      "runtime_paths_changed": 6,
+      "native_source_seal": {
+        "bytes": 9484,
+        "sha256": "e90fbc23cf1724e9d97763385ae98161b03b8d3a1025c6a606b2c4e167c1e15e"
+      },
+      "patch": {
+        "bytes": 48604,
+        "sha256": "9c2613d45cbb9da0dc9ab9e3d0c564b6852608f2143f9353179c755537d4e950"
+      },
+      "cpp_source_review": {
+        "bytes": 3679,
+        "sha256": "9f999d1d76d4e7e04abed3e366d3e048d2813780a6939ea63e199a32ee67db44"
+      },
+      "cpu_recipe_review": {
+        "bytes": 8341,
+        "sha256": "a850c29b6ef7ec320344566e64ebde14fb17b765d3e7edb06fb8f42ca27d0489"
+      },
+      "actual_cpu_build_review": {
+        "bytes": 10175,
+        "sha256": "761eaa0023c112238e6b20000fce62d56f8885ead9bf07832a973c9b0162e77e"
+      },
+      "actual_build_report": {
+        "bytes": 61793,
+        "sha256": "2a1a245c8bf6f8836efd584ada2d5504059351890221df4fa71f3b450bea6a6c"
+      },
+      "inference_executable": {
+        "bytes": 1638400,
+        "sha256": "6aebe0ff4bed831e7b438fc3f1c22594c89fb07099a1cafa6c032128a4741150"
+      },
+      "worker_executable": {
+        "bytes": 1247744,
+        "sha256": "2c520c9ace39a9c79e0c04dd252d523579ecb2163feb7390eb69dced413be3de"
+      },
+      "all_shaders_and_arithmetic_unchanged": true,
+      "allocation_padding_quantization_image_context_or_output_change": false,
+      "runtime_path_count_and_unchanged_semantics_provenance": "root source-review handoff; no source or shader execution by publication author"
+    },
+    "unchanged_model_and_input": {
+      "model_name": "datalab-to/chandra-ocr-2",
+      "revision": "af93b47dba1b47b6640c86ccf487ed2260ab9a09",
+      "original_checkpoint_bytes": 10591220088,
+      "original_checkpoint_sha256": "0804568be9f099d6479fad9ed77a4da4611f3c1e7bc6e009af7dce45e8aa3847",
+      "authentication_scope": "native held-file importer metadata; this publication does not read or rehash the checkpoint",
+      "input_manifest": {
+        "bytes": 36558,
+        "sha256": "0aa588473930f110cc359ba369623f29765a85f4e05ffcbca2ac509933b787ae"
+      },
+      "prompt_tokens": 3617,
+      "prepared_patch_rows": 12096,
+      "context_limit": 16384,
+      "normal_output_allowance": 12384,
+      "same_checkpoint_and_input_as_API_only_comparison": true
+    },
+    "device": {
+      "name": "Intel Arc A770",
+      "original_driver_version": "32.0.101.8991",
+      "same_physical_adapter_as_API_only_comparison": true
+    },
+    "observations": {
+      "weight_import_API": "DEFAULT CreateBuffer with initial data",
+      "readonly_weight_SRV_only": true,
+      "unused_weight_UAV_permission_and_view_removed": true,
+      "buffer_descriptor": {
+        "Usage": 0,
+        "BindFlags": 8,
+        "CPUAccessFlags": 0,
+        "MiscFlags": 32,
+        "StructureByteStride": 0
+      },
+      "original_operations_and_drains_completed": 732,
+      "original_storage_bytes": 9078531072,
+      "CPU_actual_submission_source_rows": 10,
+      "early_GPU_observations": 0,
+      "post_constructor_direct_copy_rows": 10,
+      "selected_tails_byte_equal": true,
+      "first_bad": null,
+      "same_original_embedding_and_output_head_Storage": true,
+      "arithmetic_executed": false,
+      "tokens_generated": false,
+      "rows": [
+        {
+          "shard": 0,
+          "global_row": 26213,
+          "bytes": 5120,
+          "source_and_direct_sha256": "e696b6bda9b22dba3ad2a49132d6353302f5b20ad2627909ae5474586a46c07f"
+        },
+        {
+          "shard": 1,
+          "global_row": 52427,
+          "bytes": 5120,
+          "source_and_direct_sha256": "0575f9588d644d6b669a29517b1dda97ea56b4831b5578edffb99913df8e4ab7"
+        },
+        {
+          "shard": 2,
+          "global_row": 78641,
+          "bytes": 5120,
+          "source_and_direct_sha256": "2e24fa14ee38bfd2344a5c305bc4142e88b220c0d8e0200d8eb83f8d4d013588"
+        },
+        {
+          "shard": 3,
+          "global_row": 104855,
+          "bytes": 5120,
+          "source_and_direct_sha256": "68256c1867dbe6bafd26887f406e0b31338531360d2e913a532459fb34756185"
+        },
+        {
+          "shard": 4,
+          "global_row": 131069,
+          "bytes": 5120,
+          "source_and_direct_sha256": "4c58764a427cb8da6c3b1637461c6f0eb3a97f56f39cea2c2c1d24ea7fe1ae57"
+        },
+        {
+          "shard": 5,
+          "global_row": 157283,
+          "bytes": 5120,
+          "source_and_direct_sha256": "0013e97f21e91db90fd0b7aaa55bea4026f715b8e6e215bcfdce3bfce4d775f6"
+        },
+        {
+          "shard": 6,
+          "global_row": 183497,
+          "bytes": 5120,
+          "source_and_direct_sha256": "40cefbc25f09d02d8462a96df50d148de585581cc35ffb7f09e4cbcfb0a266d3"
+        },
+        {
+          "shard": 7,
+          "global_row": 209711,
+          "bytes": 5120,
+          "source_and_direct_sha256": "c286446d857d97204b18a44191e0f40e0330771ebffa68d3be46fe7d5df77417"
+        },
+        {
+          "shard": 8,
+          "global_row": 235925,
+          "bytes": 5120,
+          "source_and_direct_sha256": "c2112922b51d5784596cbc2152bd795481a3786e6be8756b5a116a15db104396"
+        },
+        {
+          "shard": 9,
+          "global_row": 248319,
+          "bytes": 5120,
+          "source_and_direct_sha256": "63e342c82e7af4adadff841f0d1298a7cd5ad5a08f62a3b3077ade0a272292ef"
+        }
+      ],
+      "all_ten_source_rows": {
+        "bytes": 51200,
+        "sha256": "c265331b44a3e2ef7c433091c7a1fbbe8484c8e1937e88139fc1a3f283ac8243"
+      },
+      "all_ten_direct_rows": {
+        "bytes": 51200,
+        "sha256": "c265331b44a3e2ef7c433091c7a1fbbe8484c8e1937e88139fc1a3f283ac8243"
+      }
+    },
+    "descriptor_observation_limit": {
+      "returned_descriptor_checks_reported": 732,
+      "individual_selected_creation_receipts_retained": 10,
+      "individual_last_creation_receipt_retained": 1,
+      "all_732_individual_creation_receipts_retained_or_independently_verified": false,
+      "aggregate_report_is_not_732_retained_individual_receipts": true
+    },
+    "review_and_cleanup": {
+      "actual_import_finished_review": {
+        "bytes": 14341,
+        "sha256": "2cd7c036155fa0f2b17f433eade098502f57aab45d72d8cddd011aceddca7803"
+      },
+      "root_finished_review_authentication": {
+        "bytes": 7698,
+        "sha256": "5d7372ee03e8421980871750fa15b8e14a04b99076d9488a0416908d8c3aea54"
+      },
+      "native_result_metadata": {
+        "bytes": 21788,
+        "sha256": "c694df4b88dd7fa847a23e436f34488714c63622a42eb05ab12f156d6b4686d8"
+      },
+      "root_disposition_metadata": {
+        "bytes": 7827,
+        "sha256": "1350e4f2aba45483cfd62941b956754c214c72ca93c52de82b545896f05bec24"
+      },
+      "root_external_closure_metadata": {
+        "bytes": 9137,
+        "sha256": "cd7baa0e083e773e386c4f059ae72e0f8c9ed7ca50dcd7332bd52103d16e8f8d"
+      },
+      "root_after_return_metadata": {
+        "bytes": 11142,
+        "sha256": "3568aeb41b5d35f67aa30b71cae2535c8870b73c7c5813146a13fd45190c9052"
+      },
+      "root_authenticated_payload_files": 9,
+      "root_authenticated_payload_bytes": 194505,
+      "root_full_qualifier_reproduced": true,
+      "independent_reviewer_raw_rows_or_native_journal_read": false,
+      "independent_review_relies_on_root_raw_authentication": true,
+      "natural_import_primary_and_Job_retired": true,
+      "exact_owner_channel_and_Guardian_retired": true,
+      "historical_endpoint_restored_cold": true,
+      "one_shot_no_replay": true,
+      "native_tracking_zero_is_not_physical_Job_retirement": true,
+      "publication_author_raw_rows_read": false
+    },
+    "acceptance_limits": {
+      "selected_tails_observation_and_cleanup_only": true,
+      "whole_imported_model_byte_equality": false,
+      "API_or_driver_cause_established": false,
+      "production_fix": false,
+      "arithmetic_or_trained_numerical_correctness": false,
+      "complete_OCR": false,
+      "native_endpoint": false,
+      "page_throughput_or_speedup": false,
+      "deployment": false,
+      "future_hardware_admission": false,
+      "individual_Win32_unmap_close_success_independently_verified": false,
+      "observer_may_change_timing_or_residency": true
+    },
+    "next_matching_arithmetic_bridge_at_preparation_cutoff": {
+      "source_and_strict_CPU_recipe_independently_reviewed": true,
+      "strict_CPU_build_completed": true,
+      "translation_units": 9,
+      "application_links": 2,
+      "retained_outputs": 17,
+      "retained_output_bytes": 51671173,
+      "artifact_finished_review": "in progress at publication-preparation cutoff",
+      "primary_completed_successfully": true,
+      "remaining_owned_Job_member_after_primary_exit": 1,
+      "remaining_owned_Job_member_terminated_and_active_after": 0,
+      "whole_Job_natural_exit_claimed": false,
+      "actual_GPU_or_numerical_credit": false,
+      "provenance": "root-supplied build588/acceptance591/external592 summary; publication author did not read compiler outputs"
+    },
+    "remaining_work": [
+      "finished matching-build artifact review and actual CPU-only forecast",
+      "fresh guarded same-live import and cap2 arithmetic capture",
+      "CPU numerical reference on freshly captured exact operands",
+      "complete OCR from the unchanged client input",
+      "sustained correctly completed pages at safe concurrency and a measured ceiling after correctness"
+    ],
+    "workload_preserved": {
+      "maximum_context_tokens": 16384,
+      "normal_output_allowance_tokens": 12384,
+      "three_warm_request_bursts_not_sustained_throughput": true,
+      "new_AMD_throughput_work": false,
+      "NorthStone_GPU_actions_in_this_follow_up": false,
+      "Claude_delegation_disabled_until_owner_resumes": true
+    },
+    "earlier_API_only_failure_record_and_cutoff_preserved": true,
+    "raw_or_model_payloads_published": false
+  }
+}

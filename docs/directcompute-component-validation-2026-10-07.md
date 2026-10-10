@@ -1,0 +1,18 @@
+# DirectCompute component validation
+
+Two [compiled candidates](directcompute-kernel-builds-2026-10-07.md) now have qualified component results: a tiny query/fence completion comparison and a fixed synthetic ordered/parallel32 numerical pair. These results establish their stated component boundaries. Whole-model correctness, complete OCR, endpoint operation, sustained page throughput and deployment remain open.
+
+The completion comparison used one exploratory pair with the same synthetic input, executable, shader, Intel Arc A770, driver 32.0.101.8991 and resource caps. Each arm completed eight dispatches, nine readbacks totaling 4,608 bytes and 51 drains, with at most 512 bytes of staging per transfer. The probe reported exact copies; the finished reviewer authenticated the reports and their bindings without independently opening transferred raw buffers. Every dispatch timestamp was complete, non-disjoint and strictly below 100 ms.
+
+| Host measurement | Original query route | Fence event route | Observed query/fence ratio |
+| --- | --- | --- | --- |
+| Device-owner host elapsed, ns | 901,668,200 | 99,569,400 | 9.05567574× |
+| Summed inclusive host drain time, ns | 788,593,300 | 10,863,300 | 72.59242587× |
+
+The query route recorded 759,716,600 ns of original sleep time; the fence route recorded 1,819,400 ns across 19 event waits. Host elapsed and inclusive drain counters overlap and must not be added. The ratios describe one observed host pair, without repeated statistical significance, GPU active-time speedup or a page-throughput measurement. This tiny result establishes completion support at the retained device/driver boundary, without qualifying universal fence compatibility or full-model behavior.
+
+The launcher's false refusals of clean natural exits remain preserved alongside separate verified physical retirement and restoration to the unchanged cold endpoint. The finished review also retains a transient Linux reader priority excursion to nice -4 and a subsequent narrow reread at nice 15. Its cause remains unassigned; continuous priority enforcement is unproven. The Windows native resource and ownership evidence is recorded separately.
+
+The ordered/parallel32 pair is conditionally qualified for four fixed single-row synthetic shapes: K67/N9, K1001/N9, K2560/N1024 and K9216/N1024. Each arm contains eight dispatches and 4,132 output words. The independent CPU checker returned `INDEPENDENT_EXACT_FINITE_PASS` after evaluating 12,068,236 exact integer-dyadic products and checking the documented FP32 forward-error bounds and exact raw-to-BF16 conversion. Its finite scope excludes NaN, infinity and overflow-risk cases. Parallel32 changes accumulation order; multirow vision and prefill remain outside this qualification. The CPU certificate retains `root_admission=false` and `external_owned_closure=false`; separate finished review confirms the fixed pair and its physical retirement. Timing and future measurement admission remain open, with no measured parallel32 speedup.
+
+The parallel arm's after-point snapshot refusal remains recorded after the native capture had already retired. A separate recovery restored the same cold ownership; no more specific network cause is inferred and no kernel was replayed. The [evidence receipt](../benchmarks/evidence/directcompute-component-validation-2026-10-07.json) binds these results to acceptance metadata by logical label, byte count and SHA-256. The existing [second-shard weight discrepancy](directcompute-interrupted-watch-arithmetic-2026-10-07.md) still holds whole-model progression. The performance target remains sustained correct pages per second at the concurrency plateau using Zotero's real context and normal output allowance.

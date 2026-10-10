@@ -1,0 +1,78 @@
+{
+  "schema": "chandra.directcompute.cpu-custody-source.v1",
+  "scope": "Independently cleared CPU export-custody source; no real trained model or numerical/OCR qualification",
+  "source_baseline": "3c0816ef449f7e8ba5e94fb1cee9942fb165a647",
+  "source_files": {
+    "verification/export_logits.py": {
+      "bytes": 25680,
+      "sha256": "e1c8686d7cc0961b82c822306f853d3ebb1596207819e180ce1ec889f6bd87b1"
+    },
+    "verification/cpu_custody.py": {
+      "bytes": 54154,
+      "sha256": "e9fc9ea26ee74ce68f89424383b85cb4f8cd1ca46a03b2ea993384a7ac3fa8b1"
+    },
+    "tests/model/test_cpu_custody.py": {
+      "bytes": 73358,
+      "sha256": "60a28871f05a243eecd753b335118192703f7ded7bab9eff8e0222c76976fbd7"
+    },
+    "tests/model/test_export_custody.py": {
+      "bytes": 50334,
+      "sha256": "d3cac49b3709c378b32def8f068fe3154e24f691eb53651ef75d0f4747e4bc06"
+    },
+    "docs/directcompute-cpu-export-custody.md": {
+      "bytes": 33806,
+      "sha256": "1bafafc51724785d4dcca902b0624b11ddfdc410be14250cdbb4fbaefab3fdc3"
+    }
+  },
+  "custody_schema": "chandra.cpu-export-custody.v2",
+  "receipt_schema": "chandra.cpu-export-custody-receipt.v2",
+  "original_defects_resolved": [
+    "Executing exporter not bound to retained code",
+    "Retained evidence substitution unverified",
+    "Blocking library-source reads"
+  ],
+  "followup_defects_resolved": [
+    "Blocking logits digest before acceptance",
+    "Omission of deleted absolute loaded-module source"
+  ],
+  "tests": {
+    "interpreter": "CPython 3.12.14",
+    "supplied": {
+      "helper": 36,
+      "exporter": 17,
+      "partial_IO": 2,
+      "inventory": 3,
+      "importer": 14
+    },
+    "independent": {
+      "original_controls": 7,
+      "minimally_guarded_followup_controls": 4,
+      "new_reviewer_methods": 6
+    },
+    "old_unguarded_harness": "Three passes and one fact-collection FileNotFoundError after correct refusal; failure preserved separately"
+  },
+  "review_resources": {
+    "CPU_cores": 1,
+    "nice": 15,
+    "memory_cap_bytes": 2147483648,
+    "swap_cap_bytes": 0,
+    "observed_peak_bytes": 108097536,
+    "observed_swap_bytes": 0,
+    "memory_limit_or_OOM_events": 0,
+    "unit_state": "inactive/dead",
+    "ControlGroup_empty": true,
+    "cgroup_absent": true
+  },
+  "review_manifest_sha256": "b9cca469437f36caef863e0a22cd904c5c96f71ad83f1192c6cfeb745c5868d7",
+  "producer_freeze_sha256": "2d9a41af475349428bd2925d1479cf387278598d27d4cb231da03debd8f9a874",
+  "producer_deviation": "One CPU-only Torch presence import; no model, weights or GPU allocation. Subsequent tests use fakes.",
+  "limits": [
+    "Historical export weights attestation remains withheld",
+    "Library disk hashes do not prove which library bytes executed",
+    "Payload writes and stalled kernel reads depend on outer timeout",
+    "Actual fresh reference requires separate RAM admission, bound process and first-hand receipt validation"
+  ],
+  "actual_fresh_CPU_model_run": false,
+  "native_numerical_OCR_or_speed_acceptance": false,
+  "API_billing_fallback": false
+}

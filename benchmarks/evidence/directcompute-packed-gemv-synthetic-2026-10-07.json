@@ -1,0 +1,140 @@
+{
+  "schema": "chandra.directcompute.packed-gemv-synthetic.summary.v1",
+  "utc": "2026-10-07T16:47:46.173824+00:00",
+  "purpose": "Model-free numerical qualification of the ordered_packed native DirectCompute kernel",
+  "device": "Intel Arc A770",
+  "dtype": "BF16 and FP32 weights; FP32 arithmetic with existing BF16 output rounding",
+  "selector": "ordered_packed",
+  "source_manifest": {
+    "bytes": 3305,
+    "sha256": "cbc3e607dce2eb6740fb0dd7a945d0b1eaa7e4cf5dff0034f8d68507c9ab59be"
+  },
+  "candidate_patch": {
+    "bytes": 29181,
+    "sha256": "de904dd3fa97565a3acf1614fcc0e10d1a3ef91a045760688287af331ee8f237"
+  },
+  "strict_Windows_build_accepted": true,
+  "FXC_shader_checks_accepted": true,
+  "native_phases": 8,
+  "native_output_words_checked": 11754,
+  "malformed_admissions_refused_without_dispatch": 9,
+  "boundary_cases": 21,
+  "boundary_dispatches": 42,
+  "boundary_output_words_checked": 378,
+  "all_dispatches_strictly_below_100_ms": true,
+  "maximum_native_phase_dispatch_ms": 0.9163541666666667,
+  "declared_maximum_phase_tensor_plus_readback_bytes": 18919424,
+  "memory_plan_is_not_measured_resident_RAM_or_VRAM": true,
+  "observed_peak_process_commit_bytes": 168759296,
+  "observed_peak_Job_commit_bytes": 182538240,
+  "process_commit_cap_bytes": 268435456,
+  "Job_commit_cap_bytes": 536870912,
+  "active_process_limit": 2,
+  "tracked_tensors_zero_after_each_phase_and_final_release": true,
+  "runtime_tools_and_source_post_authenticated_files": 48,
+  "all_Job_owner_channel_group_and_root_units_closed": true,
+  "historical_worker_restored_and_confirmed_cold": true,
+  "model_loaded": false,
+  "automatic_replay": false,
+  "kernel_speedup_measured": false,
+  "whole_model_row52427_hold_changed": false,
+  "full_model_accepted": false,
+  "trained_numerics_accepted": false,
+  "OCR_accepted": false,
+  "endpoint_accepted": false,
+  "sustained_pages_per_second_accepted": false,
+  "numerical_rule": "Finite expected storage bits match; NaNs follow the declared class rule, with quiet-bit and zero-low-half requirements for rounded outputs",
+  "native_phase_timing": [
+    {
+      "name": "specials_signed_zero_inf_nan_ties",
+      "input_width": 4,
+      "outputs": 7,
+      "timing_summary": {
+        "dispatches": 4,
+        "maximum_gpu_milliseconds": 0.02125,
+        "sum_gpu_milliseconds": 0.07817708333333334
+      },
+      "tracked_after_phase_release": 0
+    },
+    {
+      "name": "ragged_odd_k_bf16_three_shards_bf16_bias",
+      "input_width": 37,
+      "outputs": 21,
+      "timing_summary": {
+        "dispatches": 6,
+        "maximum_gpu_milliseconds": 0.022708333333333334,
+        "sum_gpu_milliseconds": 0.10765625
+      },
+      "tracked_after_phase_release": 0
+    },
+    {
+      "name": "odd_k_fp32_weights_two_shards_fp32_bias",
+      "input_width": 67,
+      "outputs": 40,
+      "timing_summary": {
+        "dispatches": 4,
+        "maximum_gpu_milliseconds": 0.023854166666666666,
+        "sum_gpu_milliseconds": 0.08401041666666667
+      },
+      "tracked_after_phase_release": 0
+    },
+    {
+      "name": "odd_k1001_order_sensitive_two_shards_bf16_bias",
+      "input_width": 1001,
+      "outputs": 130,
+      "timing_summary": {
+        "dispatches": 4,
+        "maximum_gpu_milliseconds": 0.11859375,
+        "sum_gpu_milliseconds": 0.46010416666666665
+      },
+      "tracked_after_phase_release": 0
+    },
+    {
+      "name": "multi_chunk_k1001_two_shards",
+      "input_width": 1001,
+      "outputs": 2600,
+      "timing_summary": {
+        "dispatches": 8,
+        "maximum_gpu_milliseconds": 0.12838541666666667,
+        "sum_gpu_milliseconds": 0.9390104166666666
+      },
+      "tracked_after_phase_release": 0
+    },
+    {
+      "name": "full_chunk_k2560_order_sensitive",
+      "input_width": 2560,
+      "outputs": 1024,
+      "timing_summary": {
+        "dispatches": 2,
+        "maximum_gpu_milliseconds": 0.26640625,
+        "sum_gpu_milliseconds": 0.5294791666666667
+      },
+      "tracked_after_phase_release": 0
+    },
+    {
+      "name": "full_width_k9216_dyadic",
+      "input_width": 9216,
+      "outputs": 1024,
+      "timing_summary": {
+        "dispatches": 2,
+        "maximum_gpu_milliseconds": 0.9022916666666667,
+        "sum_gpu_milliseconds": 1.8030208333333335
+      },
+      "tracked_after_phase_release": 0
+    },
+    {
+      "name": "full_width_k9216_order_sensitive_fp32",
+      "input_width": 9216,
+      "outputs": 1024,
+      "timing_summary": {
+        "dispatches": 2,
+        "maximum_gpu_milliseconds": 0.9163541666666667,
+        "sum_gpu_milliseconds": 1.8188541666666667
+      },
+      "tracked_after_phase_release": 0
+    }
+  ],
+  "accepted_private_receipt_sha256": "594f7d9d5547014e9cddb4498524c5dd04e40c256fdd6b5b20b7b3c49746fe5e",
+  "finished_source_and_metadata_review_sha256": "97d038c5683052b3b6764d241da96a11506bf459b043fc00c851868938c30447",
+  "failed_qualifier_preserved": "The first offline qualifier used shorthand lease3 instead of the exact chandra-lease-3 receipt protocol; its failed result remains, and only that literal was corrected before qualifying the original captures without GPU replay."
+}

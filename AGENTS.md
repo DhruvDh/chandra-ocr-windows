@@ -9,3 +9,5 @@ Keep installed tools, environments, models, private host configuration and raw r
 The HTTP boundary accepts only supported model and inference routes. Health and model listings must not start inference. Hold capacity until generation has actually stopped, including after cancellation, and never replay a submitted request automatically. Test concurrency, cancellation and failure with isolated workers before deployment.
 
 Write ordinary prose as one physical line per paragraph. Keep source, setup, measurements and remaining work discoverable here, with concrete commands and honest evidence boundaries. Retain useful failed experiments and necessary build inputs; stop task-owned producers deliberately when they are no longer needed.
+
+Claude delegation is disabled for this work until the owner explicitly asks to resume it. Use GPT-6.1 Sol at xhigh for implementation and finished review, with Luna monitoring quota.

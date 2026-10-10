@@ -1,0 +1,51 @@
+{
+  "schema": "chandra.directcompute.cpu-reference-source.v1",
+  "date_utc": "2026-10-06",
+  "scope": "Reviewed standard-library importer and CPU-only boundary validation; historical model-weight attestation remains pending root decision.",
+  "source_sha256": {
+    "scripts/native/import_cpu_diagnostics.py": "ab33674a1121cc00e21cae330110e94e877e87b22b60c10f672592e82535215a",
+    "tests/native/test_import_cpu_diagnostics.py": "11e259606561f2dd8a34eafbcc9e7f8302a106729f5d5adef2e342db12eb8619",
+    "docs/directcompute-cpu-reference.md": "8a8be7df25a6ac1f683eebeab0ee27db317417573a5c0801e46305afd766e518"
+  },
+  "independent_review": {
+    "disposition": "cleared",
+    "report_sha256": "1dda6ac25cbfda9e4423c03386b6d11ee58c4a788cb6fe9a04cfa04c960c8303",
+    "artifacts_sha256": {
+      "repair03-completion.json": "622ff049c1346088064ff642e2bddfd2f84e3f4cd596f58ab1d725d2d3f964ee",
+      "repair03-tests.json": "5e0c791d3e62b51c1e8f497603eae8a2fd987e8e60d22f233e6cee9b4f255602",
+      "repair03-probes.json": "5b742c9b91497d68870213ba477bdd8bb7a9abadda625a6c2bcd880473d96c86",
+      "repair03-actual-types.json": "86319f1f12594d1f20507d65de7699d57c3248ee89fb61b9d3d8fb8f959eddc9",
+      "repair03-retained.json": "e56ebe029a0ee1ef6e0c2289414d0fc7ff244c0960bda170ce2ed26a0f36691d"
+    }
+  },
+  "cpu_validation": {
+    "adapter_tests": 14,
+    "unchanged_comparator_tests": 18,
+    "strict_type_mutations": 35,
+    "strict_type_refusal_runs": 70,
+    "retained_payload_ranges_byte_equal": 10,
+    "retained_source_exports_authenticated": 3,
+    "unit_wall_seconds": 15.932,
+    "unit_cpu_seconds": 7.926,
+    "memory_peak_bytes": 97894400,
+    "memory_max_bytes": 2147483648,
+    "swap_max_bytes": 0,
+    "cpu_count": 1,
+    "nice": 15,
+    "unit_retired": true
+  },
+  "reference_semantics": {
+    "cpu214": "Only the last original prompt row is admitted as prefill; later monolithic teacher rows are not cached decode.",
+    "cached06": "One prefill row and eight actual cached teacher-decode rows; histories and source-derived positions remain explicit.",
+    "payload": "Original FP32 words copied without rounding, numerical repair or fitted tolerances.",
+    "weights": "Producer records no safetensors digest; owner attestation is explicit and currently pending."
+  },
+  "qualification": {
+    "historical_weights_attested_by_root": false,
+    "native_cpu_numerical_agreement": false,
+    "amd_ocr_agreement": false,
+    "complete_ocr": false,
+    "sustained_throughput": false,
+    "deployed": false
+  }
+}
