@@ -7,7 +7,7 @@ import ipaddress
 import hashlib
 import json
 import os
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 import re
 import signal
 import secrets
@@ -52,10 +52,38 @@ def ps_quote(value):
     return "'" + value.replace("'", "''") + "'"
 
 
-def remote_command(args, lease_token):
-    argv = [args.remote_python, "-m", "chandra_service", "waystone", "--model-path", args.model_path,
+def worker_argv(args):
+    """Select one explicit worker route; the native launcher authenticates the remote config bytes."""
+    backend = getattr(args, "worker_backend", "waystone")
+    native_config = getattr(args, "native_config", None)
+    native_hash = getattr(args, "native_config_sha256", None)
+    if backend == "native":
+        if args.model_path is not None or args.normalization != "original":
+            raise ValueError("native takes its model, limits and normalization only from --native-config")
+        if not isinstance(native_config, str) or not native_config or len(native_config) > 1024 or any(c in native_config for c in "\r\n\0"):
+            raise ValueError("native requires an absolute normalized Windows --native-config path")
+        path = PureWindowsPath(native_config)
+        if not path.is_absolute() or str(path) != native_config or ".." in path.parts or not path.name:
+            raise ValueError("native requires an absolute normalized Windows --native-config path")
+        if not isinstance(native_hash, str) or not re.fullmatch(r"[0-9a-f]{64}", native_hash):
+            raise ValueError("native requires --native-config-sha256 for the exact remote configuration bytes")
+        return [args.remote_python, "-m", "chandra_service", "native",
+                "--native-config", native_config, "--native-config-sha256", native_hash,
+                "--host", "127.0.0.1", "--port", str(args.worker_port),
+                "--max-input-tokens", "16384", "--max-output-tokens", "12384"]
+    if backend != "waystone":
+        raise ValueError("worker backend must be waystone or native")
+    if native_config is not None or native_hash is not None:
+        raise ValueError("--native-config and --native-config-sha256 require --worker-backend native")
+    if not args.model_path:
+        raise ValueError("waystone requires --model-path")
+    return [args.remote_python, "-m", "chandra_service", "waystone", "--model-path", args.model_path,
             "--host", "127.0.0.1", "--port", str(args.worker_port), "--max-input-tokens", "16384",
             "--max-output-tokens", "12384", "--attention", "hybrid", "--normalization", args.normalization]
+
+
+def remote_command(args, lease_token):
+    argv = worker_argv(args)
     settings = base64.b64encode(json.dumps({"argv": argv, "cwd": args.remote_root, "lease_port": args.lease_port, "lease_token": lease_token}).encode()).decode()
     source = base64.b64encode(zlib.compress(REMOTE_SUPERVISOR.encode())).decode()
     # Invoke native Python directly: PowerShell encoded commands exceed the
@@ -167,6 +195,7 @@ def check_unit_ownership(unit_dir, name):
 
 
 def install(args):
+    worker_argv(args)  # Refuse incomplete or mixed routes before checking or changing installed state.
     if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]*", args.ssh_host):
         raise ValueError("Use a configured SSH host alias")
     if not all(1024 <= port <= 65535 for port in (args.worker_port, args.router_port, args.lease_port)) or len({args.worker_port, args.router_port, args.lease_port}) != 3:
@@ -186,10 +215,6 @@ def install(args):
     config = {"backends": {"northstone": {"url": args.northstone_url, "capacity": 2, "queue_limit": 0, "expected_page_seconds": args.northstone_page_seconds},
                             "waystone": {"url": f"http://127.0.0.1:{args.worker_port}", "capacity": 1, "queue_limit": 2, "expected_page_seconds": args.waystone_page_seconds}},
               "cooldown_seconds": 15, "inference_seconds": 1800}
-    sys.path.insert(0, str(ROOT))
-    from chandra_service.router import Endpoint
-    for name, settings in config["backends"].items():
-        Endpoint(name, **settings)
     config_path = LOCAL / "router.json"
     channel_path = LOCAL / "channel.json"
     receipt_path = LOCAL / "installation.json"
@@ -199,6 +224,21 @@ def install(args):
         previous = json.loads(receipt_path.read_text())
         if previous.get("source_root") != str(ROOT) or previous.get("units") != list(UNITS):
             raise ValueError("Existing installation receipt belongs to another owner")
+    router_text = None
+    if getattr(args, "worker_backend", "waystone") == "native" and config_path.exists():
+        with config_path.open("r", newline="") as stream:
+            router_text = stream.read()
+        config = json.loads(router_text)
+        if not isinstance(config, dict) or not isinstance(config.get("backends"), dict) or not isinstance(config["backends"].get("waystone"), dict):
+            raise ValueError("Existing owned router configuration must name the Windows waystone backend")
+        wanted_url = f"http://127.0.0.1:{args.worker_port}"
+        if config["backends"]["waystone"].get("url") != wanted_url:
+            config["backends"]["waystone"]["url"] = wanted_url
+            router_text = None
+    sys.path.insert(0, str(ROOT))
+    from chandra_service.router import Endpoint
+    for name, settings in config["backends"].items():
+        Endpoint(name, **settings)
     base = MARKER + "\n[Unit]\nDescription={description}\nAfter=network-online.target\n\n[Service]\nType=simple\nWorkingDirectory=" + directory_value(ROOT) + "\nExecStart={exec_start}\nRestart=on-failure\nRestartSec=15\nTimeoutStopSec=35\nKillMode=control-group\n\n[Install]\nWantedBy=default.target\n"
     router_args = [python, "-m", "chandra_service", "router", "--config", config_path, "--port", args.router_port]
     for host in hosts:
@@ -209,10 +249,12 @@ def install(args):
     receipt = {"schema_version": 2, "source_root": str(ROOT), "units": list(UNITS), "hosts": hosts,
                "router_port": args.router_port, "worker_port": args.worker_port, "ssh_host": args.ssh_host,
                "remote_root": args.remote_root, "remote_python": args.remote_python, "model_path": args.model_path, "normalization": args.normalization,
+               "worker_backend": getattr(args, "worker_backend", "waystone"),
+               "native_config": getattr(args, "native_config", None), "native_config_sha256": getattr(args, "native_config_sha256", None),
                "lease_port": args.lease_port, "remote_ownership": "unnamed Windows Job Object; authenticated loopback TCP lease; kill on job close",
                "unit_sha256": {name: hashlib.sha256(text.encode()).hexdigest() for name, text in zip(UNITS, content)}}
     lease_token = secrets.token_urlsafe(32)
-    files = {config_path: json.dumps(config, indent=2) + "\n",
+    files = {config_path: router_text if router_text is not None else json.dumps(config, indent=2) + "\n",
              channel_path: json.dumps({"ssh_argv": remote_command(args, lease_token), "lease_port": args.lease_port, "lease_token": lease_token}, indent=2) + "\n",
              receipt_path: json.dumps(receipt, indent=2) + "\n"}
     files.update({unit_dir / name: text for name, text in zip(UNITS, content)})
@@ -267,7 +309,10 @@ def main():
     install_parser.add_argument("--ssh-host", default="waystone")
     install_parser.add_argument("--remote-root", required=True)
     install_parser.add_argument("--remote-python", required=True)
-    install_parser.add_argument("--model-path", required=True)
+    install_parser.add_argument("--worker-backend", choices=["waystone", "native"], default="waystone", help="Explicit native opt-in; waystone preserves the historical XPU route")
+    install_parser.add_argument("--model-path", help="waystone: verified remote model directory")
+    install_parser.add_argument("--native-config", help="native: absolute normalized Windows config path")
+    install_parser.add_argument("--native-config-sha256", help="native: lowercase SHA-256 of the exact remote config bytes")
     install_parser.add_argument("--normalization", choices=["original", "gain-only"], default="original")
     install_parser.add_argument("--northstone-url", default="http://127.0.0.1:8000")
     install_parser.add_argument("--worker-port", type=int, default=18001)
@@ -291,6 +336,10 @@ def main():
         return_code = run_channel(settings["ssh_argv"], settings["lease_port"], settings["lease_token"], stop)
         raise SystemExit(0 if stop.is_set() else return_code)
     if args.action == "install":
+        try:
+            worker_argv(args)
+        except ValueError as error:
+            parser.error(str(error))
         install(args)
     elif args.action == "logs":
         subprocess.run(["journalctl", "--user", "-u", UNITS[0], "-u", UNITS[1], "-n", "100", "--no-pager"], check=True)
