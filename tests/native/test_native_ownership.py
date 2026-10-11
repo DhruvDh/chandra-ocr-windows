@@ -172,7 +172,7 @@ class SourceWorkTests(unittest.TestCase):
         root = Path(__file__).resolve().parents[2] / "ChandraNative/shaders"
         tree = S.read_tree(root)
         self.assertEqual((len(tree.files), tree.total_bytes, tree.includes, tree.tree_sha256),
-                         (38, 60285, 3, "5438acdb33fbc1ba2d3a19b31d328e2ab3d05df011b42811108b26434cab89c1"))
+                         (42, 76753, 3, "c6b94f158448befc043dfa5e86aabdc28f89e0a4f9dc0ae1e545c92f107b99e4"))
         snapshot = S.Snapshot.create(self.inputs, tree)
         try:
             self.assertEqual(snapshot.verify().tree_sha256, tree.tree_sha256)

@@ -26,7 +26,9 @@ REQUIRED = {"schema", "activate", "executable", "executable_sha256", "model_dir"
             "output_root", "caller_source", "pci", "luid", "gemv_b1_selection", "lease_ms", "process_memory_limit_bytes",
             "job_memory_limit_bytes", "worker_cpu", "max_patch_rows"}
 OPTIONAL = {"max_image_pixels": 4_000_000, "startup_seconds": 900, "admission_seconds": 60, "cancel_grace_seconds": 300,
-            "shutdown_seconds": 120, "terminate_seconds": 30, "retained_outputs": 16, "processor_dll_bootstrap": False}
+            "shutdown_seconds": 120, "terminate_seconds": 30, "retained_outputs": 16, "processor_dll_bootstrap": False,
+            "experimental_b2_decode": False, "cohort_wait_seconds": 0.05, "drain_wait_selection": "query_sleep",
+            "experimental_ordered2_b2": False, "experimental_attention_values_grid": False, "experimental_unified_parallel32_b2": False, "experimental_b2_mix_input_projections": False}
 REPARSE = 0x400
 
 
@@ -91,6 +93,13 @@ class ReadyExpectation:
     job_limit_flags: int = LIMIT_FLAGS
     job_breakaway_flags: int = BREAKAWAY_FLAGS
 
+    experimental_b2_decode: bool = False
+    drain_wait_selection: str = "query_sleep"
+    experimental_ordered2_b2: bool = False
+    experimental_attention_values_grid: bool = False
+    experimental_unified_parallel32_b2: bool = False
+    experimental_b2_mix_input_projections: bool = False
+
     def __post_init__(self):
         object.__setattr__(self, "device", dict(self.device))
 
@@ -122,25 +131,64 @@ class NativeConfig:
     retained_outputs: int
     worker_cpu: int
     processor_dll_bootstrap: bool = False
+    experimental_b2_decode: bool = False
+    cohort_wait_seconds: float = 0.05
+    drain_wait_selection: str = "query_sleep"
+    experimental_ordered2_b2: bool = False
+    experimental_attention_values_grid: bool = False
+    experimental_unified_parallel32_b2: bool = False
+    experimental_b2_mix_input_projections: bool = False
+
+    def __post_init__(self):
+        require(type(self.drain_wait_selection) is str and self.drain_wait_selection in ("query_sleep", "fence_event"),
+                "drain_wait_selection must be query_sleep or fence_event")
+        require(type(self.experimental_b2_decode) is bool, "experimental_b2_decode must be boolean")
+        require(type(self.experimental_b2_mix_input_projections) is bool and (not self.experimental_b2_mix_input_projections or (self.experimental_b2_decode and self.experimental_unified_parallel32_b2 and self.gemv_b1_selection == "parallel32" and not self.experimental_ordered2_b2)), "Mix-input projections require explicit unified B2/parallel32 and exclude ordered2")
+        require(type(self.experimental_unified_parallel32_b2) is bool, "Unified parallel32 selector must be boolean")
+        require(not self.experimental_unified_parallel32_b2 or (self.experimental_b2_decode and self.gemv_b1_selection == "parallel32" and not self.experimental_ordered2_b2), "Unified parallel32 requires explicit B2/parallel32 and excludes ordered2")
+        require(not self.experimental_b2_decode or self.gemv_b1_selection == ("parallel32" if self.experimental_unified_parallel32_b2 else "ordered"), "Experimental B2 selector differs from explicit route")
+        require(self.gemv_b1_selection != "parallel32" or self.experimental_unified_parallel32_b2, "Parallel32 requires explicit unified B2 mode")
+        require(type(self.experimental_ordered2_b2) is bool, "experimental_ordered2_b2 must be boolean")
+        require(not self.experimental_ordered2_b2 or (self.experimental_b2_decode and self.gemv_b1_selection == "ordered"),
+                "Ordered2 requires explicit experimental B2 and ordered B1")
+        require(type(self.experimental_attention_values_grid) is bool, "experimental_attention_values_grid must be boolean")
+        require(not self.experimental_attention_values_grid or self.gemv_b1_selection == ("parallel32" if self.experimental_unified_parallel32_b2 else "ordered"), "Attention grid selector differs from explicit route")
+        _number(self.cohort_wait_seconds, "cohort_wait_seconds", 0.001, 1.0, float)
 
     def expectation(self):
         return ReadyExpectation(self.pci, self.luid, self.gemv_b1_selection, self.lease_ms,
-                                self.process_memory_limit_bytes, self.job_memory_limit_bytes)
+                                self.process_memory_limit_bytes, self.job_memory_limit_bytes,
+                                experimental_b2_decode=self.experimental_b2_decode, drain_wait_selection=self.drain_wait_selection,
+                                experimental_ordered2_b2=self.experimental_ordered2_b2, experimental_attention_values_grid=self.experimental_attention_values_grid,
+                                experimental_unified_parallel32_b2=self.experimental_unified_parallel32_b2, experimental_b2_mix_input_projections=self.experimental_b2_mix_input_projections)
 
     def argv(self, shader_snapshot):
         """The worker compiles from the task-owned verified snapshot, never from the configured shader_root."""
-        return [str(self.executable), "--execute", "--model-dir", str(self.model_dir), "--shader-root", str(shader_snapshot),
+        argv = [str(self.executable), "--execute", "--model-dir", str(self.model_dir), "--shader-root", str(shader_snapshot),
                 "--input-root", str(self.input_root), "--output-root", str(self.output_root), "--pci", self.pci,
                 "--luid", self.luid, "--lease-ms", str(self.lease_ms)]
+        if self.experimental_b2_decode:
+            argv.extend(["--experimental-padded32", "--experimental-b2-decode"])
+        if self.experimental_ordered2_b2:
+            argv.append("--experimental-ordered2-b2")
+        if self.experimental_unified_parallel32_b2:
+            argv.append("--experimental-unified-parallel32-b2")
+        if self.experimental_b2_mix_input_projections:
+            argv.append("--experimental-b2-mix-input-projections")
+        if self.experimental_attention_values_grid:
+            argv.append("--experimental-attention-values-grid")
+        return argv
 
     def job_limits(self):
         return JobLimits(self.process_memory_limit_bytes, self.job_memory_limit_bytes, 1 << self.worker_cpu)
 
     def environment(self, base=None):
-        """Inherited environment minus every CHANDRA_* opt-in; the GEMV selector is set only explicitly."""
+        """Strip inherited CHANDRA_* opt-ins; set only the configured GEMV and child drain selectors."""
         env = {k: v for k, v in (os.environ if base is None else base).items() if not k.upper().startswith("CHANDRA_")}
-        if self.gemv_b1_selection == "ordered":
-            env["CHANDRA_EXPERIMENTAL_GEMV_B1"] = "ordered"
+        if self.gemv_b1_selection in ("ordered", "parallel32"):
+            env["CHANDRA_EXPERIMENTAL_GEMV_B1"] = self.gemv_b1_selection
+        if self.drain_wait_selection == "fence_event":
+            env["CHANDRA_EXPERIMENTAL_DRAIN_WAIT"] = "fence_event"
         return env
 
     def verify_executable(self):
@@ -193,7 +241,7 @@ def parse(data, digest):
         require(not nested(paths[a], paths[b]), f"{a} and {b} must be distinct and not nested")
     require(isinstance(values["pci"], str) and re.fullmatch(r"[0-9a-f]{2}:[01][0-9a-f]\.[0-7]", values["pci"]), "pci must be the adapter's lowercase BB:DD.F")
     require(isinstance(values["luid"], str) and re.fullmatch(r"[0-9a-f]{8}:[0-9a-f]{8}", values["luid"]), "luid must be lowercase HHHHHHHH:LLLLLLLL")
-    require(values["gemv_b1_selection"] in ("predecessor", "ordered"), "gemv_b1_selection must be predecessor or ordered")
+    require(values["gemv_b1_selection"] in ("predecessor", "ordered", "parallel32"), "gemv_b1_selection must be predecessor or ordered")
     lease = _number(values["lease_ms"], "lease_ms", 1000, 600000)
     process_limit = _number(values["process_memory_limit_bytes"], "process_memory_limit_bytes", 1 << 30, 1 << 40)
     job_limit = _number(values["job_memory_limit_bytes"], "job_memory_limit_bytes", process_limit, 1 << 40)
@@ -210,6 +258,13 @@ def parse(data, digest):
         shutdown_seconds=_number(values["shutdown_seconds"], "shutdown_seconds", 1, 3600, float),
         terminate_seconds=_number(values["terminate_seconds"], "terminate_seconds", 1, 600, float),
         retained_outputs=_number(values["retained_outputs"], "retained_outputs", 1, 1024),
+        experimental_b2_decode=_flag(values["experimental_b2_decode"], "experimental_b2_decode"),
+        experimental_ordered2_b2=_flag(values["experimental_ordered2_b2"], "experimental_ordered2_b2"),
+        experimental_attention_values_grid=_flag(values["experimental_attention_values_grid"], "experimental_attention_values_grid"),
+        experimental_unified_parallel32_b2=_flag(values["experimental_unified_parallel32_b2"], "experimental_unified_parallel32_b2"),
+        experimental_b2_mix_input_projections=_flag(values["experimental_b2_mix_input_projections"], "experimental_b2_mix_input_projections"),
+        drain_wait_selection=values["drain_wait_selection"],
+        cohort_wait_seconds=_number(values["cohort_wait_seconds"], "cohort_wait_seconds", 0.001, 1.0, float),
         processor_dll_bootstrap=_flag(values["processor_dll_bootstrap"], "processor_dll_bootstrap"), **paths)
     config.verify_executable()
     try:

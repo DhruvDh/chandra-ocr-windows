@@ -132,6 +132,18 @@ def config(root, **overrides):
     return NativeConfig(**values)
 
 
+def drain_wait():
+    """Synthetic settled query-route observation, shaped like Device::memoryJson; no native wait runs."""
+    return {"schema": "chandra.directcompute.experimental_drain_wait.v1",
+            "environment_variable": "CHANDRA_EXPERIMENTAL_DRAIN_WAIT", "route": "query_sleep",
+            "support": "not_queried", "maximum_block_slice_milliseconds": 10,
+            "poisoned": False, "retirement_required": False, "registered_event_outstanding": False,
+            "calls": 0, "completed_calls": 0, "failed_calls": 0, "signals": 0, "event_registrations": 0,
+            "completion_checks": 0, "blocking_wait_calls": 0, "requested_wait_milliseconds": 0,
+            "last_issued_value": 0, "last_result": None, "pending_storage_references": 0,
+            "pending_copy_owner": {"active": False, "submitted": False, "staging_bytes": 0}}
+
+
 class Script:
     """Per-worker behavior. tokens: list of token lists, one per admitted request (the last repeats)."""
 
@@ -156,6 +168,9 @@ class FakeWorker:
         self.stdin_r, self.stdin_w = os.pipe()
         self.stdout_r, self.stdout_w = os.pipe()
         self.stderr_r, self.stderr_w = os.pipe()
+        self.pipe_lock = threading.Lock()
+        self.pipe_fds = {name: getattr(self, name) for name in
+                         ("stdin_r", "stdin_w", "stdout_r", "stdout_w", "stderr_r", "stderr_w")}
         self.lock = threading.Condition()
         self.seq = 0
         self.killed = False
@@ -218,6 +233,7 @@ class FakeWorker:
                  "job": {"observed": True, "in_job": True, "limits_observed": True, "limit_flags": W.LIMIT_FLAGS, "kill_on_job_close": True,
                          "breakaway_allowed": False, "process_memory_limit_bytes": self.limits.process_memory,
                          "job_memory_limit_bytes": self.limits.job_memory, "active_process_limit": self.limits.active_processes},
+                 "drain_wait": drain_wait(),
                  "lease_ms": self.lease_ms, "qualified_full_graph": False, "qualified_OCR": False, "performance_claim": False}
         for path, value in (self.script.get("ready_override") or {}).items():
             target = ready
@@ -333,13 +349,24 @@ class FakeWorker:
                        "admitted_total": len(self.admitted), "terminal_counts": {}, "rejected_total": 0, "protocol_errors": 0, "request_replayed": False})
         self.finish(code)
 
+    def close_pipe(self, name):
+        """Close each owned descriptor once; never retry an integer that may have been reused."""
+        with self.pipe_lock:
+            fd = self.pipe_fds.pop(name, None)
+            if fd is not None:
+                setattr(self, name, None)
+                os.close(fd)
+
+    def close_pipes(self):
+        if self.thread.is_alive() or (self.reader_thread is not None and self.reader_thread.is_alive()):
+            raise RuntimeError("fake threads still own their pipes")
+        for name in tuple(self.pipe_fds):
+            self.close_pipe(name)
+
     def finish(self, code):
         self.exit_code = code
-        for fd in (self.stdout_w, self.stderr_w):
-            try:
-                os.close(fd)
-            except OSError:
-                pass
+        for name in ("stdout_w", "stderr_w"):
+            self.close_pipe(name)
 
     def authenticate(self, request):
         """The subset of the native authenticateInput rules a package writer can get wrong."""
@@ -448,6 +475,10 @@ class FakeWorker:
                   "model_provenance": {"model_sha256": P.MODEL_SHA256}, "generated_token_ids": generated, "generated_tokens_including_stop": len(generated),
                   "stop_reason": "stop_token" if stopped else "normal_output_length", "stop_token_id": generated[-1] if stopped else None,
                   "request_buffers_released": True, "tracked_buffer_bytes_after": RESIDENT, "resident_model_bytes": RESIDENT,
+                  "memory_observations": [{"phase": "request_retirement_and_drain",
+                      "observed": {"drain_wait": drain_wait(), "cpu_timing": {
+                          "schema": "chandra.directcompute.cpu_timing.v1", "enabled": False,
+                          "environment_variable": "CHANDRA_NATIVE_CPU_TIMING"}}}],
                   "worker": {"request_id": request["id"], "terminal_status": "completed", "request_replayed": False}}
         if failure == ("result_mismatch", None):
             result["generated_token_ids"] = generated[:-1]
@@ -490,10 +521,7 @@ class FakeProcess:
         os.write(self.worker.stdin_w, data)
 
     def close_stdin(self):
-        try:
-            os.close(self.worker.stdin_w)
-        except OSError:
-            pass
+        self.worker.close_pipe("stdin_w")
 
     def read_stdout(self, size):
         return os.read(self.worker.stdout_r, size)
@@ -512,6 +540,11 @@ class FakeProcess:
     def confirm_closed(self):
         if self.worker.exit_code is None or self.transport.unkillable:
             return None
+        self.worker.kill()
+        self.worker.thread.join(2)
+        if self.worker.reader_thread is not None and self.worker.reader_thread.ident is not None:
+            self.worker.reader_thread.join(2)
+        self.worker.close_pipes()
         handles = {"process": "closed", "job": "close_failed: Win32 error 6" if self.transport.handle_close_fails else "closed"}
         return {"process_exit_code": self.worker.exit_code, "job_active_processes": 0, "terminated_by_parent": self.terminations > 0,
                 "descriptors": {"stdin": "closed", "stdout": "closed", "stderr": "closed"}, "handles": handles,

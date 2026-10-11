@@ -16,7 +16,9 @@
 #include "final_import_arithmetic_gate.h"
 #include "parallel32_opt_in.h"
 #include "padded32_opt_in.h"
+#include "attention_values_grid.h"
 #include <algorithm>
+#include <array>
 #include <chrono>
 #include <cstdlib>
 #include <cstring>
@@ -36,7 +38,7 @@ using namespace chandra::dc::inference;
 struct Options {
     bool execute = false, forecast = false, diagnosticDump = false, headRowAudit = false, headRowDirectCopy = false, importRowSource = false, importRowEarly = false, importRowWatch = false, importRowWatchArithmetic = false, headShardTailAudit = false, shard1BoundaryWatch = false; uint32_t diagnosticCap = 0;
     bool finalImportTailAudit=false,weightSrvOnly=false,finalImportTailArithmetic=false;WeightImportAPI weightImportAPI=WeightImportAPI::updateSubresource;
-    bool finalImportFullPage=false,experimentalParallel32=false,experimentalPadded32=false;
+    bool finalImportFullPage=false,experimentalParallel32=false,experimentalPadded32=false,experimentalAttentionValuesGrid=false;
     WeightStorageExperiment weightStorageExperiment = WeightStorageExperiment::exact;
     std::filesystem::path model, shaders, manifest, output, diagnosticPlan; std::string pci, luid, manifestSha, diagnosticPlanSha;
 };
@@ -55,6 +57,7 @@ Options options(int argc, wchar_t** argv) {
         if (name == L"--import-final-head-tail-full-page") { o.finalImportFullPage=true;continue; }
         if (name == L"--experimental-parallel32") { o.experimentalParallel32=true;continue; }
         if (name == L"--experimental-padded32") { o.experimentalPadded32=true;continue; }
+        if (name == L"--experimental-attention-values-grid") { o.experimentalAttentionValuesGrid=true;continue; }
         if (name == L"--weight-srv-only") { o.weightSrvOnly=true;continue; }
         if (name == L"--import-final-head-tail-audit") { o.finalImportTailAudit=true;continue; }
         if (name == L"--import-shard1-boundary-watch") { o.shard1BoundaryWatch = true; continue; }
@@ -125,6 +128,8 @@ Options options(int argc, wchar_t** argv) {
                 "Padded32 requires the separately admitted unchanged captured B1 selection");
         experimental::enableGemmPadded32();
     }
+    require(!o.experimentalAttentionValuesGrid||(o.finalImportFullPage&&!o.experimentalParallel32),"Attention-values grid requires the original full-page SRV-only DEFAULT-initial route and ordered B1; no cap2 or parallel32 composition");
+    if(o.experimentalAttentionValuesGrid)chandra::attention_values_grid::enable();
     return o;
 }
 // Optional diagnostics are resolved on the CPU after input authentication and before any output,
@@ -188,6 +193,15 @@ Json padded32Selection(const Options& o) {
         {"arithmetic","Original ascending-k precise FP32 product then addition, original bias and optional BF16 RNE"},
         {"scope","CLI-latched operator selection and shader-source snapshot before model work; dispatch counts are reported separately"},
         {"trained_numerics_accepted",false},{"complete_OCR_or_PPS_accepted",false}};
+}
+Json attentionValuesGridSelection(const Options& o) {
+ require(o.experimentalAttentionValuesGrid&&chandra::attention_values_grid::enabled(),"Explicit pre-model attention-values grid selection required");
+ for(const auto& entry:std::array<std::pair<const char*,const char*>,3>{{
+  {chandra::attention_values_grid::shader,chandra::attention_values_grid::shaderSha256},
+  {chandra::attention_values_grid::serialShader,chandra::attention_values_grid::serialSha256},
+  {chandra::attention_values_grid::reduceShader,chandra::attention_values_grid::reduceSha256}}})
+  require(fileSha256(o.shaders/entry.first,64*1024)==entry.second,"Attention-values grid/original/reduce source identity differs");
+ return chandra::attention_values_grid::metadata<Json>();
 }
 // The executable image and the HLSL tree compiled at first dispatch identify this producer; neither is a source revision claim.
 Json diagnosticProducer(const Options& o) {
@@ -597,6 +611,7 @@ Json executeFinalTailFullPage(const Input& in,const Options& o){
  report["output_profile"]=fullPageOutputProfile();report["weight_srv_only_requested"]=true;report["plan"]=import_row::FinalTailObserver::forecast(o.weightImportAPI,true);report["weight_import_api"]=weight_import::name(o.weightImportAPI);report["D3D11_usage"]="DEFAULT";report["ordered_B1_environment"]="ordered";
  if(o.experimentalParallel32){report["schema"]=chandra::parallel32_opt_in::fullPageSchema;report["mode"]=chandra::parallel32_opt_in::fullPageMode;report["ordered_B1_environment"]="parallel32";report["experimental_gemv_B1"]=parallel32Selection(o);}
     if(o.experimentalPadded32){report["schema"]=chandra::padded32_opt_in::schema(true,o.experimentalParallel32);report["mode"]=chandra::padded32_opt_in::mode(true,o.experimentalParallel32);report["experimental_gemm_multirow"]=padded32Selection(o);}
+ if(o.experimentalAttentionValuesGrid){report["experimental_attention_values"]=attentionValuesGridSelection(o);report["schema"]="chandra.directcompute.final-import-attention-values-grid-full-page-result.v1";report["mode"]="final_import_then_attention_values_tile_grid_full_page_generation";}
  report["generated_token_file"]="generated-tokens.jsonl";
  report["model_import_completed"]=false;report["clean_final_import_gate_completed"]=false;report["arithmetic_call_admitted"]=false;report["arithmetic_return_observed"]=false;report["initialized_model_reused_for_arithmetic"]=false;report["owned_buffer_zero"]=false;report["complete_page_eligible"]=false;report["numerical_qualification_accepted"]=false;report["owned_worker_retirement_required"]=true;
  report["native_cancellation_path_used"]=false;report["complete_page_eligibility_scope"]="Natural caller stop, complete ordinary generation and local buffer retirement only; actual root numerical/OCR acceptance and physical worker closure remain separate";
@@ -612,14 +627,14 @@ Json executeFinalTailFullPage(const Input& in,const Options& o){
   device=std::make_unique<Device>(o.shaders.wstring(),o.pci,o.luid);phase("device_creation");report["device_identity"]=Json::parse(device->identityJson());
   {
    ModelWeights weights(*device,o.model.wstring(),12ull*1024*1024*1024,{},WeightStorageExperiment::exact,nullptr,nullptr,nullptr,nullptr,o.weightImportAPI,finalTails.get(),true);
-   report["model_import_completed"]=true;auto provenance=Json::parse(weights.provenanceJson());if(o.experimentalParallel32)provenance["experimental_gemv_B1"]=report.at("experimental_gemv_B1");if(o.experimentalPadded32)provenance["experimental_gemm_multirow"]=report.at("experimental_gemm_multirow");
+   report["model_import_completed"]=true;auto provenance=Json::parse(weights.provenanceJson());if(o.experimentalParallel32)provenance["experimental_gemv_B1"]=report.at("experimental_gemv_B1");if(o.experimentalPadded32)provenance["experimental_gemm_multirow"]=report.at("experimental_gemm_multirow");if(o.experimentalAttentionValuesGrid)provenance["experimental_attention_values"]=report.at("experimental_attention_values");
    finalTails->afterImport(*device,weights.at("model.language_model.embed_tokens.weight"),weights.at("lm_head.weight"));
    requireCleanFinalImportForArithmetic(*finalTails,o.weightImportAPI,false);report["clean_final_import_gate_completed"]=true;
    finalTails->releaseTargets();report["final_import_tail_audit"]=finalTails->report();report["model_buffers_retained_after_local_final_tail_reference_release"]=true;phase("authenticated_model_import_upload");
    require(provenance.at("full_graph_requested")==true&&provenance.at("omitted_graph_tensors").empty()&&provenance.at("tie_byte_equality")==true,"Full original graph and authenticated tied output head required");
    Json summary={{"schema","chandra.directcompute.final-import-full-page-model-summary.v1"},{"full_provenance_schema",provenance.at("schema")}};
    for(const char* key:{"model","revision","model_bytes","model_sha256","config_bytes","config_sha256","tensor_count","full_graph_requested","uploaded_tensor_names","maximum_shard_bytes","maximum_tracked_weight_bytes","tracked_buffer_bytes_before","uploaded_storage_bytes","tracked_buffer_bytes_after","tie_byte_equality_performed","tie_byte_equality","mapping_lifetime","implicit_cast_or_dequantization","numerical_acceptance","full_model_qualified","weight_import_api","API_operations_completed","UpdateSubresource_calls","DEFAULT_initial_data_Device_creations"})summary[key]=provenance.at(key);
-   summary["weight_srv_only"]=provenance.at("weight_srv_only");if(o.experimentalParallel32)summary["experimental_gemv_B1"]=provenance.at("experimental_gemv_B1");if(o.experimentalPadded32)summary["experimental_gemm_multirow"]=provenance.at("experimental_gemm_multirow");report["model_provenance_summary"]=std::move(summary);
+   summary["weight_srv_only"]=provenance.at("weight_srv_only");if(o.experimentalParallel32)summary["experimental_gemv_B1"]=provenance.at("experimental_gemv_B1");if(o.experimentalPadded32)summary["experimental_gemm_multirow"]=provenance.at("experimental_gemm_multirow");if(o.experimentalAttentionValuesGrid)summary["experimental_attention_values"]=provenance.at("experimental_attention_values");report["model_provenance_summary"]=std::move(summary);
    const auto fullProvenance=provenance.dump()+"\n";require(fullProvenance.size()<=manifestByteLimit,"Complete full-page model provenance exceeds unchanged 1 MiB metadata bound");
    const auto digest=diagnostics::sha256(fullProvenance.data(),fullProvenance.size());require(digest.size()==64&&std::all_of(digest.begin(),digest.end(),[](char c){return(c>='0'&&c<='9')||(c>='a'&&c<='f');}),"Complete full-page model provenance hash unavailable");
    report["full_model_provenance_file"]["write_attempted"]=true;{DiagnosticFile file(o.output/L"model-provenance.json");file.write(fullProvenance.data(),fullProvenance.size());file.flush();}

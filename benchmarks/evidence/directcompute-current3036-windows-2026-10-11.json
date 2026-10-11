@@ -1,0 +1,153 @@
+{
+  "schema": "chandra.directcompute.current3036.same-build-window-progress.v1",
+  "observed_cutoff_utc": "2026-10-11T08:54:48.606076+00:00",
+  "model": {
+    "repository": "datalab-to/chandra-ocr-2",
+    "revision": "af93b47dba1b47b6640c86ccf487ed2260ab9a09",
+    "dtype": "BF16",
+    "image_width": 1624,
+    "image_height": 2100,
+    "prompt_tokens": 3617,
+    "context_tokens": 16384,
+    "output_allowance_tokens": 12384
+  },
+  "source": {
+    "packet": "sol-native-gpu-host-pipeline-b2-mix-input-projections-01",
+    "files": 154,
+    "bytes": 2718780,
+    "manifest_sha256": "6a6f669b624e8bcf0d8756009a9524998b999b00e2c3a94ccb7da2c48cd0f38a",
+    "executable_bytes": 1529344,
+    "executable_sha256": "c60f54dbadefd15ccb3001842c429165304eee5499b9c724b3f0d45253a9408a"
+  },
+  "windows": [
+    {
+      "cell": "C1_A",
+      "checked_report": {
+        "artifact": "mix-input02-window-C1a-checked3322.json",
+        "bytes": 180820,
+        "sha256": "71ca2731b3376ed67641e5d70914cff0dfe45bf57c2828afd753ff198c7f91c4"
+      },
+      "unchanged_bridge_result": {
+        "artifact": "mix-input02-window-C1a-actual-aggregation-seam3359.json",
+        "bytes": 76525,
+        "sha256": "4e3ab34b58e3df2c8c6ef8f14aaac88635063847a493ee3f95e8b7a43ebb5c6c"
+      },
+      "client_concurrency": 1,
+      "submitted_measured_pages": 4,
+      "all_submitted_pages_correct": true,
+      "correct_cutoff_completions": 3,
+      "cutoff_pages_per_second": 0.0025,
+      "completed_after_cutoff_excluded": 1,
+      "complete_cohort_intervals": 2,
+      "cohort_interval_pages": 2,
+      "cohort_interval_seconds": 628.5333841520187,
+      "cohort_interval_pages_per_second": 0.0031820107736970655,
+      "original_count_eligibility": {
+        "eligible_for_repeated_cell_plateau_comparison": false,
+        "checks": {
+          "full_declared_window": true,
+          "at_least_six_complete_window_pages": false,
+          "at_least_two_completions_each_third": false,
+          "representative_case_boundary": false,
+          "three_actual_paired_cohorts_if_C2_C3": true
+        },
+        "window_case_counts": {
+          "native-0": 2,
+          "native-1": 1
+        },
+        "complete_paired_cohorts_in_window": 0,
+        "minimum_case_balanced_pages": 2,
+        "case_boundary_uncertainty_pages": 1,
+        "scope": "Finite completion-count rules declared before execution; not confidence bounds. Every completion remains reported, including final-response drain. Insufficient counts/refill/stability do not become a ceiling."
+      },
+      "natural_physical_retirement_verified": true
+    },
+    {
+      "cell": "C2_A",
+      "checked_report": {
+        "artifact": "mix-input02-window-C2a-checked3366.json",
+        "bytes": 250217,
+        "sha256": "91dfd8ebf713721e47b09ee5bde2e2359a2ff71e6dba9be5158f5780ed3ed870"
+      },
+      "unchanged_bridge_result": {
+        "artifact": "mix-input02-window-C2a-actual-aggregation-seam3370.json",
+        "bytes": 112373,
+        "sha256": "09a9c72c1276bad50369d0b1dfcb4b0aa5311b949f1072382159ef57557caa9b"
+      },
+      "client_concurrency": 2,
+      "submitted_measured_pages": 6,
+      "all_submitted_pages_correct": true,
+      "correct_cutoff_completions": 4,
+      "cutoff_pages_per_second": 0.0033333333333333335,
+      "completed_after_cutoff_excluded": 2,
+      "complete_cohort_intervals": 1,
+      "cohort_interval_pages": 2,
+      "cohort_interval_seconds": 456.3808628380066,
+      "cohort_interval_pages_per_second": 0.0043823046995507,
+      "original_count_eligibility": {
+        "eligible_for_repeated_cell_plateau_comparison": false,
+        "checks": {
+          "full_declared_window": true,
+          "at_least_six_complete_window_pages": false,
+          "at_least_two_completions_each_third": false,
+          "representative_case_boundary": false,
+          "three_actual_paired_cohorts_if_C2_C3": false
+        },
+        "window_case_counts": {
+          "native-0": 2,
+          "native-1": 2
+        },
+        "complete_paired_cohorts_in_window": 2,
+        "minimum_case_balanced_pages": 4,
+        "case_boundary_uncertainty_pages": 0,
+        "scope": "Finite completion-count rules declared before execution; not confidence bounds. Every completion remains reported, including final-response drain. Insufficient counts/refill/stability do not become a ceiling."
+      },
+      "natural_physical_retirement_verified": true
+    }
+  ],
+  "method": {
+    "window_seconds": 1200,
+    "separate_warmup_pages": 1,
+    "scheduled_concurrency_order": [
+      1,
+      2,
+      3,
+      3,
+      2,
+      1
+    ],
+    "completed_cells_at_cutoff": [
+      "C1_A",
+      "C2_A"
+    ],
+    "native_slots": 2,
+    "queue_limit": 2,
+    "automatic_replay": false,
+    "after_cutoff_completions_count_toward_rate": false,
+    "accepted_sustained_optimization_gain": false,
+    "accepted_saturation_ceiling": false,
+    "permanent_native_deployment": false
+  },
+  "numerical_limits": [
+    "Saved trained payloads and state joins retain their original narrow scope.",
+    "Higher precision whole-graph oracle and geometry tolerance remain unaccepted.",
+    "These finite synthetic-page results do not establish arbitrary-document accuracy."
+  ],
+  "test_fixture_repair": {
+    "patch_bytes": 16330,
+    "patch_sha256": "e231089bd0871e505f1b694737002abbc76c4b1419543a6f3ec5c1720d9d841c",
+    "independent_review_bytes": 9599,
+    "independent_review_sha256": "dc4f17e5af80aace06d781cb4a29bbed46c8d0ab549ad608144844f434b5f99a",
+    "qualified_implementation_files_unchanged": 20,
+    "root_original_selection": {
+      "methods_passed": 100,
+      "subtests_passed": 97,
+      "original_exit_code": 0
+    },
+    "root_extra_lifetime_controls": {
+      "methods_passed": 5,
+      "subtests_passed": 15,
+      "original_exit_code": 0
+    }
+  }
+}

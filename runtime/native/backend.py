@@ -140,6 +140,15 @@ class _CleanupOwner:
         return result
 
 
+def _request_identity(value=None):
+    """Internal association only; absent IDs keep the original random native identity."""
+    if value is None:
+        return "r-" + secrets.token_hex(16)
+    if type(value) is not str or P.SAFE_ID.fullmatch(value) is None:
+        raise NativeFailure("Invalid internal native request identity")
+    return value
+
+
 class Session:
     """One worker process. Reader, stderr, writer and supervisor threads never block on a client."""
 
@@ -147,8 +156,9 @@ class Session:
         self.process, self.config, self.expectation, self.on_closed, self.clock = process, config, expectation, on_closed, clock
         self.custody = custody       # Host custody of the shader snapshot this worker compiles from.
         self.cond = threading.Condition()
-        self.stream = P.EventStream()
+        self.stream = P.EventStream(getattr(config, "experimental_b2_decode", False))
         self.ready = None
+        self._validated_ready_event = None  # Full native event retained only after original check_ready succeeds.
         self.resident = None
         self.startup_failure = None
         self.requests = {}
@@ -328,7 +338,12 @@ class Session:
                     self.unusable = self.startup_failure
                     self._retire_locked("ready_refused", force=False)
                     return
-                self.ready = {k: event.get(k) for k in ("device_identity", "resident_model", "job", "lease_ms", "gemv_b1_selection")}
+                self._validated_ready_event = dict(event)
+                self.ready = {k: event.get(k) for k in ("device_identity", "resident_model", "job", "lease_ms", "gemv_b1_selection", "drain_wait")}
+                if getattr(self.expectation, "experimental_ordered2_b2", False) or getattr(self.expectation, "experimental_unified_parallel32_b2", False):
+                    self.ready["cohort_arithmetic"] = event["cohort_arithmetic"]
+                if getattr(self.expectation, "experimental_attention_values_grid", False):
+                    self.ready["experimental_attention_values"] = event["experimental_attention_values"]
                 return
             if kind in ("fatal", "exit"):
                 self.startup_failure = "Worker refused startup: " + str(event.get("stage") or event.get("reason"))
@@ -643,13 +658,15 @@ class Session:
         with self.cond:
             self._fail_locked(reason)
 
-    def submit(self, prepared):
-        request = _Request("r-" + secrets.token_hex(16), "o-" + secrets.token_hex(16), prepared)
+    def submit(self, prepared, request_id=None):
+        request = _Request(_request_identity(request_id), "o-" + secrets.token_hex(16), prepared)
         line = P.message("submit", id=request.id, model="chandra", input_manifest=prepared.manifest,
                          input_sha256=prepared.manifest_sha256, output=request.output)
         with self.cond:
             if self.ready is None or self.unusable or self.closed:
                 raise NativeFailure("Native worker is not accepting requests")
+            if request.id in self.requests or request.id in self.recent:
+                raise NativeFailure("Native request identity is already owned or recently retired")
             self.requests[request.id] = request
             if not self._send_locked(line):
                 raise NativeFailure("Native worker stdin is saturated")
@@ -710,6 +727,10 @@ class NativeBackend:
         self.config = config
         self._transport = transport
         self._processor = processor if processor is not None else PinnedProcessor(config.model_dir, getattr(config, "processor_dll_bootstrap", False))
+        self.parallel_requests = 2 if getattr(config, "experimental_b2_decode", False) else 1
+        if self.parallel_requests == 2:
+            from .cohort import LockedProcessor
+            self._processor = LockedProcessor(self._processor)
         self._pinned = pinned
         self._expectation = expectation if expectation is not None else config.expectation()
         self._lock = threading.Lock()
@@ -748,6 +769,9 @@ class NativeBackend:
                     "retained_cleanup": self._cleanup_owner.identity() if self._cleanup_owner is not None else None,
                     "finalization": finishing and {"pid": finishing.process.pid, "finalized": finishing.finalized, "failure": finishing.failure},
                     "qualified_full_graph": False, "qualified_OCR": False, "performance_claim": False}
+        if self.parallel_requests == 2:
+            info.update(experimental_b2_decode=True, native_decode_slots=2, cohort_page_counts=[1, 2],
+                        individual_cancel_scope="retain_own_capacity_until_cohort_retirement", performance_claim=False)
         worker = session.snapshot() if session is not None else None
         if worker is not None and worker["state"] == "closed":
             state = "failed" if failed else "retiring"  # A closed but still owned session means its publication failed.
@@ -767,15 +791,41 @@ class NativeBackend:
             "resident_model": (worker["ready"] or {}).get("resident_model"), "published": worker["published"],
             "publication_error": worker["publication_error"], "retirement": worker["retirement"],
             "snapshot_contended": worker["snapshot_contended"]})
+        if getattr(self.config, "experimental_ordered2_b2", False):
+            info["experimental_ordered2_b2"] = True
+            if info["worker"] is not None:
+                info["worker"]["cohort_arithmetic"] = (worker["ready"] or {}).get("cohort_arithmetic")
+        if getattr(self.config, "experimental_unified_parallel32_b2", False):
+            info["experimental_unified_parallel32_b2"] = True
+            if info.get("worker") is not None:
+                info["worker"]["cohort_arithmetic"] = (worker["ready"] or {}).get("cohort_arithmetic")
+        if getattr(self.config, "experimental_b2_mix_input_projections", False):
+            info["experimental_b2_mix_input_projections"] = True
+        if getattr(self.config, "experimental_attention_values_grid", False):
+            info["experimental_attention_values_grid"] = True
+            if info["worker"] is not None:
+                info["worker"]["experimental_attention_values"] = (worker["ready"] or {}).get("experimental_attention_values")
+                if self.parallel_requests == 2:
+                    info["worker"]["cohort_arithmetic"] = (worker["ready"] or {}).get("cohort_arithmetic")
         return info
 
-    def generate(self, request, cancel):
+    def generate_associated(self, request, cancel, response_id):
+        """Use the service's existing HTTP completion ID for the authenticated private native receipt."""
+        if response_id is None:
+            raise NativeFailure("Missing HTTP completion identity")
+        yield from self.generate(request, cancel, request_id=_request_identity(response_id))
+
+    def generate(self, request, cancel, *, request_id=None):
+        if request_id is not None:
+            _request_identity(request_id)
         with self._lock:
             self._adopt_locked()
             if self._closed:
                 raise NativeFailure("Native backend is closed")
             if self._failed:
                 raise NativeFailure("Native backend failed earlier; review evidence and restart the service")
+            if self.parallel_requests == 2 and self._active >= 2:
+                raise NativeFailure("Experimental cohort has two owned backend calls; wait for actual retirement")
             self._active += 1
         prepared = session = handle = None
         try:
@@ -788,7 +838,12 @@ class NativeBackend:
             if cancel.is_set():
                 return
             self._verify_source(session, "before_submit")
-            handle = session.submit(prepared)
+            if request_id is None:
+                handle = session.submit(prepared, cancel) if self.parallel_requests == 2 else session.submit(prepared)
+            else:
+                handle = session.submit(prepared, cancel, request_id=request_id) if self.parallel_requests == 2 else session.submit(prepared, request_id=request_id)
+            if handle.rejection == "client_canceled_before_submit":
+                return
             handle.source_stages.append("before_submit")
             yield from self._stream(session, handle, prepared, cancel)
         except (RequestRefused, NativeFailure):
@@ -883,6 +938,11 @@ class NativeBackend:
         if unload is not None:
             unload()
 
+    def _cohort_owner_count(self):
+        # Session callbacks acquire this lock; backend code never waits for a session condition while holding it.
+        with self._lock:
+            return self._active
+
     def _launch(self):
         """Verify the source and build, give the worker a held verified snapshot, then launch it in an owned Job."""
         config = self.config
@@ -899,7 +959,13 @@ class NativeBackend:
             snapshot.verify()           # After the hold, so the verified bytes are the ones the worker can compile.
             owner.process = transport.launch(config.argv(snapshot.shaders), config.environment(), snapshot.cwd, config.job_limits())
             owner.custody = shaders.SourceCustody(snapshot, owner.held)
-            session = owner.session = Session(owner.process, config, self._expectation, self._on_closed, custody=owner.custody)
+            session_type = Session
+            if self.parallel_requests == 2:
+                from .cohort import CohortSession
+                session_type = CohortSession
+            session = owner.session = session_type(owner.process, config, self._expectation, self._on_closed, custody=owner.custody)
+            if self.parallel_requests == 2:
+                session.owner_count = self._cohort_owner_count
             session.start()
         except BaseException as error:
             control = getattr(error, "cleanup_owner", None)
@@ -1081,7 +1147,15 @@ class NativeBackend:
             raise NativeFailure("Native worker canceled the request: " + str(terminal.get("cancel_origin")))
         if status != "completed":
             raise NativeFailure("Native request failed: " + str(terminal.get("failure_class")))
-        self._authenticate(session, handle, prepared, terminal)
+        if self.parallel_requests == 2:
+            try:
+                self._authenticate(session, handle, prepared, terminal)
+            except NativeFailure:
+                session.fail("Cohort page receipt failed authentication; no request is replayed")
+                session.wait_closed()
+                raise
+        else:
+            self._authenticate(session, handle, prepared, terminal)
         rest = decoder.finish()
         if rest:
             yield rest
@@ -1115,8 +1189,20 @@ class NativeBackend:
         try:
             result = P.strict_json(self._read_owned(directory, "result.json", RESULT_CAP, terminal["result_sha256"]))
             worker = result.get("worker") or {}
+            ordered2 = getattr(self._expectation, "experimental_ordered2_b2", False)
+            unified = getattr(self._expectation, "experimental_unified_parallel32_b2", False)
+            mix = getattr(self._expectation, "experimental_b2_mix_input_projections", False)
+            grid = getattr(self._expectation, "experimental_attention_values_grid", False)
+            P.check_attention_values_grid(result.get("experimental_attention_values"), grid)
+            P.check_attention_values_grid((result.get("model_provenance") or {}).get("experimental_attention_values"), grid)
+            if grid:
+                if result.get("experimental_attention_values") != session.ready.get("experimental_attention_values"):
+                    raise NativeFailure("Result/ready attention-grid selection differs")
+            elif "experimental_attention_values" in result or "experimental_attention_values" in (result.get("model_provenance") or {}):
+                raise NativeFailure("Unexpected attention-grid selection")
             checks = [
-                result.get("schema") == "chandra.directcompute.result.v1", result.get("mode") == "full_page_generation",
+                result.get("schema") == (P.cohort_result_schema(ordered2, grid, unified, mix) if self.parallel_requests == 2 else ("chandra.directcompute.worker-attention-values-grid-page-result.v1" if grid else "chandra.directcompute.result.v1")),
+                result.get("mode") == (P.cohort_mode(ordered2, grid, unified, mix) if self.parallel_requests == 2 else ("resident_attention_values_tile_grid_page" if grid else "full_page_generation")),
                 result.get("passed") is True, result.get("input_manifest_sha256") == prepared.manifest_sha256,
                 result.get("model_revision") == P.REVISION, result.get("prompt_tokens") == len(prepared.prompt_ids),
                 result.get("prompt_token_ids") == list(prepared.prompt_ids), result.get("generated_token_ids") == handle.tokens,
@@ -1128,8 +1214,26 @@ class NativeBackend:
                 worker.get("request_id") == handle.id, worker.get("terminal_status") == "completed", worker.get("request_replayed") is False,
                 (result.get("model_provenance") or {}).get("model_sha256") == self._expectation.model_sha256,
                 result.get("device_identity") == session.ready["device_identity"]]
+            if self.parallel_requests == 2:
+                P.check_cohort_arithmetic(result.get("cohort_arithmetic"), ordered2, grid, unified, mix)
+                P.check_cohort_arithmetic(worker.get("cohort_arithmetic"), ordered2, grid, unified, mix)
+                P.check_ordered2_dispatches(result, ordered2, handle.cohort_page_count)
+                P.check_unified_parallel32_dispatches(result, unified, handle.cohort_page_count)
+                checks.extend([worker.get("schema") == P.cohort_owner_schema(ordered2, grid, unified, mix),
+                    P.exact(worker.get("request_index"), handle.native_index), worker.get("cohort_id") == handle.cohort_id, P.exact(worker.get("cohort_slot"), handle.cohort_slot),
+                    P.exact(worker.get("cohort_page_count"), handle.cohort_page_count),
+                    P.exact(result.get("cohort_page_count"), handle.cohort_page_count),
+                    result.get("decode_arithmetic") == ("original_single_row_advance" if handle.cohort_page_count == 1 else "advanceCohort_1_or_2_active_rows"),
+                    worker.get("cancel_scope") == "whole_cohort_only", worker.get("resident_model") is True,
+                    P.exact(worker.get("model_imports_this_process"), 1), worker.get("released") is True,
+                    worker.get("worker_poisoned") is False, handle.cohort_released is True,
+                    result.get("request_retired") is True, result.get("drained") is True,
+                    P.exact(result.get("tracked_buffer_bytes_after"), session.resident),
+                    P.exact(result.get("resident_model_bytes"), session.resident),
+                    result.get("qualified_full_graph") is False, result.get("performance_claim") is False])
             if not all(checks):
                 raise NativeFailure("Native result.json disagrees with the streamed request")
+            P.check_resident_drain_wait(result, self._expectation.drain_wait_selection)
             journal = self._read_owned(directory, "generated-tokens.jsonl", JOURNAL_CAP).split(b"\n")
             if journal[-1] != b"" or len(journal) - 1 != len(handle.tokens):
                 raise NativeFailure("Native token journal length differs")

@@ -127,5 +127,5 @@ void generate(Device& device, ModelWeights& weights, const Input& in, uint32_t d
 void generateCohort(Device&, ModelWeights&, const std::array<const Input*,2>&,
     const std::array<std::filesystem::path,2>&, std::array<Json,2>&,
     std::array<std::vector<uint32_t>,2>&, std::array<TextRequest,2>&,
-    const std::array<RequestHooks,2>&, bool explicitOrderedB2=false,uint32_t pageCount=2);
+    const std::array<RequestHooks,2>&, bool explicitOrderedB2=false,uint32_t pageCount=2,bool explicitParallel32B2=false,bool explicitMixInputSharing=false);
 }

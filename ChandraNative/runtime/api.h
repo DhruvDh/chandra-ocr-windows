@@ -32,6 +32,8 @@ public:
  std::vector<uint32_t> readWords(const Buffer&);
  // Opt-in observer: one bounded underlying-buffer copy, never a shader/SRV read.
  std::vector<uint32_t> readWordsRange(const Buffer&,uint32_t firstWord,uint32_t count,direct_head_row::Receipt&);
+ // Exact raw prefix copy; retains both DEFAULT buffers until a successful drain.
+ void copyWords(const Buffer& source,Buffer& destination,uint32_t count);
  void zero(Buffer&); void drain(uint32_t timeoutMilliseconds=10000);
  // Optional experimental-route cancellation only. Sticky; never acknowledges a
  // completed drain or releases Storage. May be called from another thread while
@@ -62,6 +64,10 @@ public:
 // within shader operators; weights stay packed BF16. Recurrent/normalization reductions
 // remain FP32. No precision policy is inferred from storage alone.
 Buffer linear(Device&,const Buffer& input,const Weight&,uint32_t batchRows,bool roundOutputBF16=true,const Weight* bias=nullptr);
+// Explicit genuine-B2 seam; original six-argument ABI/defaults above remain intact.
+Buffer linear(Device&,const Buffer& input,const Weight&,uint32_t batchRows,bool roundOutputBF16,const Weight* bias,bool experimentalOrdered2);
+// Separate explicitly requested fixed-tree B2 seam; unsupported shapes refuse before allocation.
+Buffer linearParallel32B2(Device&,const Buffer&,const Weight&,uint32_t batchRows,bool roundOutputBF16=true,const Weight* bias=nullptr);
 Buffer embedding(Device&,const Weight&,const std::vector<uint32_t>& tokenIds);
 Buffer rmsNorm(Device&,const Buffer&,const Weight&,uint32_t rows,uint32_t width,float epsilon,bool onePlusWeight,bool roundOutputBF16=true);
 Buffer layerNorm(Device&,const Buffer&,const Weight& scale,const Weight& bias,uint32_t rows,uint32_t width,float epsilon,bool roundOutputBF16=true);

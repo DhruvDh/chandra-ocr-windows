@@ -33,25 +33,32 @@ using TextObserver=std::function<void(const TextObservation&)>;
 class TextModel {
  Device& device; ModelWeights& weights;
  Buffer mix(uint32_t,const Buffer&,uint32_t,const TextPositions&,TextLayerCache&);
+ // Both-active sharing only; projected rows retain their own cache/position mapping.
+ Buffer mixProjected(uint32_t,const std::array<Buffer,4>&,const TextPositions&,TextLayerCache&);
  Buffer layer(uint32_t,const Buffer&,uint32_t,const TextPositions&,TextLayerCache&);
  TextResult forward(TextRequest&,const Buffer&,const TextPositions&,bool,const TextObserver&,const std::vector<uint32_t>*);
 public:
  TextModel(Device&,ModelWeights&);
  TextRequest newRequest();
+ // Explicit B2 backing reservation only; original no-argument allocation stays eager.
+ // Existing structures/symbols are unchanged; capacity derives from the FP32 buffer extent.
+ TextRequest newRequest(uint32_t initialAttentionTokens);
  // Drops owned cache buffers. Failed or retired requests cannot be resumed.
  void retire(TextRequest&) noexcept;
  // Embeddings [tokens,2560] may be freshly merged GPU vision/text embeddings.
  TextResult prefill(TextRequest&,const Buffer& embeddings,const TextPositions&,bool logitsLastOnly=true,const TextObserver& = {});
  TextResult prefill(TextRequest&,const std::vector<uint32_t>& ids,const TextPositions&,bool logitsLastOnly=true,const TextObserver& = {});
  TextResult advance(TextRequest&,uint32_t tokenId,const TextPositions&,const TextObserver& = {});
- // Experimental ordered B1 + separately enabled padded32 only; no endpoint or cancellation policy.
+ // Original ordered B1 + padded32 remains default; a separately explicit/latching parallel32 branch is experimental.
+ // explicitParallel32B2 selects that branch; explicitMixInputSharing is a separate default-off
+ // sharing opt-in requiring it. Neither changes endpoint, survivor or cancellation policy.
  // Requires 1–2 active, disjoint requests/caches. Results preserve slot identity and are drained.
  // Observers see each request's own one-row tensors/positions and retain the original no-write contract.
  // Graph/observer failure poisons ALL active caches, preserves the original exception and keeps
  // cache ownership with the caller. Before retire()/dropping those caches, the owner MUST prove
  // Device::drain() completion; if it cannot, retire the owning worker. No replay/resume is permitted.
  TextDecodeCohortResult advanceCohort(const std::array<TextDecodeSlot,2>&,
-     bool explicitOrderedB2=false,const std::array<TextObserver,2>& = {});
+     bool explicitOrderedB2=false,const std::array<TextObserver,2>& = {},bool explicitParallel32B2=false,bool explicitMixInputSharing=false);
  // Own cache supplied explicitly: this operation makes no whole-graph claim.
  Buffer diagnosticLayer(uint32_t,const Buffer&,uint32_t,const TextPositions&,TextLayerCache&);
 };

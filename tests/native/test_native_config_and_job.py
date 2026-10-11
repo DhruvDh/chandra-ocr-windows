@@ -199,6 +199,11 @@ class FakeKernel32:
         self.calls.append("WaitForSingleObject")
         return W.WAIT_OBJECT_0
 
+    def GetExitCodeProcess(self, process, code):
+        # This call-order double reports synthetic exit; no Windows execution is implied.
+        code._obj.value = 0
+        return self._record("GetExitCodeProcess")
+
     def CloseHandle(self, handle):
         self.calls.append("CloseHandle")
         return 1
@@ -227,6 +232,8 @@ class WindowsJobTests(unittest.TestCase):
     def test_suspended_child_is_admitted_before_resume(self):
         api = FakeKernel32()
         process = self.launch(api)
+        self.addCleanup(process.confirm_closed)
+        owned_descriptors = tuple(process._descriptors.values())
         order = [c for c in api.calls if c in ("CreateJobObjectW", "SetInformationJobObject", "QueryInformationJobObject", "CreateProcessW",
                                               "AssignProcessToJobObject", "IsProcessInJob", "ResumeThread")]
         self.assertEqual(order, ["CreateJobObjectW", "SetInformationJobObject", "QueryInformationJobObject", "CreateProcessW",
@@ -237,6 +244,10 @@ class WindowsJobTests(unittest.TestCase):
         self.assertEqual((active, memory, job, affinity), (1, 12 << 30, 13 << 30, 1))
         self.assertEqual(process.pid, 4242)
         process.close_stdin()
+        self.assertTrue(process.confirm_closed()["handles_closed"])
+        for descriptor in owned_descriptors:
+            with self.assertRaises(OSError):
+                os.fstat(descriptor)
 
     def test_any_failed_admission_step_refuses_without_resume(self):
         for failure in ("SetInformationJobObject", "CreatePipe", "CreateProcessW", "AssignProcessToJobObject", "IsProcessInJob"):

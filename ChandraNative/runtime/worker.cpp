@@ -14,6 +14,10 @@
 #define PSAPI_VERSION 2
 #include "inference_core.h"
 #include "padded32_opt_in.h"
+#include "ordered2_opt_in.h"
+#include "unified_parallel32_opt_in.h"
+#include <cstdlib>
+#include "attention_values_grid.h"
 #include "final_import_arithmetic_gate.h"
 #include <algorithm>
 #include <atomic>
@@ -44,7 +48,7 @@ constexpr const char* obligations = "Source guards bound input, admission, buffe
     "The owner must supply a finite kill-on-close Windows Job, a live parent holding the stdin lease, private input/output roots, adapter admission and closure evidence.";
 
 struct Options {
-    bool execute = false, plan = false, experimentalPadded32 = false, experimentalB2 = false; uint32_t leaseMilliseconds = 0;
+    bool execute = false, plan = false, experimentalPadded32 = false, experimentalB2 = false, experimentalOrdered2 = false, experimentalAttentionValuesGrid = false, experimentalUnifiedParallel32 = false, experimentalB2MixInputs = false; uint32_t leaseMilliseconds = 0;
     std::filesystem::path model, shaders, inputRoot, outputRoot; std::string pci, luid;
 };
 Options options(int argc, wchar_t** argv) {
@@ -54,6 +58,10 @@ Options options(int argc, wchar_t** argv) {
         if (name == L"--execute") { o.execute = true; continue; }
         if (name == L"--plan") { o.plan = true; continue; }
         if (name == L"--experimental-padded32") { o.experimentalPadded32 = true; continue; }
+        if (name == L"--experimental-b2-mix-input-projections") { o.experimentalB2MixInputs = true; continue; }
+        if (name == L"--experimental-unified-parallel32-b2") { o.experimentalUnifiedParallel32 = true; continue; }
+        if (name == L"--experimental-ordered2-b2") { o.experimentalOrdered2 = true; continue; }
+        if (name == L"--experimental-attention-values-grid") { o.experimentalAttentionValuesGrid = true; continue; }
         if (name == L"--experimental-b2-decode") { o.experimentalB2 = true; continue; }
         require(i + 1 < argc, "Worker option value is missing"); std::wstring value = argv[++i];
         if (name == L"--model-dir") o.model = value;
@@ -68,6 +76,10 @@ Options options(int argc, wchar_t** argv) {
         } else throw std::runtime_error("Unknown worker option: " + utf8(name));
     }
     require(!(o.execute && o.plan), "Choose exactly one of --execute or --plan");
+    require(!o.experimentalB2MixInputs || o.experimentalUnifiedParallel32, "Mix-input sharing requires explicit unified parallel32 worker mode");
+    require(!(o.experimentalUnifiedParallel32 && o.experimentalOrdered2), "Unified parallel32 and ordered2 are mutually exclusive");
+    require(!o.experimentalUnifiedParallel32 || (o.experimentalPadded32 && o.experimentalB2), "Unified parallel32 requires explicit padded32/B2 worker mode");
+    require(!o.experimentalOrdered2 || (o.experimentalPadded32 && o.experimentalB2), "Ordered2 requires explicit padded32/B2 worker mode");
     require(o.experimentalPadded32 == o.experimentalB2, "Dedicated cohort mode requires both explicit padded32 and B2 flags");
     return o;
 }
@@ -226,18 +238,79 @@ void requireCohortInput(const Input& in,const std::string& manifestSha) {
         require(in.descriptors.count(name)!=0,"Complete production package tensor inventory required");
 }
 Json cohortSelection(const Options& o,const std::string& b1) {
-    require(o.experimentalB2 && o.experimentalPadded32 && b1=="ordered", "Cohort mode requires both explicit flags and captured ordered B1");
+    if(o.experimentalUnifiedParallel32) {
+        char* live=nullptr;size_t size=0;
+        require(_dupenv_s(&live,&size,"CHANDRA_EXPERIMENTAL_GEMV_B1")==0,"Live B1 selector unavailable");
+        const bool accepted=chandra::unified_parallel32_opt_in::selectionAllowed(o.experimentalPadded32,o.experimentalB2,o.experimentalOrdered2,b1.c_str(),live);
+        std::free(live);
+        require(accepted,"Unified parallel32 requires captured and live parallel32, both B2 flags and no ordered2");
+    } else require(o.experimentalB2 && o.experimentalPadded32 && b1=="ordered", "Cohort mode requires both explicit flags and captured ordered B1");
     for(const auto& entry:std::array<std::pair<const char*,std::pair<uint32_t,const char*>>,2>{{
         {chandra::padded32_opt_in::shader,{3356,chandra::padded32_opt_in::shaderSha256}},
         {chandra::padded32_opt_in::fallbackShader,{2444,chandra::padded32_opt_in::fallbackSha256}}}}) {
         const auto path=localFile(o.shaders,entry.first);std::vector<char> bytes(entry.second.first);
         authenticatedRead(path,bytes.data(),bytes.size(),entry.second.second);
     }
-    return {{"schema","chandra.directcompute.worker-ordered-padded32-b2-selection.v1"},{"explicit_B2",true},{"max_decode_slots",2},
+    Json selection={{"schema","chandra.directcompute.worker-ordered-padded32-b2-selection.v1"},{"explicit_B2",true},{"max_decode_slots",2},
         {"B1_selector","ordered"},{"multirow_shader",chandra::padded32_opt_in::shader},{"multirow_shader_sha256",chandra::padded32_opt_in::shaderSha256},
         {"fallback_shader",chandra::padded32_opt_in::fallbackShader},{"fallback_shader_sha256",chandra::padded32_opt_in::fallbackSha256},
         {"shader_bytes_authenticated_before_Device",true},{"unsupported_multirow_shapes_use_original_fallback",true},
         {"parallel32_excluded",true},{"trained_numerical_OCR_PPS_acceptance",false}};
+    if(o.experimentalOrdered2) {
+        const auto path=localFile(o.shaders,chandra::ordered2_opt_in::shader);
+        std::vector<char> bytes(chandra::ordered2_opt_in::shaderBytes);
+        authenticatedRead(path,bytes.data(),bytes.size(),chandra::ordered2_opt_in::shaderSha256);
+        selection["schema"]="chandra.directcompute.worker-ordered2-padded32-b2-selection.v1";
+        selection["ordered2"]={{"explicit_cli_opt_in",true},{"cli_flag","--experimental-ordered2-b2"},
+            {"shader",chandra::ordered2_opt_in::shader},{"shader_source_sha256",chandra::ordered2_opt_in::shaderSha256},
+            {"rows",2},{"output_columns_per_group",8},{"tile_K",512},{"groupshared_bytes",20520},
+            {"scope","Only explicitly marked genuine two-active-row shared FFN/head calls; vision/prefill/mix/survivor unchanged"},
+            {"arithmetic","One precise FP32 chain from +0 in ascending k; separate product then add, then bias and optional BF16 RNE; no reassociation"},
+            {"unsupported_requested_shape_refused_before_allocation",true},{"shader_bytes_authenticated_before_Device",true}};
+    }
+    if(o.experimentalUnifiedParallel32) {
+        for(const auto& entry:std::array<std::pair<const char*,std::pair<uint32_t,const char*>>,2>{{
+            {chandra::unified_parallel32_opt_in::shader,{chandra::unified_parallel32_opt_in::shaderBytes,chandra::unified_parallel32_opt_in::shaderSha256}},
+            {chandra::unified_parallel32_opt_in::singleShader,{chandra::unified_parallel32_opt_in::singleShaderBytes,chandra::unified_parallel32_opt_in::singleShaderSha256}}}}) {
+            const auto path=localFile(o.shaders,entry.first);std::vector<char> bytes(entry.second.first);
+            authenticatedRead(path,bytes.data(),bytes.size(),entry.second.second);
+        }
+        selection["schema"]="chandra.directcompute.worker-unified-parallel32-b2-selection.v1";
+        selection["B1_selector"]="parallel32";selection["parallel32_excluded"]=false;
+        selection["unified_parallel32"]={{"explicit_cli_opt_in",true},{"cli_flag","--experimental-unified-parallel32-b2"},
+            {"captured_and_live_B1_selector","parallel32"},{"shader",chandra::unified_parallel32_opt_in::shader},
+            {"shader_source_sha256",chandra::unified_parallel32_opt_in::shaderSha256},
+            {"single_row_shader",chandra::unified_parallel32_opt_in::singleShader},{"single_row_shader_sha256",chandra::unified_parallel32_opt_in::singleShaderSha256},
+            {"rows",2},{"output_columns_per_group",8},{"lanes_per_output",32},{"tile_K",512},{"groupshared_bytes",20512},
+            {"arithmetic","Per-row +0; k%32 ascending across TILE512; separate precise mul/add; tree16,8,4,2,1; bias once; optional BF16 RNE once"},
+            {"scope","B1 mix/singleton/survivor use unchanged parallel32; only explicitly marked two-active-row FFN/head share weights; dense prefill unchanged"},
+            {"unsupported_requested_shape_refused_before_allocation",true},{"shader_bytes_authenticated_before_Device",true}};
+    }
+    if(o.experimentalAttentionValuesGrid && o.experimentalOrdered2)selection["ordered2"]["scope"]="Only explicitly marked genuine two-active-row shared FFN/head calls; original B1 and survivor linear arithmetic retained; attention-values separately selected by --experimental-attention-values-grid";
+    if(o.experimentalB2MixInputs) {
+        selection["schema"]="chandra.directcompute.worker-unified-parallel32-b2-mix-input-selection.v1";
+        selection["unified_parallel32"]["scope"]="Explicit two-active-row mix-input projections and FFN/head share weights; B1/singleton/survivor, K4096 mix output and dense prefill unchanged";
+        selection["mix_input_projections"]={{"explicit_cli_opt_in",true},{"cli_flag","--experimental-b2-mix-input-projections"},
+            {"requires_unified_parallel32",true},{"max_active_rows",2},{"input_width",2560},
+            {"input_norm","Each slot keeps its original one-row input_layernorm and BF16 boundary before raw gather"},
+            {"attention",Json::array({"q_proj","k_proj","v_proj"})},{"GDN",Json::array({"in_proj_qkv","in_proj_z","in_proj_a","in_proj_b"})},
+            {"row_mapping","Raw FP32 gather/scatter in admitted slot order; separate positions, cache and recurrent state"},
+            {"arithmetic","Existing unified per-row k%32/TILE512/tree16,8,4,2,1; bias absent; BF16 RNE once"},
+            {"singleton_and_survivor","Unchanged original advance and B1 parallel32"},
+            {"default_off",true},{"trained_numerical_OCR_PPS_acceptance",false}};
+    }
+    return selection;
+}
+Json attentionValuesGridSelection(const Options& o) {
+ require(o.experimentalAttentionValuesGrid,"Explicit attention-values grid flag required");
+ for(const auto& entry:std::array<std::pair<const char*,std::pair<uint32_t,const char*>>,3>{{
+  {chandra::attention_values_grid::shader,{chandra::attention_values_grid::shaderBytes,chandra::attention_values_grid::shaderSha256}},
+  {chandra::attention_values_grid::serialShader,{chandra::attention_values_grid::serialBytes,chandra::attention_values_grid::serialSha256}},
+  {chandra::attention_values_grid::reduceShader,{chandra::attention_values_grid::reduceBytes,chandra::attention_values_grid::reduceSha256}}}}) {
+  const auto path=localFile(o.shaders,entry.first);std::vector<char> bytes(entry.second.first);
+  authenticatedRead(path,bytes.data(),bytes.size(),entry.second.second);
+ }
+ return chandra::attention_values_grid::metadata<Json>();
 }
 struct Canceled : std::runtime_error {
     std::string boundary;
@@ -259,7 +332,8 @@ class Worker {
 public:
     Worker(Options o, std::string selection, Json observedJob) : options(std::move(o)), gemvSelection(std::move(selection)), job(std::move(observedJob)) {
         output = GetStdHandle(STD_OUTPUT_HANDLE);
-        if(options.experimentalB2){cohortArithmetic=cohortSelection(options,gemvSelection);chandra::dc::experimental::enableGemmPadded32();}
+        if(options.experimentalAttentionValuesGrid){attentionGrid=attentionValuesGridSelection(options);chandra::attention_values_grid::enable();}
+        if(options.experimentalB2){cohortArithmetic=cohortSelection(options,gemvSelection);chandra::dc::experimental::enableGemmPadded32();if(options.experimentalOrdered2)chandra::dc::experimental::enableGemmOrdered2();if(options.experimentalUnifiedParallel32)chandra::dc::experimental::enableUnifiedParallel32B2();}
     }
     // Startup: Device and the complete authenticated model exist only in execute mode, created on this thread.
     bool start() {
@@ -267,7 +341,7 @@ public:
         uint32_t tailRecords = 0; uint64_t tailBytes = 0; std::filesystem::path auditDirectory;
         try {
             if (options.execute) {
-                require(gemvSelection == "ordered", "Resident SRV-only execution requires explicit ordered B1 selection");
+                require(gemvSelection == (options.experimentalUnifiedParallel32 ? "parallel32" : "ordered"), "Resident SRV-only execution requires the explicit selected B1 arithmetic");
                 auditDirectory = residentImportDirectory(options.outputRoot);
                 finalTails = residentFinalTailObserver(auditDirectory, progress, tailRecords, tailBytes);
                 heldModel = std::make_unique<Handle>(CreateFileW((options.model / L"model.safetensors").c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr));
@@ -277,6 +351,7 @@ public:
                 weights = std::make_unique<ModelWeights>(*device, options.model.wstring(), 12ull * 1024 * 1024 * 1024, std::vector<std::string>{}, WeightStorageExperiment::exact,
                     nullptr, nullptr, nullptr, nullptr, WeightImportAPI::defaultInitial, finalTails.get(), true);
                 provenance = Json::parse(weights->provenanceJson());
+                if(options.experimentalAttentionValuesGrid)provenance["experimental_attention_values"]=attentionGrid;
                 finalTails->afterImport(*device, weights->at("model.language_model.embed_tokens.weight"), weights->at("lm_head.weight"));
                 requireCleanFinalImportForArithmetic(*finalTails, WeightImportAPI::defaultInitial, false);
                 finalTails->releaseTargets();
@@ -313,7 +388,10 @@ public:
             {"model", model}, {"resident_model", resident}, {"device_identity", identity}, {"device_created", device != nullptr}, {"model_loaded", weights != nullptr},
             {"gemv_b1_selection", gemvSelection}, {"job", job}, {"lease_ms", options.leaseMilliseconds ? Json(options.leaseMilliseconds) : Json(nullptr)},
             {"obligations", obligations}, {"qualified_full_graph", false}, {"qualified_OCR", false}, {"performance_claim", false}};
-        if(options.experimentalB2){ready["protocol"]["active_slots"]=2;ready["protocol"]["waiting_slots"]=0;ready["protocol"]["execution"]="Explicit static one/two-page cohort: independent serial vision/prefill; one page uses original advance, two pages use ordered B1 plus padded32 B2 decode";ready["cohort_arithmetic"]=cohortArithmetic;ready["cohort_cancel_scope"]="whole_cohort_only";}
+        if(options.experimentalB2){ready["protocol"]["active_slots"]=2;ready["protocol"]["waiting_slots"]=0;ready["protocol"]["execution"]="Explicit static one/two-page cohort: independent serial vision/prefill; one page uses original advance, two pages use ordered B1 plus padded32 B2 decode";ready["cohort_arithmetic"]=cohortArithmetic;ready["cohort_cancel_scope"]="whole_cohort_only";if(options.experimentalOrdered2)ready["protocol"]["execution"]="Explicit static B2: original serial vision/prefill and ordered B1 mix/survivor; ordered2 shared FFN/head only for two active rows";}
+        if(options.experimentalUnifiedParallel32)ready["protocol"]["execution"]="Explicit static B2 unified parallel32: unchanged serial vision/dense prefill; per-row fixed-tree B1 mix/singleton/survivor and shared-weight fixed-tree two-row FFN/head";
+        if(options.experimentalB2MixInputs)ready["protocol"]["execution"]="Explicit static B2 unified parallel32 with two-active-row mix-input and FFN/head sharing; serial vision/prefill, independent state, original B1 singleton/survivor and K4096 mix output";
+        if(options.experimentalAttentionValuesGrid)ready["experimental_attention_values"]=attentionGrid;
         if(device)ready["drain_wait"]=Json::parse(device->memoryJson()).at("drain_wait");
         emitLocked(std::move(ready));
         return true;
@@ -352,7 +430,7 @@ public:
     }
 private:
     Options options; std::string gemvSelection; Json job; HANDLE output = INVALID_HANDLE_VALUE;
-    std::unique_ptr<Device> device; std::unique_ptr<ModelWeights> weights; std::unique_ptr<Handle> heldModel, heldConfig; Json identity = nullptr, provenance = nullptr, residentImport = nullptr, cohortArithmetic = nullptr; uint64_t residentBytes = 0;
+    std::unique_ptr<Device> device; std::unique_ptr<ModelWeights> weights; std::unique_ptr<Handle> heldModel, heldConfig; Json identity = nullptr, provenance = nullptr, residentImport = nullptr, cohortArithmetic = nullptr, attentionGrid = nullptr; uint64_t residentBytes = 0;
     std::array<TextRequest,2> cohortRequests; bool cohortOwnersHeld = false; // Device thread; retained through failed drain until worker retirement.
     std::mutex lock; std::condition_variable wake;
     std::shared_ptr<Request> active, waiting; std::set<std::string> admitted;
@@ -663,6 +741,7 @@ private:
                 {"model_imports_this_process", options.execute ? 1 : 0}, {"gemv_b1_selection", gemvSelection}, {"cancel_origin", t.origin.empty() ? Json(nullptr) : Json(t.origin)},
                 {"cancel_boundary", t.boundary.empty() ? Json(nullptr) : Json(t.boundary)}, {"released", t.released}, {"worker_poisoned", t.poisoned}, {"request_replayed", false}};
         }
+        if(options.experimentalAttentionValuesGrid){report["experimental_attention_values"]=attentionGrid;report["schema"]="chandra.directcompute.worker-attention-values-grid-page-result.v1";report["mode"]=options.execute?"resident_attention_values_tile_grid_page":"resident_attention_values_tile_grid_plan";}
         try { t.resultSha = writeReceipt(r.output, report); }
         catch (const std::exception& e) {
             if (t.status == "completed" || t.status == "planned") { t.status = "failed"; t.failureClass = "receipt_write_failed"; }
@@ -698,14 +777,26 @@ private:
             {std::lock_guard<std::mutex> guard(lock);t.origin=group.cancelOrigin;}
             if(reports[slot].is_null())reports[slot]=receipt(page,t);
             auto& report=reports[slot];
-            report["schema"]="chandra.directcompute.worker-b2-page-result.v1";
-            report["mode"]=options.execute?"resident_ordered_B1_padded32_B2_page":"resident_B2_cohort_plan";
+            report["schema"]=options.experimentalOrdered2?"chandra.directcompute.worker-ordered2-b2-page-result.v1":"chandra.directcompute.worker-b2-page-result.v1";
+            report["mode"]=options.experimentalOrdered2?(options.execute?"resident_ordered_B1_ordered2_B2_page":"resident_ordered2_B2_cohort_plan"):(options.execute?"resident_ordered_B1_padded32_B2_page":"resident_B2_cohort_plan");
+            if(options.experimentalAttentionValuesGrid){report["experimental_attention_values"]=attentionGrid;report["schema"]=options.experimentalOrdered2?"chandra.directcompute.worker-ordered2-b2-attention-values-grid-page-result.v1":"chandra.directcompute.worker-b2-attention-values-grid-page-result.v1";report["mode"]=options.experimentalOrdered2?(options.execute?"resident_ordered_B1_ordered2_B2_attention_values_tile_grid_page":"resident_ordered2_B2_attention_values_tile_grid_plan"):(options.execute?"resident_ordered_B1_padded32_B2_attention_values_tile_grid_page":"resident_B2_attention_values_tile_grid_plan");}
+            if(options.experimentalUnifiedParallel32) {
+                report["schema"]=options.experimentalAttentionValuesGrid?"chandra.directcompute.worker-unified-parallel32-b2-attention-values-grid-page-result.v1":"chandra.directcompute.worker-unified-parallel32-b2-page-result.v1";
+                report["mode"]=options.execute?(options.experimentalAttentionValuesGrid?"resident_unified_parallel32_B2_attention_values_tile_grid_page":"resident_unified_parallel32_B2_page"):"resident_unified_parallel32_B2_cohort_plan";
+            }
+            if(options.experimentalB2MixInputs) {
+                report["schema"]=options.experimentalAttentionValuesGrid?"chandra.directcompute.worker-unified-parallel32-b2-mix-input-attention-values-grid-page-result.v1":"chandra.directcompute.worker-unified-parallel32-b2-mix-input-page-result.v1";
+                report["mode"]=options.execute?(options.experimentalAttentionValuesGrid?"resident_unified_parallel32_B2_mix_input_attention_values_tile_grid_page":"resident_unified_parallel32_B2_mix_input_page"):"resident_unified_parallel32_B2_mix_input_cohort_plan";
+            }
             report["cohort_page_count"]=group.pages.size();report["decode_arithmetic"]=group.pages.size()==1?"original_single_row_advance":"advanceCohort_1_or_2_active_rows";
             report["request_retired"]=t.retired;report["drained"]=t.drained;report["request_buffers_released"]=t.released;
-            report["worker"]={{"schema","chandra.directcompute.worker-b2-page-owner.v1"},{"request_id",page.id},{"request_index",page.index},
+            report["worker"]={{"schema",options.experimentalOrdered2?"chandra.directcompute.worker-ordered2-b2-page-owner.v1":"chandra.directcompute.worker-b2-page-owner.v1"},{"request_id",page.id},{"request_index",page.index},
                 {"cohort_id",group.id},{"cohort_slot",slot},{"cohort_page_count",group.pages.size()},{"terminal_status",t.status},{"resident_model",options.execute},{"model_imports_this_process",options.execute?1:0},
                 {"cohort_arithmetic",cohortArithmetic},{"cancel_scope","whole_cohort_only"},{"cancel_origin",t.origin.empty()?Json(nullptr):Json(t.origin)},
                 {"cancel_boundary",t.boundary.empty()?Json(nullptr):Json(t.boundary)},{"released",t.released},{"worker_poisoned",t.poisoned},{"request_replayed",false}};
+            if(options.experimentalAttentionValuesGrid && options.experimentalOrdered2)report["worker"]["schema"]="chandra.directcompute.worker-ordered2-b2-attention-values-grid-page-owner.v1";
+            if(options.experimentalUnifiedParallel32)report["worker"]["schema"]=options.experimentalAttentionValuesGrid?"chandra.directcompute.worker-unified-parallel32-b2-attention-values-grid-page-owner.v1":"chandra.directcompute.worker-unified-parallel32-b2-page-owner.v1";
+            if(options.experimentalB2MixInputs)report["worker"]["schema"]=options.experimentalAttentionValuesGrid?"chandra.directcompute.worker-unified-parallel32-b2-mix-input-attention-values-grid-page-owner.v1":"chandra.directcompute.worker-unified-parallel32-b2-mix-input-page-owner.v1";
             try{t.resultSha=writeReceipt(page.output,report);}catch(const std::exception& e){if(t.status=="completed"||t.status=="planned"){t.status="failed";t.failureClass="receipt_write_failed";}t.error=(t.error.empty()?std::string():t.error+"; ")+"Receipt write failed: "+e.what();}
         }
         std::lock_guard<std::mutex> guard(lock);
@@ -723,7 +814,7 @@ private:
     }
     void executeCohort(Request& group,const std::array<Input,2>& inputs,std::array<Terminal,2>& terminal,std::array<Json,2>& reports) {
         if(cohortOwnersHeld || device->trackedBufferBytes()!=residentBytes){for(uint32_t slot=0;slot<group.pages.size();++slot){auto& t=terminal[slot];t.status="failed";t.failureClass="ownership_accounting_failure";t.error="Cohort owners or tracked buffers differ from resident baseline before dispatch";t.poisoned=true;}return;}
-        const auto begun=Clock::now();std::array<Clock::time_point,2> stamp={begun,begun};
+        const auto begun=Clock::now();const uint64_t unifiedBefore=experimental::unifiedParallel32B2Dispatches();const uint64_t ordered2Before=experimental::gemmOrdered2Dispatches();std::array<Clock::time_point,2> stamp={begun,begun};
         std::array<Json,2> phases={Json::array(),Json::array()},memories={Json::array(),Json::array()};
         std::array<std::vector<uint32_t>,2> generated;
         std::array<RequestHooks,2> hooks;
@@ -743,7 +834,7 @@ private:
             terminal[slot].dispatched=true;
         }
         cohortOwnersHeld=true;bool canceled=false,failed=false;std::string error,boundary;
-        try{generateCohort(*device,*weights,ownedInputs,outputs,reports,generated,cohortRequests,hooks,true,uint32_t(group.pages.size()));}
+        try{generateCohort(*device,*weights,ownedInputs,outputs,reports,generated,cohortRequests,hooks,true,uint32_t(group.pages.size()),options.experimentalUnifiedParallel32,options.experimentalB2MixInputs);}
         catch(const Canceled& c){canceled=true;error=c.what();boundary=c.boundary;}
         catch(const std::exception& e){failed=true;error=utf8Safe(e.what());}
         bool released=true;for(uint32_t slot=0;slot<group.pages.size();++slot)released=released && reports[slot].value("request_retired",false) && reports[slot].value("drained",false);
@@ -763,6 +854,8 @@ private:
             if(t.status=="completed")report["passed_scope"]="This page journal completed with finite greedy tokens and proven cohort retirement; trained numerical/full-OCR qualification is pending";
             else report["error"]=t.error;
             finishExecutionReport(report,inputs[slot],generated[slot],phases[slot],memories[slot],begun);
+            if(options.experimentalOrdered2)report["ordered2_dispatches"]={{"count",experimental::gemmOrdered2Dispatches()-ordered2Before},{"scope","Successful Device::dispatch returns across this whole cohort; repeated in both page reports; not GPU completion/numerical proof"}};
+            if(options.experimentalUnifiedParallel32)report["unified_parallel32_B2_dispatches"]={{"count",experimental::unifiedParallel32B2Dispatches()-unifiedBefore},{"scope","Successful dispatch submissions across this cohort; repeated in both page reports; not completion, numerical or PPS proof"}};
             report["timing_scope"]="One static one/two-page cohort interval; one page uses original single-row advance, two use shared decode; phase intervals include cohort waiting and prove no sustained pages/s";
         }
     }

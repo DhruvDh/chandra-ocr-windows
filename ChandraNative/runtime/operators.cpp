@@ -2,6 +2,8 @@
 #include "api.h"
 #include "gemv_variants.h"
 #include "padded32_opt_in.h"
+#include "ordered2_opt_in.h"
+#include "unified_parallel32_opt_in.h"
 #include <algorithm>
 #include <cmath>
 #include <cstdlib>
@@ -93,6 +95,9 @@ GemvSelection readGemvSelection() noexcept {
 }
 const GemvSelection gemvSelection = readGemvSelection();
 bool padded32Enabled = false, linearHasRun = false;
+bool ordered2Enabled = false, unifiedParallel32Enabled = false;
+uint64_t unifiedParallel32Dispatches = 0;
+uint64_t ordered2Dispatches = 0;
 experimental::GemmPadded32Counts padded32Counts;
 // Null for the predecessor route.
 const gemv_variants::Shape* gemvB1Shape() {
@@ -113,11 +118,32 @@ void enableGemmPadded32() {
 }
 bool gemmPadded32Enabled() noexcept { return padded32Enabled; }
 GemmPadded32Counts gemmPadded32Counts() noexcept { return padded32Counts; }
+void enableGemmOrdered2() {
+    if (ordered2Enabled || unifiedParallel32Enabled || linearHasRun || !padded32Enabled || gemvSelection.mode != GemvB1::ordered)
+        throw std::invalid_argument("Ordered2 requires one explicit latch after padded32, before any linear call, with captured ordered B1");
+    ordered2Enabled = true;
+}
+bool gemmOrdered2Enabled() noexcept { return ordered2Enabled; }
+uint64_t gemmOrdered2Dispatches() noexcept { return ordered2Dispatches; }
+void enableUnifiedParallel32B2() {
+    const auto live=readGemvSelection();
+    if (live.mode != GemvB1::parallel32 || unifiedParallel32Enabled || ordered2Enabled || linearHasRun || !padded32Enabled ||
+        gemvSelection.mode != GemvB1::parallel32)
+        throw std::invalid_argument("Unified parallel32 B2 requires one separate latch after padded32, before linear, with captured parallel32; ordered2 excluded");
+    unifiedParallel32Enabled = true;
+}
+bool unifiedParallel32B2Enabled() noexcept { return unifiedParallel32Enabled; }
+uint64_t unifiedParallel32B2Dispatches() noexcept { return unifiedParallel32Dispatches; }
 }
 
-Buffer linear(Device& d, const Buffer& input, const Weight& w, uint32_t rows,
-              bool roundOutputBF16, const Weight* bias) {
+static Buffer linearImpl(Device& d, const Buffer& input, const Weight& w, uint32_t rows,
+              bool roundOutputBF16, const Weight* bias, bool experimentalOrdered2, bool experimentalParallel32B2) {
     const gemv_variants::Shape* selected = gemvB1Shape(); // Throws for an invalid selector, whatever rows is.
+    if (experimentalOrdered2 && (!ordered2Enabled || !chandra::ordered2_opt_in::supported(rows,w.cols,w.bf16)))
+        throw std::invalid_argument("Ordered2 requires the explicit enabled genuine two-row BF16 FFN/head route; no fallback");
+    if (experimentalParallel32B2 && (experimentalOrdered2 || !unifiedParallel32Enabled || ordered2Enabled ||
+        !chandra::unified_parallel32_opt_in::supported(rows,w.cols,w.bf16)))
+        throw std::invalid_argument("Unified parallel32 requires its separate enabled genuine two-row BF16 FFN/head route; no fallback");
     linearHasRun = true;
     const gemv_variants::Shape* gemv = rows == 1 ? selected : nullptr;
     weight(w);
@@ -132,6 +158,30 @@ Buffer linear(Device& d, const Buffer& input, const Weight& w, uint32_t rows,
         uint32_t totalShardRows = static_cast<uint32_t>(w.shards[s].logicalElements / w.cols);
         for (uint32_t weightFirst = 0; weightFirst < totalShardRows;) {
             uint32_t currentOutputs = std::min<uint32_t>(totalShardRows-weightFirst,1024);
+            if (experimentalParallel32B2) {
+                if (unifiedParallel32Dispatches == std::numeric_limits<uint64_t>::max())
+                    throw std::overflow_error("Unified parallel32 B2 dispatch counter exhausted before submission");
+                LinearParams p{w.cols,w.rows,2,w.shardFirstRows[s]+weightFirst,currentOutputs,0,
+                    uint32_t(w.bf16) | (uint32_t(roundOutputBF16)<<1) | (uint32_t(bias!=nullptr)<<2) |
+                    (uint32_t(bias && bias->bf16)<<3),weightFirst};
+                d.dispatch(chandra::unified_parallel32_opt_in::shader,{&input,&w.shards[s],biasBuffer},{&output},
+                           &p,sizeof(p),(currentOutputs+7)/8);
+                ++unifiedParallel32Dispatches;
+                weightFirst+=currentOutputs;
+                continue;
+            }
+            if (experimentalOrdered2) {
+                if (ordered2Dispatches == std::numeric_limits<uint64_t>::max())
+                    throw std::overflow_error("Ordered2 dispatch counter exhausted before submission");
+                LinearParams p{w.cols,w.rows,2,w.shardFirstRows[s]+weightFirst,currentOutputs,0,
+                    uint32_t(w.bf16) | (uint32_t(roundOutputBF16)<<1) | (uint32_t(bias!=nullptr)<<2) |
+                    (uint32_t(bias && bias->bf16)<<3),weightFirst};
+                d.dispatch(chandra::ordered2_opt_in::shader,{&input,&w.shards[s],biasBuffer},{&output},
+                           &p,sizeof(p),(currentOutputs+7)/8);
+                ++ordered2Dispatches;
+                weightFirst+=currentOutputs;
+                continue;
+            }
             if (gemv) {
                 // Same <=1024-output, complete-K bound as the predecessor; outputsPerGroup per group.
                 LinearParams p{w.cols,w.rows,1,w.shardFirstRows[s]+weightFirst,currentOutputs,0,
@@ -159,6 +209,19 @@ Buffer linear(Device& d, const Buffer& input, const Weight& w, uint32_t rows,
         }
     }
     return output;
+}
+
+Buffer linear(Device& d, const Buffer& input, const Weight& w, uint32_t rows,
+              bool roundOutputBF16, const Weight* bias, bool experimentalOrdered2) {
+    return linearImpl(d,input,w,rows,roundOutputBF16,bias,experimentalOrdered2,false);
+}
+Buffer linearParallel32B2(Device& d, const Buffer& input, const Weight& w, uint32_t rows,
+              bool roundOutputBF16, const Weight* bias) {
+    return linearImpl(d,input,w,rows,roundOutputBF16,bias,false,true);
+}
+Buffer linear(Device& d, const Buffer& input, const Weight& w, uint32_t rows,
+              bool roundOutputBF16, const Weight* bias) {
+    return linear(d,input,w,rows,roundOutputBF16,bias,false);
 }
 
 Buffer embedding(Device& d, const Weight& w, const std::vector<uint32_t>& ids) {

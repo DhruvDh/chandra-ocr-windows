@@ -388,17 +388,25 @@ class FailureTests(Harness):
         for failure in ("wrong_sha", "result_mismatch", "journal_mismatch"):
             with self.subTest(failure=failure):
                 backend = self.backend(Script([[72, 105, 248046]], fail={0: (failure, None)}))
-                items = []
-                with self.assertRaisesRegex(NativeFailure, "receipt|result|journal"):
-                    for item in backend.generate(payload(), threading.Event()):
-                        items.append(item)
-                self.assertFalse(any(isinstance(i, dict) for i in items))
+                transport = self.transport
+                try:
+                    items = []
+                    with self.assertRaisesRegex(NativeFailure, "receipt|result|journal"):
+                        for item in backend.generate(payload(), threading.Event()):
+                            items.append(item)
+                    self.assertFalse(any(isinstance(i, dict) for i in items))
+                finally:
+                    self._close(backend, transport)  # Each independent negative owns its worker only for this subtest.
 
     def test_ready_commitments_are_enforced(self):
         overrides = {"device_identity.pci_bdf": "04:00.0", "device_identity.device_id": 0x5690, "job.kill_on_job_close": False,
                      "job.process_memory_limit_bytes": None, "job.breakaway_allowed": True, "gemv_b1_selection": "ordered",
                      "resident_model.model_sha256": "0" * 64, "model.normal_output_allowance": 4096, "lease_ms": 2000,
-                     "qualified_OCR": True, "model.caller_stop_token_ids": [248046]}
+                     "qualified_OCR": True, "model.caller_stop_token_ids": [248046],
+                     "drain_wait": None, "drain_wait.route": "fence_event",
+                     "drain_wait.poisoned": True, "drain_wait.registered_event_outstanding": True,
+                     "drain_wait.calls": True, "drain_wait.pending_storage_references": 1,
+                     "drain_wait.pending_copy_owner.active": True}
         for path, value in overrides.items():
             with self.subTest(path=path):
                 backend = self.backend(Script(ready_override={path: value}))

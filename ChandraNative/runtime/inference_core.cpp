@@ -2,6 +2,8 @@
 // Moved from inference.cpp so the CLI and the resident worker share one authenticated request path.
 #include "inference_core.h"
 #include "padded32_opt_in.h"
+#include "unified_parallel32_opt_in.h"
+#include "ordered2_opt_in.h"
 #include <psapi.h>
 #include <algorithm>
 #include <climits>
@@ -328,8 +330,14 @@ void generate(Device& device, ModelWeights& weights, const Input& in, uint32_t d
 void generateCohort(Device& device, ModelWeights& weights, const std::array<const Input*,2>& inputs,
     const std::array<std::filesystem::path,2>& outputs, std::array<Json,2>& reports,
     std::array<std::vector<uint32_t>,2>& generated, std::array<TextRequest,2>& requests,
-    const std::array<RequestHooks,2>& hooks, bool explicitOrderedB2, uint32_t pageCount) {
-    require(explicitOrderedB2 && experimental::gemmPadded32Enabled() &&
+    const std::array<RequestHooks,2>& hooks, bool explicitOrderedB2, uint32_t pageCount, bool explicitParallel32B2, bool explicitMixInputSharing) {
+    require(!explicitMixInputSharing || explicitParallel32B2, "Mix-input sharing requires explicit unified parallel32 before model work");
+    if(explicitParallel32B2) {
+        require(explicitOrderedB2 && experimental::gemmPadded32Enabled() &&
+            experimental::unifiedParallel32B2Enabled() && !experimental::gemmOrdered2Enabled() &&
+            std::strcmp(experimental::gemvB1Selection(),"parallel32")==0,
+            "Separate unified parallel32 cohort requires explicit latch and captured parallel32 before model work");
+    } else require(explicitOrderedB2 && experimental::gemmPadded32Enabled() &&
         std::strcmp(experimental::gemvB1Selection(), "ordered") == 0,
         "Cohort requires explicit B2, padded32 and captured ordered B1 before model work");
     require(pageCount>=1 && pageCount<=2 && inputs[0] && (pageCount==1 || (inputs[1] && outputs[0]!=outputs[1])), "One or two input owners and distinct paired outputs required");
@@ -351,6 +359,11 @@ void generateCohort(Device& device, ModelWeights& weights, const std::array<cons
     std::array<std::unique_ptr<NewOutput>,2> journals;
     auto phase=[&](uint32_t slot,const char* name){if(hooks[slot].phase)hooks[slot].phase(name);};
     auto checkpoint=[&](uint32_t slot,const char* name){if(hooks[slot].checkpoint)hooks[slot].checkpoint(name);};
+    auto backing=[&](uint32_t slot) {
+        Json capacities=Json::array();
+        for(uint32_t l=3;l<32;l+=4)capacities.push_back(requests[slot].layers[l].keys.storage?Json(requests[slot].layers[l].keys.words/1024):Json(nullptr));
+        reports[slot]["cache_backing"]["attention_layer_capacity_tokens"]=std::move(capacities);
+    };
     try {
         // Both CREATE_NEW journal owners are opened before the first per-page model operation.
         for (uint32_t slot=0; slot<pageCount; ++slot) {
@@ -367,7 +380,15 @@ void generateCohort(Device& device, ModelWeights& weights, const std::array<cons
             embeddings[slot]=merge(device,in,tokens,visual.poolerOutput);
             if(hooks[slot].merged)hooks[slot].merged(embeddings[slot],uint32_t(in.ids.size()));
             phase(slot,"ordered_multimodal_merge");tokens={};visual={};device.drain();checkpoint(slot,"ordered_multimodal_merge");
-            requests[slot]=text.newRequest();phase(slot,"text_request_cache_creation");checkpoint(slot,"text_request_cache_creation");
+            const uint32_t initialAttentionTokens=pageCount==2?uint32_t(in.ids.size()):contextLimit;
+            reports[slot]["cache_backing"]={{"schema","chandra.directcompute.request-cache-backing.v1"},
+                {"policy",pageCount==2?"demand_grown_per_slot_FP32":"original_eager_full_context_FP32"},
+                {"requested_initial_attention_tokens",initialAttentionTokens},{"capacity_quantum_tokens",256},
+                {"context_limit",contextLimit},{"normal_output_allowance",normalOutputLimit},
+                {"layout","token_major_4_KV_heads_256_FP32"},{"prefix_copy","raw_uint32_DEFAULT_to_DEFAULT"},
+                {"capacity_is_not_context_limit",true}};
+            requests[slot]=pageCount==2?text.newRequest(initialAttentionTokens):text.newRequest();backing(slot);
+            phase(slot,"text_request_cache_creation");checkpoint(slot,"text_request_cache_creation");
             logits[slot]=text.prefill(requests[slot],embeddings[slot],in.positions,true,hooks[slot].text);
             phase(slot,"text_prefill");embeddings[slot]={};device.drain();checkpoint(slot,"text_prefill");
         }
@@ -402,7 +423,7 @@ void generateCohort(Device& device, ModelWeights& weights, const std::array<cons
             // Cancellation is group-scoped and observed only at these host/observer boundaries.
             for(uint32_t slot=0;slot<pageCount;++slot)checkpoint(slot,"decode_step");
             if(pageCount==1)logits[0]=text.advance(requests[0],call[0].tokenId,call[0].position,observers[0]);
-            else {auto next=text.advanceCohort(call,true,observers);
+            else {auto next=text.advanceCohort(call,true,observers,explicitParallel32B2,explicitMixInputSharing);
                 for(uint32_t slot=0;slot<pageCount;++slot)if(next.active[slot])logits[slot]=std::move(next.slots[slot]);}
         }
         for(uint32_t slot=0;slot<pageCount;++slot) {
@@ -412,6 +433,7 @@ void generateCohort(Device& device, ModelWeights& weights, const std::array<cons
             report["cached_advances_before_retirement"]=requests[slot].generated;
             report["all_vocabulary_finite_observations"]=generated[slot].size();report["argmax_tie_policy"]="first vocabulary index";
         }
+        for(uint32_t slot=0;slot<pageCount;++slot)backing(slot);
         device.drain(); // Prove completion before any cache/result owner is released.
         embeddings={};logits={};
         for(uint32_t slot=0;slot<pageCount;++slot)text.retire(requests[slot]);
@@ -425,6 +447,7 @@ void generateCohort(Device& device, ModelWeights& weights, const std::array<cons
         for(uint32_t slot=0;slot<pageCount;++slot){auto& r=requests[slot];r.failed=true;for(auto& c:r.layers)c.failed=true;}
         bool drained=false;std::exception_ptr drainFailure;
         try {device.drain();drained=true;}catch(...){drainFailure=std::current_exception();}
+        try {for(uint32_t slot=0;slot<pageCount;++slot)if(reports[slot].contains("cache_backing"))backing(slot);}catch(...) {}
         if(drained){embeddings={};logits={};for(uint32_t slot=0;slot<pageCount;++slot)text.retire(requests[slot]);}
         // Reporting cannot replace the original graph/journal/cancellation exception.
         try {for(uint32_t slot=0;slot<pageCount;++slot){reports[slot]["request_failed"]=true;reports[slot]["request_retired"]=requests[slot].retired;

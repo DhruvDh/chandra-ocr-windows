@@ -395,6 +395,18 @@ std::vector<float> Device::readFloats(const Buffer& b){
  if(b.packedBF16)throw std::runtime_error("Packed BF16 is not float storage");auto words=readWords(b);
  std::vector<float> result(words.size());std::memcpy(result.data(),words.data(),words.size()*4);return result;
 }
+void Device::copyWords(const Buffer& source,Buffer& destination,uint32_t count){
+ impl->thread();impl->usable();impl->valid(source);impl->writable(destination);
+ if(!count||count>source.words||count>destination.words||source.packedBF16||destination.packedBF16||
+    source.logicalElements!=source.words||destination.logicalElements!=destination.words||
+    source.storage==destination.storage)
+  throw std::runtime_error("Exact disjoint FP32 raw-prefix copy required");
+ // Cache storage is [token,4 KV heads,256], independent of allocated token capacity.
+ // CopySubresourceRegion copies uint32 payloads without shader arithmetic or a host staging buffer.
+ const D3D11_BOX box{0,0,0,count*4,1,1};
+ impl->retain(source);impl->retain(destination);
+ impl->context->CopySubresourceRegion(destination.storage->data.Get(),0,0,0,0,source.storage->data.Get(),0,&box);
+}
 void Device::zero(Buffer& b){impl->thread();impl->usable();cpu_timing::CallScope timed(impl->cpu.get(),&cpu_timing::Recorder::zero);impl->writable(b);const UINT zeros[4]{};impl->retain(b);impl->context->ClearUnorderedAccessViewUint(b.storage->uav.Get(),zeros);}
 uint64_t Device::trackedBufferBytes()const{return impl->account->bytes.load();}
 std::string Device::identityJson()const{return impl->identity;}
