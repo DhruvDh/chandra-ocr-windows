@@ -1,0 +1,275 @@
+{
+  "schema": "chandra.directcompute.progress-2026-10-11.v1",
+  "recorded_date_UTC": "2026-10-11",
+  "publication": "Redacted aggregate of completed owner-retained records. Byte counts and SHA-256 commitments identify evidence, not redistributed raw artifacts or future execution authority.",
+  "public_source_base_commit": "77c521901045946db1f5ad55b8b623a33b1572a7",
+  "experimental_source_promotion_or_deployment_claimed": false,
+  "model": {
+    "name": "datalab-to/chandra-ocr-2",
+    "revision": "af93b47dba1b47b6640c86ccf487ed2260ab9a09",
+    "storage": "BF16"
+  },
+  "workload": {
+    "decoded_pixels": [
+      1624,
+      2100
+    ],
+    "prompt_tokens": 3617,
+    "context_limit": 16384,
+    "normal_output_allowance": 12384,
+    "short_diagnostic_substitution": false
+  },
+  "pipeline_HTTP": {
+    "scope": "Finite retained native-0 singleton2904 and complete native-0/native-1 pairs2942/3063; natural EOS248046 and physical retirement, not general endpoint or sustained-window acceptance.",
+    "identities": {
+      "current_ff0a": {
+        "bytes": 15855,
+        "sha256": "ff0a6b5e4a3e92c15728f0f218c2cbf5cb0bc2767eabd96563ad95ab0487cd1c"
+      },
+      "native154_manifest": {
+        "bytes": 27906,
+        "sha256": "68bb26bc826bdd212def96211397c634eda2493f60f59b6a5bf6abf16a231f47"
+      },
+      "native_source_binding": {
+        "bytes": 27623,
+        "sha256": "da5de0d5ff4a415356873e5f5f670f515156c50aaab0384d90a1b005031fa325"
+      },
+      "compiled_worker": {
+        "bytes": 1542144,
+        "sha256": "104095066ea58e447cfb766552a9209a9b374e59ce67da97a81e62e056fa8362"
+      },
+      "CPU_report": {
+        "bytes": 76032,
+        "sha256": "9b32fd548ff6624b50c46169b5ab1242127de61b4715eee481fb04118147ffd3"
+      },
+      "CPU_review": {
+        "bytes": 18096,
+        "sha256": "520034c0182876724f6b4cd9e006865b5deaee204077fb492c8af19dd90b58c3"
+      },
+      "endpoint_source_review": {
+        "bytes": 12724,
+        "sha256": "6fe5aeef95b0c5a361fff1e6ffa9750a13da7034cf0e77f057a8e1f368ed36d3"
+      }
+    },
+    "episodes": {
+      "singleton2904": {
+        "review": {
+          "bytes": 22674,
+          "sha256": "861b4b922dbe2a1ebadbd9f88abfc3a881b9241f8ab83cd65aea362b994b8ea2"
+        },
+        "native_result": {
+          "bytes": 333623,
+          "sha256": "e26eb4ffa6c1c64b80b228b75652d169d1db1e1edfc64aa95b04639666f8d0fa"
+        },
+        "nine_field_journal": {
+          "bytes": 150386,
+          "sha256": "98432211cb56f3600dc857f62d708cf198e6b875d8dac21184c7dcd18b3e704f"
+        },
+        "generated_IDs_including_natural_EOS": 556
+      },
+      "pair2942": {
+        "review": {
+          "bytes": 24612,
+          "sha256": "5c1771b6b04c232c383c0faf6d69760fcffac728926cb0d754e1f70798f76e18"
+        },
+        "native_results": {
+          "native-0": {
+            "bytes": 333617,
+            "sha256": "651bad150f4f17ded8a772e96fbd3d1d3d03b76c9e12b1f11a5add3f8f7d5bfe"
+          },
+          "native-1": {
+            "bytes": 333648,
+            "sha256": "49542dcde21ad1cb49e978025bd71263d9865f54a92f5b27da85d7715c61f085"
+          }
+        },
+        "nine_field_journals": {
+          "native-0": {
+            "bytes": 150386,
+            "sha256": "98432211cb56f3600dc857f62d708cf198e6b875d8dac21184c7dcd18b3e704f"
+          },
+          "native-1": {
+            "bytes": 151422,
+            "sha256": "1e1f7f1f9761a7967b8d92840db1a86922fd93da722b8aff7379c642a520f8bb"
+          }
+        },
+        "generated_IDs_including_natural_EOS": [
+          556,
+          560
+        ],
+        "two_active_cached_advances": 555,
+        "survivor_advances": 4,
+        "native1_survivor_slot": 1
+      },
+      "reverse_pair3063": {
+        "review": {
+          "bytes": 63453,
+          "sha256": "27426def8dcf9a94ff76a9703901ae7c55a09edcd6d3040974c9aab2c6474f9f"
+        },
+        "native_results": {
+          "native-0": {
+            "bytes": 333631,
+            "sha256": "db1b1a04aa55bc41c5f9eb16184e4a49305c89b2e1cb184f76a2b09f08aa5833"
+          },
+          "native-1": {
+            "bytes": 333625,
+            "sha256": "edbb39396652e4e747bce9c3f8fe809ea6c85c55ecaa68336d7ccf7405e6267e"
+          }
+        },
+        "nine_field_journals": {
+          "native-0": {
+            "bytes": 150386,
+            "sha256": "98432211cb56f3600dc857f62d708cf198e6b875d8dac21184c7dcd18b3e704f"
+          },
+          "native-1": {
+            "bytes": 151422,
+            "sha256": "1e1f7f1f9761a7967b8d92840db1a86922fd93da722b8aff7379c642a520f8bb"
+          }
+        },
+        "generated_IDs_including_natural_EOS": [
+          556,
+          560
+        ],
+        "two_active_cached_advances": 555,
+        "survivor_advances": 4,
+        "native1_survivor_slot": 0
+      }
+    },
+    "reference_scope": {
+      "reverse_to_first_pair_complete_IDs_and_nine_field_journals_exact": true,
+      "native0_complete_current2415_singleton2622_IDs_and_journal_exact": true,
+      "native1_standalone_current2415_journal_available": false,
+      "current2252_native1_IDs_equal_but_logit_journals_differ": true,
+      "current2252_native0_geometry_token_divergence_retained": true,
+      "substantive_text_tables_equations_order_non_geometry_markup_exact_to_retained_AMD": true,
+      "AMD_geometry_changed_blocks": {
+        "native0": 5,
+        "native1": 8
+      },
+      "geometry_tolerance_accepted": false
+    },
+    "pair_proof": {
+      "bundle": {
+        "bytes": 1464,
+        "sha256": "3f40f0ad2328a992d2824b203aff440dbdde5f1b7d072098bd229804169229ca"
+      },
+      "unchanged_stopped_consumer": {
+        "bytes": 8002,
+        "sha256": "5122f7b6fb9a00a54d41abf8ccd2e9c9a7f4b2a2838f25fb551c6be08b7e3e6b"
+      },
+      "status": "PASS_EXISTING_PAIR_PROOFS_ONLY",
+      "survivor_slots": [
+        0,
+        1
+      ],
+      "operational_window_or_PPS_acceptance": false
+    }
+  },
+  "own_row_mix": {
+    "scope": "Actual current3036 CPU artifact and capture3104: five cached calls with two eager owners; same-arithmetic preservation and three persisted own-B1 differentials only.",
+    "identities": {
+      "current3036": {
+        "bytes": 10533,
+        "sha256": "43bc44fc6cee19c93b5abc5af01e65a5ce9ef6ffecdba9274aaa57c06f375c55"
+      },
+      "native154_manifest": {
+        "bytes": 27919,
+        "sha256": "6a6f669b624e8bcf0d8756009a9524998b999b00e2c3a94ccb7da2c48cd0f38a"
+      },
+      "native_source_seal": {
+        "bytes": 26849,
+        "sha256": "49b4d8b8c85eaa60a93a6312eebcc8a484c5f1faf89c4a056c1aef36e462a0dc"
+      },
+      "source_review": {
+        "bytes": 2147,
+        "sha256": "3847668e7fa804f3ddf1ce17351600811efbd5604526030b319672a212c93e99"
+      },
+      "compiled_worker": {
+        "bytes": 1529344,
+        "sha256": "c60f54dbadefd15ccb3001842c429165304eee5499b9c724b3f0d45253a9408a"
+      },
+      "CPU_report": {
+        "bytes": 75523,
+        "sha256": "fb92f2723c5412f20115c20c4855e7710242b182790dd83e01a645c0a568b4f6"
+      },
+      "CPU_review": {
+        "bytes": 20006,
+        "sha256": "8dadcfd6b012e1763bd26ac11a298d0f73e28233387ded0b85abe02430d3a065"
+      },
+      "trained_review": {
+        "bytes": 19756,
+        "sha256": "bbf67b7547038f66c31b1c1127a941c6384d63fa631153b2ddd2b1e7b4415fcc"
+      },
+      "capture": {
+        "bytes": 159809,
+        "sha256": "309e03b79e07701613ee464cb5eaad56d33fd77100b9b374004bccd504c03056"
+      },
+      "collection": {
+        "bytes": 13169,
+        "sha256": "2b4c8e7b88ab7b25b0b77b63c61064efd135675d2e61e611629472e4d8c2c09d"
+      },
+      "offline_report": {
+        "bytes": 22301,
+        "sha256": "dc905b0406c405b19b25d74488f9fcea74f6df3e3f6b4cdf5bdef79933d39fc0"
+      },
+      "ff0a2790_baseline_review": {
+        "bytes": 13439,
+        "sha256": "69c14bdd007afe76aa7ca26e94f5e7c3853faee140b386bc67c23156b17d035c"
+      },
+      "ff0a2790_baseline_report": {
+        "bytes": 22868,
+        "sha256": "3fbeb2451bad7c2973183925523667558b444120402b73bcc1c0ed327953a6cb"
+      }
+    },
+    "comparison": {
+      "all20_saved_payloads_exact_to_ff0a2790": true,
+      "all8_semantic_and_incoming_outgoing_state_joins_exact_to_ff0a2790": true,
+      "three_persisted_own_B1_differentials_bitwise_exact": true,
+      "complete_KV_GDN_arrays_producer_hashed_not_persisted": true,
+      "CPU249": "Descriptive metrics only; no independent higher precision full-graph oracle or numerical tolerance.",
+      "native847_predecessor_all_equal": false
+    },
+    "full_page_HTTP": "Pending at this documentation cutoff; live or unfinished work supplies no result.",
+    "complete_page_numerical_PPS_or_deployment_acceptance": false
+  },
+  "other_candidates": {
+    "deferred_mix_to_gather_wait": {
+      "current3110": {
+        "bytes": 10698,
+        "sha256": "39b21ab2b4f5ce255f2d7296a72f89be93aef131ae4eeac7bda4337da3fbab80"
+      },
+      "worker_CPU_review": {
+        "bytes": 13241,
+        "sha256": "44de40868a08fc5fde6fceb0a2a51d4ff2b793ae5a68217e139bc412d8f5cc7b"
+      },
+      "observer_CPU3122_review": {
+        "bytes": 11656,
+        "sha256": "34aeed415fcbec2e3e2697fdfbd13922a466cc2e2d04d2214001b2de6d66bbb0"
+      },
+      "GPU_result_accepted": false
+    },
+    "DirectML_FP32_screen02": {
+      "source_manifest": {
+        "bytes": 870,
+        "sha256": "b33ff1f6df3a31ebf117be082dc7f2f9c8044c35b177416080cf67c9bdb56fad"
+      },
+      "source_review": {
+        "bytes": 10301,
+        "sha256": "1d55132d2198ffcc0edd2e31a20fb894ce8886ad612f0f248846e33fc8789e2e"
+      },
+      "status": "CLEAR_SOURCE_ONLY",
+      "compilation_or_runtime_result": false
+    }
+  },
+  "limits": [
+    "No accepted or deployed sustained correct pages/s improvement, concurrency plateau or permanent native endpoint. Finite episodes and logical dispatch counts supply no speedup claim.",
+    "No arbitrary-document or layout-truth acceptance, whole-graph numerical tolerance or independent AMD numerical oracle. Substantive AMD agreement and selected scalar journals have their stated scope.",
+    "All earlier accepted/failure records and their original qualification flags remain unchanged. This aggregate adds completed metadata commitments only."
+  ],
+  "public_navigation": {
+    "text_graph": "../../ChandraNative/runtime/text_model.cpp",
+    "runtime_API": "../../ChandraNative/runtime/api.h",
+    "work_record": "../../docs/work-record.md",
+    "earlier_HTTP": "directcompute-native-http-2026-10-10.json",
+    "earlier_CLI_B2": "directcompute-current144-2026-10-10.json"
+  }
+}

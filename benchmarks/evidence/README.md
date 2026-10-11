@@ -1,5 +1,9 @@
 # Measured evidence
 
+The [October 11 progress receipt](directcompute-progress-2026-10-11.json) records completed experimental pipeline HTTP singleton2904 and pairs2942/3063, natural EOS, both survivor slots and actual unchanged stopped pair-proof consumption. It separately records the own-row mix-input CPU artifact and trained capture3104: 20 saved payloads, eight causal-state joins and three persisted own-B1 differentials match their qualified targets. Five/eight page geometry differences, the absent native-1 standalone current2415 journal, descriptive CPU249 metrics and unequal native847 arrays remain explicit. Deferred-wait CPU artifacts and the corrected DirectML source screen are brief pending candidates. No sustained pages/s gain, permanent endpoint, whole-graph tolerance or layout truth is accepted.
+
+## Earlier HTTP observations
+
 The [native HTTP observations](directcompute-native-http-2026-10-10.json) accept the retained current2252 singleton and two complete pairs, with exact own-current144 IDs, nine-field journals and full text, including both survivor slots across separate stages. The current2415 singleton reaches full natural EOS and matches substantive content, but changes one token/bounding box and has earlier same-history logit differences. These finite cold episodes establish no layout tolerance, whole-graph numerical accuracy, general endpoint/client conformance, permanent deployment or sustained throughput. Original failed outcomes and qualification flags remain preserved.
 
 ## Earlier evidence
