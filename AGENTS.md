@@ -2,6 +2,8 @@
 
 This repository preserves Const-me/Whisper's history while adding Chandra OCR 2 inference, numerical validation and endpoint routing for Windows Intel GPUs. Read [Readme.md](Readme.md), [the design](docs/design.md) and [the work record](docs/work-record.md) before resuming. Keep the original MPL-2.0 license and upstream attribution; model weights have their own license.
 
+The October 15 backend decision makes maintained llama.cpp engines the current candidates; follow [the engine trial](docs/sycl-engine-trial.md). SYCL completed four pages but later reproduced a large model-free startup allocation; unchanged SYCL restarts are held. The same-pin Vulkan build starts reliably in the initial bounded tests and is undergoing correctness and sustained-concurrency measurements. Backend choice is authorized, including AdaptiveCpp, XPU or OpenVINO when evidence supports a separate candidate. Retain the DirectCompute/HLSL implementation and failed experiments as references; their historical progression holds and proof sequences do not govern a new engine. Bounded complete-page runs and provisional timings are allowed to learn about a candidate before promotion.
+
 Correctness precedes performance. Pin the model revision, processor, runtime and input pixels; compare numerical outputs and complete OCR before promoting a faster implementation. A kernel probe is evidence for that kernel, not proof that the full model works. Record failures and missing measurements as such. Never silently fall back to a CPU, change precision, trim image dimensions or output allowance, or substitute a different checkpoint.
 
 Keep installed tools, environments, models, private host configuration and raw runs under ignored project-local locations. Use synthetic or explicitly authorized public benchmark documents. Do not copy research files, live Zotero state, credentials or machine-private paths into this public repository. Preserve the owner's other services and coordinate GPU allocation before loading another model.
@@ -10,4 +12,6 @@ The HTTP boundary accepts only supported model and inference routes. Health and 
 
 Write ordinary prose as one physical line per paragraph. Keep source, setup, measurements and remaining work discoverable here, with concrete commands and honest evidence boundaries. Retain useful failed experiments and necessary build inputs; stop task-owned producers deliberately when they are no longer needed.
 
-Claude delegation is disabled for this work until the owner explicitly asks to resume it. Use GPT-6.1 Sol at xhigh for implementation and finished review, with Luna monitoring quota.
+Claude delegation is disabled for this work until the owner explicitly asks to resume it. The owner temporarily selected GPT-6 Astra at ultra for this backend evaluation. Every new or revised script requires literal `codex --no-daemon review` before execution; a review through `codex exec` does not substitute for that command.
+
+Use Luna for quiet current-account usage monitoring. Report actionable low-capacity warnings or an observation failure; do not send routine updates. Warn at five percent remaining and stop at a clean boundary when authenticated current-account capacity is exhausted or restricted. Unknown capacity is not zero, and another account's limits do not identify this task's allowance.
