@@ -393,4 +393,131 @@ class NativeManagerTests(unittest.TestCase):
 
 
 
+class LlamaManagerTests(unittest.TestCase):
+    """Authenticated admission and existing service transaction, without live operations."""
+
+    fixture = NativeManagerTests.fixture
+    install_fake = NativeManagerTests.install_fake
+    decoded = NativeManagerTests.decoded
+
+    def settings(self, directory, slots=4, raw=None, **changes):
+        values = arguments()
+        values.worker_backend = 'llama'
+        values.model_path = None
+        values.llama_config = r'C:\owned endpoint\llama.json'
+        values.llama_config_copy = Path(directory) / 'llama.json'
+        data = raw if raw is not None else json.dumps({'activate': 'evaluate-llama-b11429-vulkan', 'parallel_requests': slots}).encode()
+        values.llama_config_copy.write_bytes(data)
+        values.llama_config_sha256 = hashlib.sha256(data).hexdigest()
+        for name, value in changes.items():
+            setattr(values, name, value)
+        return values
+
+    def test_authenticated_profiles_derive_worker_admission_with_normal_idle(self):
+        for slots in (1, 2, 4):
+            with self.subTest(slots=slots), tempfile.TemporaryDirectory() as temporary:
+                values = self.settings(temporary, slots)
+                launch, settings = self.decoded(values)
+                self.assertEqual(settings['argv'], [values.remote_python, '-m', 'chandra_service', 'llama',
+                    '--llama-config', values.llama_config, '--llama-config-sha256', values.llama_config_sha256,
+                    '--host', '127.0.0.1', '--port', '18001', '--queue-limit', str(slots - 1), '--idle-seconds', '300'])
+                self.assertEqual(settings['cwd'], values.remote_root)
+                self.assertEqual((settings['lease_port'], settings['lease_token']), (18002, 'synthetic-lease-token'))
+                self.assertIn('127.0.0.1:18001:127.0.0.1:18001', launch)
+
+    def test_bad_or_mixed_llama_inputs_refuse_before_installation_mutates_anything(self):
+        cases = [{'llama_config': None}, {'llama_config_sha256': None}, {'llama_config_copy': None},
+                 {'llama_config': 'llama.json'}, {'llama_config': 'C:/owned/llama.json'},
+                 {'llama_config': r'C:\owned\..\llama.json'}, {'llama_config_sha256': 'A' * 64},
+                 {'llama_config_sha256': 'a' * 64}, {'model_path': r'C:\model'},
+                 {'normalization': 'gain-only'}, {'native_config': r'C:\native.json'},
+                 {'native_config_sha256': 'b' * 64}, {'worker_backend': 'waystone'}, {'worker_backend': 'native'}]
+        for changes in cases:
+            with self.subTest(changes=changes), tempfile.TemporaryDirectory() as temporary:
+                values = self.settings(temporary, **changes)
+                with patch.object(manage, 'check_unit_ownership') as ownership, patch.object(manage, 'systemctl') as service:
+                    with self.assertRaises(ValueError):
+                        manage.install(values)
+                    ownership.assert_not_called()
+                    service.assert_not_called()
+        for raw in (b'{}', b'[]', b'{bad', b'x' * 65537,
+                    b'{"activate":"evaluate-llama-b11429-vulkan","parallel_requests":1,"parallel_requests":4}'):
+            with self.subTest(raw=raw[:100]), tempfile.TemporaryDirectory() as temporary:
+                with self.assertRaises(ValueError):
+                    manage.worker_argv(self.settings(temporary, raw=raw))
+        for slots in (True, 0, 3, 8, 4.0, '4', None):
+            with self.subTest(slots=slots), tempfile.TemporaryDirectory() as temporary:
+                with self.assertRaises(ValueError):
+                    manage.worker_argv(self.settings(temporary, slots))
+
+    def test_config_copy_change_cannot_silently_change_router_capacity(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            values = self.settings(temporary)
+            values.llama_config_copy.write_text('{"activate":"evaluate-llama-b11429-vulkan","parallel_requests":1}')
+            with self.assertRaisesRegex(ValueError, 'SHA-256'):
+                manage.worker_argv(values)
+
+    def test_generated_command_requires_same_remote_config_hash_before_listener(self):
+        from chandra_service.__main__ import main
+        with tempfile.TemporaryDirectory() as temporary:
+            values = self.settings(temporary)
+            argv = manage.worker_argv(values)
+            with patch('sys.argv', ['chandra_service', *argv[3:]]), \
+                    patch('runtime.llama.load_config', side_effect=ValueError('remote configuration SHA-256 differs')) as load, \
+                    patch('runtime.native.winjob.kernel32') as kernel, patch('chandra_service.__main__.socket.socket') as listen:
+                with self.assertRaises(SystemExit) as refusal:
+                    main()
+                self.assertEqual(refusal.exception.code, 2)
+                self.assertEqual(str(load.call_args.args[0]), values.llama_config)
+                self.assertEqual(load.call_args.args[1], values.llama_config_sha256)
+                kernel.assert_not_called()
+                listen.assert_not_called()
+
+    def test_c4_install_changes_only_windows_admission_and_retains_router_policy(self):
+        for existing in (False, True):
+            with self.subTest(existing=existing), tempfile.TemporaryDirectory() as temporary:
+                f = self.fixture(temporary, existing=existing)
+                values = self.settings(temporary, lan_address='192.168.1.20')
+                self.install_fake(f, values)
+                config = json.loads((f[2] / 'router.json').read_text())
+                self.assertEqual(config['backends']['waystone']['capacity'], 4)
+                self.assertEqual(config['backends']['waystone']['queue_limit'], 0)
+                self.assertEqual(config['backends']['waystone']['auto_queue_limit'], 0)
+                if existing:
+                    expected = f[4]
+                    expected['backends']['waystone'].update(capacity=4, queue_limit=0, auto_queue_limit=0)
+                    self.assertEqual(config, expected)
+                receipt = json.loads((f[2] / 'installation.json').read_text())
+                self.assertEqual(receipt['llama_parallel_requests'], 4)
+                self.assertEqual(receipt['llama_config_sha256'], values.llama_config_sha256)
+                self.assertEqual(receipt['hosts'], ['127.0.0.1', '192.168.1.20'])
+                for name in manage.UNITS:
+                    self.assertEqual(receipt['unit_sha256'][name], hashlib.sha256((f[3] / name).read_bytes()).hexdigest())
+                self.assertEqual((f[2] / 'channel.json').stat().st_mode & 0o777, 0o600)
+
+    def test_llama_failed_install_restores_private_bytes_modes_and_states(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            f = self.fixture(temporary)
+            before = {p: (p.read_bytes(), p.stat().st_mode & 0o777) for p in f[5]}
+            commands = self.install_fake(f, self.settings(temporary), fail_start=True)
+            self.assertEqual({p: (p.read_bytes(), p.stat().st_mode & 0o777) for p in f[5]}, before)
+            self.assertIn(['systemctl', '--user', 'start', manage.UNITS[0]], commands)
+            self.assertNotIn(['systemctl', '--user', 'start', manage.UNITS[1]], commands)
+
+    def test_llama_manager_cli_requires_authenticated_local_copy(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            values = self.settings(temporary)
+            args = ['manage.py', 'install', '--worker-backend', 'llama', '--remote-root', values.remote_root,
+                    '--remote-python', values.remote_python, '--llama-config', values.llama_config,
+                    '--llama-config-sha256', values.llama_config_sha256]
+            with patch('sys.argv', args), patch.object(manage, 'install') as install:
+                with self.assertRaises(SystemExit) as refusal:
+                    manage.main()
+                self.assertEqual(refusal.exception.code, 2)
+                install.assert_not_called()
+            with patch('sys.argv', [*args, '--llama-config-copy', str(values.llama_config_copy)]), patch.object(manage, 'install') as install:
+                manage.main()
+                self.assertEqual(manage.llama_slots(install.call_args.args[0]), 4)
+
+
 if __name__ == '__main__': unittest.main()

@@ -53,10 +53,28 @@ def ps_quote(value):
 
 
 def worker_argv(args):
-    """Select one explicit worker route; the native launcher authenticates the remote config bytes."""
+    """Select one explicit route; configured launchers authenticate before listening."""
     backend = getattr(args, "worker_backend", "waystone")
     native_config = getattr(args, "native_config", None)
     native_hash = getattr(args, "native_config_sha256", None)
+    llama_config = getattr(args, "llama_config", None)
+    llama_hash = getattr(args, "llama_config_sha256", None)
+    llama_copy = getattr(args, "llama_config_copy", None)
+    if backend != "llama" and any(value is not None for value in (llama_config, llama_hash, llama_copy)):
+        raise ValueError("--llama-config, --llama-config-sha256 and --llama-config-copy require --worker-backend llama")
+    if backend == "llama":
+        if native_config is not None or native_hash is not None or args.model_path is not None or args.normalization != "original":
+            raise ValueError("llama takes its model, limits and normalization only from --llama-config")
+        if not isinstance(llama_config, str) or not llama_config or len(llama_config) > 1024 or any(c in llama_config for c in '\r\n\0"'):
+            raise ValueError("llama requires an absolute normalized Windows --llama-config path")
+        path = PureWindowsPath(llama_config)
+        if not path.is_absolute() or str(path) != llama_config or ".." in path.parts or not path.name:
+            raise ValueError("llama requires an absolute normalized Windows --llama-config path")
+        slots = llama_slots(args)
+        return [args.remote_python, "-m", "chandra_service", "llama",
+                "--llama-config", llama_config, "--llama-config-sha256", llama_hash,
+                "--host", "127.0.0.1", "--port", str(args.worker_port),
+                "--queue-limit", str(slots - 1), "--idle-seconds", "300"]
     if backend == "native":
         if args.model_path is not None or args.normalization != "original":
             raise ValueError("native takes its model, limits and normalization only from --native-config")
@@ -72,7 +90,7 @@ def worker_argv(args):
                 "--host", "127.0.0.1", "--port", str(args.worker_port),
                 "--max-input-tokens", "16384", "--max-output-tokens", "12384"]
     if backend != "waystone":
-        raise ValueError("worker backend must be waystone or native")
+        raise ValueError("worker backend must be waystone, native or llama")
     if native_config is not None or native_hash is not None:
         raise ValueError("--native-config and --native-config-sha256 require --worker-backend native")
     if not args.model_path:
@@ -80,6 +98,35 @@ def worker_argv(args):
     return [args.remote_python, "-m", "chandra_service", "waystone", "--model-path", args.model_path,
             "--host", "127.0.0.1", "--port", str(args.worker_port), "--max-input-tokens", "16384",
             "--max-output-tokens", "12384", "--attention", "hybrid", "--normalization", args.normalization]
+
+
+def llama_slots(args):
+    """Derive admission from the same authenticated bytes the remote CLI requires."""
+    digest = getattr(args, "llama_config_sha256", None)
+    copy = getattr(args, "llama_config_copy", None)
+    if not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest) or copy is None:
+        raise ValueError("llama requires --llama-config-sha256 and --llama-config-copy")
+    try:
+        with Path(copy).open("rb") as stream:
+            data = stream.read(65537)
+    except OSError as error:
+        raise ValueError("Cannot read the local --llama-config-copy") from error
+    if len(data) > 65536 or hashlib.sha256(data).hexdigest() != digest:
+        raise ValueError("Local llama configuration size or SHA-256 differs")
+    def pairs(items):
+        result = {}
+        for key, value in items:
+            if key in result:
+                raise ValueError("Duplicate llama configuration field")
+            result[key] = value
+        return result
+    raw = json.loads(data.decode("utf-8"), object_pairs_hook=pairs)
+    if not isinstance(raw, dict) or raw.get("activate") != "evaluate-llama-b11429-vulkan":
+        raise ValueError("Explicit llama candidate configuration is required")
+    slots = raw.get("parallel_requests")
+    if type(slots) is not int or slots not in (1, 2, 4):
+        raise ValueError("llama parallel_requests must be 1, 2 or 4")
+    return slots
 
 
 def remote_command(args, lease_token):
@@ -196,6 +243,7 @@ def check_unit_ownership(unit_dir, name):
 
 def install(args):
     worker_argv(args)  # Refuse incomplete or mixed routes before checking or changing installed state.
+    slots = llama_slots(args) if getattr(args, "worker_backend", "waystone") == "llama" else None
     if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]*", args.ssh_host):
         raise ValueError("Use a configured SSH host alias")
     if not all(1024 <= port <= 65535 for port in (args.worker_port, args.router_port, args.lease_port)) or len({args.worker_port, args.router_port, args.lease_port}) != 3:
@@ -225,7 +273,7 @@ def install(args):
         if previous.get("source_root") != str(ROOT) or previous.get("units") != list(UNITS):
             raise ValueError("Existing installation receipt belongs to another owner")
     router_text = None
-    if getattr(args, "worker_backend", "waystone") == "native" and config_path.exists():
+    if getattr(args, "worker_backend", "waystone") in ("native", "llama") and config_path.exists():
         with config_path.open("r", newline="") as stream:
             router_text = stream.read()
         config = json.loads(router_text)
@@ -234,6 +282,12 @@ def install(args):
         wanted_url = f"http://127.0.0.1:{args.worker_port}"
         if config["backends"]["waystone"].get("url") != wanted_url:
             config["backends"]["waystone"]["url"] = wanted_url
+            router_text = None
+    if slots is not None:
+        # Worker queue_limit is total admission minus one; router queue_limit is waiting beyond capacity.
+        wanted = {"capacity": slots, "queue_limit": 0, "auto_queue_limit": 0}
+        if any(config["backends"]["waystone"].get(key) != value for key, value in wanted.items()):
+            config["backends"]["waystone"].update(wanted)
             router_text = None
     sys.path.insert(0, str(ROOT))
     from chandra_service.router import Endpoint
@@ -251,6 +305,8 @@ def install(args):
                "remote_root": args.remote_root, "remote_python": args.remote_python, "model_path": args.model_path, "normalization": args.normalization,
                "worker_backend": getattr(args, "worker_backend", "waystone"),
                "native_config": getattr(args, "native_config", None), "native_config_sha256": getattr(args, "native_config_sha256", None),
+               "llama_config": getattr(args, "llama_config", None), "llama_config_sha256": getattr(args, "llama_config_sha256", None),
+               "llama_parallel_requests": slots,
                "lease_port": args.lease_port, "remote_ownership": "unnamed Windows Job Object; authenticated loopback TCP lease; kill on job close",
                "unit_sha256": {name: hashlib.sha256(text.encode()).hexdigest() for name, text in zip(UNITS, content)}}
     lease_token = secrets.token_urlsafe(32)
@@ -309,10 +365,13 @@ def main():
     install_parser.add_argument("--ssh-host", default="waystone")
     install_parser.add_argument("--remote-root", required=True)
     install_parser.add_argument("--remote-python", required=True)
-    install_parser.add_argument("--worker-backend", choices=["waystone", "native"], default="waystone", help="Explicit native opt-in; waystone preserves the historical XPU route")
+    install_parser.add_argument("--worker-backend", choices=["waystone", "native", "llama"], default="waystone", help="Explicit native/llama opt-in; waystone preserves the historical XPU route")
     install_parser.add_argument("--model-path", help="waystone: verified remote model directory")
     install_parser.add_argument("--native-config", help="native: absolute normalized Windows config path")
     install_parser.add_argument("--native-config-sha256", help="native: lowercase SHA-256 of the exact remote config bytes")
+    install_parser.add_argument("--llama-config", help="llama: absolute normalized Windows config path")
+    install_parser.add_argument("--llama-config-sha256", help="llama: lowercase SHA-256 shared by remote config and local copy")
+    install_parser.add_argument("--llama-config-copy", type=Path, help="llama: private local copy of the remote config, used to derive admission")
     install_parser.add_argument("--normalization", choices=["original", "gain-only"], default="original")
     install_parser.add_argument("--northstone-url", default="http://127.0.0.1:8000")
     install_parser.add_argument("--worker-port", type=int, default=18001)
