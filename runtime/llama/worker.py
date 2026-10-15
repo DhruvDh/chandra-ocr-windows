@@ -226,7 +226,8 @@ class OwnedWorker:
     def snapshot(self):
         """Copy bounded status only: no polling, authentication, cleanup or launch."""
         with self._state_lock:
-            result = {"started": self._started, "starting": not self._startup_done.is_set(),
+            result = {"engine": self.config.engine, "config_sha256": self.config.config_sha256,
+                      "started": self._started, "starting": not self._startup_done.is_set(),
                       "stop_requested": self._stop.is_set(), "closed": self._closed,
                       "pending": self._started and not self._closed,
                       "pid": getattr(self._process, "pid", None), "exit_code": self._exit_code,

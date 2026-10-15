@@ -121,7 +121,7 @@ def llama_slots(args):
             result[key] = value
         return result
     raw = json.loads(data.decode("utf-8"), object_pairs_hook=pairs)
-    if not isinstance(raw, dict) or raw.get("activate") != "evaluate-llama-b11429-vulkan":
+    if not isinstance(raw, dict) or raw.get("activate") not in ("evaluate-llama-b11429-vulkan", "evaluate-llama-b11429-sycl"):
         raise ValueError("Explicit llama candidate configuration is required")
     slots = raw.get("parallel_requests")
     if type(slots) is not int or slots not in (1, 2, 4):

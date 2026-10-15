@@ -134,7 +134,7 @@ class Harness:
         self.start_allowed.set()
         self.config = SimpleNamespace(startup_seconds=5, request_seconds=5, max_image_pixels=6_291_456,
                                       admission_physical_bytes=6 * GIB, admission_commit_bytes=11 * GIB,
-                                      parallel_requests=parallel)
+                                      parallel_requests=parallel, engine="vulkan")
         self.backend = LlamaBackend(self.config, worker_factory=self.worker_factory,
                                     client_factory=self.client_factory, prepare=self.prepare,
                                     memory=lambda: dict(self.memory), port_factory=lambda: 18003)
@@ -253,6 +253,7 @@ class BackendTests(unittest.TestCase):
         self.assertFalse(self.h.backend.health()["owned_worker_pending"])
 
     def test_construction_health_and_two_requests_share_one_startup(self):
+        self.assertEqual(self.h.backend.health()["backend"], "llama-vulkan-candidate")
         self.assertEqual(self.h.backend.health()["state"], "asleep")
         self.assertEqual((self.h.workers, self.h.clients, self.h.calls), ([], [], []))
         for _ in range(2):
@@ -267,6 +268,19 @@ class BackendTests(unittest.TestCase):
             self.assertEqual(payload["model"], self.h.workers[0].alias)
             self.assertFalse(payload["cache_prompt"])
             self.assertEqual((payload["max_tokens"], payload["temperature"], payload["top_p"]), (12384, 0, 0.1))
+
+    def test_sycl_health_remains_passive_and_unqualified(self):
+        self.h.config.engine = "sycl"
+        health = self.h.backend.health()
+        self.assertEqual((health["backend"], health["phase"], health["qualified"]),
+                         ("llama-sycl-candidate", "asleep", False))
+        self.assertEqual((self.h.workers, self.h.clients, self.h.calls), ([], [], []))
+        result = self.h.collect()
+        self.finished(result)
+        self.assertIsNone(result.error)
+        self.assertEqual(result.items[-1]["finish_reason"], "stop")
+        self.assertFalse(self.h.backend.health()["qualified"])
+        self.assertEqual(self.h.preparations, 1)
 
     def test_final_metadata_waits_for_the_observed_idle_slot(self):
         self.h.slot_release.clear()

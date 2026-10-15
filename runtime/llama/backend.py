@@ -1,4 +1,4 @@
-"""Bounded slots on one exclusively owned llama.cpp b11429 Vulkan server.
+"""Bounded slots on one exclusively owned llama.cpp b11429 server.
 
 Each successful call observes its own slot idle after DONE. A shared failure retires the
 whole Job before affected calls return capacity. Submitted requests are never replayed.
@@ -116,7 +116,7 @@ class LlamaBackend:
                      "starting" if not session.ready else "busy" if self._active else "awake")
             state = ("failed" if self._failure else "offline" if self._closing else
                      "awake" if phase in ("awake", "busy") else "degraded" if phase == "retiring" else "asleep")
-            return {"state": state, "phase": phase, "backend": "llama-vulkan-candidate",
+            return {"state": state, "phase": phase, "backend": f"llama-{self.config.engine}-candidate",
                     "loaded": phase in ("awake", "busy"), "capacity": self.parallel_requests,
                     "qualified": False, "error": self._failure,
                     "owned_worker_pending": session is not None and not session.worker.snapshot()["closed"]}

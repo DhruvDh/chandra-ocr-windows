@@ -115,6 +115,8 @@ class Transport:
 
 class Config:
     runtime_dir = Path("/fake/runtime")
+    engine = "vulkan"
+    config_sha256 = "a" * 64
 
     def __init__(self, events):
         self.events, self.auth_hook = events, None
@@ -181,6 +183,17 @@ class WorkerTests(unittest.TestCase):
         self.assertTrue(self.worker.alive())
         with self.assertRaises(RuntimeError):
             self.worker.start(18003, "key", "chandra")
+
+    def test_sycl_identity_is_retained_without_polling_or_launching(self):
+        self.config.engine = "sycl"
+        before = self.worker.snapshot()
+        self.assertEqual((before["engine"], before["config_sha256"]), ("sycl", self.config.config_sha256))
+        self.assertEqual(self.events, [])
+        self.start()
+        self.job.finish()
+        closed = self.worker.retire()
+        self.assertTrue(closed["closed"])
+        self.assertEqual((closed["engine"], closed["config_sha256"]), (before["engine"], before["config_sha256"]))
 
     def test_process_exit_and_both_drains_precede_handle_and_file_release(self):
         self.start()

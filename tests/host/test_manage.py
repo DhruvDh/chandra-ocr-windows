@@ -400,13 +400,13 @@ class LlamaManagerTests(unittest.TestCase):
     install_fake = NativeManagerTests.install_fake
     decoded = NativeManagerTests.decoded
 
-    def settings(self, directory, slots=4, raw=None, **changes):
+    def settings(self, directory, slots=4, raw=None, activation='evaluate-llama-b11429-vulkan', **changes):
         values = arguments()
         values.worker_backend = 'llama'
         values.model_path = None
         values.llama_config = r'C:\owned endpoint\llama.json'
         values.llama_config_copy = Path(directory) / 'llama.json'
-        data = raw if raw is not None else json.dumps({'activate': 'evaluate-llama-b11429-vulkan', 'parallel_requests': slots}).encode()
+        data = raw if raw is not None else json.dumps({'activate': activation, 'parallel_requests': slots}).encode()
         values.llama_config_copy.write_bytes(data)
         values.llama_config_sha256 = hashlib.sha256(data).hexdigest()
         for name, value in changes.items():
@@ -424,6 +424,31 @@ class LlamaManagerTests(unittest.TestCase):
                 self.assertEqual(settings['cwd'], values.remote_root)
                 self.assertEqual((settings['lease_port'], settings['lease_token']), (18002, 'synthetic-lease-token'))
                 self.assertIn('127.0.0.1:18001:127.0.0.1:18001', launch)
+
+    def test_explicit_sycl_profiles_derive_admission_from_the_authenticated_copy(self):
+        for slots in (1, 2, 4):
+            with self.subTest(slots=slots), tempfile.TemporaryDirectory() as temporary:
+                values = self.settings(temporary, slots, activation='evaluate-llama-b11429-sycl')
+                self.assertEqual(manage.llama_slots(values), slots)
+                self.assertEqual(manage.worker_argv(values), [values.remote_python, '-m', 'chandra_service', 'llama',
+                    '--llama-config', values.llama_config, '--llama-config-sha256', values.llama_config_sha256,
+                    '--host', '127.0.0.1', '--port', '18001', '--queue-limit', str(slots - 1), '--idle-seconds', '300'])
+
+    def test_sycl_capacity_hash_and_unknown_markers_refuse_before_installation_mutates_anything(self):
+        activation = 'evaluate-llama-b11429-sycl'
+        cases = [(activation, slots, False) for slots in (True, 0, 3, 8, 4.0, '4', None)]
+        cases += [(activation, 4, True), ('evaluate-llama-b11429-sycl-other', 4, False),
+                  (None, 4, False), ([activation], 4, False)]
+        for marker, slots, bad_hash in cases:
+            with self.subTest(marker=marker, slots=slots, bad_hash=bad_hash), tempfile.TemporaryDirectory() as temporary:
+                values = self.settings(temporary, slots, activation=marker)
+                if bad_hash:
+                    values.llama_config_sha256 = '0' * 64
+                with patch.object(manage, 'check_unit_ownership') as ownership, patch.object(manage, 'systemctl') as service:
+                    with self.assertRaises(ValueError):
+                        manage.install(values)
+                    ownership.assert_not_called()
+                    service.assert_not_called()
 
     def test_bad_or_mixed_llama_inputs_refuse_before_installation_mutates_anything(self):
         cases = [{'llama_config': None}, {'llama_config_sha256': None}, {'llama_config_copy': None},
