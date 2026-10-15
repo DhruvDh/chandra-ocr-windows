@@ -56,10 +56,10 @@ class Worker:
         self.inference_seconds = inference_seconds
         self.backend, self.limit = backend, queue_limit + 1
         parallel = getattr(backend, "parallel_requests", 1)
-        if type(parallel) is not int or parallel not in (1, 2):
-            raise ValueError("Backend parallel_requests must be one or two")
+        if type(parallel) is not int or not 1 <= parallel <= 64:
+            raise ValueError("Backend parallel_requests must be an integer between 1 and 64")
         self.execution_slots = parallel
-        self.lock = asyncio.Semaphore(2) if parallel == 2 else asyncio.Lock()
+        self.lock = asyncio.Semaphore(parallel) if parallel > 1 else asyncio.Lock()
         self.jobs = set()
         self.active_jobs = []
         self.closing = False
@@ -122,18 +122,25 @@ class Worker:
 
     @asynccontextmanager
     async def _all_slots(self):
-        """Idle unload owns both experimental slots, preserving start/stop serialization."""
-        async with self.lock:
-            await self.lock.acquire()
-            try:
-                yield
-            finally:
+        """Idle unload owns every execution slot; cancellation releases partial acquisitions."""
+        acquired = 0
+        try:
+            for _ in range(self.execution_slots):
+                await self.lock.acquire()
+                acquired += 1
+            yield
+        finally:
+            for _ in range(acquired):
                 self.lock.release()
 
     async def idle(self, seconds):
         while True:
             await asyncio.sleep(min(seconds, 5))
-            async with (self._all_slots() if self.execution_slots == 2 else self.lock):
+            # Do not collect execution permits from a busy/backlogged service just to
+            # discover under the barrier that no idle unload was eligible.
+            if self.jobs or time.monotonic() - self.last_activity < seconds or not hasattr(self.backend, "unload"):
+                continue
+            async with self._all_slots():
                 if not self.jobs and time.monotonic() - self.last_activity >= seconds and hasattr(self.backend, "unload"):
                     try:
                         await asyncio.to_thread(self.backend.unload)

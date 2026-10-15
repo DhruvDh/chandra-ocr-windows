@@ -16,7 +16,7 @@ def validate_host(host):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('mode', choices=['waystone', 'router', 'native'])
+    parser.add_argument('mode', choices=['waystone', 'router', 'native', 'llama'])
     parser.add_argument('--host', action='append', help='Repeat to bind loopback and explicit private LAN addresses in one process')
     parser.add_argument('--port', type=int, default=8081)
     parser.add_argument('--model-path')
@@ -31,7 +31,11 @@ def main():
     parser.add_argument('--normalization', choices=['original', 'gain-only'], default='original', help='Opt-in exact normalization gain cache; original is the rollback path')
     parser.add_argument('--native-config', type=Path, help='native: explicit DirectCompute endpoint configuration JSON')
     parser.add_argument('--native-config-sha256', help='native: SHA-256 of the exact configuration bytes')
+    parser.add_argument('--llama-config', type=Path, help='llama: explicit opt-in maintained-engine configuration JSON')
+    parser.add_argument('--llama-config-sha256', help='llama: SHA-256 of the exact configuration bytes')
     args = parser.parse_args()
+    if args.mode != 'llama' and (args.llama_config is not None or args.llama_config_sha256 is not None):
+        parser.error('--llama-config and --llama-config-sha256 require llama mode')
     if args.max_pixels <= 0 or args.max_input_tokens <= 0 or not 1 <= args.max_output_tokens <= 12384:
         parser.error('Pixel/context limits must be positive and output limit must be 1..12384')
     hosts = args.host or ['127.0.0.1']
@@ -65,6 +69,24 @@ def main():
         except (ValueError, RuntimeError, OSError) as error:
             parser.error(f'native configuration refused: {error}')
         app = create_native_app(NativeBackend(config), queue_limit=args.queue_limit, inference_seconds=args.inference_seconds, idle_seconds=args.idle_seconds)
+    elif args.mode == 'llama':
+        incompatible = {'model_path': None, 'max_pixels': 4_000_000, 'max_input_tokens': 16384,
+                        'max_output_tokens': 12384, 'attention': 'hybrid', 'normalization': 'original',
+                        'config': None, 'native_config': None, 'native_config_sha256': None}
+        if any(getattr(args, name) != value for name, value in incompatible.items()):
+            parser.error('llama takes its model, device, conditioning and limits only from --llama-config')
+        if not args.llama_config or not args.llama_config_sha256:
+            parser.error('llama requires --llama-config and --llama-config-sha256')
+        from runtime.llama import LlamaBackend, load_config
+        from runtime.llama.app import create_llama_app
+        from runtime.native.winjob import kernel32
+        try:
+            config = load_config(args.llama_config, args.llama_config_sha256)
+            kernel32()  # Capability check only: no Job, worker, model hash or device allocation.
+        except (ValueError, RuntimeError, OSError) as error:
+            parser.error(f'llama configuration refused: {error}')
+        app = create_llama_app(LlamaBackend(config), queue_limit=args.queue_limit,
+                               inference_seconds=args.inference_seconds, idle_seconds=args.idle_seconds)
     else:
         if not args.config:
             parser.error('router requires --config')
