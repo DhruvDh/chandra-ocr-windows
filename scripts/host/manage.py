@@ -202,14 +202,29 @@ def remote_command(args, lease_token):
             args.ssh_host, remote]
 
 
-def read_exact(connection, count):
+def read_exact(connection, count, *, deadline=None, stop=None, process=None):
     data = bytearray()
-    while len(data) < count:
-        chunk = connection.recv(count - len(data))
+    while True:
+        if (stop is not None and stop.is_set()) or (process is not None and process.poll() is not None):
+            raise InterruptedError("Lease startup stopped before ownership acknowledgement")
+        if deadline is not None:
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise TimeoutError("Lease ownership acknowledgement deadline exceeded")
+        if len(data) >= count:
+            return bytes(data)
+        if deadline is not None:
+            connection.settimeout(min(.2, remaining))
+        try:
+            chunk = connection.recv(count - len(data))
+        except socket.timeout as error:
+            if deadline is None or error.errno is not None:
+                raise
+            # A receive poll is not lease loss; keep this socket and every ACK byte.
+            continue
         if not chunk:
             raise OSError("Lease closed before ownership acknowledgement")
         data.extend(chunk)
-    return bytes(data)
 
 
 def run_channel(argv, lease_port, lease_token, stop=None):
@@ -224,8 +239,9 @@ def run_channel(argv, lease_port, lease_token, stop=None):
                 try:
                     connection = socket.create_connection(("127.0.0.1", lease_port), timeout=1)
                     connection.sendall(lease_token.encode() + b"\n")
-                    if read_exact(connection, 6) != b"owned\n":
+                    if read_exact(connection, 6, deadline=deadline, stop=stop, process=process) != b"owned\n":
                         raise OSError("Lease ownership acknowledgement missing")
+                    connection.settimeout(1)
                 except OSError:
                     if connection is not None:
                         connection.close()

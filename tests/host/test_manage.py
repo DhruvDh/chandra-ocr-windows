@@ -1,5 +1,6 @@
 import argparse
 import base64
+import errno
 import importlib.util
 import hashlib
 import json
@@ -20,6 +21,90 @@ def arguments():
     return argparse.Namespace(ssh_host='waystone', remote_root=r'C:\owned checkout', remote_python=r'C:\owned\python.exe',
                               model_path=r'C:\owned\model', worker_port=18001, lease_port=18002, router_port=8002, lan_address=None,
                               northstone_url='http://127.0.0.1:8000', northstone_page_seconds=1, waystone_page_seconds=2, normalization='original')
+
+
+class ChannelEpisode:
+    """Only the ownership handshake: no sockets, sleeping or child processes."""
+    def __init__(self, deliveries, *, cancel_at=None, exit_at=None):
+        self.now, self.cancel_at, self.exit_at = 0.0, cancel_at, exit_at
+        self.deliveries, self.operations, self.waits = list(deliveries), [], []
+        self.stopped, self.connections = False, 0
+        self.connection = self.Connection(self)
+        self.process = self.Process(self)
+
+    def is_set(self):
+        return self.stopped or (self.cancel_at is not None and self.now >= self.cancel_at)
+
+    def set(self):
+        self.stopped = True
+
+    def wait(self, seconds):
+        self.waits.append(seconds)
+        if not self.is_set():
+            self.now += seconds
+        return self.is_set()
+
+    def connect(self, address, timeout):
+        self.connections += 1
+        if self.connections != 1:
+            raise AssertionError("A delayed ACK must not reconnect or resend the token")
+        if address != ('127.0.0.1', 18002) or timeout != 1:
+            raise AssertionError("The existing connection target and timeout changed")
+        self.connection.timeout = timeout
+        return self.connection
+
+    class Connection:
+        def __init__(self, episode):
+            self.episode, self.timeout, self.closed, self.timeouts = episode, 1, False, []
+
+        def settimeout(self, value):
+            self.timeout = value
+            self.timeouts.append(value)
+
+        def sendall(self, data):
+            if self.closed:
+                raise AssertionError("Send after close")
+            self.episode.operations.append(('send', data, self.timeout))
+            if data == b'alive\n':
+                self.episode.set()
+
+        def recv(self, count):
+            if self.closed:
+                raise AssertionError("Receive after close")
+            episode = self.episode
+            until = episode.now + self.timeout
+            if not episode.deliveries or episode.deliveries[0][0] > until:
+                episode.now = until
+                raise manage.socket.timeout("simulated ACK receive timeout")
+            when, data = episode.deliveries.pop(0)
+            episode.now = max(episode.now, when)
+            if isinstance(data, BaseException):
+                raise data
+            if len(data) > count:
+                episode.deliveries.insert(0, (when, data[count:]))
+            return data[:count]
+
+        def close(self):
+            if self.closed:
+                raise AssertionError("Lease closed twice")
+            self.closed = True
+            self.episode.operations.append(('close',))
+
+    class Process:
+        def __init__(self, episode):
+            self.episode, self.returncode = episode, None
+
+        def poll(self):
+            episode = self.episode
+            if ((episode.exit_at is not None and episode.now >= episode.exit_at)
+                    or (episode.connection.closed and not episode.is_set())):
+                return 1
+            return None
+
+        def wait(self, timeout):
+            self.episode.operations.append(('wait', timeout))
+            self.returncode = 0 if self.episode.is_set() else 1
+            return self.returncode
 
 
 class ManagerTests(unittest.TestCase):
@@ -56,6 +141,7 @@ class ManagerTests(unittest.TestCase):
         order = []
         stop = threading.Event()
         class Connection:
+            def settimeout(self, value): pass
             def sendall(self, text):
                 order.append(('send', text))
                 if text == b'alive\n': stop.set()
@@ -74,6 +160,57 @@ class ManagerTests(unittest.TestCase):
         class Connection:
             def recv(self, count): return chunks.pop(0)
         self.assertEqual(manage.read_exact(Connection(), 6), b'owned\n')
+
+    def test_delayed_fragmented_ack_keeps_connection_and_token_until_owned(self):
+        episode = ChannelEpisode([(.1, b'ow'), (1.2, b'ned\n')])
+        with patch.object(manage.subprocess, 'Popen', return_value=episode.process) as launch, \
+                patch.object(manage.socket, 'create_connection', side_effect=episode.connect) as connect, \
+                patch.object(manage.time, 'monotonic', side_effect=lambda: episode.now):
+            self.assertEqual(manage.run_channel(['owned-ssh'], 18002, 'test-token', episode), 0)
+        launch.assert_called_once_with(['owned-ssh'], stdin=subprocess.DEVNULL)
+        connect.assert_called_once_with(('127.0.0.1', 18002), timeout=1)
+        self.assertEqual(episode.now, 1.2)
+        self.assertEqual(episode.operations, [('send', b'test-token\n', 1), ('send', b'alive\n', 1),
+                                              ('close',), ('wait', 10)])
+        self.assertEqual(episode.waits, [2])
+        self.assertTrue(all(0 < value <= .2 for value in episode.connection.timeouts[:-1]))
+        self.assertEqual(episode.connection.timeouts[-1], 1)
+
+    def test_incomplete_or_deadline_ack_does_not_renew_startup_budget(self):
+        for deliveries in ([], [(.1, b'o'), (14.9, b'wn'), (15, b'ed\n')]):
+            episode = ChannelEpisode(deliveries)
+            with self.subTest(deliveries=deliveries), \
+                    patch.object(manage.subprocess, 'Popen', return_value=episode.process), \
+                    patch.object(manage.socket, 'create_connection', side_effect=episode.connect), \
+                    patch.object(manage.time, 'monotonic', side_effect=lambda: episode.now):
+                with self.assertRaisesRegex(RuntimeError, 'within 15s'):
+                    manage.run_channel(['owned-ssh'], 18002, 'test-token', episode)
+            self.assertEqual(episode.now, 15)
+            self.assertEqual(episode.connections, 1)
+            self.assertEqual(episode.operations, [('send', b'test-token\n', 1), ('close',), ('wait', 10)])
+            self.assertTrue(all(0 < value <= .2 for value in episode.connection.timeouts))
+
+    def test_bad_ack_eof_and_transport_error_never_authenticate(self):
+        for data in (b'wrong\n', b'', ConnectionResetError('simulated lease loss'),
+                     TimeoutError(errno.ETIMEDOUT, 'simulated transport timeout')):
+            episode = ChannelEpisode([(.1, data)])
+            with self.subTest(data=data), patch.object(manage.subprocess, 'Popen', return_value=episode.process), \
+                    patch.object(manage.socket, 'create_connection', side_effect=episode.connect), \
+                    patch.object(manage.time, 'monotonic', side_effect=lambda: episode.now):
+                self.assertEqual(manage.run_channel(['owned-ssh'], 18002, 'test-token', episode), 1)
+            self.assertEqual(episode.connections, 1)
+            self.assertEqual(episode.operations, [('send', b'test-token\n', 1), ('close',), ('wait', 10)])
+
+    def test_stop_or_process_exit_during_ack_closes_promptly(self):
+        for options, code in (({'cancel_at': .45}, 0), ({'exit_at': .45}, 1)):
+            episode = ChannelEpisode([(.1, b'ow')], **options)
+            with self.subTest(options=options), patch.object(manage.subprocess, 'Popen', return_value=episode.process), \
+                    patch.object(manage.socket, 'create_connection', side_effect=episode.connect), \
+                    patch.object(manage.time, 'monotonic', side_effect=lambda: episode.now):
+                self.assertEqual(manage.run_channel(['owned-ssh'], 18002, 'test-token', episode), code)
+            self.assertLess(episode.now, 1)
+            self.assertEqual(episode.connections, 1)
+            self.assertEqual(episode.operations, [('send', b'test-token\n', 1), ('close',), ('wait', 10)])
 
     def test_effective_foreign_unit_and_dropins_are_preserved(self):
         with tempfile.TemporaryDirectory() as directory:
