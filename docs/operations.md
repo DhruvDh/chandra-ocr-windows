@@ -1,6 +1,10 @@
 # Run and manage the endpoints
 
-The installed Windows and ROCm endpoints have passed the synthetic OCR and CLI checks recorded in the [acceptance measurements](../benchmarks/evidence/README.md). Consult that record and the [work record](work-record.md) for the tested lifecycle and numerical boundaries before changing the deployment.
+The normal Windows endpoint selects the maintained SYCL Q8_0-KV C6 profile through the existing Waystone lease and router. Use the [maintained-engine deployment guide](llama-deployment.md) for its authenticated source/configuration, capacity, admission and rollback instructions, and the [installed Q8 record](../benchmarks/evidence/sycl-q8-normal-service-2026-10-16.json) for finite lifecycle, CLI and four-case throughput evidence. The profile retains `qualified:false`; broader numerical/OCR qualification remains open. Inspect local operational state before changing services; a selected configuration does not imply that its processes are currently active. The older Windows XPU and ROCm observations remain in the [evidence index](../benchmarks/evidence/README.md).
+
+## Historical XPU endpoint and shared router
+
+The following XPU setup, one-slot admission and PyTorch memory descriptions preserve the earlier deployment. They do not configure the selected llama.cpp SYCL profile; the router API and ownership principles remain shared.
 
 Clone this repository on both hosts and install the [Windows inference environment](../runtime/waystone/README.md). Download and verify the pinned checkpoint with `scripts/download_model.py` and `scripts/model_inventory.py`; run `scripts/waystone/xpu_probe.py` with the Windows environment's interpreter before loading a model. On the Linux host, `uv sync --locked --group test --group benchmark` installs the separate service/client environment.
 
@@ -69,9 +73,9 @@ This source capability needs root's later installation and Windows acceptance. P
 
 Use the direct forwarded node base `http://127.0.0.1:18001/v1` (or the explicitly chosen worker port), with model alias `chandra`, for native concurrent-page qualification. Retain the exact 1,624 × 2,100 decoded request pixels, 3,617 prompt tokens, 16,384 context and 12,384 output allowance. Health and model listings must remain passive; verify idle worker unload, cancellation ownership without replay, safe shutdown, nested native/lease Jobs and lease-loss retirement on Windows before accepting this control route. Source tests and unit installation establish no deployment, new numerical acceptance or sustained pages-per-second improvement.
 
-## Install and control the user services
+## Historical XPU installation and shared service controls
 
-Run these commands from the Linux checkout. Set `SSH_ALIAS` to an existing key-authenticated SSH alias, `WINDOWS_PROJECT` to the remote checkout, `WINDOWS_PYTHON` to its installed inference interpreter, and `WINDOWS_MODEL` to the verified model directory. The source synchronization command preserves replaced remote files and verifies their hashes; it does not update Git, environments or model weights. Stop task-owned inference before replacing serving source.
+The following source synchronization and default installation commands target the historical XPU package; use the [maintained-engine deployment guide](llama-deployment.md) when selecting SYCL. The status, logs, stop and start commands act on the owned units under their installed configuration. Run from the Linux checkout. Set `SSH_ALIAS` to an existing key-authenticated SSH alias, `WINDOWS_PROJECT` to the remote checkout, `WINDOWS_PYTHON` to its installed inference interpreter, and `WINDOWS_MODEL` to the verified model directory. The historical source synchronization preserves replaced remote files and verifies their hashes; it does not update Git, environments or model weights. Stop task-owned inference before replacing serving source.
 
 ```bash
 uv run --no-sync python scripts/waystone/deploy_source.py --ssh-host "$SSH_ALIAS" --remote-root "$WINDOWS_PROJECT"
