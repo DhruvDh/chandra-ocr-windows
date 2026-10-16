@@ -434,6 +434,28 @@ class LlamaManagerTests(unittest.TestCase):
                     '--llama-config', values.llama_config, '--llama-config-sha256', values.llama_config_sha256,
                     '--host', '127.0.0.1', '--port', '18001', '--queue-limit', str(slots - 1), '--idle-seconds', '300'])
 
+    def test_four_cpu_profile_propagates_from_same_authenticated_bytes(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            raw = {'activate': 'evaluate-llama-b11429-sycl', 'parallel_requests': 4,
+                   'worker_cpu': 0, 'sycl_host_cpu_count': 4}
+            values = self.settings(temporary, raw=json.dumps(raw).encode())
+            launch, settings = self.decoded(values)
+            self.assertEqual(settings['job_affinity'], 15)
+            self.assertLess(len(launch[-1]), 7500)
+            self.assertEqual(manage.llama_slots(values), 4)
+            raw['sycl_host_cpu_count'] = 8
+            values.llama_config_copy.write_text(json.dumps(raw))
+            with self.assertRaisesRegex(ValueError, 'SHA-256'):
+                manage.remote_command(values, 'token')
+            for count, cpu, activation in ((True, 0, 'sycl'), (1, 0, 'sycl'), (8, 0, 'sycl'),
+                                            (4, 1, 'sycl'), (4, False, 'sycl'), (4, 0, 'vulkan')):
+                raw.update(sycl_host_cpu_count=count, worker_cpu=cpu, activate='evaluate-llama-b11429-' + activation)
+                with self.subTest(count=count, cpu=cpu, activation=activation), self.assertRaisesRegex(ValueError, 'host CPU profile'):
+                    manage.remote_command(self.settings(temporary, raw=json.dumps(raw).encode()), 'token')
+            for activation in ('sycl', 'vulkan'):
+                values = self.settings(temporary, activation='evaluate-llama-b11429-' + activation)
+                self.assertNotIn('job_affinity', self.decoded(values)[1])
+
     def test_sycl_capacity_hash_and_unknown_markers_refuse_before_installation_mutates_anything(self):
         activation = 'evaluate-llama-b11429-sycl'
         cases = [(activation, slots, False) for slots in (True, 0, 3, 8, 4.0, '4', None)]

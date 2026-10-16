@@ -2,7 +2,7 @@
 
 The child is created suspended at below-normal priority with exactly three inherited pipe handles, assigned to
 a fresh unnamed, non-inheritable Job with kill-on-close, finite process and job memory limits, one active
-process, one logical CPU and no breakaway, verified inside that Job, and only then resumed. Every Win32 call
+process, an explicit one-CPU or four-CPU affinity and no breakaway, verified inside that Job, and only then resumed. Every Win32 call
 is checked, including every handle closure: a failed closure is reported as failed and its handle retained,
 never claimed closed. There is no subprocess fallback: an unsupported host or any failed step refuses
 execution. If this process dies the OS closes the Job handle and kill-on-close retires the worker.
@@ -141,7 +141,7 @@ class ContainmentError(RuntimeError):
 class JobLimits:
     process_memory: int
     job_memory: int
-    affinity: int  # Exactly one logical CPU.
+    affinity: int  # One logical CPU, or the explicit four-logical-CPU mask 15.
     active_processes: int = 1
 
 
@@ -637,8 +637,9 @@ class WindowsJobTransport:
         self._admit()
         if not (type(limits.process_memory) is int and type(limits.job_memory) is int and 0 < limits.process_memory <= limits.job_memory <= 1 << 40):
             raise ContainmentError("Finite process and job memory limits are required")
-        if not (type(limits.affinity) is int and 0 < limits.affinity < 1 << 64 and limits.affinity & (limits.affinity - 1) == 0):
-            raise ContainmentError("Exactly one logical CPU is required")
+        if not (type(limits.affinity) is int and 0 < limits.affinity < 1 << 64
+                and (limits.affinity & (limits.affinity - 1) == 0 or limits.affinity == 15)):
+            raise ContainmentError("One logical CPU or explicit mask 15 is required")
         if type(limits.active_processes) is not int or limits.active_processes != 1:
             raise ContainmentError("Exactly one active process is required")
         commandline = ctypes.create_unicode_buffer(command_line(argv))

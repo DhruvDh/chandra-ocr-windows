@@ -268,6 +268,28 @@ class WindowsJobTests(unittest.TestCase):
             self.launch(api)
         self.assertIn("TerminateJobObject", api.calls)
 
+    def test_explicit_four_cpu_mask_is_verified_and_other_multibit_masks_refused(self):
+        for mask in (1, 8, 15):
+            with self.subTest(mask=mask):
+                api = FakeKernel32()
+                process = W.WindowsJobTransport(api=api, osf=FakeOsf()).launch(
+                    ["C:\\w.exe"], {}, "C:\\", W.JobLimits(12 << 30, 13 << 30, mask))
+                self.assertEqual(api.limits[-1], mask)
+                self.assertLess(api.calls.index("QueryInformationJobObject"), api.calls.index("ResumeThread"))
+                self.assertTrue(process.confirm_closed()["handles_closed"])
+        for mask in (True, 0, 3, 7, 14, 31, 1 << 64):
+            with self.subTest(mask=mask):
+                api = FakeKernel32()
+                with self.assertRaisesRegex(W.ContainmentError, "mask 15"):
+                    W.WindowsJobTransport(api=api, osf=FakeOsf()).launch(
+                        ["C:\\w.exe"], {}, "C:\\", W.JobLimits(12 << 30, 13 << 30, mask))
+                self.assertNotIn("CreateProcessW", api.calls)
+        api = FakeKernel32(sticky=False)
+        with self.assertRaisesRegex(W.ContainmentError, "did not take effect"):
+            W.WindowsJobTransport(api=api, osf=FakeOsf()).launch(
+                ["C:\\w.exe"], {}, "C:\\", W.JobLimits(12 << 30, 13 << 30, 15))
+        self.assertNotIn("CreateProcessW", api.calls)
+
     def test_unsupported_host_and_unsafe_arguments(self):
         if os.name != "nt":
             with self.assertRaisesRegex(W.ContainmentError, "unsupported"):

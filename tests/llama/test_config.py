@@ -148,11 +148,81 @@ class ConfigTests(unittest.TestCase):
                 self.assertEqual(os.environ[key], "1")
         self.assertEqual(env.pop("ONEAPI_DEVICE_SELECTOR"), "level_zero:2")
         self.assertEqual(env.pop("MKL_NUM_THREADS"), "1")
+        self.assertEqual(env.pop("GGML_SYCL_FA_ONEDNN_UNMASKED"), "0")
+        self.assertEqual(env.pop("GGML_SYCL_FA_ONEDNN_DG2_D64"), "0")
         self.assertEqual(vulkan.pop("GGML_VK_VISIBLE_DEVICES"), "2")
         self.assertEqual(env, vulkan)
         self.assertEqual(env["OMP_NUM_THREADS"], "1")
         self.assertFalse(any(key.startswith(("GGML_", "SYCL_", "ONEAPI_")) for key in env))
         self.assertNotIn("untrusted", env["PATH"])
+
+    def test_explicit_sycl_profile_binds_leaf_cache_and_four_logical_cpus(self):
+        from unittest.mock import patch
+        self.select_sycl()
+        default = self.config()
+        cache = self.root / "private-cache"
+        cache.mkdir()
+        self.raw.update(sycl_cache_dir=str(cache), sycl_host_cpu_count=4,
+                        sycl_vision_leaf_sha256=self.raw["runtime_files"][1]["sha256"])
+        selected = self.config()
+        selected.authenticate()
+        with patch.dict("os.environ", {"SYSTEMROOT": str(self.root), "SYCL_CACHE_DIR": "/foreign",
+                                       "SYCL_CACHE_MAX_SIZE": "999", "GGML_SYCL_FA_ONEDNN_UNMASKED": "foreign"}, clear=True):
+            env = selected.environment()
+            original = default.environment()
+        self.assertEqual({key: env[key] for key in ("SYCL_CACHE_PERSISTENT", "SYCL_CACHE_TRACE", "SYCL_CACHE_MAX_SIZE",
+                                                   "SYCL_CACHE_MIN_DEVICE_IMAGE_SIZE", "SYCL_CACHE_DIR")},
+                         {"SYCL_CACHE_PERSISTENT": "1", "SYCL_CACHE_TRACE": "1", "SYCL_CACHE_MAX_SIZE": "1073741824",
+                          "SYCL_CACHE_MIN_DEVICE_IMAGE_SIZE": "0", "SYCL_CACHE_DIR": str(cache)})
+        self.assertFalse(any(key.startswith("SYCL_CACHE_") for key in original))
+        self.assertEqual((original["GGML_SYCL_FA_ONEDNN_UNMASKED"], original["GGML_SYCL_FA_ONEDNN_DG2_D64"]), ("0", "0"))
+        self.assertEqual((env["GGML_SYCL_FA_ONEDNN_UNMASKED"], env["GGML_SYCL_FA_ONEDNN_DG2_D64"]), ("1", "1"))
+        self.assertEqual((env["OMP_NUM_THREADS"], env["MKL_NUM_THREADS"]), ("1", "1"))
+        self.assertEqual(selected.argv(18003, "key", "alias"), default.argv(18003, "key", "alias"))
+        self.assertEqual(selected.job_limits().affinity, 15)
+        self.assertEqual(default.job_limits().affinity, 1)
+        self.assertEqual((selected.job_limits().process_memory, selected.job_limits().job_memory),
+                         (default.job_limits().process_memory, default.job_limits().job_memory))
+
+    def test_sycl_vision_refuses_unbound_or_malformed_leaf_identity(self):
+        self.select_sycl()
+        for digest in (None, True, "0" * 64, "A" * 64, "short"):
+            with self.subTest(digest=digest):
+                self.raw["sycl_vision_leaf_sha256"] = digest
+                with self.assertRaisesRegex(ValueError, "vision leaf"):
+                    self.config()
+
+    def test_sycl_cache_is_an_existing_nonlink_directory_rechecked_at_startup(self):
+        self.select_sycl()
+        cache = self.root / "private-cache"
+        cache.mkdir()
+        link = self.root / "cache-link"
+        link.symlink_to(cache, target_is_directory=True)
+        for path in ("relative", str(self.root / "absent"), self.raw["model"]["path"], str(link), None):
+            with self.subTest(path=path):
+                self.raw["sycl_cache_dir"] = path
+                with self.assertRaises((ValueError, OSError)):
+                    self.config()
+        self.raw["sycl_cache_dir"] = str(cache)
+        config = self.config()
+        cache.rmdir()
+        cache.symlink_to(self.runtime, target_is_directory=True)
+        with self.assertRaisesRegex(ValueError, "symlink"):
+            config.authenticate()
+
+    def test_four_cpu_profile_is_explicit_sycl_only_and_retains_cpu_zero(self):
+        for key, value in (("sycl_host_cpu_count", 4), ("sycl_cache_dir", str(self.root)),
+                           ("sycl_vision_leaf_sha256", "0" * 64)):
+            self.raw[key] = value
+            with self.assertRaisesRegex(ValueError, "engine-specific"):
+                self.config()
+            del self.raw[key]
+        self.select_sycl()
+        for count, cpu in ((True, 0), (1, 0), (2, 0), (8, 0), ("4", 0), (4, 1), (4, False)):
+            with self.subTest(count=count, cpu=cpu):
+                self.raw.update(sycl_host_cpu_count=count, worker_cpu=cpu)
+                with self.assertRaisesRegex(ValueError, "host CPU profile"):
+                    self.config()
 
     def test_sycl_selector_requires_its_own_explicit_namespace(self):
         self.raw["activate"] = SYCL_ACTIVATION

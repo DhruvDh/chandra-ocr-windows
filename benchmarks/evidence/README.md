@@ -1,5 +1,17 @@
 # Measured evidence
 
+## Current maintained-engine profile
+
+The installed fused-vision SYCL profile's [two C4 sustained runs](sycl-vision-affinity-repeat-2026-10-16.json) reached 0.0742634 and 0.0742734 correct original-endpoint pages/s, with all 120 warmup/measured source checks passing and both owners closing cleanly. This is about 49.6% above the single comparable Vulkan observation; the [engine guide](../../docs/sycl-engine-trial.md) defines the measurement boundary and separates prepared-image timings.
+
+The [independent CPU FP32 vision comparison](sycl-vision-cpu-reference-2026-10-16.json) places fused vision's native-0 final-conditioning relative L2 error at 0.853%, versus 12.282% for the original path. It resolves that specific OFF/ON concern with a complete one-page vision tensor, not a universal numerical or OCR claim. The [CLI compatibility record](sycl-cli-compatibility-2026-10-16.json) records passing native/scanned two-page invocations through the normal SYCL route, natural stops and exact prior Vulkan Markdown/metadata hashes. The [current work record](../../docs/work-record.md#current-work) describes the finite normal lifecycle results and remaining acceptance boundary.
+
+The earlier [SYCL baseline](sycl-baseline-throughput-2026-10-16.json), [vision operator](sycl-vision-attention-operator-2026-10-15.json), [first vision cohort](sycl-vision-page-throughput-2026-10-16.json), [vision repeat](sycl-vision-repeat-2026-10-16.json), [initial affinity run](sycl-vision-affinity-2026-10-16.json) and [conditioning comparison](sycl-vision-conditioning-2026-10-16.json) preserve their distinct scopes. Raw private inputs, runtimes and operational journals remain outside the public repository.
+
+## Retained DirectCompute and earlier endpoint evidence
+
+The records below retain their original dates, candidates and acceptance boundaries. Their outstanding checks and deployment statements describe those historical configurations, not the installed maintained-engine profile.
+
 The [October 11 progress receipt](directcompute-progress-2026-10-11.json) records completed experimental pipeline HTTP singleton2904 and pairs2942/3063, natural EOS, both survivor slots and actual unchanged stopped pair-proof consumption. It separately records the own-row mix-input CPU artifact and trained capture3104: 20 saved payloads, eight causal-state joins and three persisted own-B1 differentials match their qualified targets. Five/eight page geometry differences, the absent native-1 standalone current2415 journal, descriptive CPU249 metrics and unequal native847 arrays remain explicit. Deferred-wait CPU artifacts and the corrected DirectML source screen are brief pending candidates. No sustained pages/s gain, permanent endpoint, whole-graph tolerance or layout truth is accepted.
 
 ## Earlier HTTP observations

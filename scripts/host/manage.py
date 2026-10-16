@@ -100,8 +100,8 @@ def worker_argv(args):
             "--max-output-tokens", "12384", "--attention", "hybrid", "--normalization", args.normalization]
 
 
-def llama_slots(args):
-    """Derive admission from the same authenticated bytes the remote CLI requires."""
+def llama_profile(args):
+    """Derive admission and optional outer affinity from the authenticated remote config copy."""
     digest = getattr(args, "llama_config_sha256", None)
     copy = getattr(args, "llama_config_copy", None)
     if not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest) or copy is None:
@@ -126,12 +126,24 @@ def llama_slots(args):
     slots = raw.get("parallel_requests")
     if type(slots) is not int or slots not in (1, 2, 4):
         raise ValueError("llama parallel_requests must be 1, 2 or 4")
-    return slots
+    if 'sycl_host_cpu_count' in raw:
+        if (raw['activate'] != 'evaluate-llama-b11429-sycl'
+                or type(raw['sycl_host_cpu_count']) is not int or raw['sycl_host_cpu_count'] != 4
+                or type(raw.get('worker_cpu')) is not int or raw['worker_cpu'] != 0):
+            raise ValueError("SYCL host CPU profile requires count 4 and worker_cpu 0")
+    return raw
+
+
+def llama_slots(args):
+    return llama_profile(args)['parallel_requests']
 
 
 def remote_command(args, lease_token):
     argv = worker_argv(args)
-    settings = base64.b64encode(json.dumps({"argv": argv, "cwd": args.remote_root, "lease_port": args.lease_port, "lease_token": lease_token}).encode()).decode()
+    values = {"argv": argv, "cwd": args.remote_root, "lease_port": args.lease_port, "lease_token": lease_token}
+    if getattr(args, "worker_backend", "waystone") == "llama" and 'sycl_host_cpu_count' in llama_profile(args):
+        values['job_affinity'] = 15
+    settings = base64.b64encode(json.dumps(values).encode()).decode()
     source = base64.b64encode(zlib.compress(REMOTE_SUPERVISOR.encode())).decode()
     # Invoke native Python directly: PowerShell encoded commands exceed the
     # Windows SSH shell command-length limit once the supervisor is embedded.
@@ -307,6 +319,7 @@ def install(args):
                "native_config": getattr(args, "native_config", None), "native_config_sha256": getattr(args, "native_config_sha256", None),
                "llama_config": getattr(args, "llama_config", None), "llama_config_sha256": getattr(args, "llama_config_sha256", None),
                "llama_parallel_requests": slots,
+               "llama_job_affinity": 15 if slots is not None and 'sycl_host_cpu_count' in llama_profile(args) else None,
                "lease_port": args.lease_port, "remote_ownership": "unnamed Windows Job Object; authenticated loopback TCP lease; kill on job close",
                "unit_sha256": {name: hashlib.sha256(text.encode()).hexdigest() for name, text in zip(UNITS, content)}}
     lease_token = secrets.token_urlsafe(32)
