@@ -434,6 +434,65 @@ class LlamaManagerTests(unittest.TestCase):
                     '--llama-config', values.llama_config, '--llama-config-sha256', values.llama_config_sha256,
                     '--host', '127.0.0.1', '--port', '18001', '--queue-limit', str(slots - 1), '--idle-seconds', '300'])
 
+    def test_q8_c6_installs_six_capacity_and_preserves_other_router_policy(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            f = self.fixture(temporary)
+            raw = {'activate': 'evaluate-llama-b11429-sycl', 'parallel_requests': 6,
+                   'sycl_kv_cache_type': 'q8_0', 'admission_physical_bytes': 21 * (1 << 28),
+                   'admission_commit_bytes': 49 * (1 << 28), 'worker_cpu': 0, 'sycl_host_cpu_count': 4}
+            values = self.settings(temporary, raw=json.dumps(raw).encode())
+            launch, settings = self.decoded(values)
+            argv = settings['argv']
+            self.assertEqual(argv[argv.index('--queue-limit') + 1], '5')
+            self.assertEqual(argv[argv.index('--idle-seconds') + 1], '300')
+            self.assertEqual(settings['job_affinity'], 15)
+            self.assertIn('127.0.0.1:18001:127.0.0.1:18001', launch)
+            self.assertIn('127.0.0.1:18002:127.0.0.1:18002', launch)
+            self.install_fake(f, values)
+            expected = f[4]
+            expected['backends']['waystone'].update(capacity=6, queue_limit=0, auto_queue_limit=0)
+            self.assertEqual(json.loads((f[2] / 'router.json').read_text()), expected)
+            receipt = json.loads((f[2] / 'installation.json').read_text())
+            self.assertEqual(receipt['llama_parallel_requests'], 6)
+            self.assertEqual(receipt['llama_config_sha256'], values.llama_config_sha256)
+            self.assertEqual(receipt['llama_job_affinity'], 15)
+            raw['sycl_kv_cache_type'] = 'bf16'
+            values.llama_config_copy.write_text(json.dumps(raw))
+            with self.assertRaisesRegex(ValueError, 'SHA-256'):
+                manage.worker_argv(values)
+
+    def test_invalid_kv_or_six_slot_forecasts_refuse_before_installation(self):
+        good = {'activate': 'evaluate-llama-b11429-sycl', 'parallel_requests': 6,
+                'sycl_kv_cache_type': 'q8_0', 'admission_physical_bytes': 21 * (1 << 28),
+                'admission_commit_bytes': 49 * (1 << 28)}
+        changes = [('sycl_kv_cache_type', value) for value in (None, 'bf16', 'f16', 'Q8_0', True, 8, [], {})]
+        changes += [('activate', 'evaluate-llama-b11429-vulkan'), ('parallel_requests', 8)]
+        for key in ('admission_physical_bytes', 'admission_commit_bytes'):
+            changes.extend((key, value) for value in (None, good[key] - 1, True, float(good[key]), 33 << 30))
+        for key, value in changes:
+            raw = dict(good)
+            if value is None:
+                del raw[key]
+            else:
+                raw[key] = value
+            with self.subTest(key=key, value=value), tempfile.TemporaryDirectory() as temporary:
+                values = self.settings(temporary, raw=json.dumps(raw).encode())
+                with patch.object(manage, 'check_unit_ownership') as ownership, patch.object(manage, 'systemctl') as service:
+                    with self.assertRaises(ValueError):
+                        manage.install(values)
+                    ownership.assert_not_called()
+                    service.assert_not_called()
+        for activation, kv, valid in (('sycl', 'bf16', True), ('sycl', 'q8_0', True),
+                                       ('sycl', 'f16', False), ('vulkan', 'bf16', False), ('vulkan', 'q8_0', False)):
+            with self.subTest(activation=activation, kv=kv), tempfile.TemporaryDirectory() as temporary:
+                raw = {'activate': 'evaluate-llama-b11429-' + activation, 'parallel_requests': 4, 'sycl_kv_cache_type': kv}
+                values = self.settings(temporary, raw=json.dumps(raw).encode())
+                if valid:
+                    self.assertEqual(manage.llama_slots(values), 4)
+                else:
+                    with self.assertRaises(ValueError):
+                        manage.llama_slots(values)
+
     def test_four_cpu_profile_propagates_from_same_authenticated_bytes(self):
         with tempfile.TemporaryDirectory() as temporary:
             raw = {'activate': 'evaluate-llama-b11429-sycl', 'parallel_requests': 4,

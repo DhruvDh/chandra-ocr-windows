@@ -116,7 +116,7 @@ class Collection:
 
 
 class Harness:
-    def __init__(self, parallel=1):
+    def __init__(self, parallel=1, **profile):
         self.workers, self.clients, self.calls, self.collections = [], [], [], []
         self.mutex = threading.RLock()
         self.records, self.active_slots = [], {}
@@ -135,6 +135,7 @@ class Harness:
         self.config = SimpleNamespace(startup_seconds=5, request_seconds=5, max_image_pixels=6_291_456,
                                       admission_physical_bytes=6 * GIB, admission_commit_bytes=11 * GIB,
                                       parallel_requests=parallel, engine="vulkan")
+        self.config.__dict__.update(profile)
         self.backend = LlamaBackend(self.config, worker_factory=self.worker_factory,
                                     client_factory=self.client_factory, prepare=self.prepare,
                                     memory=lambda: dict(self.memory), port_factory=lambda: 18003)

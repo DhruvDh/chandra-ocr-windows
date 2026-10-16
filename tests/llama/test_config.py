@@ -11,6 +11,12 @@ from runtime.native.winjob import command_line
 
 
 class ConfigTests(unittest.TestCase):
+    def test_imports_are_from_the_checkout_containing_these_tests(self):
+        from runtime.llama import backend, config
+        root = Path(__file__).resolve().parents[2]
+        self.assertEqual(Path(config.__file__).resolve(), root / "runtime/llama/config.py")
+        self.assertEqual(Path(backend.__file__).resolve(), root / "runtime/llama/backend.py")
+
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)
@@ -78,6 +84,98 @@ class ConfigTests(unittest.TestCase):
         for parallel in (True, 0, 3, 8, "2"):
             self.raw["parallel_requests"] = parallel
             with self.assertRaisesRegex(ValueError, "parallel_requests"):
+                self.config()
+
+    def test_q8_kv_changes_only_both_cache_arguments_and_config_identity(self):
+        from unittest.mock import patch
+        self.select_sycl()
+        self.raw["parallel_requests"] = 4
+        cache = self.root / "cache"
+        cache.mkdir()
+        self.raw.update(sycl_cache_dir=str(cache), sycl_host_cpu_count=4,
+                        sycl_vision_leaf_sha256=self.raw["runtime_files"][1]["sha256"])
+        default = self.config()
+        self.assertEqual(default.sycl_kv_cache_type, "bf16")
+        self.raw["sycl_kv_cache_type"] = "bf16"
+        explicit = self.config()
+        self.assertEqual(default.argv(18003, "key", "alias"), explicit.argv(18003, "key", "alias"))
+        self.raw["sycl_kv_cache_type"] = "q8_0"
+        q8 = self.config()
+        expected = default.argv(18003, "key", "alias")
+        for flag in ("--cache-type-k", "--cache-type-v"):
+            expected[expected.index(flag) + 1] = "q8_0"
+        self.assertEqual(q8.argv(18003, "key", "alias"), expected)
+        self.assertNotEqual(q8.config_sha256, default.config_sha256)
+        self.assertEqual(q8.files(), default.files())
+        self.assertEqual(q8.job_limits(), default.job_limits())
+        with patch.dict("os.environ", {"SYSTEMROOT": str(self.root), "LLAMA_ARG_CACHE_TYPE_K": "f32",
+                                       "LLAMA_ARG_CACHE_TYPE_V": "f32"}, clear=True):
+            self.assertEqual(q8.environment(), default.environment())
+            self.assertNotIn("LLAMA_ARG_CACHE_TYPE_K", q8.environment())
+            self.assertEqual(os.environ["LLAMA_ARG_CACHE_TYPE_K"], "f32")
+
+    def test_six_slots_require_explicit_q8_and_both_conservative_forecasts(self):
+        from dataclasses import replace
+        from runtime.llama.backend import LlamaBackend
+        from runtime.llama.memory import FLOOR, check_memory
+        self.select_sycl()
+        self.raw.update(parallel_requests=6, sycl_kv_cache_type="q8_0",
+                        admission_physical_bytes=21 * (1 << 28), admission_commit_bytes=49 * (1 << 28))
+        good = dict(self.raw)
+        for field, value in (("sycl_kv_cache_type", None), ("sycl_kv_cache_type", "bf16"),
+                             ("admission_physical_bytes", None), ("admission_commit_bytes", None),
+                             ("admission_physical_bytes", good["admission_physical_bytes"] - 1),
+                             ("admission_commit_bytes", good["admission_commit_bytes"] - 1),
+                             ("admission_physical_bytes", True), ("admission_commit_bytes", 49.0 * (1 << 28))):
+            self.raw = dict(good)
+            if value is None:
+                del self.raw[field]
+            else:
+                self.raw[field] = value
+            with self.subTest(field=field, value=value), self.assertRaises(ValueError):
+                self.config()
+        self.raw = good
+        config = self.config()
+        argv = config.argv(18003, "key", "alias")
+        command_line(argv)
+        self.assertLessEqual(len(argv), 64)
+        for flag, value in (("--ctx-size", "98304"), ("--parallel", "6"), ("--n-predict", "12384"),
+                            ("--cache-type-k", "q8_0"), ("--cache-type-v", "q8_0")):
+            self.assertEqual(argv[argv.index(flag) + 1], value)
+        self.assertIn("--no-kv-unified", argv)
+        limits = config.job_limits()
+        self.assertEqual((limits.process_memory, limits.job_memory, limits.affinity),
+                         (21 * (1 << 29), 43 * (1 << 28), 1))
+        self.assertEqual(FLOOR, 4 << 30)
+        for key, forecast in (("available_physical", config.admission_physical_bytes),
+                              ("available_commit", config.admission_commit_bytes)):
+            observed = {"available_physical": 40 << 30, "available_commit": 40 << 30}
+            observed[key] = forecast + FLOOR
+            with self.assertRaises(RuntimeError):
+                check_memory(observed, config.admission_physical_bytes, config.admission_commit_bytes)
+        for changes in ({"sycl_kv_cache_type": "bf16"}, {"engine": "vulkan"},
+                        {"admission_commit_bytes": 11 << 30}, {"parallel_requests": 8}):
+            invalid = replace(config, **changes)
+            with self.subTest(changes=changes):
+                with self.assertRaises(ValueError):
+                    invalid.argv(18003, "key", "alias")
+                with self.assertRaises(ValueError):
+                    LlamaBackend(invalid)
+
+    def test_kv_type_is_sycl_only_and_never_coerced(self):
+        for value in ("bf16", "q8_0"):
+            self.raw["sycl_kv_cache_type"] = value
+            with self.assertRaisesRegex(ValueError, "engine-specific"):
+                self.config()
+        del self.raw["sycl_kv_cache_type"]
+        self.raw["parallel_requests"] = 6
+        with self.assertRaises(ValueError):
+            self.config()
+        self.raw["parallel_requests"] = 4
+        self.select_sycl()
+        for value in (None, True, 8, "Q8_0", "f16", "q4_0", [], {}):
+            self.raw["sycl_kv_cache_type"] = value
+            with self.subTest(value=value), self.assertRaisesRegex(ValueError, "sycl_kv_cache_type"):
                 self.config()
 
     def test_configuration_digest_and_opt_in_are_required(self):

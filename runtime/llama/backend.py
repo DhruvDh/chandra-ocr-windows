@@ -13,7 +13,7 @@ import time
 import httpx
 
 from chandra_service.validation import validate, validate_completion_metadata
-from .config import CONTEXT
+from .config import CONTEXT, validate_kv_profile
 from .memory import check_memory, observe_memory
 from .worker import AdmissionRefused, OwnedWorker
 
@@ -97,8 +97,8 @@ class _Call:
 class LlamaBackend:
     def __init__(self, config, *, worker_factory=OwnedWorker, client_factory=httpx.Client,
                  prepare=_prepare, memory=observe_memory, port_factory=_private_port):
-        if type(config.parallel_requests) is not int or config.parallel_requests not in (1, 2, 4):
-            raise ValueError("Expected an explicit 1, 2 or 4 slot profile")
+        validate_kv_profile(config.engine, config.parallel_requests, getattr(config, "sycl_kv_cache_type", "bf16"),
+                            config.admission_physical_bytes, config.admission_commit_bytes)
         self.config, self.parallel_requests = config, config.parallel_requests
         self._worker_factory, self._client_factory = worker_factory, client_factory
         self._prepare, self._memory, self._port_factory = prepare, memory, port_factory

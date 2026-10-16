@@ -1,4 +1,4 @@
-"""Offline C2/C4 sessions: independent slots and shared whole-worker retirement."""
+"""Offline C2/C4 and explicit Q8 C6 sessions: slots and shared worker retirement."""
 
 import asyncio
 import threading
@@ -10,10 +10,13 @@ from runtime.llama.backend import LlamaFailure
 from runtime.llama.worker import AdmissionRefused
 from tests.llama.test_backend import GIB, Harness, request
 
+Q8_C6 = {"engine": "sycl", "sycl_kv_cache_type": "q8_0",
+         "admission_physical_bytes": 21 * GIB // 4, "admission_commit_bytes": 49 * GIB // 4}
+
 
 class ParallelBackendTests(unittest.TestCase):
-    def harness(self, parallel=2):
-        h = Harness(parallel)
+    def harness(self, parallel=2, **profile):
+        h = Harness(parallel, **profile)
         h.stream_mode = "held"
         self.addCleanup(h.close)
         return h
@@ -34,10 +37,10 @@ class ParallelBackendTests(unittest.TestCase):
         result.thread.join(1)
         self.assertFalse(result.thread.is_alive())
 
-    def test_two_and_four_requests_overlap_in_one_worker_with_distinct_slots(self):
-        for parallel in (2, 4):
+    def test_two_four_and_explicit_q8_six_requests_share_distinct_slots(self):
+        for parallel, profile in ((2, {}), (4, {}), (6, Q8_C6)):
             with self.subTest(parallel=parallel):
-                h = self.harness(parallel)
+                h = self.harness(parallel, **profile)
                 results = [h.collect(request(f"page-{index}")) for index in range(parallel)]
                 records = [self.blocked(h, f"page-{index}") for index in range(parallel)]
                 self.assertEqual((len(h.workers), len(h.clients), len(h.posts)), (1, 1, parallel))
@@ -310,6 +313,28 @@ class ParallelServiceCapacityTests(unittest.IsolatedAsyncioTestCase):
             if time.monotonic() >= deadline:
                 self.fail("fake parallel service condition did not arrive")
             await asyncio.sleep(0.01)
+
+    async def test_q8_six_admitted_seventh_refused_and_cancellation_never_replays(self):
+        h = Harness(6, **Q8_C6)
+        h.stream_mode = "held"
+        self.addAsyncCleanup(asyncio.to_thread, h.close)
+        service = Worker(h.backend, queue_limit=5, inference_seconds=5)
+        jobs = [service.submit(request(f"page-{index}")) for index in range(6)]
+        self.assertTrue(all(job is not None for job in jobs))
+        await self.until(lambda: len(h.records) == 6 and all(record.blocked.is_set() for record in h.records))
+        self.assertEqual({record.slot for record in h.records}, set(range(6)))
+        self.assertIsNone(service.submit(request("seventh")))
+        worker = h.workers[0]
+        worker.allow_retire.clear()
+        jobs[0].cancel.set()
+        await self.until(worker.retiring.is_set)
+        self.assertTrue(all(not job.done.is_set() for job in jobs))
+        self.assertIsNone(service.submit(request("during-retirement")))
+        worker.allow_retire.set()
+        await self.until(lambda: not service.jobs and all(job.done.is_set() for job in jobs))
+        self.assertTrue(worker.closed)
+        self.assertEqual((len(h.workers), len(h.posts)), (1, 6))
+        self.assertTrue(all(not job.metadata for job in jobs))
 
     async def test_canceled_peer_holds_all_four_service_jobs_until_shared_retirement(self):
         h = Harness(4)

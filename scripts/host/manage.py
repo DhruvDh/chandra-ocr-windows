@@ -124,8 +124,18 @@ def llama_profile(args):
     if not isinstance(raw, dict) or raw.get("activate") not in ("evaluate-llama-b11429-vulkan", "evaluate-llama-b11429-sycl"):
         raise ValueError("Explicit llama candidate configuration is required")
     slots = raw.get("parallel_requests")
-    if type(slots) is not int or slots not in (1, 2, 4):
-        raise ValueError("llama parallel_requests must be 1, 2 or 4")
+    if type(slots) is not int or slots not in (1, 2, 4, 6):
+        raise ValueError("llama parallel_requests must be 1, 2, 4 or conditional 6")
+    kv_type = raw.get('sycl_kv_cache_type', 'bf16')
+    if (not isinstance(kv_type, str) or kv_type not in ('bf16', 'q8_0')
+            or ('sycl_kv_cache_type' in raw and raw['activate'] != 'evaluate-llama-b11429-sycl')):
+        raise ValueError("sycl_kv_cache_type requires explicit SYCL and bf16 or q8_0")
+    if slots == 6:
+        physical, commit = raw.get('admission_physical_bytes'), raw.get('admission_commit_bytes')
+        if (raw['activate'] != 'evaluate-llama-b11429-sycl' or kv_type != 'q8_0'
+                or type(physical) is not int or not 21 * (1 << 28) <= physical <= 32 * (1 << 30)
+                or type(commit) is not int or not 49 * (1 << 28) <= commit <= 32 * (1 << 30)):
+            raise ValueError("Six slots require explicit SYCL Q8 KV and admission forecasts >= 5.25 GiB physical and 12.25 GiB commit")
     if 'sycl_host_cpu_count' in raw:
         if (raw['activate'] != 'evaluate-llama-b11429-sycl'
                 or type(raw['sycl_host_cpu_count']) is not int or raw['sycl_host_cpu_count'] != 4
