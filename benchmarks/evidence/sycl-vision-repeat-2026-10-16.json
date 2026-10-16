@@ -1,0 +1,88 @@
+{
+  "schema": "chandra-sycl-vision-repeat-throughput-v1",
+  "scope": "One 720-second original-image endpoint run with the vision-SDPA candidate, using the same measurement boundary as the original-endpoint baseline runs. Rates include endpoint CPU image preparation, queueing, and inference; they exclude client PDF rendering, cold model loading, warmup, and offline assessment.",
+  "candidate": {
+    "backend": "SYCL",
+    "variant": "vision SDPA",
+    "ggml_sycl_dll_sha256": "90e65f3b67017a598a7fc0c467bf08b15157ee521d27f1e1921126461ae641c7"
+  },
+  "configuration_hashes": {
+    "hash_semantics": {
+      "throughput_client_configuration_file_sha256": "SHA256 of this run's local throughput-client configuration.json.",
+      "worker_configuration_sha256": "Canonical worker configuration digest recorded by the server packaging evidence.",
+      "worker_recipe_sha256": "Server run recipe digest recorded in the closed serve receipt."
+    },
+    "throughput_client_configuration_file_sha256": "c4dd4aefb0db28b5a99b92efc7fa7e13974f4758ba4354d09e57c7ea636b0e3e",
+    "worker_configuration_sha256": "f64d6b24c8c031d3a4104e1fb7eca3743b412b68d4932182c3e6e44ec2eb9c0f",
+    "worker_recipe_sha256": "a27adc81325824d3f762617d105582fc2d8d9bd18a337e0d87e2e13852853066"
+  },
+  "workload_pins": {
+    "client_sha256": "f87f52dbd254af254e6b596018bfacf52fe2ab39b365811beeee0824f96ee22c",
+    "request_manifest_sha256": "34d0b43fc6c44c5c996d414171b9f9854d6ee81742075899fa71ee66bfeb8f2a"
+  },
+  "measurement": {
+    "concurrency": 4,
+    "window_seconds": 720,
+    "warmups": 4,
+    "measured_requests": 51,
+    "source_passed_responses": 55,
+    "source_assessment_passed": true,
+    "correct_pages_inside_window": 47,
+    "correct_pages_in_full_cohort": 51,
+    "fill_and_drain_seconds": 752.8328593609986,
+    "pages_per_second_inside_window": 0.06527777777777778,
+    "pages_per_second_including_drain": 0.06774412057848882
+  },
+  "comparisons": {
+    "first_vision_c4_run": {
+      "window_seconds": 360,
+      "pages_per_second_including_drain": 0.06673484382466155,
+      "single_run_observed_increase_percent": 1.51237
+    },
+    "matched_sycl_c4_baseline": {
+      "window_seconds": 360,
+      "pages_per_second_including_drain": 0.0437939694476231,
+      "single_run_observed_increase_percent": 54.68824
+    },
+    "selected_vulkan_reference": {
+      "window_seconds": 360,
+      "pages_per_second_including_drain": 0.0496514710313,
+      "single_run_observed_increase_percent": 36.4393,
+      "remains_selected": true
+    },
+    "interpretation": "The candidate's 720-second repeat is within 1.52 percent of its first 360-second observation. Each baseline has only one observation; these descriptive comparisons establish neither a repeated paired comparison, a confidence interval, nor a throughput ceiling."
+  },
+  "closure": {
+    "serve_receipt_sha256": "10fc4ab79a7bc9da2951ba471945df493daa473364bc7d58b7b7cb8c72645ac1",
+    "outer_controller_exit_code": 0,
+    "nested_worker_exit_code": 3235774465,
+    "nested_worker_stopped_deliberately": true,
+    "nested_worker_fault_recorded": false,
+    "job_zero_active_at_close": true,
+    "handles_closed": true,
+    "descriptors_closed": true,
+    "output_drains_eof": true,
+    "outer_inputs_released": 59,
+    "inner_inputs_released": 74,
+    "serving_job_peak_private_bytes": 10858004480,
+    "inner_job_peak_private_bytes": 10783858688,
+    "process_peak_private_bytes": 10782777344,
+    "peak_scope_note": "Outer and nested Job private-memory scopes overlap and must not be added; none is a VRAM measurement."
+  },
+  "artifact_hashes": {
+    "summary_sha256": "68fd3beb8a381ae9b0180912561b7cb8099b582900022f0a3ab55957029b5091",
+    "source_assessment_sha256": "6a053f067098417ea86d726fddddd4e437e5a5b37627fbb6abe0b2b321912e6f",
+    "throughput_client_configuration_file_sha256": "c4dd4aefb0db28b5a99b92efc7fa7e13974f4758ba4354d09e57c7ea636b0e3e",
+    "phase_commitments_sha256": "f28e02fad546d91e09ba09a34938c774eeb07d349c9fbfe5e10c0ec6968ede12",
+    "warmup_sha256": "2fc9d37af918884d77828e2adeaadc334612c6e50fbb5da05499d4cafd25f8d1",
+    "measurement_sha256": "7cd0172399e70d60e69b50954944d5acf8a2ec05e84a81e81dab43acc64ffe29"
+  },
+  "qualification": {
+    "numerical_equivalence_established": false,
+    "broader_accuracy_qualified": false,
+    "completed_candidate_throughput_observations": 2,
+    "repeated_paired_comparison_pending": true,
+    "promotion": "pending",
+    "throughput_ceiling_established": false
+  }
+}
