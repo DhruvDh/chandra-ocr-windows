@@ -20,6 +20,6 @@ The HTTP boundary accepts only supported model and inference routes. Health and 
 
 Write ordinary prose as one physical line per paragraph. Keep source, setup, measurements and remaining work discoverable here, with concrete commands and honest evidence boundaries. Retain useful failed experiments and necessary build inputs; stop task-owned producers deliberately when they are no longer needed.
 
-Claude delegation is disabled for this work until the owner explicitly asks to resume it. The owner temporarily selected GPT-6 Astra at ultra for this backend evaluation. Every new or revised script requires literal `codex --no-daemon review` before execution; a review through `codex exec` does not substitute for that command.
+Claude delegation is disabled for this work until the owner explicitly asks to resume it. The owner selected Sol at ultra for this work on October 16; do not use Astra subagents without explicit authorization. Every new or revised script requires literal `codex --no-daemon review` before execution; a review through `codex exec` does not substitute for that command.
 
 Use Luna for quiet current-account usage monitoring. Report actionable low-capacity warnings or an observation failure; do not send routine updates. Warn at five percent remaining and stop at a clean boundary when authenticated current-account capacity is exhausted or restricted. Unknown capacity is not zero, and another account's limits do not identify this task's allowance.
