@@ -13,6 +13,8 @@ ENGINES = {ACTIVATION: "vulkan", SYCL_ACTIVATION: "sycl"}
 CONTEXT = 16384
 OUTPUT = 12384
 GIB = 1 << 30
+SYCL_DECODE_GRAPH_LEAF_SHA256 = "4e4445190ab5b7686a0990c11aa8faf8f0c27bbf2b9f445430193b0aaa446234"
+SYCL_DECODE_GRAPH_MODEL_SHA256 = "74699f738159fc227e8153e5345cc36795aa81fe726ff4746fee8f7b7efe7f6d"
 
 
 def require(condition, message):
@@ -21,7 +23,8 @@ def require(condition, message):
 
 
 def validate_kv_profile(engine, slots, kv_type, physical, commit, *, batch_size=128,
-                        host_cpu_count=1, worker_cpu=None, vision_leaf=None, cache_dir=None):
+                        host_cpu_count=1, worker_cpu=None, vision_leaf=None, cache_dir=None,
+                        decode_graph=False, model_sha256=None, runtime_files=()):
     require(engine in ("vulkan", "sycl"), "Invalid llama engine")
     require(isinstance(kv_type, str) and kv_type in ("bf16", "q8_0"), "Invalid sycl_kv_cache_type")
     require(engine == "sycl" or kv_type == "bf16", "Q8 KV requires SYCL")
@@ -40,6 +43,17 @@ def validate_kv_profile(engine, slots, kv_type, physical, commit, *, batch_size=
                 "Five slots require the explicit four-CPU SYCL profile")
         require(isinstance(vision_leaf, str) and re.fullmatch(r"[0-9a-f]{64}", vision_leaf)
                 and cache_dir is not None, "Five slots require explicit fused vision and persistent cache")
+    require(type(decode_graph) is bool, "Invalid sycl_decode_graph boolean")
+    if decode_graph:
+        require(engine == "sycl" and slots == 5 and batch_size == 256 and kv_type == "q8_0",
+                "Decode graph requires the explicit SYCL Q8 five-slot batch-256 profile")
+        require(isinstance(cache_dir, Path), "Decode graph requires an explicit persistent cache path")
+        require(vision_leaf == SYCL_DECODE_GRAPH_LEAF_SHA256 and model_sha256 == SYCL_DECODE_GRAPH_MODEL_SHA256,
+                "Decode graph requires the pinned graph leaf and evaluated Q8 text model")
+        require(isinstance(runtime_files, (tuple, list))
+                and any(isinstance(item, Identity) and item.path.name.casefold() == "ggml-sycl.dll"
+                        and item.sha256 == SYCL_DECODE_GRAPH_LEAF_SHA256 for item in runtime_files),
+                "Decode graph leaf must match the authenticated runtime inventory")
 
 
 def plain_path(value):
@@ -99,11 +113,27 @@ class LlamaConfig:
     sycl_host_cpu_count: int = 1
     sycl_kv_cache_type: str = "bf16"
     sycl_batch_size: int = 128
+    sycl_decode_graph: bool = False
+
+    def __post_init__(self):
+        require(type(self.sycl_decode_graph) is bool, "Invalid sycl_decode_graph boolean")
+        if self.sycl_decode_graph:
+            self._validate_profile()
+
+    def _validate_profile(self):
+        validate_kv_profile(self.engine, self.parallel_requests, self.sycl_kv_cache_type,
+                            self.admission_physical_bytes, self.admission_commit_bytes,
+                            batch_size=self.sycl_batch_size, host_cpu_count=self.sycl_host_cpu_count,
+                            worker_cpu=self.worker_cpu, vision_leaf=self.sycl_vision_leaf_sha256,
+                            cache_dir=self.sycl_cache_dir, decode_graph=self.sycl_decode_graph,
+                            model_sha256=getattr(self.model, "sha256", None), runtime_files=self.runtime_files)
 
     def files(self):
         return [item.path for item in (*self.runtime_files, self.model, self.projector, self.template)]
 
     def authenticate(self):
+        if self.sycl_decode_graph:
+            self._validate_profile()
         if self.sycl_cache_dir is not None:
             require(plain_path(str(self.sycl_cache_dir)).is_dir(), "SYCL cache directory is required")
         expected = {item.path.name.casefold() for item in self.runtime_files}
@@ -121,6 +151,8 @@ class LlamaConfig:
 
     def environment(self):
         require(self.engine in ("vulkan", "sycl"), "Invalid llama engine")
+        if self.sycl_decode_graph:
+            self._validate_profile()
         # Do not inherit undocumented arithmetic, backend selection or executable search overrides.
         allowed = {"SYSTEMROOT", "WINDIR", "TEMP", "TMP", "USERPROFILE", "LOCALAPPDATA", "APPDATA", "HOMEDRIVE", "HOMEPATH"}
         env = {key: value for key, value in os.environ.items() if key.upper() in allowed}
@@ -132,6 +164,8 @@ class LlamaConfig:
             env.update(ONEAPI_DEVICE_SELECTOR=f"level_zero:{self.device_index}", MKL_NUM_THREADS="1",
                        GGML_SYCL_FA_ONEDNN_UNMASKED=vision, GGML_SYCL_FA_ONEDNN_DG2_D64=vision,
                        ZES_ENABLE_SYSMAN="0", UR_L0_ENABLE_SYSMAN_ENV_DEFAULT="0", UR_L0_ENABLE_ZESINIT_DEFAULT="0")
+            if self.sycl_decode_graph:
+                env.update(GGML_SYCL_ENABLE_GRAPH="0", GGML_SYCL_DECODE_GRAPH="3")
             if self.sycl_cache_dir is not None:
                 require(plain_path(str(self.sycl_cache_dir)).is_dir(), "SYCL cache directory is required")
                 env.update(SYCL_CACHE_PERSISTENT="1", SYCL_CACHE_TRACE="1", SYCL_CACHE_MAX_SIZE=str(GIB),
@@ -141,13 +175,11 @@ class LlamaConfig:
         return env
 
     def argv(self, port, api_key, alias):
-        validate_kv_profile(self.engine, self.parallel_requests, self.sycl_kv_cache_type,
-                            self.admission_physical_bytes, self.admission_commit_bytes,
-                            batch_size=self.sycl_batch_size, host_cpu_count=self.sycl_host_cpu_count,
-                            worker_cpu=self.worker_cpu, vision_leaf=self.sycl_vision_leaf_sha256,
-                            cache_dir=self.sycl_cache_dir)
+        self._validate_profile()
         device = "SYCL0" if self.engine == "sycl" else "Vulkan0"
         return [str(self.runtime_dir / "llama-server.exe"),
+                # Device parsing initializes SYCL: its one-time graph settings need INFO logging already enabled.
+                *(["--log-verbosity", "4"] if self.sycl_decode_graph else []),
                 "--model", str(self.model.path), "--mmproj", str(self.projector.path),
                 "--device", device, "--mmproj-device", device,
                 *(["--tensor-split", "1"] if self.engine == "sycl" else []), "--n-gpu-layers", "99",
@@ -184,7 +216,7 @@ def load_config(path, expected_sha256):
     fields = {"activate", "runtime_dir", "runtime_files", "model", "projector", "template", device_field, "worker_cpu", "startup_seconds", "request_seconds", "max_image_pixels", "parallel_requests"}
     optional = {"admission_physical_bytes", "admission_commit_bytes"}
     if engine == "sycl":
-        optional |= {"sycl_cache_dir", "sycl_vision_leaf_sha256", "sycl_host_cpu_count", "sycl_kv_cache_type", "sycl_batch_size"}
+        optional |= {"sycl_cache_dir", "sycl_vision_leaf_sha256", "sycl_host_cpu_count", "sycl_kv_cache_type", "sycl_batch_size", "sycl_decode_graph"}
     require(fields <= set(raw) <= fields | optional, "Explicit engine-specific llama configuration is required")
     runtime = plain_path(raw["runtime_dir"])
     require(runtime.is_dir(), "Runtime directory is required")
@@ -213,14 +245,16 @@ def load_config(path, expected_sha256):
         require(type(raw[name]) is int and low <= raw[name] <= high, f"Invalid {name}")
     kv_type = raw.get("sycl_kv_cache_type", "bf16")
     batch_size = raw.get("sycl_batch_size", 128)
+    decode_graph = raw.get("sycl_decode_graph", False)
     # Pass raw forecasts so C5/C6 cannot inherit a missing field's default.
     validate_kv_profile(engine, raw["parallel_requests"], kv_type,
                         raw.get("admission_physical_bytes"), raw.get("admission_commit_bytes"),
                         batch_size=batch_size, host_cpu_count=host_cpus, worker_cpu=raw["worker_cpu"],
-                        vision_leaf=vision, cache_dir=cache)
+                        vision_leaf=vision, cache_dir=cache, decode_graph=decode_graph,
+                        model_sha256=model.sha256, runtime_files=runtime_files)
     forecasts = [raw.get("admission_physical_bytes", 6 * GIB), raw.get("admission_commit_bytes", 11 * GIB)]
     require(all(type(value) is int and GIB <= value <= 32 * GIB for value in forecasts), "Invalid admission forecasts")
     return LlamaConfig(expected_sha256, runtime, runtime_files, model, projector, template,
                        *(raw[name] for name in (device_field, "worker_cpu", "startup_seconds", "request_seconds", "max_image_pixels", "parallel_requests")), *forecasts,
                        engine=engine, sycl_cache_dir=cache, sycl_vision_leaf_sha256=vision, sycl_host_cpu_count=host_cpus,
-                       sycl_kv_cache_type=kv_type, sycl_batch_size=batch_size)
+                       sycl_kv_cache_type=kv_type, sycl_batch_size=batch_size, sycl_decode_graph=decode_graph)

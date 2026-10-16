@@ -490,6 +490,67 @@ class LlamaManagerTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'SHA-256'):
                 manage.worker_argv(values)
 
+    def test_decode_graph_installs_only_the_existing_five_slot_transport(self):
+        from runtime.llama.config import SYCL_DECODE_GRAPH_LEAF_SHA256, SYCL_DECODE_GRAPH_MODEL_SHA256
+        with tempfile.TemporaryDirectory() as temporary:
+            f = self.fixture(temporary)
+            raw = {'activate': 'evaluate-llama-b11429-sycl', 'parallel_requests': 5,
+                   'sycl_batch_size': 256, 'sycl_kv_cache_type': 'q8_0', 'sycl_decode_graph': True,
+                   'admission_physical_bytes': 21 * (1 << 28), 'admission_commit_bytes': 49 * (1 << 28),
+                   'worker_cpu': 0, 'sycl_host_cpu_count': 4, 'sycl_vision_leaf_sha256': SYCL_DECODE_GRAPH_LEAF_SHA256,
+                   'sycl_cache_dir': r'C:\owned cache', 'model': {'sha256': SYCL_DECODE_GRAPH_MODEL_SHA256},
+                   'runtime_files': [{'path': r'C:\runtime\ggml-sycl.dll', 'sha256': SYCL_DECODE_GRAPH_LEAF_SHA256}]}
+            values = self.settings(temporary, raw=json.dumps(raw).encode())
+            launch, settings = self.decoded(values)
+            self.assertEqual(settings['job_affinity'], 15)
+            argv = settings['argv']
+            self.assertEqual(argv[argv.index('--queue-limit') + 1], '4')
+            self.assertEqual(argv[argv.index('--idle-seconds') + 1], '300')
+            self.assertNotIn('--log-verbosity', argv)  # The Windows adapter owns engine options.
+            self.assertNotIn('GGML_SYCL_DECODE_GRAPH', launch)
+            self.install_fake(f, values)
+            receipt = json.loads((f[2] / 'installation.json').read_text())
+            self.assertEqual(receipt['llama_config_sha256'], values.llama_config_sha256)
+            self.assertEqual(receipt['llama_parallel_requests'], 5)
+            self.assertEqual(receipt['llama_job_affinity'], 15)
+
+    def test_decode_graph_invalid_profiles_refuse_before_host_mutation(self):
+        import copy
+        from runtime.llama.config import SYCL_DECODE_GRAPH_LEAF_SHA256, SYCL_DECODE_GRAPH_MODEL_SHA256
+        good = {'activate': 'evaluate-llama-b11429-sycl', 'parallel_requests': 5,
+                'sycl_batch_size': 256, 'sycl_kv_cache_type': 'q8_0', 'sycl_decode_graph': True,
+                'admission_physical_bytes': 21 * (1 << 28), 'admission_commit_bytes': 49 * (1 << 28),
+                'worker_cpu': 0, 'sycl_host_cpu_count': 4, 'sycl_vision_leaf_sha256': SYCL_DECODE_GRAPH_LEAF_SHA256,
+                'sycl_cache_dir': r'C:\owned cache', 'model': {'sha256': SYCL_DECODE_GRAPH_MODEL_SHA256},
+                'runtime_files': [{'path': r'C:\runtime\ggml-sycl.dll', 'sha256': SYCL_DECODE_GRAPH_LEAF_SHA256}]}
+        changes = [('sycl_decode_graph', value) for value in (None, 0, 1, 'true', [], {})]
+        changes += [('parallel_requests', value) for value in (1, 2, 4, 6, True)]
+        changes += [('sycl_batch_size', value) for value in (128, 512, True, 256.0)]
+        changes += [('sycl_kv_cache_type', value) for value in ('bf16', 'f16', True)]
+        changes += [('sycl_host_cpu_count', value) for value in (1, 8, True)]
+        changes += [('worker_cpu', value) for value in (1, True)]
+        changes += [('activate', 'evaluate-llama-b11429-vulkan'), ('sycl_vision_leaf_sha256', 'a' * 64),
+                    ('runtime_files', []), ('model', {'sha256': 'a' * 64}), ('sycl_cache_dir', ''),
+                    ('context', 8192), ('max_output_tokens', 512)]
+        for key in ('admission_physical_bytes', 'admission_commit_bytes'):
+            changes += [(key, value) for value in (None, good[key] - 1, True, float(good[key]), 33 << 30)]
+        for key, value in changes:
+            raw = copy.deepcopy(good)
+            raw[key] = value
+            with self.subTest(key=key, value=value), tempfile.TemporaryDirectory() as temporary:
+                values = self.settings(temporary, raw=json.dumps(raw).encode())
+                with patch.object(manage, 'check_unit_ownership') as ownership, patch.object(manage, 'systemctl') as service:
+                    with self.assertRaises(ValueError):
+                        manage.install(values)
+                    ownership.assert_not_called()
+                    service.assert_not_called()
+        for value in (False, True):
+            with self.subTest(vulkan=value), tempfile.TemporaryDirectory() as temporary:
+                raw = {'activate': 'evaluate-llama-b11429-vulkan', 'parallel_requests': 1, 'sycl_decode_graph': value}
+                values = self.settings(temporary, raw=json.dumps(raw).encode())
+                with self.assertRaises(ValueError):
+                    manage.llama_profile(values)
+
     def test_unmeasured_c5_and_b256_combinations_refuse_before_installation(self):
         good = {'activate': 'evaluate-llama-b11429-sycl', 'parallel_requests': 5,
                 'sycl_batch_size': 256, 'sycl_kv_cache_type': 'q8_0',

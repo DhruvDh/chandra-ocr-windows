@@ -6,7 +6,8 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from runtime.llama.config import ACTIVATION, SYCL_ACTIVATION, load_config
+from runtime.llama.config import (ACTIVATION, SYCL_ACTIVATION, SYCL_DECODE_GRAPH_LEAF_SHA256,
+                                 SYCL_DECODE_GRAPH_MODEL_SHA256, load_config)
 from runtime.native.winjob import command_line
 
 
@@ -57,6 +58,12 @@ class ConfigTests(unittest.TestCase):
                         admission_physical_bytes=21 * (1 << 28), admission_commit_bytes=49 * (1 << 28),
                         sycl_host_cpu_count=4, sycl_cache_dir=str(cache),
                         sycl_vision_leaf_sha256=self.raw["runtime_files"][1]["sha256"])
+
+    def select_decode_graph(self):
+        self.select_c5_b256()
+        self.raw.update(sycl_decode_graph=True, sycl_vision_leaf_sha256=SYCL_DECODE_GRAPH_LEAF_SHA256)
+        self.raw["runtime_files"][1]["sha256"] = SYCL_DECODE_GRAPH_LEAF_SHA256
+        self.raw["model"]["sha256"] = SYCL_DECODE_GRAPH_MODEL_SHA256
 
     def test_authentication_covers_code_weights_projector_template_and_added_dll(self):
         config = self.config()
@@ -258,6 +265,113 @@ class ConfigTests(unittest.TestCase):
                             admission_physical_bytes=21 * (1 << 28), admission_commit_bytes=49 * (1 << 28))
             with self.subTest(parallel=parallel), self.assertRaisesRegex(ValueError, "Batch 256"):
                 self.config()
+
+    def test_decode_graph_adds_only_early_info_option_and_explicit_graph_environment(self):
+        from dataclasses import replace
+        from unittest.mock import patch
+        from runtime.llama.backend import LlamaBackend
+        self.select_decode_graph()
+        graph = self.config()
+        eager = replace(graph, sycl_decode_graph=False)
+        argv = graph.argv(18003, "key", "alias")
+        self.assertEqual(argv[:3], [str(self.runtime / "llama-server.exe"), "--log-verbosity", "4"])
+        self.assertLess(argv.index("--log-verbosity"), argv.index("--device"))
+        self.assertLess(argv.index("--log-verbosity"), argv.index("--mmproj-device"))
+        self.assertEqual(argv[:1] + argv[3:], eager.argv(18003, "key", "alias"))
+        command_line(argv)
+        self.assertEqual(len(argv), 64)
+        for flag, value in (("--ctx-size", "81920"), ("--n-predict", "12384"), ("--parallel", "5"),
+                            ("--batch-size", "256"), ("--ubatch-size", "256"),
+                            ("--threads", "1"), ("--threads-batch", "1"),
+                            ("--cache-type-k", "q8_0"), ("--cache-type-v", "q8_0")):
+            self.assertEqual(argv[argv.index(flag) + 1], value)
+        with patch.dict("os.environ", {"SYSTEMROOT": str(self.root), "GGML_SYCL_ENABLE_GRAPH": "1",
+                                       "GGML_SYCL_DECODE_GRAPH": "1", "GGML_SYCL_DEBUG": "1",
+                                       "GGML_SYCL_DEV_DEBUG": "1"}, clear=True):
+            expected = eager.environment()
+            for key in ("GGML_SYCL_ENABLE_GRAPH", "GGML_SYCL_DECODE_GRAPH", "GGML_SYCL_DEBUG", "GGML_SYCL_DEV_DEBUG"):
+                self.assertNotIn(key, expected)
+            expected.update(GGML_SYCL_ENABLE_GRAPH="0", GGML_SYCL_DECODE_GRAPH="3")
+            self.assertEqual(graph.environment(), expected)
+        self.assertEqual(graph.files(), eager.files())
+        self.assertEqual(graph.job_limits(), eager.job_limits())
+        self.assertEqual(LlamaBackend(graph).parallel_requests, 5)
+        # Pinned names/hashes do not authenticate these deliberately synthetic fixture bytes.
+        with self.assertRaisesRegex(ValueError, "SHA-256"):
+            graph.authenticate()
+
+    def test_decode_graph_omission_and_false_preserve_every_existing_profile(self):
+        from unittest.mock import patch
+        vulkan = self.config()
+        vulkan_raw = dict(self.raw)
+        self.assertIs(vulkan.sycl_decode_graph, False)
+        self.assertNotIn("--log-verbosity", vulkan.argv(18003, "key", "alias"))
+        self.select_sycl()
+        for slots, kv, batch in ((1, "bf16", 128), (2, "q8_0", 128), (4, "bf16", 128), (6, "q8_0", 128)):
+            self.raw.update(parallel_requests=slots, sycl_kv_cache_type=kv, sycl_batch_size=batch,
+                            admission_physical_bytes=21 * (1 << 28), admission_commit_bytes=49 * (1 << 28))
+            omitted = self.config()
+            self.raw["sycl_decode_graph"] = False
+            explicit = self.config()
+            self.assertIs(omitted.sycl_decode_graph, False)
+            self.assertEqual(omitted.argv(18003, "key", "alias"), explicit.argv(18003, "key", "alias"))
+            with patch.dict("os.environ", {"SYSTEMROOT": str(self.root)}, clear=True):
+                self.assertEqual(omitted.environment(), explicit.environment())
+            self.assertEqual(omitted.job_limits(), explicit.job_limits())
+            del self.raw["sycl_decode_graph"]
+        for value in (False, True):
+            self.raw = {**vulkan_raw, "sycl_decode_graph": value}
+            with self.assertRaisesRegex(ValueError, "engine-specific"):
+                self.config()
+
+    def test_decode_graph_rejects_other_shapes_identities_types_and_context_overrides(self):
+        import copy
+        from dataclasses import replace
+        from types import SimpleNamespace
+        from runtime.llama.backend import LlamaBackend
+        self.select_decode_graph()
+        good = copy.deepcopy(self.raw)
+        config = self.config()
+        changes = [("sycl_decode_graph", value) for value in (None, 0, 1, "true", [], {})]
+        changes += [("parallel_requests", value) for value in (1, 2, 4, 6, True)]
+        changes += [("sycl_batch_size", value) for value in (128, 512, True, 256.0)]
+        changes += [("sycl_kv_cache_type", value) for value in ("bf16", "f16", True)]
+        changes += [("sycl_host_cpu_count", value) for value in (1, 8, True)]
+        changes += [("worker_cpu", value) for value in (1, True)]
+        changes += [("sycl_vision_leaf_sha256", "a" * 64), ("sycl_cache_dir", None), ("sycl_cache_dir", True),
+                    ("context", 8192), ("max_output_tokens", 512)]
+        for key in ("admission_physical_bytes", "admission_commit_bytes"):
+            changes += [(key, value) for value in (None, good[key] - 1, True, float(good[key]), 33 << 30)]
+        for key, value in changes:
+            self.raw = copy.deepcopy(good)
+            # JSON null is distinct from omission for the boolean selector.
+            if value is None and key != "sycl_decode_graph":
+                del self.raw[key]
+            else:
+                self.raw[key] = value
+            with self.subTest(load=(key, value)), self.assertRaises(ValueError):
+                self.config()
+        for field in ("model", "runtime_files"):
+            self.raw = copy.deepcopy(good)
+            target = self.raw[field] if field == "model" else self.raw[field][1]
+            target["sha256"] = "a" * 64
+            with self.subTest(identity=field), self.assertRaises(ValueError):
+                self.config()
+        direct = [{key: value} for key, value in changes if key not in ("context", "max_output_tokens")]
+        direct += [{"engine": "vulkan"}, {"model": None}, {"model": replace(config.model, sha256="a" * 64)},
+                   {"runtime_files": (config.runtime_files[0],)}]
+        for changed in direct:
+            with self.subTest(construction=changed), self.assertRaises(ValueError):
+                replace(config, **changed)
+            invalid = SimpleNamespace(**{**vars(config), **changed})
+            with self.subTest(backend=changed), self.assertRaises(ValueError):
+                LlamaBackend(invalid)
+            # Bypass construction deliberately to verify argv independently rechecks the profile.
+            invalid_config = object.__new__(type(config))
+            for key, value in vars(invalid).items():
+                object.__setattr__(invalid_config, key, value)
+            with self.subTest(argv=changed), self.assertRaises(ValueError):
+                invalid_config.argv(18003, "key", "alias")
 
     def test_kv_type_is_sycl_only_and_never_coerced(self):
         for value in ("bf16", "q8_0"):

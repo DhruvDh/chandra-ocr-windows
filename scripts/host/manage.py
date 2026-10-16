@@ -130,6 +130,10 @@ def llama_profile(args):
     if (not isinstance(kv_type, str) or kv_type not in ('bf16', 'q8_0')
             or ('sycl_kv_cache_type' in raw and raw['activate'] != 'evaluate-llama-b11429-sycl')):
         raise ValueError("sycl_kv_cache_type requires explicit SYCL and bf16 or q8_0")
+    decode_graph = raw.get('sycl_decode_graph', False)
+    if (type(decode_graph) is not bool
+            or ('sycl_decode_graph' in raw and raw['activate'] != 'evaluate-llama-b11429-sycl')):
+        raise ValueError("sycl_decode_graph requires explicit SYCL and a boolean")
     batch_size = raw.get('sycl_batch_size', 128)
     if (type(batch_size) is not int or batch_size not in (128, 256)
             or ('sycl_batch_size' in raw and raw['activate'] != 'evaluate-llama-b11429-sycl')
@@ -153,6 +157,21 @@ def llama_profile(args):
                 or type(raw['sycl_host_cpu_count']) is not int or raw['sycl_host_cpu_count'] != 4
                 or type(raw.get('worker_cpu')) is not int or raw['worker_cpu'] != 0):
             raise ValueError("SYCL host CPU profile requires count 4 and worker_cpu 0")
+    if decode_graph:
+        graph_leaf = '4e4445190ab5b7686a0990c11aa8faf8f0c27bbf2b9f445430193b0aaa446234'
+        graph_model = '74699f738159fc227e8153e5345cc36795aa81fe726ff4746fee8f7b7efe7f6d'
+        allowed = {'activate', 'runtime_dir', 'runtime_files', 'model', 'projector', 'template', 'sycl_device_index',
+                   'worker_cpu', 'startup_seconds', 'request_seconds', 'max_image_pixels', 'parallel_requests',
+                   'admission_physical_bytes', 'admission_commit_bytes', 'sycl_cache_dir', 'sycl_vision_leaf_sha256',
+                   'sycl_host_cpu_count', 'sycl_kv_cache_type', 'sycl_batch_size', 'sycl_decode_graph'}
+        if (slots != 5 or batch_size != 256 or kv_type != 'q8_0' or not set(raw) <= allowed
+                or raw.get('sycl_vision_leaf_sha256') != graph_leaf
+                or not isinstance(raw.get('model'), dict) or raw['model'].get('sha256') != graph_model
+                or not isinstance(raw.get('runtime_files'), list)
+                or not any(isinstance(item, dict) and isinstance(item.get('path'), str)
+                           and PureWindowsPath(item['path']).name.casefold() == 'ggml-sycl.dll'
+                           and item.get('sha256') == graph_leaf for item in raw['runtime_files'])):
+            raise ValueError("Decode graph requires the pinned graph leaf and Q8 text in the explicit SYCL Q8 five-slot batch-256 profile")
     return raw
 
 

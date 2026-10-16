@@ -103,7 +103,10 @@ class LlamaBackend:
                             host_cpu_count=getattr(config, "sycl_host_cpu_count", 1),
                             worker_cpu=getattr(config, "worker_cpu", None),
                             vision_leaf=getattr(config, "sycl_vision_leaf_sha256", None),
-                            cache_dir=getattr(config, "sycl_cache_dir", None))
+                            cache_dir=getattr(config, "sycl_cache_dir", None),
+                            decode_graph=getattr(config, "sycl_decode_graph", False),
+                            model_sha256=getattr(getattr(config, "model", None), "sha256", None),
+                            runtime_files=getattr(config, "runtime_files", ()))
         self.config, self.parallel_requests = config, config.parallel_requests
         self._worker_factory, self._client_factory = worker_factory, client_factory
         self._prepare, self._memory, self._port_factory = prepare, memory, port_factory
