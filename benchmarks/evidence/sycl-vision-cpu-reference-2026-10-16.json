@@ -1,0 +1,162 @@
+{
+  "schema": "sycl-vision-cpu-reference-evidence-v1",
+  "date": "2026-10-16",
+  "case": "native-0",
+  "status": {
+    "capture_success": true,
+    "child_returncode": 0,
+    "child_joined": true,
+    "process_group_absent": true,
+    "kill_escalated": false,
+    "automatic_replay": false,
+    "guard_or_retry": false,
+    "numerical_acceptance": null,
+    "independent_review": "Clear for the scoped conclusion: fused vision is substantially closer to independent CPU FP32 on native-0; the specific divergence concern is resolved sufficiently to resume engineering, without blanket numerical or deployment acceptance.",
+    "deployment_qualification": "not established"
+  },
+  "reference": {
+    "description": "Independent finite-precision CPU FP32 vision reference; not exact real arithmetic and not an AMD internal tensor.",
+    "checkpoint_revision": "af93b47dba1b47b6640c86ccf487ed2260ab9a09",
+    "checkpoint_sha256": "0804568be9f099d6479fad9ed77a4da4611f3c1e7bc6e009af7dce45e8aa3847",
+    "weights_loaded": 297,
+    "parameters": 333514240,
+    "source_weight_dtype": "BF16",
+    "compute_dtype": "FP32",
+    "final_tensor_shape": [3024, 2560],
+    "final_tensor_tokens": 3024,
+    "final_tensor_width": 2560,
+    "tensor_sha256": "c0ad2dccb569cae11b811e77fbb3d8fdebd773088a934613c230b9f0a628ecf3",
+    "tensor_finite": true,
+    "vision_attention": {
+      "calls": 24,
+      "operator": "aten::_scaled_dot_product_flash_attention_for_cpu",
+      "query_key_value_shape": [1, 16, 12096, 64],
+      "dtype": "FP32",
+      "device": "CPU",
+      "dispatch": "direct operator call; unsupported dispatch fails; no fallback",
+      "mask": null,
+      "dropout": 0,
+      "causal": false,
+      "scale": 0.125
+    }
+  },
+  "inputs": {
+    "manifest_sha256": "9bff81ef22f676ec1e2775815f57d05abf635a13a237836638923d0e93f64fd5",
+    "image_case": "native-0",
+    "processor_pixels_shape": [12096, 1536],
+    "grid_thw": [1, 126, 96],
+    "sha256": {
+      "model_config_json": "e26f17b70463de21fd68f1ef6d8f67f8e33e65d55a7a6895242130a18db60587",
+      "pixel_values_raw": "cceb99a5792fd339216bb98bdc6fcbebf607b49993236d10b08a356d029a3440",
+      "image_grid_raw": "f642a0b047c08f822a5144bbb041513db17714e1a80153ac0d45f45aeb39321e",
+      "input_image": "8c7af6cdb9c3fc1530fae40f2dee3d4001a029364ed3acfa0242128b353754a9",
+      "input_manifest": "0aa588473930f110cc359ba369623f29765a85f4e05ffcbca2ac509933b787ae",
+      "processor_reference": "778d51c98b8efbb15da9c5fdebb529980752587b5badc73204e4f86ac7bd5a4f",
+      "prepared_input_receipt": "8990bbdbbe6fd6ed90ff0e29b48b3d002e827110ccbb503abbbe61a646e62be7"
+    }
+  },
+  "runtime": {
+    "python_version": "3.12.14",
+    "python_executable_sha256": "5ebcd7993f0e40cb4b16e15d2c4c3c343ecad419966299b8e8f6f9e6a36bf779",
+    "pytorch_version": "2.14.1+cpu",
+    "pytorch_git_revision": "5c4886908584029761b579af026dcfb627c84070",
+    "transformers_version": "5.18.0",
+    "runtime_file_sha256": {
+      "torch_cpu_library": "5acf62dcd9d367db4788122f8fefd506027ed5a7aec70467a7fffd08a97ad64c",
+      "safetensors_rust_extension": "e6f17a9e9846bc2bc4ad94cc5431746b59785de3d2681ef2666e8890ae192dfb",
+      "transformers_qwen3_5_modeling": "d0c8561d91e31e50d9a57b74196c5a7ad023e42ebe9f84004d0a535310879939",
+      "transformers_qwen3_5_configuration": "2f26c4bb911772d42a5f16e82bdea4b9ba1ac07872df527ec228622d35f3c30e",
+      "transformers_initialization": "a2392653161633d4f8aefb473e776113ec5df8844acdba892569407ca56c2d6a",
+      "transformers_vision_utils": "bcecd5a92b3266b9926272a549d2b1a0f1fe7646c698c0fa19bd96f976085356",
+      "transformers_modeling_utils": "3b615a8d21cbbf8e4193422db7d168b4567ad25688aa585ffe440bd6cb128ba3",
+      "torch_mkldnn_backend": "574aef1845cc930e7d2333d08adbbdf5ac96f6755b19a4c1571ea72d9d09c83a",
+      "transformers_generic_utils": "cdc3e071b1e8cc9286178b7335d72d5fd3467423d6dd3b1eeca6a42ec387fb51"
+    },
+    "attention_kernel_source": {
+      "file": "PyTorch aten/native/cpu/FlashAttentionKernel.cpp",
+      "git_revision": "5c4886908584029761b579af026dcfb627c84070",
+      "sha256": "2e77b79c6f340fe01b15e442ea9dd319649087579a31906c08f6afe2c86ec482"
+    }
+  },
+  "capture": {
+    "capture_source_sha256": "6cd18ba7b8c410ac5fdb58272f9d3c1a40128fd50b8bc4a747185d01bdefe42a",
+    "receipt_sha256": "af6b3bd80f1c2d5d7e04f5e7389c000f30bea0b25cbf5c72891390b66580167f",
+    "metadata_sha256": "185364c5d99b461c45a28998c02b9b3753b31c1f2bd0550af8bed5572a0bbae4",
+    "forward_seconds": 52.85074559600616,
+    "elapsed_seconds": 71.05067166899971,
+    "process_maxrss_bytes": 2476285952,
+    "logical_cpu_limit": 4,
+    "torch_intraop_threads": 4,
+    "cpu_quota_percent": 400,
+    "memory_limit_bytes": 6442450944,
+    "swap_limit_bytes": 0,
+    "minimum_sampled_host_memavailable_bytes": 48531992576,
+    "observed_cgroup_peak_bytes": 6442450944,
+    "resource_interpretation": "The cgroup peak reached its configured limit while process maximum RSS was about 2.48 GB. memory.stat attribution was not collected; no cache-cause or OOM claim is made."
+  },
+  "comparison": {
+    "file_sha256": "5858a36e4b7ebf64c2e22f441b808dbae1442c9ca033ac3ee5fa8e426ac9b193",
+    "comparison_wrapper_sha256": "b0f8f16a3dcbb8612d4c5189eab7008823d7fc61819976d389ea1203eb352c22",
+    "comparator_sha256": "f63c660b9a9c136539f4af96391a0967b780971b599a8a1e3fa9e2823d0767b5",
+    "integrity_verified": true,
+    "numerical_acceptance": null,
+    "execution": {
+      "wall_seconds": 3.680,
+      "cpu_seconds": 2.893,
+      "peak_memory_mib": 22.7,
+      "swap_bytes": 0
+    },
+    "method": "FP64 reductions; NMSE is sum((candidate-reference)^2) / sum(reference^2); per-token distributions use nearest rank; no token rows are included.",
+    "scope": "Each actual GPU arm is compared to the independent CPU FP32 vision tensor for the same native-0 image, grid, patch order and merger order. Differences include all vision arithmetic, not attention alone. The GPU-normalized input was not captured; the source-derived scalar normalization ordering delta is at most 5.914e-8. Neither arm is designated as ground truth.",
+    "arms": {
+      "off": {
+        "receipt_sha256": "9ce6852e022fa1e6405dab7e6a04e3d9b98ee96bc08cd165c2d9ec976b643d51",
+        "owner_sha256": "f3ba3651b48f9bf9d1257ea87153bd30443d180d3d47a82181b5242c6775767c",
+        "dump_sha256": "0f202428e8ee11c738c7c2c0a3d85727e33b1854e02f333f4c8280076af4f272",
+        "relative_l2": 0.12281667030992435,
+        "nmse_reference_energy": 0.015083934506016654,
+        "max_absolute_error": 2.80195951461792,
+        "per_token_relative_l2": {
+          "p50": 0.11538032114958631,
+          "p95": 0.4501220735672108,
+          "p99": 0.7516002640160784,
+          "max": 2.5111023356057087
+        },
+        "angular_error_degrees": {
+          "p50": 5.501146906900639,
+          "p95": 17.30012156639777,
+          "p99": 30.577186507669882,
+          "max": 57.14911238028886
+        },
+        "undefined_relative_l2_tokens": 0
+      },
+      "on": {
+        "receipt_sha256": "5fba4ddc772a1e5cdf2f2b145354987453a340fe597c6e97ee6ed6cabeba5da1",
+        "owner_sha256": "9b0ff59cea7656715d063a28aedfa77753093c5f417c43cfff1bf21468570dd3",
+        "dump_sha256": "b7b6d676ba4a8f135f34e691dff6e47061f2125550efe4af669698b686da0626",
+        "relative_l2": 0.008531856549517804,
+        "nmse_reference_energy": 0.00007279257618154984,
+        "max_absolute_error": 0.4063146114349365,
+        "per_token_relative_l2": {
+          "p50": 0.0046641052701277075,
+          "p95": 0.02678125519387027,
+          "p99": 0.06656636704819763,
+          "max": 0.3443887493793815
+        },
+        "angular_error_degrees": {
+          "p50": 0.223068630823583,
+          "p95": 1.0699579411314315,
+          "p99": 2.379282449399149,
+          "max": 14.05145990814662
+        },
+        "undefined_relative_l2_tokens": 0
+      }
+    }
+  },
+  "limitations": [
+    "One native-0 image and one CPU reference run do not establish general numerical equivalence.",
+    "The CPU reference is independent finite-precision FP32, not exact arithmetic or the AMD internal tensor; the GPU-normalized intermediate was not captured.",
+    "The comparison covers all vision arithmetic and sets no acceptance threshold; independent review clears only the scoped improvement and resumption of engineering.",
+    "No inference-speed result, deployment qualification, or promotion claim follows from this numerical comparison."
+  ]
+}
