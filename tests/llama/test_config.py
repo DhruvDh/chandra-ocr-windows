@@ -49,6 +49,15 @@ class ConfigTests(unittest.TestCase):
         Path(item["path"]).rename(path)
         item["path"] = str(path)
 
+    def select_c5_b256(self):
+        self.select_sycl()
+        cache = self.root / "private-cache"
+        cache.mkdir()
+        self.raw.update(parallel_requests=5, sycl_batch_size=256, sycl_kv_cache_type="q8_0",
+                        admission_physical_bytes=21 * (1 << 28), admission_commit_bytes=49 * (1 << 28),
+                        sycl_host_cpu_count=4, sycl_cache_dir=str(cache),
+                        sycl_vision_leaf_sha256=self.raw["runtime_files"][1]["sha256"])
+
     def test_authentication_covers_code_weights_projector_template_and_added_dll(self):
         config = self.config()
         config.authenticate()
@@ -140,6 +149,7 @@ class ConfigTests(unittest.TestCase):
         command_line(argv)
         self.assertLessEqual(len(argv), 64)
         for flag, value in (("--ctx-size", "98304"), ("--parallel", "6"), ("--n-predict", "12384"),
+                            ("--batch-size", "128"), ("--ubatch-size", "128"),
                             ("--cache-type-k", "q8_0"), ("--cache-type-v", "q8_0")):
             self.assertEqual(argv[argv.index(flag) + 1], value)
         self.assertIn("--no-kv-unified", argv)
@@ -161,6 +171,93 @@ class ConfigTests(unittest.TestCase):
                     invalid.argv(18003, "key", "alias")
                 with self.assertRaises(ValueError):
                     LlamaBackend(invalid)
+
+    def test_c5_b256_preserves_every_other_argument_environment_and_resource_limit(self):
+        from dataclasses import replace
+        from unittest.mock import patch
+        from runtime.llama.backend import LlamaBackend
+        from runtime.llama.memory import FLOOR, check_memory
+        self.select_c5_b256()
+        config = self.config()
+        config.authenticate()
+        c6 = replace(config, parallel_requests=6, sycl_batch_size=128)
+        expected = c6.argv(18003, "key", "alias")
+        for flag, value in (("--ctx-size", "81920"), ("--parallel", "5"),
+                            ("--batch-size", "256"), ("--ubatch-size", "256")):
+            expected[expected.index(flag) + 1] = value
+        self.assertEqual(config.argv(18003, "key", "alias"), expected)
+        command_line(expected)
+        self.assertLessEqual(len(expected), 64)
+        self.assertIn("--no-kv-unified", expected)
+        self.assertEqual(config.files(), c6.files())
+        self.assertEqual(config.job_limits(), c6.job_limits())
+        limits = config.job_limits()
+        self.assertEqual((limits.process_memory, limits.job_memory, limits.affinity),
+                         (21 * (1 << 29), 43 * (1 << 28), 15))
+        with patch.dict("os.environ", {"SYSTEMROOT": str(self.root), "LLAMA_ARG_BATCH": "512",
+                                       "GGML_SYCL_ENABLE_GRAPH": "1"}, clear=True):
+            self.assertEqual(config.environment(), c6.environment())
+            self.assertNotIn("LLAMA_ARG_BATCH", config.environment())
+            self.assertNotIn("GGML_SYCL_ENABLE_GRAPH", config.environment())
+            self.assertEqual(config.environment()["OMP_NUM_THREADS"], "1")
+            self.assertEqual(config.environment()["MKL_NUM_THREADS"], "1")
+        self.assertEqual(LlamaBackend(config).parallel_requests, 5)
+        for key, forecast in (("available_physical", config.admission_physical_bytes),
+                              ("available_commit", config.admission_commit_bytes)):
+            observed = {"available_physical": 40 << 30, "available_commit": 40 << 30}
+            observed[key] = forecast + FLOOR
+            with self.subTest(key=key), self.assertRaises(RuntimeError):
+                check_memory(observed, config.admission_physical_bytes, config.admission_commit_bytes)
+            observed[key] += 1
+            check_memory(observed, config.admission_physical_bytes, config.admission_commit_bytes)
+
+    def test_c5_b256_refuses_unmeasured_shapes_precision_affinity_and_missing_forecasts(self):
+        from dataclasses import replace
+        from runtime.llama.backend import LlamaBackend
+        self.select_c5_b256()
+        good = dict(self.raw)
+        config = self.config()
+        changes = [("sycl_batch_size", value) for value in (None, True, 128, 256.0, "256", 512)]
+        changes += [("parallel_requests", value) for value in (True, 3, 7, 8)]
+        changes += [("sycl_kv_cache_type", value) for value in (None, "bf16", "f16")]
+        changes += [("sycl_host_cpu_count", value) for value in (None, 1, 8, True)]
+        changes += [("worker_cpu", value) for value in (True, 1)]
+        changes += [("sycl_cache_dir", None), ("sycl_vision_leaf_sha256", None),
+                    ("sycl_vision_leaf_sha256", "0" * 64), ("context", 8192), ("max_output_tokens", 512)]
+        for field in ("admission_physical_bytes", "admission_commit_bytes"):
+            changes += [(field, value) for value in (None, good[field] - 1, True, float(good[field]), 33 << 30)]
+        for field, value in changes:
+            self.raw = dict(good)
+            if value is None:
+                del self.raw[field]
+            else:
+                self.raw[field] = value
+            with self.subTest(field=field, value=value), self.assertRaises(ValueError):
+                self.config()
+        for changes in ({"parallel_requests": 4}, {"parallel_requests": 6}, {"engine": "vulkan"},
+                        {"sycl_batch_size": 128}, {"sycl_batch_size": True}, {"sycl_kv_cache_type": "bf16"},
+                        {"sycl_host_cpu_count": 1}, {"worker_cpu": True}, {"sycl_cache_dir": None},
+                        {"sycl_vision_leaf_sha256": None}, {"admission_physical_bytes": 5 << 30},
+                        {"admission_commit_bytes": 12 << 30}):
+            invalid = replace(config, **changes)
+            with self.subTest(direct=changes):
+                with self.assertRaises(ValueError):
+                    invalid.argv(18003, "key", "alias")
+                with self.assertRaises(ValueError):
+                    LlamaBackend(invalid)
+
+    def test_batch_option_is_sycl_only_and_256_is_exclusive_to_c5(self):
+        for value in (128, 256):
+            self.raw["sycl_batch_size"] = value
+            with self.subTest(engine="vulkan", value=value), self.assertRaisesRegex(ValueError, "engine-specific"):
+                self.config()
+        del self.raw["sycl_batch_size"]
+        self.select_sycl()
+        for parallel in (1, 2, 4, 6):
+            self.raw.update(parallel_requests=parallel, sycl_batch_size=256, sycl_kv_cache_type="q8_0",
+                            admission_physical_bytes=21 * (1 << 28), admission_commit_bytes=49 * (1 << 28))
+            with self.subTest(parallel=parallel), self.assertRaisesRegex(ValueError, "Batch 256"):
+                self.config()
 
     def test_kv_type_is_sycl_only_and_never_coerced(self):
         for value in ("bf16", "q8_0"):

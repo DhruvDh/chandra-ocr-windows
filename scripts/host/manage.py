@@ -124,18 +124,30 @@ def llama_profile(args):
     if not isinstance(raw, dict) or raw.get("activate") not in ("evaluate-llama-b11429-vulkan", "evaluate-llama-b11429-sycl"):
         raise ValueError("Explicit llama candidate configuration is required")
     slots = raw.get("parallel_requests")
-    if type(slots) is not int or slots not in (1, 2, 4, 6):
-        raise ValueError("llama parallel_requests must be 1, 2, 4 or conditional 6")
+    if type(slots) is not int or slots not in (1, 2, 4, 5, 6):
+        raise ValueError("llama parallel_requests must be 1, 2, 4 or conditional 5/6")
     kv_type = raw.get('sycl_kv_cache_type', 'bf16')
     if (not isinstance(kv_type, str) or kv_type not in ('bf16', 'q8_0')
             or ('sycl_kv_cache_type' in raw and raw['activate'] != 'evaluate-llama-b11429-sycl')):
         raise ValueError("sycl_kv_cache_type requires explicit SYCL and bf16 or q8_0")
-    if slots == 6:
+    batch_size = raw.get('sycl_batch_size', 128)
+    if (type(batch_size) is not int or batch_size not in (128, 256)
+            or ('sycl_batch_size' in raw and raw['activate'] != 'evaluate-llama-b11429-sycl')
+            or (batch_size == 256 and slots != 5)):
+        raise ValueError("sycl_batch_size requires SYCL and batch 256 is limited to the explicit Q8 five-slot profile")
+    if slots in (5, 6):
         physical, commit = raw.get('admission_physical_bytes'), raw.get('admission_commit_bytes')
         if (raw['activate'] != 'evaluate-llama-b11429-sycl' or kv_type != 'q8_0'
                 or type(physical) is not int or not 21 * (1 << 28) <= physical <= 32 * (1 << 30)
                 or type(commit) is not int or not 49 * (1 << 28) <= commit <= 32 * (1 << 30)):
-            raise ValueError("Six slots require explicit SYCL Q8 KV and admission forecasts >= 5.25 GiB physical and 12.25 GiB commit")
+            raise ValueError("Five or six slots require explicit SYCL Q8 KV and admission forecasts >= 5.25 GiB physical and 12.25 GiB commit")
+    if slots == 5:
+        if (batch_size != 256 or type(raw.get('sycl_host_cpu_count')) is not int or raw['sycl_host_cpu_count'] != 4
+                or type(raw.get('worker_cpu')) is not int or raw['worker_cpu'] != 0
+                or not isinstance(raw.get('sycl_vision_leaf_sha256'), str)
+                or not re.fullmatch(r'[0-9a-f]{64}', raw['sycl_vision_leaf_sha256'])
+                or not isinstance(raw.get('sycl_cache_dir'), str) or not raw['sycl_cache_dir']):
+            raise ValueError("Five slots require explicit batch 256, four CPUs, fused vision and persistent cache")
     if 'sycl_host_cpu_count' in raw:
         if (raw['activate'] != 'evaluate-llama-b11429-sycl'
                 or type(raw['sycl_host_cpu_count']) is not int or raw['sycl_host_cpu_count'] != 4

@@ -98,7 +98,12 @@ class LlamaBackend:
     def __init__(self, config, *, worker_factory=OwnedWorker, client_factory=httpx.Client,
                  prepare=_prepare, memory=observe_memory, port_factory=_private_port):
         validate_kv_profile(config.engine, config.parallel_requests, getattr(config, "sycl_kv_cache_type", "bf16"),
-                            config.admission_physical_bytes, config.admission_commit_bytes)
+                            config.admission_physical_bytes, config.admission_commit_bytes,
+                            batch_size=getattr(config, "sycl_batch_size", 128),
+                            host_cpu_count=getattr(config, "sycl_host_cpu_count", 1),
+                            worker_cpu=getattr(config, "worker_cpu", None),
+                            vision_leaf=getattr(config, "sycl_vision_leaf_sha256", None),
+                            cache_dir=getattr(config, "sycl_cache_dir", None))
         self.config, self.parallel_requests = config, config.parallel_requests
         self._worker_factory, self._client_factory = worker_factory, client_factory
         self._prepare, self._memory, self._port_factory = prepare, memory, port_factory

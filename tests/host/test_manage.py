@@ -461,6 +461,74 @@ class LlamaManagerTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'SHA-256'):
                 manage.worker_argv(values)
 
+    def test_q8_c5_b256_installs_five_capacity_with_both_owned_affinities(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            f = self.fixture(temporary)
+            raw = {'activate': 'evaluate-llama-b11429-sycl', 'parallel_requests': 5,
+                   'sycl_batch_size': 256, 'sycl_kv_cache_type': 'q8_0',
+                   'admission_physical_bytes': 21 * (1 << 28), 'admission_commit_bytes': 49 * (1 << 28),
+                   'worker_cpu': 0, 'sycl_host_cpu_count': 4, 'sycl_vision_leaf_sha256': 'a' * 64,
+                   'sycl_cache_dir': r'C:\owned cache'}
+            values = self.settings(temporary, raw=json.dumps(raw).encode())
+            launch, settings = self.decoded(values)
+            argv = settings['argv']
+            self.assertEqual(argv[argv.index('--queue-limit') + 1], '4')
+            self.assertEqual(argv[argv.index('--idle-seconds') + 1], '300')
+            self.assertEqual(settings['job_affinity'], 15)
+            self.assertIn('127.0.0.1:18001:127.0.0.1:18001', launch)
+            self.assertIn('127.0.0.1:18002:127.0.0.1:18002', launch)
+            self.install_fake(f, values)
+            expected = f[4]
+            expected['backends']['waystone'].update(capacity=5, queue_limit=0, auto_queue_limit=0)
+            self.assertEqual(json.loads((f[2] / 'router.json').read_text()), expected)
+            receipt = json.loads((f[2] / 'installation.json').read_text())
+            self.assertEqual(receipt['llama_parallel_requests'], 5)
+            self.assertEqual(receipt['llama_job_affinity'], 15)
+            self.assertEqual(receipt['llama_config_sha256'], values.llama_config_sha256)
+            raw['sycl_batch_size'] = 128
+            values.llama_config_copy.write_text(json.dumps(raw))
+            with self.assertRaisesRegex(ValueError, 'SHA-256'):
+                manage.worker_argv(values)
+
+    def test_unmeasured_c5_and_b256_combinations_refuse_before_installation(self):
+        good = {'activate': 'evaluate-llama-b11429-sycl', 'parallel_requests': 5,
+                'sycl_batch_size': 256, 'sycl_kv_cache_type': 'q8_0',
+                'admission_physical_bytes': 21 * (1 << 28), 'admission_commit_bytes': 49 * (1 << 28),
+                'worker_cpu': 0, 'sycl_host_cpu_count': 4, 'sycl_vision_leaf_sha256': 'a' * 64,
+                'sycl_cache_dir': r'C:\owned cache'}
+        changes = [('sycl_batch_size', value) for value in (None, 128, True, 256.0, '256', 512)]
+        changes += [('parallel_requests', value) for value in (1, 2, 4, 6, 8, True)]
+        changes += [('sycl_kv_cache_type', value) for value in (None, 'bf16', 'f16', True)]
+        changes += [('sycl_host_cpu_count', value) for value in (None, 1, 8, True)]
+        changes += [('worker_cpu', value) for value in (None, 1, True)]
+        changes += [('sycl_cache_dir', value) for value in (None, '', True)]
+        changes += [('sycl_vision_leaf_sha256', value) for value in (None, '', 'A' * 64, True)]
+        changes += [('activate', 'evaluate-llama-b11429-vulkan')]
+        for key in ('admission_physical_bytes', 'admission_commit_bytes'):
+            changes += [(key, value) for value in (None, good[key] - 1, True, float(good[key]), 33 << 30)]
+        for key, value in changes:
+            raw = dict(good)
+            if value is None:
+                del raw[key]
+            else:
+                raw[key] = value
+            with self.subTest(key=key, value=value), tempfile.TemporaryDirectory() as temporary:
+                values = self.settings(temporary, raw=json.dumps(raw).encode())
+                with patch.object(manage, 'check_unit_ownership') as ownership, patch.object(manage, 'systemctl') as service:
+                    with self.assertRaises(ValueError):
+                        manage.install(values)
+                    ownership.assert_not_called()
+                    service.assert_not_called()
+        for activation in ('vulkan', 'sycl'):
+            with self.subTest(batch128=activation), tempfile.TemporaryDirectory() as temporary:
+                raw = {'activate': 'evaluate-llama-b11429-' + activation, 'parallel_requests': 4, 'sycl_batch_size': 128}
+                values = self.settings(temporary, raw=json.dumps(raw).encode())
+                if activation == 'vulkan':
+                    with self.assertRaises(ValueError):
+                        manage.llama_slots(values)
+                else:
+                    self.assertEqual(manage.llama_slots(values), 4)
+
     def test_invalid_kv_or_six_slot_forecasts_refuse_before_installation(self):
         good = {'activate': 'evaluate-llama-b11429-sycl', 'parallel_requests': 6,
                 'sycl_kv_cache_type': 'q8_0', 'admission_physical_bytes': 21 * (1 << 28),

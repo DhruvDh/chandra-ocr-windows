@@ -20,16 +20,26 @@ def require(condition, message):
         raise ValueError(message)
 
 
-def validate_kv_profile(engine, slots, kv_type, physical, commit):
+def validate_kv_profile(engine, slots, kv_type, physical, commit, *, batch_size=128,
+                        host_cpu_count=1, worker_cpu=None, vision_leaf=None, cache_dir=None):
     require(engine in ("vulkan", "sycl"), "Invalid llama engine")
     require(isinstance(kv_type, str) and kv_type in ("bf16", "q8_0"), "Invalid sycl_kv_cache_type")
     require(engine == "sycl" or kv_type == "bf16", "Q8 KV requires SYCL")
-    require(type(slots) is int and slots in (1, 2, 4, 6), "Invalid parallel_requests")
-    if slots == 6:
-        require(engine == "sycl" and kv_type == "q8_0", "Six slots require explicit SYCL Q8 KV")
+    require(type(slots) is int and slots in (1, 2, 4, 5, 6), "Invalid parallel_requests")
+    require(type(batch_size) is int and batch_size in (128, 256), "Invalid sycl_batch_size")
+    require(batch_size == 128 or (engine == "sycl" and slots == 5), "Batch 256 requires the explicit SYCL Q8 five-slot profile")
+    if slots in (5, 6):
+        require(engine == "sycl" and kv_type == "q8_0", "Five or six slots require explicit SYCL Q8 KV")
         require(type(physical) is int and 21 * GIB // 4 <= physical <= 32 * GIB
                 and type(commit) is int and 49 * GIB // 4 <= commit <= 32 * GIB,
-                "Six slots require explicit admission forecasts >= 5.25 GiB physical and 12.25 GiB commit")
+                "Five or six slots require explicit admission forecasts >= 5.25 GiB physical and 12.25 GiB commit")
+    if slots == 5:
+        require(batch_size == 256, "Five slots require explicit sycl_batch_size 256")
+        require(type(host_cpu_count) is int and host_cpu_count == 4
+                and type(worker_cpu) is int and worker_cpu == 0,
+                "Five slots require the explicit four-CPU SYCL profile")
+        require(isinstance(vision_leaf, str) and re.fullmatch(r"[0-9a-f]{64}", vision_leaf)
+                and cache_dir is not None, "Five slots require explicit fused vision and persistent cache")
 
 
 def plain_path(value):
@@ -88,6 +98,7 @@ class LlamaConfig:
     sycl_vision_leaf_sha256: str | None = None
     sycl_host_cpu_count: int = 1
     sycl_kv_cache_type: str = "bf16"
+    sycl_batch_size: int = 128
 
     def files(self):
         return [item.path for item in (*self.runtime_files, self.model, self.projector, self.template)]
@@ -131,7 +142,10 @@ class LlamaConfig:
 
     def argv(self, port, api_key, alias):
         validate_kv_profile(self.engine, self.parallel_requests, self.sycl_kv_cache_type,
-                            self.admission_physical_bytes, self.admission_commit_bytes)
+                            self.admission_physical_bytes, self.admission_commit_bytes,
+                            batch_size=self.sycl_batch_size, host_cpu_count=self.sycl_host_cpu_count,
+                            worker_cpu=self.worker_cpu, vision_leaf=self.sycl_vision_leaf_sha256,
+                            cache_dir=self.sycl_cache_dir)
         device = "SYCL0" if self.engine == "sycl" else "Vulkan0"
         return [str(self.runtime_dir / "llama-server.exe"),
                 "--model", str(self.model.path), "--mmproj", str(self.projector.path),
@@ -139,7 +153,7 @@ class LlamaConfig:
                 *(["--tensor-split", "1"] if self.engine == "sycl" else []), "--n-gpu-layers", "99",
                 "--fit", "off", "--load-mode", "none", "--ctx-size", str(CONTEXT * self.parallel_requests), "--n-predict", str(OUTPUT),
                 *(["--no-kv-unified"] if self.parallel_requests > 1 else []),
-                "--image-max-tokens", "3072", "--batch-size", "128", "--ubatch-size", "128", "--parallel", str(self.parallel_requests),
+                "--image-max-tokens", "3072", "--batch-size", str(self.sycl_batch_size), "--ubatch-size", str(self.sycl_batch_size), "--parallel", str(self.parallel_requests),
                 "--threads", "1", "--threads-batch", "1", "--flash-attn", "on",
                 "--cache-type-k", self.sycl_kv_cache_type, "--cache-type-v", self.sycl_kv_cache_type,
                 "--cache-ram", "0", "--ctx-checkpoints", "0", "--cache-reuse", "0", "--no-cache-prompt",
@@ -170,7 +184,7 @@ def load_config(path, expected_sha256):
     fields = {"activate", "runtime_dir", "runtime_files", "model", "projector", "template", device_field, "worker_cpu", "startup_seconds", "request_seconds", "max_image_pixels", "parallel_requests"}
     optional = {"admission_physical_bytes", "admission_commit_bytes"}
     if engine == "sycl":
-        optional |= {"sycl_cache_dir", "sycl_vision_leaf_sha256", "sycl_host_cpu_count", "sycl_kv_cache_type"}
+        optional |= {"sycl_cache_dir", "sycl_vision_leaf_sha256", "sycl_host_cpu_count", "sycl_kv_cache_type", "sycl_batch_size"}
     require(fields <= set(raw) <= fields | optional, "Explicit engine-specific llama configuration is required")
     runtime = plain_path(raw["runtime_dir"])
     require(runtime.is_dir(), "Runtime directory is required")
@@ -198,12 +212,15 @@ def load_config(path, expected_sha256):
     for name, low, high in ((device_field, 0, 15), ("worker_cpu", 0, 63), ("startup_seconds", 1, 1800), ("request_seconds", 1, 1800), ("max_image_pixels", 1, 6_291_456)):
         require(type(raw[name]) is int and low <= raw[name] <= high, f"Invalid {name}")
     kv_type = raw.get("sycl_kv_cache_type", "bf16")
-    # Pass raw forecasts here so C6 cannot inherit a missing field's default.
+    batch_size = raw.get("sycl_batch_size", 128)
+    # Pass raw forecasts so C5/C6 cannot inherit a missing field's default.
     validate_kv_profile(engine, raw["parallel_requests"], kv_type,
-                        raw.get("admission_physical_bytes"), raw.get("admission_commit_bytes"))
+                        raw.get("admission_physical_bytes"), raw.get("admission_commit_bytes"),
+                        batch_size=batch_size, host_cpu_count=host_cpus, worker_cpu=raw["worker_cpu"],
+                        vision_leaf=vision, cache_dir=cache)
     forecasts = [raw.get("admission_physical_bytes", 6 * GIB), raw.get("admission_commit_bytes", 11 * GIB)]
     require(all(type(value) is int and GIB <= value <= 32 * GIB for value in forecasts), "Invalid admission forecasts")
     return LlamaConfig(expected_sha256, runtime, runtime_files, model, projector, template,
                        *(raw[name] for name in (device_field, "worker_cpu", "startup_seconds", "request_seconds", "max_image_pixels", "parallel_requests")), *forecasts,
                        engine=engine, sycl_cache_dir=cache, sycl_vision_leaf_sha256=vision, sycl_host_cpu_count=host_cpus,
-                       sycl_kv_cache_type=kv_type)
+                       sycl_kv_cache_type=kv_type, sycl_batch_size=batch_size)
