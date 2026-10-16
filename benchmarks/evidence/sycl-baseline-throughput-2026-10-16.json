@@ -1,0 +1,152 @@
+{
+  "schema": "chandra-sycl-baseline-throughput-v1",
+  "scope": "Three single original-image endpoint runs at SYCL C1, C2, and C4 concurrency; rates include endpoint CPU image preparation, queuing, and inference, and exclude client PDF rendering, cold model loading, warmup, and offline assessment.",
+  "hash_semantics": {
+    "configuration_file_sha256": "SHA256 of that run's local throughput-client configuration.json.",
+    "worker_configuration_sha256": "Canonical worker-configuration pin recorded by the server packaging evidence."
+  },
+  "common_configuration": {
+    "client_sha256": "f87f52dbd254af254e6b596018bfacf52fe2ab39b365811beeee0824f96ee22c",
+    "request_manifest_sha256": "34d0b43fc6c44c5c996d414171b9f9854d6ee81742075899fa71ee66bfeb8f2a",
+    "source_assessor_sha256": "df8aade39d546395bcfb180f88d7d82f442d20ac683206e3db87b5c5604e1124",
+    "baseline_ggml_sycl_dll_sha256": "962233f10351d5f7a4ce83ba8e5caa41a0e4aabd2b80a1246c26d75a9dc6b2d7",
+    "text_weights": "Q8_0",
+    "projector_storage": "BF16",
+    "kv_storage": "BF16",
+    "batch": 128,
+    "microbatch": 128,
+    "context_per_slot": 16384,
+    "max_output_tokens": 12384,
+    "vision_sdpa_patch": false,
+    "measurement_window_seconds": 360
+  },
+  "runs": [
+    {
+      "concurrency": 1,
+      "label": "C1",
+      "warmups": 4,
+      "measured_requests": 12,
+      "source_passed_responses": 16,
+      "source_assessment_passed": true,
+      "correct_pages_inside_window": 11,
+      "correct_pages_in_full_cohort": 12,
+      "fill_and_drain_seconds": 385.5566211749974,
+      "pages_per_second_inside_window": 0.030555555555555555,
+      "pages_per_second_including_drain": 0.0311238332866119,
+      "configuration_file_sha256": "0cdbe718b87d0b4705ca8d425ed9448bff03ac867acb4ebad15e60fec1f131e9",
+      "worker_configuration_sha256": "a6dcff8c6596cd912afec6f219ed7b0abd30d22d1bba59ec04813ca126ca9b63",
+      "recipe_sha256": "bcb1de52c4601c67529182e9d50ea8b1d47a36e290d748bdd2f4196e67f2d409",
+      "summary_sha256": "d62195c345326e9824059c48a6f410f053913608fd0e9eed688c8e1ddae40042",
+      "source_assessment_sha256": "5f7f640f117bf391544450a65a259169da5ec5bd0f11ba3a5fb1dfa005d6e433",
+      "serve_receipt_sha256": "4a804dc0119324fdb76995b5a9ae8b6762c824293bf6addd9270cd0085200c48",
+      "phase_commitments": {
+        "file_sha256": "8788c08f72f94c393e34d29c9cf13cba3e78fad037f1171dafba1820bb8cb401",
+        "warmup_json_sha256": "9c769ab9cdb46a66eccf58e143a84b1bc5f6976ce9e0390cf4281a190158aeee",
+        "measurement_json_sha256": "b650c32fef533d4e7cc73464e9122a0d3490d96e8eb47dc4b6f3ea3e0a3235c5"
+      },
+      "closure": {
+        "outer_exit_code": 0,
+        "nested_worker_exit_code": 3235774465,
+        "nested_worker_stopped_deliberately": true,
+        "nested_worker_fault_recorded": false,
+        "outer_and_inner_jobs_zero_active": true,
+        "handles_closed": true,
+        "descriptors_closed": true,
+        "output_drains_eof": true,
+        "outer_inputs_released": 54,
+        "inner_inputs_released": 74,
+        "outer_job_peak_bytes": 8492019712,
+        "inner_job_peak_bytes": 8429965312,
+        "peak_scope_note": "Outer and inner Job peaks overlap, are not additive, and are not VRAM measurements."
+      }
+    },
+    {
+      "concurrency": 2,
+      "label": "C2",
+      "warmups": 4,
+      "measured_requests": 14,
+      "source_passed_responses": 18,
+      "source_assessment_passed": true,
+      "correct_pages_inside_window": 12,
+      "correct_pages_in_full_cohort": 14,
+      "fill_and_drain_seconds": 370.03772176799976,
+      "pages_per_second_inside_window": 0.03333333333333333,
+      "pages_per_second_including_drain": 0.03783398063610794,
+      "configuration_file_sha256": "d83b0e4d4475b410bdd5cc227cdc1bced56eb63494e552bf194456522be6a45b",
+      "worker_configuration_sha256": "343bb25a24091a38facb83ced8c04e37eda336e1d573bf4817d803cea6ddb5bc",
+      "recipe_sha256": "4b8480a764817211891d893dd8a6ee73204b32add3f6caba5f46de3c264f26bc",
+      "summary_sha256": "3c443be9a86a722dedff0718871965f698737c90d77f88b164dcdfe453977a67",
+      "source_assessment_sha256": "edb35f938583356ed6d5a17c455bd8fff78f127d376e5df76780fe84b7342772",
+      "serve_receipt_sha256": "c9d413825266131252b6617e25aba96a3a21f15a3bdfca3ec5dd01c80f832ed6",
+      "phase_commitments": {
+        "file_sha256": "e843c72bbcf52f29b58f99e275025e72655ee6a92cfe14165819cda851115ce7",
+        "warmup_json_sha256": "1d080e59246802896efaba8185dd607064c0bbf6b0c4e4a26d8bb1708ffa80a4",
+        "measurement_json_sha256": "8a476c08138151176512674d8c02937fd575992128707ae946c9eba0371f1be7"
+      },
+      "closure": {
+        "outer_exit_code": 0,
+        "nested_worker_exit_code": 3235774465,
+        "nested_worker_stopped_deliberately": true,
+        "nested_worker_fault_recorded": false,
+        "outer_and_inner_jobs_zero_active": true,
+        "handles_closed": true,
+        "descriptors_closed": true,
+        "output_drains_eof": true,
+        "outer_inputs_released": 54,
+        "inner_inputs_released": 74,
+        "outer_job_peak_bytes": 9321025536,
+        "inner_job_peak_bytes": 9253969920,
+        "peak_scope_note": "Outer and inner Job peaks overlap, are not additive, and are not VRAM measurements."
+      }
+    },
+    {
+      "concurrency": 4,
+      "label": "C4",
+      "warmups": 4,
+      "measured_requests": 16,
+      "source_passed_responses": 20,
+      "source_assessment_passed": true,
+      "correct_pages_inside_window": 12,
+      "correct_pages_in_full_cohort": 16,
+      "fill_and_drain_seconds": 365.34710604700376,
+      "pages_per_second_inside_window": 0.03333333333333333,
+      "pages_per_second_including_drain": 0.0437939694476231,
+      "configuration_file_sha256": "fe402851b2dba3ec99efc81a460e1f070cd0ef58b6715a3376e3af408ba23ac5",
+      "worker_configuration_sha256": "42c473edc8bf7a3ea5a29a45096536993aefd55b3ab3c06550ae6cac6252cc18",
+      "recipe_sha256": "2f18194128034b61095d99cf50846c7389ff8b96880babf2bcbc4abb1128deeb",
+      "summary_sha256": "0f1c0c58d0fb522b80154ff103500be9515f2d76df2ec6f7b1cb0a476d7a7f6b",
+      "source_assessment_sha256": "fbc215f4639f55a7b661caa46210431ea5f30a32ac74a953e1c16f71f93b8f9a",
+      "serve_receipt_sha256": "e269cb888e68b6a4236fa405b7275ac0d352afe40b8680e0c18d283e5add467a",
+      "phase_commitments": {
+        "file_sha256": "b4546f23f9dc2e51790a66d50294a9cdf62167bf0323acd61d7175c618982e6b",
+        "warmup_json_sha256": "aa1a450df0c32dfff27e54c55ed5598d3cd9045d932110ae784b65f8c4ca9153",
+        "measurement_json_sha256": "a4d158768e0b5922cffec3c47bad1116c8ddb92344644323232e5efd4ee68703"
+      },
+      "closure": {
+        "outer_exit_code": 0,
+        "nested_worker_exit_code": 3235774465,
+        "nested_worker_stopped_deliberately": true,
+        "nested_worker_fault_recorded": false,
+        "outer_and_inner_jobs_zero_active": true,
+        "handles_closed": true,
+        "descriptors_closed": true,
+        "output_drains_eof": true,
+        "outer_inputs_released": 54,
+        "inner_inputs_released": 74,
+        "outer_job_peak_bytes": 10862972928,
+        "inner_job_peak_bytes": 10788982784,
+        "peak_scope_note": "Outer and inner Job peaks overlap, are not additive, and are not VRAM measurements."
+      }
+    }
+  ],
+  "assessment": {
+    "best_observed_baseline_concurrency": "C4 among these three single runs",
+    "c2_and_c4_correct_pages_inside_360_seconds": 12,
+    "ceiling_established": false,
+    "numerical_equivalence_established": false,
+    "deployment_changed": false,
+    "selected_backend": "Vulkan",
+    "selected_vulkan_original_endpoint_pages_per_second": 0.0496514710313,
+    "selected_vulkan_reference_faster_than_observed_c4": true
+  }
+}

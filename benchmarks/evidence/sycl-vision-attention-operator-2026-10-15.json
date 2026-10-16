@@ -1,0 +1,68 @@
+{
+  "schema": "chandra-sycl-vision-attention-operator-v1",
+  "date": "2026-10-15",
+  "scope": "Bounded same-leaf operator checks and one default/enabled actual-shape performance aggregate per arm; no full-page OCR, sustained throughput, or deployment qualification.",
+  "candidate": {
+    "llama_cpp_commit": "d81235049384534c167caea52b85a694f6103d14",
+    "source_patch_sha256": "497141a724763b5ffa9f42e637c2b794f6e05c5c02551b133056ca92ebe844ec",
+    "ggml_sycl_dll_sha256": "90e65f3b67017a598a7fc0c467bf08b15157ee521d27f1e1921126461ae641c7",
+    "build_receipt_sha256": "992b8ba9f1c0748f8d7e3bec574cc2cb8a4d0dfbaad0a1536c08f3a07386f54c",
+    "onednn_version": "3.11.4",
+    "onednn_commit": "0291f89430882d350585d276cc0d0eda623906e9",
+    "experimental_environment": {"GGML_SYCL_FA_ONEDNN_UNMASKED": "1", "GGML_SYCL_FA_ONEDNN_DG2_D64": "1"},
+    "control_environment": {"GGML_SYCL_FA_ONEDNN_UNMASKED": "0", "GGML_SYCL_FA_ONEDNN_DG2_D64": "0"},
+    "sycl_f16": true,
+    "onednn": true,
+    "direct_level_zero_api": false
+  },
+  "operator_run": {
+    "receipt_sha256": "ddb0bc1274363bdb4caf985962199e6d3bc9928b1f0c96806d2b569c1b61eea2",
+    "success": true,
+    "children": 4,
+    "all_child_exit_codes_zero": true,
+    "all_jobs_zero_active_processes": true,
+    "handles_and_descriptors_closed": true,
+    "stdout_stderr_drained_to_eof": true,
+    "original_inputs_released": 84,
+    "copied_executable_released": 1,
+    "maximum_job_peak_bytes": 519315456,
+    "peak_memory_scope": "Owned process Job memory, not VRAM"
+  },
+  "correctness": {
+    "cases_per_arm": 4,
+    "cases": ["vision64", "vision256", "masked64", "masked128"],
+    "arms": ["default", "enabled"],
+    "cpu_reference_nmse_threshold": 0.0005,
+    "all_cases_passed": true,
+    "operands_randomized_independently_per_arm": true,
+    "bitwise_paired_comparison": false
+  },
+  "actual_shape_performance": {
+    "operation": "FLASH_ATTN_EXT",
+    "batch": 1,
+    "sequence_length": 12096,
+    "heads": 16,
+    "head_dimension": 64,
+    "query_dtype": "F32",
+    "key_value_dtype": "F16",
+    "fused_dispatch_trace": "oneDNN sdp_primitive_kernel_t",
+    "aggregate_measurements_per_arm": 1,
+    "timed_repeats_per_aggregate": 232,
+    "default_microseconds_per_operation": 359137.362069,
+    "enabled_microseconds_per_operation": 20420.745690,
+    "default_to_enabled_ratio": 17.5868877,
+    "includes": ["packing", "conversions", "allocation and deallocation waits"],
+    "excludes": ["initialization", "warmup and JIT compilation", "upload", "final cache destruction"],
+    "cpu_correctness_comparison": false,
+    "same_buffers_repeated": true,
+    "page_throughput_measurement": false
+  },
+  "qualification": {
+    "full_page_result": "Pending at this operator-record cutoff; the later first page cohort is recorded separately in sycl-vision-page-throughput-2026-10-16.json.",
+    "deployment": "not deployed",
+    "page_gain_established": false,
+    "selected_backend": "Vulkan",
+    "selected_original_endpoint_pages_per_second": 0.0496514710313,
+    "selected_rate_changed": false
+  }
+}

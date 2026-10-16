@@ -1,0 +1,78 @@
+{
+  "schema": "chandra-sycl-vision-page-throughput-v1",
+  "scope": "One original-image endpoint throughput run with the vision-SDPA candidate, using the same measurement boundary as the baseline runs. Rates include endpoint CPU image preparation, queueing, and inference; they exclude client PDF rendering, cold model loading, warmup, and offline assessment.",
+  "candidate": {
+    "backend": "SYCL",
+    "variant": "vision SDPA",
+    "ggml_sycl_dll_sha256": "90e65f3b67017a598a7fc0c467bf08b15157ee521d27f1e1921126461ae641c7"
+  },
+  "configuration_hashes": {
+    "hash_semantics": {
+      "throughput_client_configuration_file_sha256": "SHA256 of the local throughput-client configuration.json.",
+      "worker_configuration_sha256": "Canonical worker configuration digest recorded by the server packaging evidence.",
+      "worker_recipe_sha256": "Server run recipe digest recorded in the closed serve receipt."
+    },
+    "throughput_client_configuration_file_sha256": "05ec9e085e69b250b0e01e6de374349167a825d9913b35a81699edbc57870ea2",
+    "worker_configuration_sha256": "f64d6b24c8c031d3a4104e1fb7eca3743b412b68d4932182c3e6e44ec2eb9c0f",
+    "worker_recipe_sha256": "a27adc81325824d3f762617d105582fc2d8d9bd18a337e0d87e2e13852853066"
+  },
+  "workload_pins": {
+    "client_sha256": "f87f52dbd254af254e6b596018bfacf52fe2ab39b365811beeee0824f96ee22c",
+    "request_manifest_sha256": "34d0b43fc6c44c5c996d414171b9f9854d6ee81742075899fa71ee66bfeb8f2a"
+  },
+  "measurement": {
+    "concurrency": 4,
+    "window_seconds": 360,
+    "warmups": 4,
+    "measured_requests": 26,
+    "source_passed_responses": 30,
+    "source_assessment_passed": true,
+    "correct_pages_inside_window": 22,
+    "correct_pages_in_full_cohort": 26,
+    "fill_and_drain_seconds": 389.6015710819993,
+    "pages_per_second_inside_window": 0.06111111111111111,
+    "pages_per_second_including_drain": 0.06673484382466155
+  },
+  "comparison": {
+    "matched_baseline": {
+      "backend": "SYCL C4 baseline",
+      "pages_per_second_including_drain": 0.0437939694476231,
+      "single_run_observed_increase_percent": 52.3836379
+    },
+    "selected_vulkan_reference": {
+      "pages_per_second_including_drain": 0.0496514710313,
+      "single_run_observed_increase_percent": 34.4065794,
+      "remains_selected": true
+    },
+    "c4_comparison_note": "One observation for each setting; this does not establish a repeatable gain or throughput ceiling."
+  },
+  "closure": {
+    "serve_receipt_sha256": "3d24c59e7981e0aac63e7ea2bf25994ccc00342971e542489b51b7430b46c9b8",
+    "outer_exit_code": 0,
+    "nested_worker_exit_code": 3235774465,
+    "nested_worker_stopped_deliberately": true,
+    "nested_worker_fault_recorded": false,
+    "outer_and_inner_jobs_zero_active": true,
+    "handles_closed": true,
+    "descriptors_closed": true,
+    "output_drains_eof": true,
+    "outer_inputs_released": 59,
+    "inner_inputs_released": 74,
+    "outer_job_peak_private_bytes": 10834333696,
+    "inner_job_peak_private_bytes": 10759839744,
+    "peak_scope_note": "The outer and inner peaks overlap, must not be added, and are not VRAM measurements."
+  },
+  "artifact_hashes": {
+    "summary_sha256": "7a9f8acf85622701885bb6089f5d933939e8544e0a86227b8d70efac20157983",
+    "source_assessment_sha256": "51cfd129b22d4f041e6babdfa136a1aa7a6d5625d5ef4cc147b6ef01b8e07901",
+    "phase_commitments_sha256": "52edbb3fa1184b0d9c369e2f8a7c858d26e9f57b16aaf091d9cf508c3290c0f2",
+    "warmup_sha256": "5510b8048a936393b0a31a1b1d615cfbdc7b4be33fa1f7933625ff390be96a63",
+    "measurement_sha256": "1c0b581ce5844ec46a0127039b13d840d7fb32a2ec5e3dcd1b4d9929a8f8cfde"
+  },
+  "qualification": {
+    "numerical_equivalence_established": false,
+    "repeated_throughput_measurement_pending": true,
+    "promotion": "pending",
+    "optional_batch_512_trial_status": "Failed during warmup at the existing system-commit reserve; complete outer Job retirement confirmed, no measured phase or throughput result."
+  }
+}
