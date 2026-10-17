@@ -585,6 +585,7 @@ class LlamaManagerTests(unittest.TestCase):
             self.assertEqual(settings['job_affinity'], 15)
             self.assertIn('127.0.0.1:18001:127.0.0.1:18001', launch)
             self.assertIn('127.0.0.1:18002:127.0.0.1:18002', launch)
+
             self.install_fake(f, values)
             expected = f[4]
             expected['backends']['waystone'].update(capacity=6, queue_limit=0, auto_queue_limit=0)
@@ -596,6 +597,18 @@ class LlamaManagerTests(unittest.TestCase):
             raw['sycl_kv_cache_type'] = 'bf16'
             values.llama_config_copy.write_text(json.dumps(raw))
             with self.assertRaisesRegex(ValueError, 'SHA-256'):
+                manage.worker_argv(values)
+
+    def test_startup_evidence_flag_changes_no_engine_or_guard_arguments(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            values = self.settings(temporary)
+            original = manage.worker_argv(values)
+            values.llama_startup_diagnostic = True
+            selected = manage.worker_argv(values)
+            selected.remove('--llama-startup-diagnostic')
+            self.assertEqual(selected, original)
+            values.worker_backend = 'native'
+            with self.assertRaisesRegex(ValueError, 'requires --worker-backend llama'):
                 manage.worker_argv(values)
 
     def test_q8_c5_b256_installs_five_capacity_with_both_owned_affinities(self):

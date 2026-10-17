@@ -1,6 +1,7 @@
 """One opt-in llama-server Job owner. Import and status reads start nothing."""
 
 import copy
+import logging
 import threading
 import time
 
@@ -27,8 +28,11 @@ class OwnedWorker:
     while a child, reader, control handle or held file might remain owned.
     """
 
-    def __init__(self, config, transport=None):
+    def __init__(self, config, transport=None, *, diagnostic=None):
         self.config, self._transport = config, transport
+        self._diagnostic = diagnostic
+        self._diagnostic_launch_evidence = {}
+        self._tail_clipped = {name: False for name in ("stdout", "stderr")}
         self._state_lock = threading.Lock()
         self._control_lock = threading.Lock()
         self._retire_lock = threading.Lock()
@@ -43,6 +47,29 @@ class OwnedWorker:
         self._faults = []
         self._exit_code = self._closure = self._cleanup = self._file_release = None
 
+    def diagnostic_record(self, *, stage=None, retirement=None, freeze=False, required=True):
+        if self._diagnostic is None:
+            return
+        snapshot = self.snapshot()
+        snapshot["tail_clipped"] = dict(self._tail_clipped)
+        snapshot["partial_launch_pending"] = self._cleanup_owner is not None
+        snapshot["launch_evidence"] = self._diagnostic_launch_evidence
+        if snapshot["pid"] is None and self._cleanup_owner is not None:
+            snapshot["pid"] = (getattr(self._cleanup_owner, "pid", None) or
+                               getattr(getattr(self._cleanup_owner, "process_info", None), "dwProcessId", None))
+        if snapshot["pid"] is None:
+            snapshot["pid"] = self._diagnostic_launch_evidence.get("pid")
+        try:
+            self._diagnostic.record(snapshot, stage=stage, retirement=retirement, freeze=freeze)
+        except Exception:
+            if required:
+                raise
+            # Retirement and the original failure must survive diagnostic sink failure.
+            try:
+                logging.getLogger("chandra.llama.startup").error("Private startup evidence write failed during owned retirement")
+            except BaseException:
+                pass
+
     def _fault(self, operation, error):
         message = f"{operation}: {type(error).__name__}: {str(error)[:256]}"
         with self._state_lock:
@@ -56,20 +83,30 @@ class OwnedWorker:
             self._started = True
             self._startup_done.clear()
         try:
+            if self._diagnostic is not None:
+                self._diagnostic.begin(self.config.config_sha256, api_key, alias)
+            self.diagnostic_record(stage="hold_inputs")
             if self._transport is None:
                 self._transport = WindowsJobTransport()
             self._held = self._transport.hold(self.config.files())
+            self.diagnostic_record(stage="authenticate_inputs")
             self.config.authenticate()  # Hash/inventory checks occur under the read-only file holds.
             with self._control_lock:
                 if self._stop.is_set():
                     raise _StartupCanceled("llama worker startup was canceled before launch")
                 if admit is not None:
+                    self.diagnostic_record(stage="second_admission")
                     admit()
                 if self._stop.is_set():
                     raise _StartupCanceled("llama worker startup was canceled before launch")
+                if self._diagnostic is not None:
+                    self.diagnostic_record(stage="launch_native")
+                    if self._stop.is_set():
+                        raise _StartupCanceled("llama worker startup was canceled before launch")
                 self._process = self._transport.launch(
                     self.config.argv(port, api_key, alias), self.config.environment(),
                     self.config.runtime_dir, self.config.job_limits())
+            self.diagnostic_record(stage="native_started")
             # Once transport launch is admitted it owns the child, even if stop races with ResumeThread.
             if self._stop.is_set():
                 self.request_stop()
@@ -83,9 +120,15 @@ class OwnedWorker:
             return self
         except BaseException as error:
             self._cleanup_owner = getattr(error, "cleanup_owner", None)
+            evidence = getattr(error, "evidence", None)
+            if self._diagnostic is not None and type(evidence) is dict:
+                self._diagnostic_launch_evidence = {key: evidence.get(key)
+                    for key in ("pid", "handles_closed", "child_created", "child_retired", "child_exited", "contained", "resumed")
+                    if type(evidence.get(key)) in (int, bool)}
             if not isinstance(error, (AdmissionRefused, _StartupCanceled)):
                 self._fault("startup", error)
             self.request_stop()
+            self.diagnostic_record(retirement="startup_failed", required=False)
             raise
         finally:
             self._startup_done.set()
@@ -98,7 +141,13 @@ class OwnedWorker:
                 if not chunk:
                     break
                 with self._state_lock:
+                    self._tail_clipped[name] |= len(self._tails[name]) + len(chunk) > TAIL_BYTES
                     self._tails[name] = (self._tails[name] + chunk)[-TAIL_BYTES:]
+                try:
+                    self.diagnostic_record()
+                except Exception as error:
+                    self._fault("startup diagnostic", error)
+                    self.request_stop()  # Keep draining the owned pipes through termination/EOF.
         except BaseException as error:
             self._fault(name + " drain", error)
             self.request_stop()
@@ -187,6 +236,8 @@ class OwnedWorker:
     def retire(self):
         """Block until startup, Job, drains, control resources and held files have retired."""
         self.request_stop()
+        if not self._closed:
+            self.diagnostic_record(retirement="retirement_requested", required=False)
         with self._retire_lock:
             with self._state_lock:
                 started = self._started  # start checks stop and clears the barrier under this same lock.
@@ -205,9 +256,11 @@ class OwnedWorker:
                             continue
                         self._cleanup_owner = None
                     if not self._retire_process():
+                        self.diagnostic_record(retirement="waiting_native_closure", required=False)
                         time.sleep(POLL_SECONDS)
                         continue
                     if self._held is not None:
+                        self.diagnostic_record(retirement="releasing_inputs", required=False)
                         release = self._held.release()
                         with self._state_lock:
                             self._file_release = copy.deepcopy(release)
@@ -218,6 +271,7 @@ class OwnedWorker:
                         self._held = None
                     with self._state_lock:
                         self._closed = True
+                    self.diagnostic_record(retirement="closed", required=False)
                 except Exception as error:
                     self._fault("retirement", error)
                     time.sleep(POLL_SECONDS)

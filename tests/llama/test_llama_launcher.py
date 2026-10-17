@@ -150,7 +150,7 @@ class LlamaLauncherTests(unittest.TestCase):
     def test_llama_flags_are_refused_in_every_other_mode(self):
         modes = [["waystone", "--model-path", "model"], ["router", "--config", "router.json"],
                  ["native", "--native-config", "native.json", "--native-config-sha256", "b" * 64]]
-        flags = [["--llama-config", "llama.json"], ["--llama-config-sha256", self.sha]]
+        flags = [["--llama-config", "llama.json"], ["--llama-config-sha256", self.sha], ["--llama-startup-diagnostic"]]
         with patch("chandra_service.__main__.Path.read_text", return_value="{}"):
             for mode in modes:
                 for flag in flags:
@@ -159,6 +159,13 @@ class LlamaLauncherTests(unittest.TestCase):
         for factory in (self.load, self.make_backend, self.xpu, self.router, self.native_backend):
             factory.assert_not_called()
         self.assert_not_listening()
+
+    def test_private_startup_opt_in_uses_only_the_authenticated_config_parent(self):
+        self.make_backend.side_effect = None
+        self.make_backend.return_value = self.backend
+        self.invoke([*self.arguments, "--llama-startup-diagnostic"])
+        self.make_backend.assert_called_once_with(self.configuration,
+                                                  startup_diagnostic_path=Path("llama-startup.private.json"))
 
     def test_waystone_default_limits_and_backend_remain_unchanged(self):
         self.invoke(["waystone", "--model-path", "local-model"])

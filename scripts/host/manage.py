@@ -55,6 +55,9 @@ def ps_quote(value):
 def worker_argv(args):
     """Select one explicit route; configured launchers authenticate before listening."""
     backend = getattr(args, "worker_backend", "waystone")
+    diagnostic = getattr(args, "llama_startup_diagnostic", False)
+    if diagnostic and backend != "llama":
+        raise ValueError("--llama-startup-diagnostic requires --worker-backend llama")
     native_config = getattr(args, "native_config", None)
     native_hash = getattr(args, "native_config_sha256", None)
     llama_config = getattr(args, "llama_config", None)
@@ -73,6 +76,7 @@ def worker_argv(args):
         slots = llama_slots(args)
         return [args.remote_python, "-m", "chandra_service", "llama",
                 "--llama-config", llama_config, "--llama-config-sha256", llama_hash,
+                *(["--llama-startup-diagnostic"] if diagnostic else []),
                 "--host", "127.0.0.1", "--port", str(args.worker_port),
                 "--queue-limit", str(slots - 1), "--idle-seconds", "300"]
     if backend == "native":
@@ -379,6 +383,8 @@ def install(args):
                "llama_job_affinity": 15 if slots is not None and 'sycl_host_cpu_count' in llama_profile(args) else None,
                "lease_port": args.lease_port, "remote_ownership": "unnamed Windows Job Object; authenticated loopback TCP lease; kill on job close",
                "unit_sha256": {name: hashlib.sha256(text.encode()).hexdigest() for name, text in zip(UNITS, content)}}
+    if getattr(args, "llama_startup_diagnostic", False):
+        receipt["llama_startup_diagnostic"] = True
     lease_token = secrets.token_urlsafe(32)
     files = {config_path: router_text if router_text is not None else json.dumps(config, indent=2) + "\n",
              channel_path: json.dumps({"ssh_argv": remote_command(args, lease_token), "lease_port": args.lease_port, "lease_token": lease_token}, indent=2) + "\n",
@@ -442,6 +448,7 @@ def main():
     install_parser.add_argument("--llama-config", help="llama: absolute normalized Windows config path")
     install_parser.add_argument("--llama-config-sha256", help="llama: lowercase SHA-256 shared by remote config and local copy")
     install_parser.add_argument("--llama-config-copy", type=Path, help="llama: private local copy of the remote config, used to derive admission")
+    install_parser.add_argument("--llama-startup-diagnostic", action="store_true", help="llama: retain bounded private startup evidence beside the authenticated config")
     install_parser.add_argument("--normalization", choices=["original", "gain-only"], default="original")
     install_parser.add_argument("--northstone-url", default="http://127.0.0.1:8000")
     install_parser.add_argument("--worker-port", type=int, default=18001)

@@ -33,8 +33,9 @@ def main():
     parser.add_argument('--native-config-sha256', help='native: SHA-256 of the exact configuration bytes')
     parser.add_argument('--llama-config', type=Path, help='llama: explicit opt-in maintained-engine configuration JSON')
     parser.add_argument('--llama-config-sha256', help='llama: SHA-256 of the exact configuration bytes')
+    parser.add_argument('--llama-startup-diagnostic', action='store_true', help='llama: opt in to one private startup snapshot beside the config; requires fresh protected storage')
     args = parser.parse_args()
-    if args.mode != 'llama' and (args.llama_config is not None or args.llama_config_sha256 is not None):
+    if args.mode != 'llama' and (args.llama_config is not None or args.llama_config_sha256 is not None or args.llama_startup_diagnostic):
         parser.error('--llama-config and --llama-config-sha256 require llama mode')
     if args.max_pixels <= 0 or args.max_input_tokens <= 0 or not 1 <= args.max_output_tokens <= 12384:
         parser.error('Pixel/context limits must be positive and output limit must be 1..12384')
@@ -85,7 +86,8 @@ def main():
             kernel32()  # Capability check only: no Job, worker, model hash or device allocation.
         except (ValueError, RuntimeError, OSError) as error:
             parser.error(f'llama configuration refused: {error}')
-        app = create_llama_app(LlamaBackend(config), queue_limit=args.queue_limit,
+        diagnostic = {'startup_diagnostic_path': args.llama_config.parent / 'llama-startup.private.json'} if args.llama_startup_diagnostic else {}
+        app = create_llama_app(LlamaBackend(config, **diagnostic), queue_limit=args.queue_limit,
                                inference_seconds=args.inference_seconds, idle_seconds=args.idle_seconds)
     else:
         if not args.config:
