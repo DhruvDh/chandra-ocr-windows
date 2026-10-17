@@ -1,0 +1,129 @@
+{
+  "schema": "chandra.directcompute.component-validation.v1",
+  "date": "2026-10-07",
+  "scope": "one tiny matched completion pair and one fixed synthetic numerical kernel pair",
+  "evidence_bindings": {
+    "finished_fence_pair_review": {
+      "bytes": 8884,
+      "sha256": "b989d8dac1f6d486ef51fb8d2c37d18f77abed58b766d15bba04d8fe078413db"
+    },
+    "query_point_acceptance": {
+      "bytes": 3133,
+      "sha256": "270ca16b8d3f5c8effb990fca99254f417734d29383b3f555dd346b753f25c40"
+    },
+    "fence_point_acceptance": {
+      "bytes": 3126,
+      "sha256": "475b2efe70bf8d2fb9a6577f4749643a53980ad836b56975de966a80bcb429d9"
+    },
+    "query_settled_boundary": {
+      "bytes": 2836,
+      "sha256": "b31aabc8a8090b48af390f640834c385670ec82d420285599c9011e64e389194"
+    },
+    "fence_settled_boundary": {
+      "bytes": 3348,
+      "sha256": "895159c9f0c6ba9b34e82d75057871b3e654fcd030cdfab91fdaf3c59f3282c8"
+    },
+    "fence_review_resource_qualification": {
+      "bytes": 832,
+      "sha256": "0d20147622ee4bf3e87b435a309381381cf7166a7adc758ebfce32317427db9c"
+    },
+    "fence_review_post_closure": {
+      "bytes": 2256,
+      "sha256": "b97959500f6481f3650e4f571c46605a0eb5a3818a1edb75a4e1c708c5172018"
+    },
+    "parallel32_exact_CPU_certificate": {
+      "bytes": 6059,
+      "sha256": "c5c490a37251d08cb8b26032912e218e0239b44b1b6c6d1c6b08e4194b0f4ebf"
+    },
+    "finished_parallel32_pair_review": {
+      "bytes": 5531,
+      "sha256": "6bcde3ce11d790ffecd2831ddb548471832073f614c6ff84c58c9628bed8439a"
+    }
+  },
+  "fence_wait": {
+    "matched_pair_count": 1,
+    "model_free": true,
+    "same_synthetic_input_executable_shader_device_driver_caps": true,
+    "GPU": "Intel Arc A770",
+    "driver": "32.0.101.8991",
+    "dispatches_each": 8,
+    "readbacks_each": 9,
+    "readback_bytes_each": 4608,
+    "drains_each": 51,
+    "maximum_staging_bytes_per_transfer": 512,
+    "exact_copy_reports_accepted": true,
+    "raw_transfer_bytes_independently_inspected_by_finished_reviewer": false,
+    "complete_non_disjoint_dispatch_timestamps": true,
+    "maximum_dispatch_milliseconds_exclusive": 100,
+    "query_sleep": {
+      "device_owner_host_elapsed_nanoseconds": 901668200,
+      "sum_inclusive_host_drain_nanoseconds": 788593300,
+      "actual_original_sleep_nanoseconds": 759716600,
+      "event_waits": 0,
+      "event_actual_wait_nanoseconds": 0
+    },
+    "fence_event": {
+      "device_owner_host_elapsed_nanoseconds": 99569400,
+      "sum_inclusive_host_drain_nanoseconds": 10863300,
+      "actual_original_sleep_nanoseconds": 0,
+      "event_waits": 19,
+      "event_actual_wait_nanoseconds": 1819400
+    },
+    "observed_query_to_fence_host_elapsed_ratio": 9.05567574,
+    "observed_query_to_fence_inclusive_host_drain_ratio": 72.59242587,
+    "ratios_scope": "single exploratory pair of overlapping host component counters",
+    "physical_retirement_confirmed": true,
+    "unchanged_cold_restoration_confirmed": true,
+    "original_launcher_false_refusals_preserved": true,
+    "unmodified_launcher_automatic_closure_reporting_clear": false,
+    "tiny_device_driver_completion_support_observed": true,
+    "universal_fence_compatibility_accepted": false,
+    "repeated_statistical_significance_claimed": false,
+    "GPU_active_time_speedup_claimed": false
+  },
+  "fence_review_resource_qualification": {
+    "terminal_sampled_Linux_nice": -4,
+    "narrow_readonly_reread_nice15_samples_confirmed": true,
+    "cause_unassigned": true,
+    "continuous_priority_enforcement_claimed": false,
+    "Windows_native_resource_and_ownership_evidence_separate": true
+  },
+  "parallel32": {
+    "fixed_model_free_kernel_pair_conditionally_qualified": true,
+    "single_row_only": true,
+    "shapes": [
+      { "K": 67, "N": 9 },
+      { "K": 1001, "N": 9 },
+      { "K": 2560, "N": 1024 },
+      { "K": 9216, "N": 1024 }
+    ],
+    "dispatches_each": 8,
+    "output_words_checked_each": 4132,
+    "exact_integer_dyadic_products": 12068236,
+    "CPU_checker_status": "INDEPENDENT_EXACT_FINITE_PASS",
+    "documented_FP32_forward_error_bounds_passed": true,
+    "exact_raw_to_BF16_conversion_passed": true,
+    "finite_scope": "fixed normals above FTZ and below overflow bounds; no NaN, infinity or overflow-risk admission",
+    "reassociated_accumulation_disclosed": true,
+    "multirow_vision_prefill_qualified": false,
+    "CPU_certificate_root_admission": false,
+    "CPU_certificate_external_owned_closure": false,
+    "separate_finished_review_physical_retirement_confirmed": true,
+    "original_after_point_snapshot_refusal_preserved": true,
+    "native_retired_before_snapshot_refusal": true,
+    "original_wrapper_accepted_as_clean": false,
+    "separate_same_ownership_cold_restoration_confirmed": true,
+    "more_specific_network_cause_inferred": false,
+    "kernel_replayed": false,
+    "timings_or_performance_accepted": false,
+    "future_measurement_admitted": false,
+    "measured_speedup": null
+  },
+  "automatic_replay": false,
+  "original_second_shard_discrepancy_holds_whole_model": true,
+  "whole_model_correctness": false,
+  "complete_OCR_acceptance": false,
+  "native_endpoint_acceptance": false,
+  "sustained_pages_per_second": null,
+  "deployed": false
+}

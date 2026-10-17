@@ -1,0 +1,5 @@
+ByteAddressBuffer x:register(t0);ByteAddressBuffer w:register(t1);RWByteAddressBuffer y:register(u0);RWByteAddressBuffer cache:register(u1);
+cbuffer Params:register(b0){uint rows,width,offset,stride,base,count,mode,pad;}
+float bf(float x){uint u=asuint(x);if((u&0x7f800000)==0x7f800000&&(u&0x007fffff)!=0)return asfloat(u|0x00400000);return asfloat((u+0x7fff+((u>>16)&1))&0xffff0000);}
+float wt(ByteAddressBuffer w,uint i){return asfloat(((w.Load((i>>1)*4)>>((i&1)*16))&65535)<<16);}
+[numthreads(128,1,1)]void main(uint3 t:SV_DispatchThreadID){uint c=t.x;if(c>=width)return;for(uint r=0;r<rows;r++){float current=asfloat(x.Load((r*width+c)*4));float value=asfloat(cache.Load((c*4+1)*4))*wt(w,c*4)+asfloat(cache.Load((c*4+2)*4))*wt(w,c*4+1)+asfloat(cache.Load((c*4+3)*4))*wt(w,c*4+2)+current*wt(w,c*4+3);cache.Store((c*4)*4,asuint(asfloat(cache.Load((c*4+1)*4))));cache.Store((c*4+1)*4,asuint(asfloat(cache.Load((c*4+2)*4))));cache.Store((c*4+2)*4,asuint(asfloat(cache.Load((c*4+3)*4))));cache.Store((c*4+3)*4,asuint(current));value=bf(value);y.Store((r*width+c)*4,asuint(bf(value/(1+exp(-value)))));}}

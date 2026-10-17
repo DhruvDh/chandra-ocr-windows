@@ -1,0 +1,5 @@
+ByteAddressBuffer x:register(t0);ByteAddressBuffer pt:register(t1);ByteAddressBuffer ph:register(t2);ByteAddressBuffer pw:register(t3);RWByteAddressBuffer y:register(u0);
+cbuffer Params:register(b0){uint rows,width,offset,stride,base,count,mode,pad;}
+float bf(float x){uint u=asuint(x);if((u&0x7f800000)==0x7f800000&&(u&0x007fffff)!=0)return asfloat(u|0x00400000);return asfloat((u+0x7fff+((u>>16)&1))&0xffff0000);}
+float wt(ByteAddressBuffer w,uint i){return asfloat(((w.Load((i>>1)*4)>>((i&1)*16))&65535)<<16);}
+[numthreads(128,1,1)]void main(uint3 t:SV_DispatchThreadID){uint i=t.x;if(i>=rows*width*256)return;uint d=i%256,r=i/(width*256);if(d>=64){y.Store((i)*4,asuint(asfloat(x.Load((i)*4))));return;}uint f=d%32;uint axis=(f%3==1&&f<33)?1:((f%3==2&&f<30)?2:0);float position=axis==0?pt.Load((r)*4):(axis==1?ph.Load((r)*4):pw.Load((r)*4));float angle=position*pow(10000000.0,-float(f)*2.0/64.0);float c=bf(cos(angle)),s=bf(sin(angle));uint partner=d<32?i+32:i-32;float rotated=d<32?-asfloat(x.Load((partner)*4)):asfloat(x.Load((partner)*4));y.Store((i)*4,asuint(bf(bf(asfloat(x.Load((i)*4))*c)+bf(rotated*s))));}

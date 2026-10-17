@@ -1,0 +1,345 @@
+{
+  "schema": "chandra.public.directcompute.first-page-head-audit-failure.v1",
+  "date": "2026-10-06",
+  "scope": "Failed finite original native0 two-prediction control; no trained numerical, complete OCR, endpoint or throughput qualification",
+  "model_revision": "af93b47dba1b47b6640c86ccf487ed2260ab9a09",
+  "model_file_sha256": "0804568be9f099d6479fad9ed77a4da4611f3c1e7bc6e009af7dce45e8aa3847",
+  "source08_manifest_sha256": "2332e765eb53c47e1e2a540c031a92b5e1f0669b0240bc26ab7b211c776b85d2",
+  "source08_review_seal_sha256": "56b0aae0e060008844ca0729a0f970d1058b568e85a43935acd67c7bfa3a032b",
+  "build23_executable_sha256": "369d7fcdcb375aeb0d0803d31bcf7498da5377b41a749b8215c940389dde687b",
+  "result_sha256": "a4a892cb5475974c37c0eeec28bd7041e045518cb6dcc465f27673b5c8d9831b",
+  "original_input_manifest_sha256": "0aa588473930f110cc359ba369623f29765a85f4e05ffcbca2ac509933b787ae",
+  "image_dimensions": [
+    1624,
+    2100
+  ],
+  "prompt_tokens": 3617,
+  "context_limit": 16384,
+  "normal_output_allowance": 12384,
+  "diagnostic_token_cap": 2,
+  "tokens": [
+    2539,
+    795
+  ],
+  "audit_complete": true,
+  "control_passed": false,
+  "first_invalid_stage": "tied_head_storage_changed_after_import@prediction0",
+  "findings": [
+    "tied_head_storage_changed_after_import@prediction0",
+    "tied_head_storage_changed_after_import@prediction1"
+  ],
+  "import_checksum_mismatch_rows": 0,
+  "import_exact_copied_rows": 0,
+  "predictions": [
+    {
+      "name": "prediction0",
+      "argmax": 2539,
+      "argmax_logit": 24.75,
+      "checksum_mismatch_rows": 1,
+      "exact_comparison": {
+        "checksum_mismatch_rows_not_compared": 0,
+        "differing_rows_with_matching_checksum": [],
+        "identical_rows_with_mismatching_checksum": [],
+        "rows_compared": 3,
+        "rows_differing": [
+          26213
+        ],
+        "rows_identical": [
+          2539,
+          248069
+        ],
+        "rows_selected": 3,
+        "scope": "Byte identity or difference is proven for compared rows only; every other row passed or failed a 32-bit checksum screen"
+      },
+      "final_norm_hidden": {
+        "all_zero": false,
+        "finite": true,
+        "l2": 162.54339055304408,
+        "pre_norm_row_recorded": false,
+        "rmsnorm_contract": 243.28538483209465
+      },
+      "head_recompute": [
+        {
+          "a_priori_error_bound": 0.23111244568420808,
+          "bitwise_equal_gpu_row": true,
+          "bitwise_equal_source_row": true,
+          "cpu_ordered_from_gpu_row": 24.75,
+          "cpu_ordered_from_source_row": 24.75,
+          "exact_dot_source_row": 24.699436271752347,
+          "gpu_logit": 24.75,
+          "row": 2539,
+          "within_bound": true
+        },
+        {
+          "a_priori_error_bound": 0.2733956350101547,
+          "bitwise_equal_gpu_row": true,
+          "bitwise_equal_source_row": true,
+          "cpu_ordered_from_gpu_row": 18.875,
+          "cpu_ordered_from_source_row": 18.875,
+          "exact_dot_source_row": 18.83948931703344,
+          "gpu_logit": 18.875,
+          "row": 248069,
+          "within_bound": true
+        }
+      ],
+      "row_dumps": [
+        {
+          "checksum_matches_source": true,
+          "copied_checksum": 432293301,
+          "differing_words": 0,
+          "exact_match": true,
+          "file": "prediction0.row2539.gpu.bf16",
+          "first_differing_word": null,
+          "gpu_checksum": 432293301,
+          "gpu_l2": 0.5340291328607704,
+          "gpu_max_abs": 0.036865234375,
+          "gpu_nonfinite": 0,
+          "gpu_sha256": "66180d31a85bb757efee16d4df61d1278fd5fefba538d49f236a144bc1271e66",
+          "local_row": 2539,
+          "reasons": [
+            "argmax"
+          ],
+          "row": 2539,
+          "shard": 0,
+          "source_checksum": 432293301,
+          "source_l2": 0.5340291328607704,
+          "source_sha256": "66180d31a85bb757efee16d4df61d1278fd5fefba538d49f236a144bc1271e66"
+        },
+        {
+          "checksum_matches_source": true,
+          "copied_checksum": 3562679852,
+          "differing_words": 0,
+          "exact_match": true,
+          "file": "prediction0.row248069.gpu.bf16",
+          "first_differing_word": null,
+          "gpu_checksum": 3562679852,
+          "gpu_l2": 0.6347953024965293,
+          "gpu_max_abs": 0.049560546875,
+          "gpu_nonfinite": 0,
+          "gpu_sha256": "e2edfe2b51c1b3ee9d9442a3f30417cddef7202f91289874f2c3394eb295b80d",
+          "local_row": 12143,
+          "reasons": [
+            "runner_up"
+          ],
+          "row": 248069,
+          "shard": 9,
+          "source_checksum": 3562679852,
+          "source_l2": 0.6347953024965293,
+          "source_sha256": "e2edfe2b51c1b3ee9d9442a3f30417cddef7202f91289874f2c3394eb295b80d"
+        },
+        {
+          "checksum_matches_source": false,
+          "copied_checksum": 3233607856,
+          "differing_words": 64,
+          "exact_match": false,
+          "file": "prediction0.row26213.gpu.bf16",
+          "first_differing_word": 768,
+          "gpu_checksum": 3233607856,
+          "gpu_l2": 0.6276558321331703,
+          "gpu_max_abs": 0.0498046875,
+          "gpu_nonfinite": 0,
+          "gpu_sha256": "4f8fc83808bf4219ef98c894d157bd5daab67b42cd722c5de3255ff28fa8fa8e",
+          "local_row": 26213,
+          "reasons": [
+            "checksum_mismatch"
+          ],
+          "row": 26213,
+          "shard": 0,
+          "source_checksum": 4110728128,
+          "source_l2": 0.6413497301714065,
+          "source_sha256": "e696b6bda9b22dba3ad2a49132d6353302f5b20ad2627909ae5474586a46c07f"
+        }
+      ]
+    },
+    {
+      "name": "prediction1",
+      "argmax": 795,
+      "argmax_logit": 29.5,
+      "checksum_mismatch_rows": 1,
+      "exact_comparison": {
+        "checksum_mismatch_rows_not_compared": 0,
+        "differing_rows_with_matching_checksum": [],
+        "identical_rows_with_mismatching_checksum": [],
+        "rows_compared": 3,
+        "rows_differing": [
+          26213
+        ],
+        "rows_identical": [
+          795,
+          29
+        ],
+        "rows_selected": 3,
+        "scope": "Byte identity or difference is proven for compared rows only; every other row passed or failed a 32-bit checksum screen"
+      },
+      "final_norm_hidden": {
+        "all_zero": false,
+        "finite": true,
+        "l2": 143.37185529281294,
+        "pre_norm_row_recorded": false,
+        "rmsnorm_contract": 243.28538483209465
+      },
+      "head_recompute": [
+        {
+          "a_priori_error_bound": 0.25305630256937756,
+          "bitwise_equal_gpu_row": true,
+          "bitwise_equal_source_row": true,
+          "cpu_ordered_from_gpu_row": 29.5,
+          "cpu_ordered_from_source_row": 29.5,
+          "exact_dot_source_row": 29.461033040832262,
+          "gpu_logit": 29.5,
+          "row": 795,
+          "within_bound": true
+        },
+        {
+          "a_priori_error_bound": 0.23675279080269568,
+          "bitwise_equal_gpu_row": true,
+          "bitwise_equal_source_row": true,
+          "cpu_ordered_from_gpu_row": 20.25,
+          "cpu_ordered_from_source_row": 20.25,
+          "exact_dot_source_row": 20.25275052851066,
+          "gpu_logit": 20.25,
+          "row": 29,
+          "within_bound": true
+        }
+      ],
+      "row_dumps": [
+        {
+          "checksum_matches_source": true,
+          "copied_checksum": 3421311518,
+          "differing_words": 0,
+          "exact_match": true,
+          "file": "prediction1.row795.gpu.bf16",
+          "first_differing_word": null,
+          "gpu_checksum": 3421311518,
+          "gpu_l2": 0.6503919499138907,
+          "gpu_max_abs": 0.0625,
+          "gpu_nonfinite": 0,
+          "gpu_sha256": "bf5f6bb7a7d34313230cc13eaf5e0cb65aac4fc47f80f61fd054407db93b6149",
+          "local_row": 795,
+          "reasons": [
+            "argmax"
+          ],
+          "row": 795,
+          "shard": 0,
+          "source_checksum": 3421311518,
+          "source_l2": 0.6503919499138907,
+          "source_sha256": "bf5f6bb7a7d34313230cc13eaf5e0cb65aac4fc47f80f61fd054407db93b6149"
+        },
+        {
+          "checksum_matches_source": true,
+          "copied_checksum": 386352162,
+          "differing_words": 0,
+          "exact_match": true,
+          "file": "prediction1.row29.gpu.bf16",
+          "first_differing_word": null,
+          "gpu_checksum": 386352162,
+          "gpu_l2": 0.6490618920155014,
+          "gpu_max_abs": 0.05126953125,
+          "gpu_nonfinite": 0,
+          "gpu_sha256": "d5523e51541558aa85b71a6ef11fe5a1a8e05777e4a9b65f2a8a3d48a9868b83",
+          "local_row": 29,
+          "reasons": [
+            "runner_up"
+          ],
+          "row": 29,
+          "shard": 0,
+          "source_checksum": 386352162,
+          "source_l2": 0.6490618920155014,
+          "source_sha256": "d5523e51541558aa85b71a6ef11fe5a1a8e05777e4a9b65f2a8a3d48a9868b83"
+        },
+        {
+          "checksum_matches_source": false,
+          "copied_checksum": 3233607856,
+          "differing_words": 64,
+          "exact_match": false,
+          "file": "prediction1.row26213.gpu.bf16",
+          "first_differing_word": 768,
+          "gpu_checksum": 3233607856,
+          "gpu_l2": 0.6276558321331703,
+          "gpu_max_abs": 0.0498046875,
+          "gpu_nonfinite": 0,
+          "gpu_sha256": "4f8fc83808bf4219ef98c894d157bd5daab67b42cd722c5de3255ff28fa8fa8e",
+          "local_row": 26213,
+          "reasons": [
+            "checksum_mismatch"
+          ],
+          "row": 26213,
+          "shard": 0,
+          "source_checksum": 4110728128,
+          "source_l2": 0.6413497301714065,
+          "source_sha256": "e696b6bda9b22dba3ad2a49132d6353302f5b20ad2627909ae5474586a46c07f"
+        }
+      ]
+    }
+  ],
+  "differing_block": {
+    "differing_word_count": 64,
+    "first_word": 768,
+    "last_word": 831,
+    "contiguous": true,
+    "within_shard_byte_start": 134213632,
+    "distance_from_128MiB_boundary_bytes": 4096,
+    "GPU_row0_and_row1_byte_equal": true,
+    "physical_storage_or_cause_proven": false
+  },
+  "small_source_read": {
+    "CPU_only": true,
+    "GPU_or_model_loaded": false,
+    "model_bytes": 10591220088,
+    "same_stat_before_after": true,
+    "header_bytes": 91504,
+    "header_sha256": "be3fcb45a39582ed73e000d7b1d06656f8b5eb925dde6ba748104400e374f73e",
+    "tensor_metadata": {
+      "dtype": "BF16",
+      "shape": [
+        248320,
+        2560
+      ],
+      "data_offsets": [
+        1271398400,
+        2542796800
+      ]
+    },
+    "rows": {
+      "26213": {
+        "file": "source-row26213.bf16",
+        "absolute_model_offset": 1405700472,
+        "tensor_relative_byte_offset": 134210560,
+        "bytes": 5120,
+        "sha256": "e696b6bda9b22dba3ad2a49132d6353302f5b20ad2627909ae5474586a46c07f"
+      },
+      "52427": {
+        "file": "source-row52427.bf16",
+        "absolute_model_offset": 1539916152,
+        "tensor_relative_byte_offset": 268426240,
+        "bytes": 5120,
+        "sha256": "0575f9588d644d6b669a29517b1dda97ea56b4831b5578edffb99913df8e4ab7"
+      }
+    },
+    "whole_file_hash_not_recomputed_in_this_tiny_read": true,
+    "custody": "Row26213 extracted bytes exactly match the authenticated source-row hash retained by the closed Build23 auditor; original model whole-file provenance remains that prior held-file importer/audit run"
+  },
+  "elapsed_wrapper_seconds": 430.64099999997416,
+  "minimum_available_Windows_RAM_bytes": 18938507264,
+  "Job": {
+    "peak_process_commit_bytes": 10790678528,
+    "peak_job_commit_bytes": 10799874048,
+    "process_commit_limit_bytes": 12884901888,
+    "job_commit_limit_bytes": 13153337344,
+    "affinity_mask": 1,
+    "priority_class": 16384,
+    "total_job_processes": 2,
+    "active_job_processes_before_retirement": 0,
+    "active_job_processes_after_retirement": 0,
+    "returncode": 0,
+    "kill_on_job_close": true
+  },
+  "native_retired": true,
+  "native_drained": true,
+  "owned_buffer_zero": true,
+  "ordinary_service_restored_cold": true,
+  "whole_model_progression_held": true,
+  "physical_storage_or_cause_proven": false,
+  "automatic_replay": false,
+  "interpretation": "Exact retained bytes differ on the SRV copy path after a matching import checksum screen. No source-row identity existed at import, and checksum/copy/graph share that read path. Direct D3D11 copy versus SRV read and a separately recorded padding contrast are the next discriminator; neither original failed worker nor earlier first-page acceptance is cleared."
+}

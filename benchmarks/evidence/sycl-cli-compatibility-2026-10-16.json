@@ -1,0 +1,171 @@
+{
+  "schema": "sycl-cli-compatibility-evidence-v1",
+  "date": "2026-10-16",
+  "candidate": "normal SYCL profile",
+  "scope": "two unchanged Chandra CLI invocations over the retained native and scanned two-page synthetic PDFs",
+  "configuration": {
+    "installed_profile_configuration_sha256": "0cbd81641b95218b5d33e7acb1ba801f0c8854f2905f7a24ca42c29be863562b",
+    "selected_leaf_sha256": "90e65f3b67017a598a7fc0c467bf08b15157ee521d27f1e1921126461ae641c7",
+    "cli_setup_sha256": "5231dda57b6a3dfa98d59cd9ba9a8bf8815143292cd57c497e74c41c4e22dd76",
+    "model": "chandra",
+    "normal_output_allowance_tokens": 12384,
+    "request_parameters": {
+      "max_tokens": 12384,
+      "temperature": 0.0,
+      "top_p": 0.1
+    },
+    "source_sha256": {
+      "cli_source": "00dce8c7dd048c4d1ad6d9fe815fb09d3fd7884c7f869d6bfea7f903a1b5cbd8",
+      "cli_validator": "5ad6ad28a69698da3d4ccd0eafd57a497d479660368d4d39f3d61a25f99e2023",
+      "journal_module": "b8d8a0771c4a109714b143829bc0eed29ee780d09c26abc3fe9187bfcfee43ab",
+      "expected_content": "4b1ef0f664b376cfc83e75210a04ee71bb4c30f275283023d10109fa9fbc5db3",
+      "native_pdf": "c05d46d2512770226b94afb711bcabef74addcdb64bf1822ad39ec1f3e3b47e5",
+      "scanned_pdf": "fde5ae3b1d95197c31514a5ba166a402980bc7c7e15ed6322c9971652cfb830e"
+    }
+  },
+  "transport_policy": {
+    "explicit_posts_per_invocation": 2,
+    "explicit_posts_total": 4,
+    "sdk_max_retries": 0,
+    "redirects": false,
+    "captured_http_headers": false,
+    "all_requests_http_200": true
+  },
+  "invocations": [
+    {
+      "fixture": "native",
+      "pdf_pages": 2,
+      "exit_code": 0,
+      "runtime_seconds": 49.064,
+      "cpu_time_ms": 759,
+      "memory_peak_reported": "265.1M",
+      "swap_peak_reported": "0B",
+      "cli_log_sha256": "d3a74caa9a30393b5073441b2c964ac69dfa4a16ad20dd03bc7639e4498d53a1",
+      "assessment_log_sha256": "ab022bd196c91fa71d4c03b8dddc314e6a67dde42cd75e8c14a88917e6af7d87",
+      "assessment_sha256": "a33c1b31b19a94c1c22b99ac0d5b53b04868b197170fb065faeb3bd9e7d1d368",
+      "journal_policy_sha256": "5ac9f3b4bff9563ed9a66710cf16fe33c8860229fda4715d01e31ac338af9c4d",
+      "assessment": {
+        "passed": true,
+        "captured_response_output_correspondence": true,
+        "natural_completion_verified": true,
+        "markdown_sha256": "684cf073e2843f7cef6fbde4867a461f72e5c579fbe3caae50b715b4631d31a1",
+        "metadata_sha256": "c5163cb2c0ba49d2c860e42c7e0d148e8b2f429926989a1abcaef45d7145764f",
+        "metadata": {
+          "file_name": "native.pdf",
+          "pages": 2,
+          "total_token_count": 1230,
+          "total_chunks": 25,
+          "total_images": 0,
+          "page_box_metadata": [
+            {"page_num": 0, "box": [0, 0, 1632, 2112], "token_count": 779, "chunks": 19},
+            {"page_num": 1, "box": [0, 0, 1632, 2112], "token_count": 451, "chunks": 6}
+          ]
+        }
+      },
+      "requests": [
+        {
+          "call_id": "0000",
+          "page_num": 0,
+          "http_status": 200,
+          "max_tokens": 12384,
+          "request_sha256": "694e0669d3f4dbc4ab86460cae65ca92e2ae94ce07575996b85d0d5b16238df4",
+          "response_sha256": "508720375399c07b032f2dc35fe05c1374447fd2be780fd4df0d13d42f510d22",
+          "journal_record_sha256": "ab5ec5b112552f08f0632cdf7a81c34dbba380bced2809719f4a9868c25f2f37",
+          "prompt_tokens": 3617,
+          "completion_tokens": 779,
+          "finish_reason": "stop"
+        },
+        {
+          "call_id": "0001",
+          "page_num": 1,
+          "http_status": 200,
+          "max_tokens": 12384,
+          "request_sha256": "2287fabd79c281feb6520d654ecb8220cea690eec71cb2efed60e416ce2be2f7",
+          "response_sha256": "7e746d05e1e1d5ae8ca79f597e5d30e1784cc29397548b587607be4bc3345cad",
+          "journal_record_sha256": "80b5c2fe98a1ecf17d0a5918f6373fb2b7f6cdcd1dbd5c13e21454f3754656f4",
+          "prompt_tokens": 3617,
+          "completion_tokens": 451,
+          "finish_reason": "stop"
+        }
+      ],
+      "prior_vulkan_exact_output_match": {
+        "assessment_sha256": "3a9d9d9f9020bbf4ae7a772fcd902307f0bd309ce0b5ac6e708488311d41ba58",
+        "markdown_sha256_matches": true,
+        "metadata_sha256_matches": true
+      }
+    },
+    {
+      "fixture": "scanned",
+      "pdf_pages": 2,
+      "exit_code": 0,
+      "runtime_seconds": 40.326,
+      "cpu_time_ms": 722,
+      "memory_peak_reported": "168.4M",
+      "swap_peak_reported": "0B",
+      "cli_log_sha256": "7e0cfb0027ab385f54b70776415d93269baf08ef58468f024c33fb49972a9f33",
+      "assessment_log_sha256": "b5748f6edf3e13d9b11be1e64a75ee4b19b1d9c29168190cfed65344d5a51593",
+      "assessment_sha256": "30d573a454ba26ba850946253efd8ec652632dda1cf37420ed99f7eed75c7cee",
+      "journal_policy_sha256": "5ac9f3b4bff9563ed9a66710cf16fe33c8860229fda4715d01e31ac338af9c4d",
+      "assessment": {
+        "passed": true,
+        "captured_response_output_correspondence": true,
+        "natural_completion_verified": true,
+        "markdown_sha256": "684cf073e2843f7cef6fbde4867a461f72e5c579fbe3caae50b715b4631d31a1",
+        "metadata_sha256": "a8e407de1b7abde3035784b23838bcdf97edde90ecb5947b8ba98baf03bce1ea",
+        "metadata": {
+          "file_name": "scanned.pdf",
+          "pages": 2,
+          "total_token_count": 1230,
+          "total_chunks": 25,
+          "total_images": 0,
+          "page_box_metadata": [
+            {"page_num": 0, "box": [0, 0, 1632, 2112], "token_count": 779, "chunks": 19},
+            {"page_num": 1, "box": [0, 0, 1632, 2112], "token_count": 451, "chunks": 6}
+          ]
+        }
+      },
+      "requests": [
+        {
+          "call_id": "0000",
+          "page_num": 1,
+          "http_status": 200,
+          "max_tokens": 12384,
+          "request_sha256": "c0dcda57c6d1baaaef4b84b8c74b3b9e8e648b6a91ed5cebd8d5979d8a751257",
+          "response_sha256": "42ec46d815113876328fb245d7c7eda73fe9d10768210388bb370e17d960bb52",
+          "journal_record_sha256": "7569e19908a492e8f8cc7e16a773fa633da5d9682403f831722e79acc35255bd",
+          "prompt_tokens": 3617,
+          "completion_tokens": 451,
+          "finish_reason": "stop"
+        },
+        {
+          "call_id": "0001",
+          "page_num": 0,
+          "http_status": 200,
+          "max_tokens": 12384,
+          "request_sha256": "9844d70bfa3e6161f44b3ea53e325b4ea03c9969e354898bab6d002edd520cc2",
+          "response_sha256": "73e0081da7980651055b0f4aba2076704e9da7b629459d44575f23bca5f1f69a",
+          "journal_record_sha256": "36b1dbe195139cd904bbd207bbee5a79b1e664b15eedec85313ccefe3c05177b",
+          "prompt_tokens": 3617,
+          "completion_tokens": 779,
+          "finish_reason": "stop"
+        }
+      ],
+      "prior_vulkan_exact_output_match": {
+        "assessment_sha256": "dfef6ccb3b307421594c68f21c1ee266a4531fc98f0a1099a2e2c9465dc78f06",
+        "markdown_sha256_matches": true,
+        "metadata_sha256_matches": true
+      }
+    }
+  ],
+  "interpretation": {
+    "cli_compatibility_passed": true,
+    "same_exact_markdown_and_fixture_metadata_hashes_as_prior_vulkan_cli": true,
+    "new_throughput_measurement": false,
+    "c4_overlap_exercised": false,
+    "normal_lifecycle_followup_pending": true,
+    "full_promotion_claimed": false,
+    "independent_remote_execution_attestation_claimed": false,
+    "complete_prose_layout_acceptance_claimed": false,
+    "numerical_equivalence_or_general_ocr_acceptance_claimed": false
+  }
+}

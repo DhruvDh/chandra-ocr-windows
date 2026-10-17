@@ -1,0 +1,233 @@
+{
+  "schema": "chandra.directcompute.exact-native-second-page-failure.v1",
+  "source_cutoff": "623da8786562a7c1fd9178ccb68034cf491fc39b",
+  "outcome": "Rejected original second native page; invalid numerical output from the first prediction, no EOS or content acceptance",
+  "input": {
+    "fixture": "native-1",
+    "source_page_zero_based": 1,
+    "manifest": {
+      "bytes": 36567,
+      "sha256": "aab97d615f7e3181b9a3ef814f8784030f17fb186a31964df0a2a6063512e8d1"
+    },
+    "RGB_dimensions": [
+      1624,
+      2100
+    ],
+    "prompt_tokens": 3617,
+    "grid": [
+      1,
+      126,
+      96
+    ],
+    "patches": 12096,
+    "context": 16384,
+    "normal_output_allowance": 12384,
+    "diagnostic_token_cap": null
+  },
+  "model": {
+    "repository": "datalab-to/chandra-ocr-2",
+    "revision": "af93b47dba1b47b6640c86ccf487ed2260ab9a09",
+    "original_weight_format": "BF16"
+  },
+  "frozen_build": {
+    "name": "Build20",
+    "worker_executable_sha256": "74bd66ce9593060d97077ba5bdc8e0978fc388462d2ee263b6e38f55a9cd6fd5",
+    "source_manifest": {
+      "bytes": 17243,
+      "sha256": "c5164ad8335560c1c7c9b620250a23f9b9e8e6f65c113fc1641d7bfe71089cf0"
+    },
+    "candidate_text_softmax_sha256": "283d3356ea3c882517e96ddff26706bae21bfe3cd04a523fc065e9aa8183169e",
+    "candidate_production_source_landed": false,
+    "immutable_gemv_selector": "ordered",
+    "selected_diagnostics_enabled": false,
+    "ordinary_checkpoint_and_phase_token_callbacks_remain": true
+  },
+  "device": {
+    "model": "Intel Arc A770",
+    "vendor_ID": "8086",
+    "device_ID": "56a0",
+    "API": "DirectCompute/D3D11"
+  },
+  "observed_failure": {
+    "generated_count": 1952,
+    "EOS_observed": false,
+    "first_enormous_logit_index": 0,
+    "first_all_vocabulary_zero_tie_index": 1,
+    "every_ID_alternates_52427_0": true,
+    "all_odd_rows_zero_and_tie_all_248320": true,
+    "even_best_logit_range": [
+      9.953037915854457e+29,
+      1.0101590720568703e+31
+    ],
+    "first_four_journal_rows": [
+      {
+        "argmax_tie_policy": "first vocabulary index",
+        "best_logit": 9.953037915854457e+29,
+        "generated_index": 0,
+        "logit_storage": "full 248320-value FP32 readback; graph cast boundaries remain explicit",
+        "maximum_tie_count": 1,
+        "runner_up_logit": 23.25,
+        "stop": false,
+        "token_id": 52427,
+        "top_margin": 9.953037915854457e+29
+      },
+      {
+        "argmax_tie_policy": "first vocabulary index",
+        "best_logit": 0.0,
+        "generated_index": 1,
+        "logit_storage": "full 248320-value FP32 readback; graph cast boundaries remain explicit",
+        "maximum_tie_count": 248320,
+        "runner_up_logit": 0.0,
+        "stop": false,
+        "token_id": 0,
+        "top_margin": 0.0
+      },
+      {
+        "argmax_tie_policy": "first vocabulary index",
+        "best_logit": 2.4461695176279114e+30,
+        "generated_index": 2,
+        "logit_storage": "full 248320-value FP32 readback; graph cast boundaries remain explicit",
+        "maximum_tie_count": 1,
+        "runner_up_logit": 14.25,
+        "stop": false,
+        "token_id": 52427,
+        "top_margin": 2.4461695176279114e+30
+      },
+      {
+        "argmax_tie_policy": "first vocabulary index",
+        "best_logit": 0.0,
+        "generated_index": 3,
+        "logit_storage": "full 248320-value FP32 readback; graph cast boundaries remain explicit",
+        "maximum_tie_count": 248320,
+        "runner_up_logit": 0.0,
+        "stop": false,
+        "token_id": 0,
+        "top_margin": 0.0
+      }
+    ],
+    "decoded_first_120_characters": "iteDatabase!iteDatabase!iteDatabase!iteDatabase!iteDatabase!iteDatabase!iteDatabase!iteDatabase!iteDatabase!iteDatabase!",
+    "literal_checks_passed": 0,
+    "literal_checks_total": 18
+  },
+  "closure": {
+    "started_utc": "2026-10-06T09:56:24.656347+00:00",
+    "wrapper_seconds": 1791.484999999986,
+    "request_seconds": 1759.9294012,
+    "guard_stop_reason": "Local1790second deadline",
+    "terminal_status": "canceled",
+    "cancel_origin": "input_eof",
+    "cancel_boundary": "text.layer.12",
+    "request_drained": true,
+    "request_retired": true,
+    "request_replayed": false,
+    "worker_poisoned": false,
+    "request_retired_to_resident_tracked_bytes": 9078531072,
+    "Job": {
+      "peak_process_commit_bytes": 10777980928,
+      "peak_job_commit_bytes": 10797625344,
+      "process_commit_limit_bytes": 12884901888,
+      "job_commit_limit_bytes": 13153337344,
+      "affinity_mask": 1,
+      "priority_class": 16384,
+      "total_job_processes": 3,
+      "active_job_processes_before_retirement": 1,
+      "active_job_processes_after_retirement": 0,
+      "returncode": 1,
+      "kill_on_job_close": true
+    },
+    "minimum_sampled_available_host_RAM_bytes": 19124125696,
+    "host_RAM_samples": 3247,
+    "ordinary_historical_service_restored_cold_at_receipt": true
+  },
+  "retained_primary_AMD": {
+    "same_authenticated_original_encoded_image_and_RGB_pixels": true,
+    "retained_AMD_prompt_tokens": 3617,
+    "retained_AMD_completion_tokens": 560,
+    "retained_AMD_finish_reason": "stop",
+    "retained_AMD_content_equal": false,
+    "retained_AMD_actual_token_IDs_available": false,
+    "retained_AMD_runtime_source_attested": false,
+    "reference_files": {
+      "recorded-cli-northstone-01/http/0001-record.json": {
+        "bytes": 1380,
+        "sha256": "09d118e2260526f588348421306a2d9dea64c245dfcf64d576c8ad7adf69fcce"
+      },
+      "recorded-cli-northstone-01/http/0001-request.raw": {
+        "bytes": 320677,
+        "sha256": "0c168d5cdc92f7148366814ee6c6bcd6c099c0a044463adf694439ddcebba094"
+      },
+      "recorded-cli-northstone-01/http/0001-response.raw": {
+        "bytes": 2092,
+        "sha256": "2c5177d03a0f4c2093dbe5b8e8d4d0907b2d0bce12f6854bc8c5a967195c5a0d"
+      }
+    },
+    "reference_summary": {
+      "bytes": 76983,
+      "sha256": "e873eddded4b6279b520bd1223d2cf6beb0abe2407b471803d2add0e60ad26a7"
+    }
+  },
+  "artifact_commitments": {
+    "result.json": {
+      "bytes": 328444,
+      "sha256": "a5f53d30907abb78e54a6a03bd0878a1a8d4754d25eee6230f849923deefe561"
+    },
+    "generated-tokens.jsonl": {
+      "bytes": 559175,
+      "sha256": "58bb40af6cb00e27625827ae8127297da59ff43ca20c7024a7d87371d596f124"
+    },
+    "job.json": {
+      "bytes": 404,
+      "sha256": "06a72b29e0c43fb1e8753566c72bf101577e4e1177b4a267fd75cc95c0e9c30c"
+    },
+    "process.json": {
+      "bytes": 413,
+      "sha256": "c0476b67f1baca22e237f927801525cf90396e6c357999ab969ce430a67b6699"
+    },
+    "channel-result.json": {
+      "bytes": 137,
+      "sha256": "71ac5098a07a8bc19949981de790d904bdfcc3efa789997d8366ed66f29b0292"
+    },
+    "events.jsonl": {
+      "bytes": 496185,
+      "sha256": "7168e6257ea3571212d028da083e29b79c8e3325a954921e799bf28fa3be08c0"
+    },
+    "host-memory.jsonl": {
+      "bytes": 258797,
+      "sha256": "baf6ed2a74ce022b90d7d64b3746b33778e442498b00244378f136fe33ff2a48"
+    },
+    "ordinary-worker-restored.json": {
+      "bytes": 634,
+      "sha256": "a6009eefb0cd70c20ac2f5e6655c16d2416cc6a801856c4ade1d817752b1ed77"
+    },
+    "closed-failure-analysis.json": {
+      "bytes": 6488,
+      "sha256": "1894e66c26b9b8cb82e3dcf0c12119adb3d8acc1576b847f2880cbe4069920d5"
+    },
+    "failed-decoded-output.txt": {
+      "bytes": 11712,
+      "sha256": "c72cb2521024ec0936bbe858a129c15b7d802616e137c94332d07fd9d1162254"
+    }
+  },
+  "analysis_source": {
+    "bytes": 7132,
+    "sha256": "b5d0b271ccf3f661df806af1c9724efa2af99bab4d3977073cba8277bf79d71c"
+  },
+  "acceptance": {
+    "original_second_page_OCR": false,
+    "EOS": false,
+    "fresh_trained_numerics": false,
+    "cause_established": false,
+    "page_credit": false,
+    "throughput_claim": false,
+    "AMD_service_or_GPU_actions": false
+  },
+  "limits": [
+    "Finite logits do not establish meaningful numerical validity.",
+    "The descriptive 1e6 threshold is not an acceptance tolerance or implemented guard.",
+    "The first original page success remains valid at its recorded single-fixture scope; it does not qualify this second page or the corpus.",
+    "Windows Job commit is not RSS; tracked buffers are not driver-wide VRAM.",
+    "Clean request retirement and external Job closure do not diagnose the arithmetic failure or establish a machine-wide no-hang guarantee.",
+    "The retained AMD response lacks actual token IDs and remote runtime source attestation.",
+    "Cold service restoration describes the retained receipt cutoff, not current process state."
+  ]
+}

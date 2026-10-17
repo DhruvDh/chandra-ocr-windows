@@ -1,0 +1,387 @@
+--- a/ggml/src/ggml-sycl/fattn-onednn.cpp
++++ b/ggml/src/ggml-sycl/fattn-onednn.cpp
+@@ -44,6 +44,22 @@
+     const ggml_tensor * mask  = dst->src[3];
+     const ggml_tensor * sinks = dst->src[4];
+ 
++    // Opt-in experiment: the Chandra vision MHA envelope, including smaller
++    // same-layout operator controls. Do not admit unrelated unmasked graphs.
++    const bool unmasked_vision = !mask && !sinks &&
++        Q->type == GGML_TYPE_F32 && K->type == GGML_TYPE_F16 && V->type == GGML_TYPE_F16 &&
++        Q->ne[0] == 64 && K->ne[0] == 64 && V->ne[0] == 64 &&
++        Q->ne[2] == 16 && K->ne[2] == 16 && V->ne[2] == 16 &&
++        Q->ne[3] == 1 && K->ne[3] == 1 && V->ne[3] == 1 &&
++        Q->ne[1] == K->ne[1] && K->ne[1] == V->ne[1] &&
++        Q->ne[1] >= GGML_SYCL_FA_ONEDNN_MIN_Q && Q->ne[1] <= 12096 &&
++        Q->nb[0] == sizeof(float) && ggml_sycl_fattn_onednn_binds_kv(K, V) &&
++        ggml_flash_attn_ext_get_prec(dst) == GGML_PREC_F32;
++    static const bool enable_unmasked = ggml_sycl_get_env("GGML_SYCL_FA_ONEDNN_UNMASKED", 0) == 1;
++    if (!mask && (!enable_unmasked || !unmasked_vision)) {
++        return false;
++    }
++
+     // F16 KV: native SDPA at any KV length.
+     // Non-F16: dequant to F16 then SDPA at prefill lengths. Only the
+     // standard quantized KV cache types (Q4_0-Q8_0) and F32 are accepted
+@@ -77,7 +93,10 @@
+                          arch == gpu_arch::intel_gpu_dg2_g11 ||
+                          arch == gpu_arch::intel_gpu_dg2_g12);
+ 
+-    if (!support_spda && K->ne[0] == 64) {
++    // Keep the known DG2 dimension-64 exclusion for every existing masked
++    // route. This second flag is only a narrow, explicitly unqualified bypass.
++    static const bool enable_dg2_d64 = ggml_sycl_get_env("GGML_SYCL_FA_ONEDNN_DG2_D64", 0) == 1;
++    if (!support_spda && K->ne[0] == 64 && !(enable_unmasked && enable_dg2_d64 && unmasked_vision)) {
+         return false;
+     }
+     // Optional KV-length ceiling (GGML_SYCL_FA_ONEDNN_MAX_KV, 0 = unlimited). Escape hatch:
+@@ -87,19 +106,23 @@
+         return false;
+     }
+     // gate for the following cases
+-    // 1. if the oneDNN graph Add node has no input --> skip
++    // 1. absent masks are admitted only by the experimental vision gate above
+     // 2. types other than f16 need different logical_tensor declaration
+     // 3. the mask must be shape [1, 1, q, seq]
+     // 4. sinks: excludes attention sink (Xiao et al., 2024) that can't be modeled by oneDNN graph
+-    if (!mask || mask->type != GGML_TYPE_F16 || mask->ne[2] != 1 || mask->ne[3] != 1 || sinks) {
++    if ((mask && (mask->type != GGML_TYPE_F16 || mask->ne[2] != 1 || mask->ne[3] != 1)) || sinks) {
+         return false;
+     }
+-    float max_bias = 0.0f, logit_softcap = 0.0f;
++    float scale = 0.0f, max_bias = 0.0f, logit_softcap = 0.0f;
++    memcpy(&scale,         (const float *) dst->op_params + 0, sizeof(float));
+     memcpy(&max_bias,      (const float *) dst->op_params + 1, sizeof(float));
+     memcpy(&logit_softcap, (const float *) dst->op_params + 2, sizeof(float));
+     if (max_bias != 0.0f || logit_softcap != 0.0f) {
+         return false;
+     }
++    if (!mask && scale != 0.125f) {
++        return false;
++    }
+     // K and V must share head_dim: the SDPA graph uses a single `d` for both.
+     const int64_t d = K->ne[0];
+     if (V->ne[0] != d || Q->ne[3] != 1) {
+@@ -122,6 +145,7 @@
+ #include "dnnl.hpp"
+ #include "dnnl_sycl.hpp"
+ #include "oneapi/dnnl/dnnl_graph.hpp"   // graph API lives only under oneapi/dnnl/, not at the include root
++#include "fattn-onednn-vision.hpp"
+ 
+ using namespace dnnl;
+ using namespace dnnl::graph;
+@@ -161,14 +185,16 @@
+     compiled_partition          cp;
+     std::vector<logical_tensor> ins;
+     logical_tensor              out;
+-    size_t id_q = 0, id_k = 0, id_v = 0, id_scale = 0, id_mask = 0;
++    size_t id_q = 0, id_k = 0, id_v = 0, id_scale = 0;
++    std::optional<size_t> id_mask;
+     bool   ok = false;
+ };
+ 
+-// Build + compile the contiguous-input GQA SDPA graph (MatMul->Divide->Add->SoftMax->MatMul), f32 out.
+-// Mirrors the hardware-verified scratch/onednn_sdpa_probe.cpp build_gqa (partitions=1, sdp_primitive_kernel_t).
++// Build + compile GQA SDPA (MatMul->Divide->[optional Add]->SoftMax->MatMul), f16 out.
++// Preserve the pinned masked graph; the optional-mask route is unqualified.
+ static sdpa_partition build_sdpa(const engine & eng, int H, int Hkv, int q, int seq, int d,
+-                                 const std::array<int64_t, 5> & k_str, const std::array<int64_t, 5> & v_str) try {
++                                 const std::array<int64_t, 5> & k_str, const std::array<int64_t, 5> & v_str,
++                                 bool has_mask) try {
+     using ltype = logical_tensor::layout_type;
+     using dt    = logical_tensor::data_type;
+     using ldims = logical_tensor::dims;
+@@ -192,16 +218,22 @@
+     auto sdiv   = op(id++, op::kind::Divide, "scale_div");     // score / (1/kq_scale) == score * kq_scale
+     sdiv.add_inputs({score, scale}); sdiv.add_outputs({scaled});
+ 
+-    auto mask   = logical_tensor(id++, t,  msk,  ltype::strided);
+-    auto masked = logical_tensor(id++, fi, s_sz, ltype::strided);
+-    auto madd   = op(id++, op::kind::Add, "mask_add");
+-    madd.add_inputs({scaled, mask}); madd.add_outputs({masked});
++    auto softmax_input = scaled;
++    std::optional<op> madd;
++    if (has_mask) {
++        auto mask   = logical_tensor(id++, t,  msk,  ltype::strided);
++        auto masked = logical_tensor(id++, fi, s_sz, ltype::strided);
++        madd.emplace(id++, op::kind::Add, "mask_add");
++        madd->add_inputs({scaled, mask}); madd->add_outputs({masked});
++        softmax_input = masked;
++        E.id_mask = mask.get_id();
++    }
+ 
+     auto probs  = logical_tensor(id++, t,  s_sz, ltype::strided);
+     auto smax   = op(id++, op::kind::SoftMax, "softmax");
+     smax.set_attr<int64_t>(op::attr::axis, -1);
+     smax.set_attr<std::string>(op::attr::mode, "inf_as_zero");
+-    smax.add_inputs({masked}); smax.add_outputs({probs});
++    smax.add_inputs({softmax_input}); smax.add_outputs({probs});
+ 
+     auto value  = logical_tensor(id++, t,  kv_sz, v_st);
+     // f16 output is REQUIRED to hit sdp_primitive_kernel_t (the systolic micro-kernel); an f32 output
+@@ -212,11 +244,16 @@
+     bmm2.add_inputs({probs, value}); bmm2.add_outputs({output});
+ 
+     dnnl::graph::graph g(eng.get_kind());
+-    g.add_op(bmm1); g.add_op(sdiv); g.add_op(madd); g.add_op(smax); g.add_op(bmm2);
++    g.add_op(bmm1); g.add_op(sdiv);
++    if (madd) { g.add_op(*madd); }
++    g.add_op(smax); g.add_op(bmm2);
+     g.finalize();
+ 
+     auto parts = g.get_partitions();
+     if (parts.size() != 1 || !parts[0].is_supported()) {
++        if (!has_mask) {
++            GGML_ABORT("[VISION-SDPA] oneDNN did not form a supported unmasked partition");
++        }
+         GGML_LOG_WARN("%s: oneDNN did not fuse the SDPA graph; falling back to TILE kernel\n", __func__);
+         return E;   // ok stays false -> caller falls back to TILE
+     }
+@@ -225,11 +262,14 @@
+     E.cp       = parts[0].compile(E.ins, {E.out}, eng);
+     E.out      = E.cp.query_logical_tensor(E.out.get_id());
+     E.id_q     = query.get_id(); E.id_k = key.get_id(); E.id_v = value.get_id();
+-    E.id_scale = scale.get_id(); E.id_mask = mask.get_id();
++    E.id_scale = scale.get_id();
+     E.ok       = true;
+     return E;
+ }
+ catch (const std::exception & e) {
++    if (!has_mask) {
++        GGML_ABORT("[VISION-SDPA] unmasked partition build failed (%s)", e.what());
++    }
+     // compile() can reject a stride set the partitioner never inspects; memoise the failure so the
+     // fallback costs one build rather than one per call.
+     GGML_LOG_WARN("%s: oneDNN SDPA partition build failed (%s); falling back to TILE kernel\n", __func__, e.what());
+@@ -253,8 +293,10 @@
+     memcpy(&kq_scale, (const float *) dst->op_params + 0, sizeof(float));
+ 
+     dpct::queue_ptr stream = ctx.stream();
+-    dnnl::engine    eng    = ctx.engine_dnnl(stream);
+-    dnnl::stream    strm   = ctx.stream_dnnl(stream);
++    // A separate public Graph allocator bounds only this opt-in route. A
++    // supported partition is not proof that oneDNN selected fused SDPA.
++    dnnl::engine    eng    = mask ? ctx.engine_dnnl(stream) : ggml_sycl_vision_sdpa::get_engine(*stream);
++    dnnl::stream    strm   = mask ? ctx.stream_dnnl(stream) : dnnl::sycl_interop::make_stream(eng, *stream);
+ 
+     const ggml_sycl_fattn_extra extra = ggml_sycl_fattn_get_extra(dst);
+ 
+@@ -400,20 +442,23 @@
+         outf_ptr = outf_pool->get();
+     }
+ 
+-    // compile once per (device, shape, KV strides), reuse across layers/calls. Stride 2 always
++    // compile once per (engine, mask presence, device, shape, KV strides), reuse across layers/calls. Stride 2 always
+     // repeats stride 1 and stride 4 is always 1, so the key covers every entry that can differ.
+     static std::unordered_map<std::string, sdpa_partition> cache;
+-    char keyb[256];
+-    snprintf(keyb, sizeof(keyb), "%d:%lld:%lld:%lld:%lld:%lld:%lld:%lld:%lld:%lld:%lld:%lld", ggml_sycl_get_device(),
++    char keyb[320];
++    snprintf(keyb, sizeof(keyb), "%p:%d:%d:%lld:%lld:%lld:%lld:%lld:%lld:%lld:%lld:%lld:%lld:%lld", (void *) eng.get(), int(mask != nullptr), ggml_sycl_get_device(),
+              (long long) H, (long long) Hkv, (long long) q, (long long) seq, (long long) d,
+              (long long) k_str[0], (long long) k_str[1], (long long) k_str[3],
+              (long long) v_str[0], (long long) v_str[1], (long long) v_str[3]);
+     auto it = cache.find(keyb);
+     if (it == cache.end()) {
+-        it = cache.emplace(keyb, build_sdpa(eng, (int) H, (int) Hkv, (int) q, (int) seq, (int) d, k_str, v_str)).first;
++        it = cache.emplace(keyb, build_sdpa(eng, (int) H, (int) Hkv, (int) q, (int) seq, (int) d, k_str, v_str, mask != nullptr)).first;
+     }
+     sdpa_partition & E = it->second;
+     if (!E.ok) {
++        if (!mask) {
++            GGML_ABORT("[VISION-SDPA] unmasked partition unavailable; refusing experimental fallback");
++        }
+         // oneDNN can decline a shape or a stride set that _supported() never sees; build_sdpa warns per key.
+         ggml_sycl_flash_attn_ext_tile(ctx, dst);
+         return;
+@@ -424,13 +469,17 @@
+         if (r == E.id_k)     return K_ptr;
+         if (r == E.id_v)     return V_ptr;
+         if (r == E.id_scale) return scale_dev;
+-        if (r == E.id_mask)  return (void *) mask->data;
++        if (E.id_mask && r == *E.id_mask) return (void *) mask->data;
+         return nullptr;
+     };
+     std::vector<tensor> ti;
+     ti.reserve(E.ins.size());
+     for (auto & lt : E.ins) {
+-        ti.emplace_back(lt, eng, id2ptr(lt.get_id()));
++        void * ptr = id2ptr(lt.get_id());
++        if (!mask && !ptr) {
++            GGML_ABORT("[VISION-SDPA] unexpected unmasked partition input");
++        }
++        ti.emplace_back(lt, eng, ptr);
+     }
+     tensor to(E.out, eng, outf_ptr);
+     E.cp.execute(strm, ti, {to});
+@@ -446,6 +495,9 @@
+     }
+ }
+ catch (const std::exception & e) {
++    if (!dst->src[3]) {
++        GGML_ABORT("[VISION-SDPA] unmasked SDPA failed (%s); refusing experimental fallback", e.what());
++    }
+     // any oneDNN/SYCL failure is non-fatal: fall back to the existing kernel (strictly additive).
+     GGML_LOG_WARN("%s: oneDNN SDPA failed (%s); falling back to TILE kernel\n", __func__, e.what());
+     ggml_sycl_flash_attn_ext_tile(ctx, dst);
+--- /dev/null
++++ b/ggml/src/ggml-sycl/fattn-onednn-vision.hpp
+@@ -0,0 +1,158 @@
++#ifndef GGML_SYCL_FATTN_ONEDNN_VISION_HPP
++#define GGML_SYCL_FATTN_ONEDNN_VISION_HPP
++
++#include <mutex>
++#include <unordered_map>
++#include <vector>
++
++#include "oneapi/dnnl/dnnl_graph_sycl.hpp"
++
++// Experimental unmasked attention only. Public Graph allocators bound internal
++// tensors; they do not identify the compiled implementation or bound driver/JIT
++// memory. Keep the ordinary masked engine and allocator unchanged.
++namespace ggml_sycl_vision_sdpa {
++
++static constexpr size_t max_allocation_bytes = 64ull << 20;
++static constexpr size_t max_live_bytes       = 128ull << 20;
++
++struct allocation {
++    size_t bytes;
++    sycl::context context;
++};
++
++struct allocator_state {
++    std::mutex mutex;
++    std::unordered_map<void *, allocation> allocations;
++    std::vector<sycl::queue> queues;
++    size_t live_bytes = 0;
++};
++
++static allocator_state & state() {
++    // oneDNN may retain callbacks in its own caches beyond our cache teardown.
++    // This small state intentionally lasts until the owned worker exits. The
++    // experiment does not support unloading the backend DLL inside a process.
++    static auto * retained = new allocator_state;
++    return *retained;
++}
++
++static void * allocate(size_t bytes, size_t alignment, const void * dev, const void * context) noexcept {
++    try {
++        auto & s = state();
++        const size_t charged = bytes == 0 ? 1 : bytes;
++        {
++            std::lock_guard<std::mutex> lock(s.mutex);
++            if (charged > max_allocation_bytes || charged > max_live_bytes - s.live_bytes) {
++                GGML_ABORT("[VISION-SDPA] denied Graph allocation: request=%zu live=%zu limits=%zu/%zu; refusing possible quadratic fallback",
++                           charged, s.live_bytes, max_allocation_bytes, max_live_bytes);
++            }
++            s.live_bytes += charged;
++        }
++        // oneDNN's default SYCL allocator treats alignment 0 as 64.
++        if (alignment == 0) {
++            alignment = 64;
++        }
++        void * ptr = sycl::aligned_alloc_device(alignment, charged,
++                *static_cast<const sycl::device *>(dev), *static_cast<const sycl::context *>(context));
++        if (!ptr) {
++            GGML_ABORT("[VISION-SDPA] device allocation failed: %zu bytes", charged);
++        }
++        {
++            std::lock_guard<std::mutex> lock(s.mutex);
++            if (!s.allocations.emplace(ptr, allocation{charged, *static_cast<const sycl::context *>(context)}).second) {
++                GGML_ABORT("[VISION-SDPA] duplicate allocation identity");
++            }
++        }
++        return ptr;
++    } catch (...) {
++        // Do not throw through a C callback or return nullptr to an unchecked
++        // library scratchpad path. The finite experiment must fail closed.
++        GGML_ABORT("[VISION-SDPA] Graph allocator failed");
++    }
++}
++
++static void deallocate(void * ptr, const void * dev, const void * context, void * event) noexcept {
++    if (!ptr) {
++        return;
++    }
++    try {
++        auto & s = state();
++        const auto & device = *static_cast<const sycl::device *>(dev);
++        const auto & ctx    = *static_cast<const sycl::context *>(context);
++        std::vector<sycl::queue> owned_queues;
++        {
++            std::lock_guard<std::mutex> lock(s.mutex);
++            auto it = s.allocations.find(ptr);
++            if (it == s.allocations.end() || it->second.context != ctx) {
++                GGML_ABORT("[VISION-SDPA] unknown allocation/context during release");
++            }
++            for (const auto & queue : s.queues) {
++                if (queue.get_device() == device && queue.get_context() == ctx) {
++                    owned_queues.push_back(queue);
++                }
++            }
++        }
++        if (owned_queues.empty()) {
++            GGML_ABORT("[VISION-SDPA] no registered execution queue during release");
++        }
++        if (event) {
++            static_cast<sycl::event *>(event)->wait_and_throw();
++        }
++        // oneDNN can unwind after a partial submission before recording its
++        // final event. Drain the actual candidate queues before releasing USM.
++        // This conservative synchronization is part of the measured candidate.
++        for (auto & queue : owned_queues) {
++            queue.wait_and_throw();
++        }
++        // Never hold the accounting lock across a queue/event wait. Keep bytes
++        // charged until free completes; serialize pointer reuse with the map.
++        std::lock_guard<std::mutex> lock(s.mutex);
++        auto it = s.allocations.find(ptr);
++        if (it == s.allocations.end()) {
++            GGML_ABORT("[VISION-SDPA] duplicate release");
++        }
++        sycl::free(ptr, ctx);
++        s.live_bytes -= it->second.bytes;
++        s.allocations.erase(it);
++    } catch (...) {
++        GGML_ABORT("[VISION-SDPA] Graph allocation release/completion failed");
++    }
++}
++
++static dnnl::engine get_engine(sycl::queue & queue) {
++    auto & s = state();
++    {
++        std::lock_guard<std::mutex> lock(s.mutex);
++        bool known = false;
++        for (const auto & registered : s.queues) {
++            known = known || registered == queue;
++        }
++        if (!known) {
++            s.queues.push_back(queue);
++        }
++    }
++    struct entry {
++        sycl::device device;
++        sycl::context context;
++        dnnl::engine engine;
++    };
++    static std::mutex engine_mutex;
++    static std::vector<entry> engines;
++    std::lock_guard<std::mutex> lock(engine_mutex);
++    const auto device = queue.get_device();
++    const auto context = queue.get_context();
++    for (const auto & cached : engines) {
++        if (cached.device == device && cached.context == context) {
++            return cached.engine;
++        }
++    }
++    auto allocator = dnnl::graph::sycl_interop::make_allocator(allocate, deallocate);
++    auto engine = dnnl::graph::sycl_interop::make_engine_with_allocator(device, context, allocator);
++    engines.push_back({device, context, engine});
++    GGML_LOG_INFO("[VISION-SDPA] experimental unmasked Graph engine; allocation limits=%zu/%zu bytes; fused implementation must be verified separately\n",
++                  max_allocation_bytes, max_live_bytes);
++    return engine;
++}
++
++} // namespace ggml_sycl_vision_sdpa
++
++#endif

@@ -1,0 +1,393 @@
+{
+  "schema": "chandra.directcompute.exact-client-recovery.v1",
+  "source_cutoff": "f0d00b35eb39913b508b05f90af831a71018e926",
+  "outcome": "One original populated Zotero fixture completes in frozen native CLI and ordinary worker; functional content and owned closure accepted at these cutoffs",
+  "input": {
+    "fixture": "native-0",
+    "manifest": {
+      "bytes": 36558,
+      "sha256": "0aa588473930f110cc359ba369623f29765a85f4e05ffcbca2ac509933b787ae"
+    },
+    "decoded_RGB_dimensions": [
+      1624,
+      2100
+    ],
+    "prompt_tokens": 3617,
+    "grid": [
+      1,
+      126,
+      96
+    ],
+    "patches": 12096,
+    "context": 16384,
+    "normal_output_allowance": 12384,
+    "diagnostic_token_cap": null
+  },
+  "model": {
+    "repository": "datalab-to/chandra-ocr-2",
+    "revision": "af93b47dba1b47b6640c86ccf487ed2260ab9a09",
+    "original_weight_format": "BF16",
+    "safetensors_bytes": 10591220088,
+    "safetensors_sha256": "0804568be9f099d6479fad9ed77a4da4611f3c1e7bc6e009af7dce45e8aa3847",
+    "resident_tracked_model_bytes": 9078531072
+  },
+  "device": {
+    "model": "Intel Arc A770",
+    "vendor_ID": "8086",
+    "device_ID": "56a0",
+    "API": "DirectCompute/D3D11"
+  },
+  "frozen_build": {
+    "name": "Build20",
+    "source_manifest": {
+      "bytes": 17243,
+      "sha256": "c5164ad8335560c1c7c9b620250a23f9b9e8e6f65c113fc1641d7bfe71089cf0"
+    },
+    "build_result": {
+      "bytes": 4196,
+      "sha256": "c38444095b9fe5069e317e98b8872dfb53ee7fcb015e304def717874ff8852b1"
+    },
+    "CLI_executable_sha256": "9a4ffe51840447ba0a5a9e0cf786cbcd0a5294ddb662a91474de33675f6fb21a",
+    "worker_executable_sha256": "74bd66ce9593060d97077ba5bdc8e0978fc388462d2ee263b6e38f55a9cd6fd5",
+    "candidate_text_softmax_sha256": "283d3356ea3c882517e96ddff26706bae21bfe3cd04a523fc065e9aa8183169e",
+    "original_text_softmax_sha256": "5b6c0445dcebe2acdc8104bf1c0fd2b37e1c05665d30d960ca4a0e83d6432369",
+    "candidate_change": "Uniform group barrier after shared maximum read, before reduction storage reuse",
+    "strict_compilation": "MSVC C++17 /fp:strict /W4; fxc cs_5_0 /O3 /Gis",
+    "existing_HLSL_warnings_preserved": true,
+    "archive_is_pure_Git_archive": false,
+    "archive_scope": "Tracked source with candidate shader overlay; original shader control and eight historical evidence inputs are outside compile inputs",
+    "candidate_production_source_landed": false,
+    "runtime_DXBC_identity_attested": false
+  },
+  "native_CLI": {
+    "generated_IDs_including_caller_stop": 556,
+    "caller_stop": 248046,
+    "literal_checks": [
+      18,
+      18
+    ],
+    "wrapper_seconds": 797.4839999999967,
+    "phase_seconds": [
+      {
+        "name": "device_creation",
+        "wall_seconds": 0.0901535
+      },
+      {
+        "name": "authenticated_model_import_upload",
+        "wall_seconds": 26.1832633
+      },
+      {
+        "name": "complete_vision_forward",
+        "wall_seconds": 220.0309834
+      },
+      {
+        "name": "text_embedding",
+        "wall_seconds": 0.0072699
+      },
+      {
+        "name": "ordered_multimodal_merge",
+        "wall_seconds": 0.0945432
+      },
+      {
+        "name": "text_request_cache_creation",
+        "wall_seconds": 0.0277948
+      },
+      {
+        "name": "text_prefill",
+        "wall_seconds": 164.1479103
+      },
+      {
+        "name": "greedy_cached_decode_and_token_readback",
+        "wall_seconds": 386.4493532
+      },
+      {
+        "name": "request_retirement_and_drain",
+        "wall_seconds": 0.0132446
+      },
+      {
+        "name": "model_buffer_release_and_drain",
+        "wall_seconds": 0.0952931
+      }
+    ],
+    "job": {
+      "peak_process_commit_bytes": 10829438976,
+      "peak_job_commit_bytes": 10838720512,
+      "process_commit_limit_bytes": 12884901888,
+      "job_commit_limit_bytes": 13153337344,
+      "affinity_mask": 1,
+      "priority_class": 16384,
+      "total_job_processes": 2,
+      "active_job_processes_before_retirement": 0,
+      "active_job_processes_after_retirement": 0,
+      "returncode": 0,
+      "kill_on_job_close": true
+    },
+    "minimum_sampled_available_host_RAM_bytes": 19099127808,
+    "host_RAM_samples": 1464,
+    "guard_stop_reason": null,
+    "automatic_replay": false,
+    "artifacts": {
+      "result.json": {
+        "bytes": 321903,
+        "sha256": "43d0fae0a992c14edabbebba532915c1d7bc063d7f2d2328447904af5e3095b2"
+      },
+      "generated-tokens.jsonl": {
+        "bytes": 150308,
+        "sha256": "a692bb75e65bdc747c02ec411495e7222ecaa7a63a7b1c2dc38ad637c1c373be"
+      },
+      "execute-process.json": {
+        "bytes": 425,
+        "sha256": "52e4eb574c1bf771e269a355e343dfde1494e561525af3354ddd2ae2ec18274d"
+      },
+      "execute-job.json": {
+        "bytes": 404,
+        "sha256": "bcb53647ec04c4a000dce26f9beebbcee457ad84f51b5de62ec875317aac31e5"
+      },
+      "execute-channel.json": {
+        "bytes": 136,
+        "sha256": "89edaa0da75a2805bcfb6c87df4fa2270a79a6bc40b1e400b4bf9b53c8383e8e"
+      },
+      "execute-memory.jsonl": {
+        "bytes": 149565,
+        "sha256": "d730ba5e0dd4507e0362b880f6933efa21e96c7a16569923d9f4fd1f297df582"
+      },
+      "ordinary-worker-restored.json": {
+        "bytes": 634,
+        "sha256": "2d678e6d90c467bdf8f7989a3b02bd49555c6671510b22ac12cd8d8caa5d6193"
+      }
+    }
+  },
+  "ordinary_worker": {
+    "generated_IDs_including_caller_stop": 556,
+    "caller_stop": 248046,
+    "literal_checks": [
+      18,
+      18
+    ],
+    "wrapper_seconds": 795.8589999999967,
+    "phase_seconds": [
+      {
+        "name": "complete_vision_forward",
+        "wall_seconds": 228.3461707
+      },
+      {
+        "name": "text_embedding",
+        "wall_seconds": 0.0062579
+      },
+      {
+        "name": "ordered_multimodal_merge",
+        "wall_seconds": 0.0252847
+      },
+      {
+        "name": "text_request_cache_creation",
+        "wall_seconds": 0.0399752
+      },
+      {
+        "name": "text_prefill",
+        "wall_seconds": 158.7067827
+      },
+      {
+        "name": "greedy_cached_decode_and_token_readback",
+        "wall_seconds": 381.8961337
+      },
+      {
+        "name": "request_retirement_and_drain",
+        "wall_seconds": 0.0166629
+      }
+    ],
+    "job": {
+      "peak_process_commit_bytes": 10754756608,
+      "peak_job_commit_bytes": 10774224896,
+      "process_commit_limit_bytes": 12884901888,
+      "job_commit_limit_bytes": 13153337344,
+      "affinity_mask": 1,
+      "priority_class": 16384,
+      "total_job_processes": 3,
+      "active_job_processes_before_retirement": 0,
+      "active_job_processes_after_retirement": 0,
+      "returncode": 0,
+      "kill_on_job_close": true
+    },
+    "minimum_sampled_available_host_RAM_bytes": 19330629632,
+    "host_RAM_samples": 1463,
+    "guard_stop_reason": null,
+    "automatic_replay": false,
+    "artifacts": {
+      "result.json": {
+        "bytes": 319215,
+        "sha256": "ea9b989067fbe6bad7125c509c2e4c7a8c63427002b181e9b65c3b803b1c71a4"
+      },
+      "generated-tokens.jsonl": {
+        "bytes": 150308,
+        "sha256": "a692bb75e65bdc747c02ec411495e7222ecaa7a63a7b1c2dc38ad637c1c373be"
+      },
+      "process.json": {
+        "bytes": 392,
+        "sha256": "0b8ccf8dfbf4ee3a5aa38e1bc364b5dc6a07e283b02c09a5c22b49b192aa4503"
+      },
+      "job.json": {
+        "bytes": 404,
+        "sha256": "754f945aadad94147e50ecf940d0c1eaf37453d3853f3147c9588c16b8c93262"
+      },
+      "channel-result.json": {
+        "bytes": 130,
+        "sha256": "e3aca0488c2ca088cb6720010a422cb618dcd7e4347f6d24430ba9589441aed4"
+      },
+      "host-memory.jsonl": {
+        "bytes": 117212,
+        "sha256": "ec96752465818457eac19dc823ef592b8b08a79715c35b1f273007c7a14bf23f"
+      },
+      "ordinary-worker-restored.json": {
+        "bytes": 634,
+        "sha256": "463e4bcfe5e99bf1aa70db0a0806baf28c682df6655f6dd12b894f01261c3c12"
+      }
+    }
+  },
+  "ordinary_worker_observers": {
+    "selected_value_diagnostics": false,
+    "CPU_timing_enabled": false,
+    "normal_cancellation_checkpoints": true,
+    "normal_phase_token_events": true,
+    "ordered_events": 569,
+    "request_retired_to_resident_model_bytes": 9078531072,
+    "tracked_buffers_after_clean_exit": 0
+  },
+  "CLI_worker_comparison": {
+    "all_generated_IDs_equal": true,
+    "scalar_journal_bytes_equal": true,
+    "decoded_output_bytes_equal": true,
+    "journal_sha256": "a692bb75e65bdc747c02ec411495e7222ecaa7a63a7b1c2dc38ad637c1c373be",
+    "decoded_output_sha256": "8aa6b30096f811d579ea4dd0b514a0321aeaf5723a6e74424234f42c3220cbad",
+    "content_comparison": {
+      "bytes": 2929,
+      "sha256": "c4f56dceedc19abcbaf10ede9b3129039f659c5b48b511942f79e669e7a4cffb"
+    },
+    "CLI_content_screen": {
+      "bytes": 2197,
+      "sha256": "a01c28f6a5edbcdc60959e6b7e093507f44ae7728075acb0751a7ca74e8772f8"
+    }
+  },
+  "retained_primary_AMD_comparison": {
+    "same_encoded_image_and_decoded_pixels_authenticated": true,
+    "text_tables_and_non_geometry_markup_exactly_equal": true,
+    "projection": "Remove only nine top-level bbox attributes",
+    "changed_bbox_blocks": 5,
+    "maximum_absolute_coordinate_difference": 1,
+    "coordinate_scale": [
+      0,
+      1000
+    ],
+    "geometry_tolerance_accepted": false,
+    "actual_AMD_token_ID_sequence_available": false,
+    "remote_AMD_runtime_source_attested": false,
+    "new_AMD_inference": false,
+    "comparison": {
+      "bytes": 3438,
+      "sha256": "a2d8ddddb805abb78a9b50a16eb29472e271996d7d9cb185f237843775789e36"
+    },
+    "reference_summary": {
+      "bytes": 76983,
+      "sha256": "e873eddded4b6279b520bd1223d2cf6beb0abe2407b471803d2add0e60ad26a7"
+    }
+  },
+  "independent_reviews": {
+    "build": {
+      "checks_passed": 699,
+      "sealed_utc": "2026-10-06T07:55:49.575356+00:00",
+      "seal": {
+        "bytes": 1855,
+        "sha256": "77b2706b7a4fdf86a15298b956f192c46f4793236df757beb9edb15d95ddbda4"
+      },
+      "receipt": {
+        "bytes": 71830,
+        "sha256": "c08618a2e03caa837e1f9571d15983ff706053e4261de554a68daa6e7ca30254"
+      },
+      "review": {
+        "bytes": 6917,
+        "sha256": "48bbbf9ceb8148d775b133aa844cb2e1a5297217061ab47aed478b54377a3857"
+      },
+      "scope": "Independent finished artifact review; no repeated inference"
+    },
+    "normal_CLI": {
+      "checks_passed": 416,
+      "sealed_utc": "2026-10-06T09:32:27.899559+00:00",
+      "seal": {
+        "bytes": 3225,
+        "sha256": "6807b1fdead876da0c01e73e7dc1c7cc32d54fd05bedac7948e16660e528cbec"
+      },
+      "receipt": {
+        "bytes": 102443,
+        "sha256": "2d9b9d5b270ce73d4e70ee76ad1fdd542b2dfb0c6c1f43c361a40e3be294f532"
+      },
+      "review": {
+        "bytes": 9181,
+        "sha256": "43f04d89d3d11740d22168cd945f398066c5627e58df5d37f4691f1c9004e266"
+      },
+      "scope": "Independent finished artifact review; no repeated inference"
+    },
+    "retained_AMD_content": {
+      "checks_passed": 57,
+      "sealed_utc": "2026-10-06T09:39:11.054806+00:00",
+      "seal": {
+        "bytes": 2325,
+        "sha256": "2fb9da3de54d47aa3615373ad6077c2d97e11efd6339062a1d53c1aced399d46"
+      },
+      "receipt": {
+        "bytes": 21547,
+        "sha256": "f789cd596acc0bc22b6686a287c3fe0b9fe83710841b09cf12300acf250de7e5"
+      },
+      "review": {
+        "bytes": 3145,
+        "sha256": "96ad6f7a8b968e6ed91f2dec7cc44ce6721c08c3741ba0d07718f892fadcc594"
+      },
+      "scope": "Independent finished artifact review; no repeated inference"
+    },
+    "ordinary_worker": {
+      "checks_passed": 667,
+      "sealed_utc": "2026-10-06T09:50:25.989192+00:00",
+      "seal": {
+        "bytes": 2292,
+        "sha256": "3a5db323faa12096eb7b4bb11c476fae10b94d6d58decaea4eda2b8d326acdb6"
+      },
+      "receipt": {
+        "bytes": 75599,
+        "sha256": "c1498e37b651f64800307c6105bfb41592c0697d9ca35c9cf71c4571527b1b51"
+      },
+      "review": {
+        "bytes": 7989,
+        "sha256": "ff3176db2c40e24ca9cfa577960153d51fd0ab127f9d2f59d1198a3107c2bd07"
+      },
+      "scope": "Independent finished artifact review; no repeated inference"
+    }
+  },
+  "historical_points": {
+    "old_Blank_Page_failure": "directcompute-exact-client-failure-2026-10-06.json",
+    "old_failure_unchanged": true,
+    "interrupted_worker04": {
+      "bytes": 811,
+      "sha256": "66997285a2ef65787eb1f2e2c7b02a3a29d74782eaf45c193f113b2515e05dd0"
+    },
+    "interrupted_worker04_replayed_or_accepted": false,
+    "successful_worker_is_a_distinct_request": true
+  },
+  "acceptance": {
+    "single_original_fixture_functional_content": true,
+    "CLI_worker_scalar_equality": true,
+    "owned_resource_closure": true,
+    "complete_corpus": false,
+    "fresh_trained_numerical_reference": false,
+    "sole_barrier_causation": false,
+    "model_free_multiwave_GPU_regression": false,
+    "native_HTTP_endpoint_deployed": false,
+    "exact_SDK_native_endpoint_acceptance": false,
+    "sustained_throughput_ceiling": false,
+    "qualified_node_throughput_gain": false
+  },
+  "limits": [
+    "The two successful runs cover the same one fixture, not two distinct corpus pages.",
+    "Cold wrapper intervals exclude image decoding and processor work and are not steady-state GPU timing.",
+    "Windows Job commit is not RSS; tracked device buffers are not driver-wide VRAM.",
+    "Cold service restoration is observed at each receipt cutoff, not a claim of current machine state.",
+    "Source, multiwave, trained numerical, remaining corpus, native HTTP/client and sustained-throughput boundaries remain open."
+  ]
+}

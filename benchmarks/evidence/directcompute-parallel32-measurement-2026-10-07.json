@@ -1,0 +1,312 @@
+{
+  "schema": "chandra.directcompute.parallel32.measurement.publication.v1",
+  "recorded_date": "2026-10-07",
+  "status": "SCOPED_COMPONENT_MEASUREMENT_CONDITIONALLY_ACCEPTED",
+  "workload": {
+    "model_free": true,
+    "synthetic_fixed_operands": true,
+    "linear_rows": 1,
+    "shapes": [
+      {
+        "K": 67,
+        "N": 9,
+        "input_vector_format": "FP32",
+        "bias": true
+      },
+      {
+        "K": 1001,
+        "N": 9,
+        "input_vector_format": "FP32",
+        "bias": true
+      },
+      {
+        "K": 2560,
+        "N": 1024,
+        "input_vector_format": "FP32",
+        "bias": false
+      },
+      {
+        "K": 9216,
+        "N": 1024,
+        "input_vector_format": "FP32",
+        "bias": false
+      }
+    ],
+    "dispatches_per_arm": 8,
+    "samples_per_shape_output_arm": 1,
+    "warmups": 0,
+    "additional_repetitions": 0
+  },
+  "device": {
+    "name": "Intel Arc A770",
+    "original_driver_version": "32.0.101.8991",
+    "same_physical_adapter_and_driver": true
+  },
+  "build_provenance": {
+    "same_accepted_executable": {
+      "bytes": 653312,
+      "sha256": "794b253fded15dd3f67f0df61472c4813b381c40df1171875a64c34811844e65"
+    },
+    "same_source_manifest": {
+      "bytes": 2952,
+      "sha256": "f507a7d3e8d520695881e809fcaf347f3227f392c47adbbab8b800378f0a2710"
+    },
+    "same_phase_contract_sha256": "53a2be1314fa8275212dc74416f60442d57e18281be9eb05ad6ca0372a01e1a6",
+    "ordered_shader": {
+      "bytes": 4966,
+      "sha256": "6f4d02b5394663eb94765f57579e6ac2b60bbfd76ec3ba8cb00642983849431b"
+    },
+    "parallel32_shader": {
+      "bytes": 4803,
+      "sha256": "8d3a4293f5c96ab5e689c70e2168bb6a570b17e998ab26437118d18d1f6ca847"
+    }
+  },
+  "timestamps": {
+    "frequency_hz": 19200000,
+    "all_intervals_nondisjoint": true,
+    "GPU_duration_from_host_wall": false,
+    "ratio_definition": "ordered tick duration divided by parallel32 tick duration"
+  },
+  "measurements": [
+    {
+      "K": 67,
+      "N": 9,
+      "output": "FP32",
+      "ordered_ticks": 394,
+      "parallel32_ticks": 427,
+      "ordered_GPU_ms": 0.020520833333333332,
+      "parallel32_GPU_ms": 0.022239583333333333,
+      "ordered_over_parallel32_ratio": 0.9227166276346604,
+      "samples_each": 1
+    },
+    {
+      "K": 67,
+      "N": 9,
+      "output": "BF16-rounded",
+      "ordered_ticks": 402,
+      "parallel32_ticks": 421,
+      "ordered_GPU_ms": 0.0209375,
+      "parallel32_GPU_ms": 0.021927083333333333,
+      "ordered_over_parallel32_ratio": 0.9548693586698337,
+      "samples_each": 1
+    },
+    {
+      "K": 1001,
+      "N": 9,
+      "output": "FP32",
+      "ordered_ticks": 1351,
+      "parallel32_ticks": 780,
+      "ordered_GPU_ms": 0.07036458333333333,
+      "parallel32_GPU_ms": 0.040625,
+      "ordered_over_parallel32_ratio": 1.7320512820512821,
+      "samples_each": 1
+    },
+    {
+      "K": 1001,
+      "N": 9,
+      "output": "BF16-rounded",
+      "ordered_ticks": 1367,
+      "parallel32_ticks": 851,
+      "ordered_GPU_ms": 0.07119791666666667,
+      "parallel32_GPU_ms": 0.04432291666666666,
+      "ordered_over_parallel32_ratio": 1.6063454759106932,
+      "samples_each": 1
+    },
+    {
+      "K": 2560,
+      "N": 1024,
+      "output": "FP32",
+      "ordered_ticks": 3174,
+      "parallel32_ticks": 1571,
+      "ordered_GPU_ms": 0.1653125,
+      "parallel32_GPU_ms": 0.08182291666666666,
+      "ordered_over_parallel32_ratio": 2.0203691915977084,
+      "samples_each": 1
+    },
+    {
+      "K": 2560,
+      "N": 1024,
+      "output": "BF16-rounded",
+      "ordered_ticks": 3179,
+      "parallel32_ticks": 1494,
+      "ordered_GPU_ms": 0.16557291666666665,
+      "parallel32_GPU_ms": 0.0778125,
+      "ordered_over_parallel32_ratio": 2.1278447121820614,
+      "samples_each": 1
+    },
+    {
+      "K": 9216,
+      "N": 1024,
+      "output": "FP32",
+      "ordered_ticks": 10525,
+      "parallel32_ticks": 4392,
+      "ordered_GPU_ms": 0.5481770833333334,
+      "parallel32_GPU_ms": 0.22875,
+      "ordered_over_parallel32_ratio": 2.3964025500910746,
+      "samples_each": 1
+    },
+    {
+      "K": 9216,
+      "N": 1024,
+      "output": "BF16-rounded",
+      "ordered_ticks": 10840,
+      "parallel32_ticks": 4348,
+      "ordered_GPU_ms": 0.5645833333333333,
+      "parallel32_GPU_ms": 0.22645833333333334,
+      "ordered_over_parallel32_ratio": 2.4931002759889602,
+      "samples_each": 1
+    }
+  ],
+  "optional_host_telemetry": {
+    "enabled": false,
+    "drain_nanoseconds": null,
+    "copy_nanoseconds": null,
+    "readback_nanoseconds": null,
+    "interpretation": "disabled recorder; unavailable durations are not zero"
+  },
+  "numerical_qualification": {
+    "status": "INDEPENDENT_EXACT_MEASUREMENT_CAPTURE_PASS",
+    "exact_integer_dyadic_products_and_FP32_error_bounds": true,
+    "exact_FP32_to_BF16_conversion": true,
+    "parallel_reassociation": "fixed 32-lane FP32 reduction tree",
+    "scope": "four fixed finite synthetic shapes",
+    "pure_certificate_authority_flags": {
+      "root_admission": false,
+      "external_owned_closure": false,
+      "full_ocr_acceptance": false,
+      "page_performance_acceptance": false
+    },
+    "new_oracle_or_capture_for_publication": false
+  },
+  "actual_component_acceptance": {
+    "root_comparison_and_independent_finished_review": true,
+    "timing_arithmetic_and_capture_provenance": true,
+    "external_retirement_and_root_producer_closure": true,
+    "blocking_defects": []
+  },
+  "physical_closure": {
+    "both_arms_naturally_retired": true,
+    "both_Jobs_retired_zero_active_processes": true,
+    "five_handles_closed_each": true,
+    "watchdogs_joined": true,
+    "exact_owners_and_transport_local_groups_closed": true,
+    "finished_review_scopes_closed": 21,
+    "final_review_observer_externally_closed": true
+  },
+  "resource_observations": {
+    "offline_comparison": {
+      "CPU_affinity": [
+        0
+      ],
+      "actual_nice": 15,
+      "hard_NICE": [
+        5,
+        5
+      ],
+      "hard_AS_bytes": [
+        268435456,
+        268435456
+      ],
+      "max_RSS_KiB": 29440
+    },
+    "publication_validation_allowance": {
+      "CPU_affinity": [
+        0
+      ],
+      "nice_floor": 15,
+      "hard_NICE": [
+        5,
+        5
+      ],
+      "RAM_and_AS_max_bytes": 268435456,
+      "swap_max_bytes": 0,
+      "CPU_seconds_max": 5,
+      "wall_seconds_max": 30
+    },
+    "accounting_scope": "offline metadata comparison and publication validation; not GPU VRAM or native inference performance"
+  },
+  "preserved_operational_boundaries": {
+    "candidate_preflight_refused_before_candidate_existed": true,
+    "historical_endpoint_already_absent": true,
+    "one_time_supported_cold_restoration_before_fresh_candidate": true,
+    "automatic_inference_replay": false,
+    "exit_or_driver_cause_established": false,
+    "early_restoration_wrong_filename": "failed before Python or SSH; root-observed narrative only",
+    "initial_offline_comparison": "refused missing CPU-set property before capture comparison; root-observed narrative only",
+    "corrected_offline_comparison": "same gate with only the missing CPU-set property supplied; no hardware work",
+    "durable_receipts_invented_for_early_failures": false
+  },
+  "qualification_limits": {
+    "B1_decode_final_head_and_genuine_one_row_linear_calls_only": true,
+    "multirow_vision_or_prefill": false,
+    "statistical_significance": false,
+    "sustained_performance": false,
+    "performance_ceiling": false,
+    "whole_model_correctness": false,
+    "complete_OCR": false,
+    "pages_per_second": false,
+    "deployment": false,
+    "future_execution_or_replay_admission": false,
+    "original_weight_import_fault_before_arithmetic_remains_open": true
+  },
+  "logical_evidence_identities": {
+    "finished_independent_review": {
+      "bytes": 4913,
+      "sha256": "d8b2b96578d16cdb4d3335c66878b281b6008798fc3ce992ac5e099c8ac16bc6"
+    },
+    "review_seal": {
+      "bytes": 5648,
+      "sha256": "09f1b87fabc5e20009ac7dfd553aa5dcaf77cea1ded8b8d19ac86184a3b7c7f6"
+    },
+    "review_finish": {
+      "bytes": 7026,
+      "sha256": "f00244bf8eb238e70cd3783f62c0c2165710fae7b0c04b40c37be4ed23e7614a"
+    },
+    "review_post_closure": {
+      "bytes": 7585,
+      "sha256": "c3083ba8cb8c08f9c3476b37dbb17f17788b01aee5ab9807cb6686070c50c664"
+    },
+    "review_publishable_summary": {
+      "bytes": 3948,
+      "sha256": "1a09534484579efde44cd9e7d998c1a342a882408e8c49a5f2366ad3f235ef31"
+    },
+    "review_custody_boundaries": {
+      "bytes": 9151,
+      "sha256": "ae11d24e149f16e595f5bcc24881f2c57e6772afb719b5498d152f23f15ba06a"
+    },
+    "actual_offline_timing_comparison": {
+      "bytes": 14505,
+      "sha256": "31edd87e657fc05aad28855ac6d0ab4ae0f4426cfba80d2599d774450ccc5076"
+    },
+    "corrected_offline_comparison_execution": {
+      "bytes": 2331,
+      "sha256": "7def0ee087fd60372a0d53e76ff6b0ae680a5533e29031c2dd780f4d782d7569"
+    },
+    "measured_pair_numerical_certificate": {
+      "bytes": 6076,
+      "sha256": "b87adf7a8c2e54a6b669e9428c97419833941b1a554dc7c57f0a465664614b7c"
+    }
+  },
+  "actual_capture_identities": {
+    "ordered": {
+      "bytes": 117807,
+      "sha256": "5b4a88bc77e2f99d2883d306ad68c162dfa1d0689f2366016915d16bf18f3b77"
+    },
+    "parallel32": {
+      "bytes": 117878,
+      "sha256": "c6a1e1cbda54a7e2bf342af7883ec21bebbe52be5417d50f40df83aaccf4be07"
+    }
+  },
+  "separate_root_closure_identities": {
+    "ordered": {
+      "bytes": 1023,
+      "sha256": "0d10d47fda0929dd2781d5c6c06b7a785be00e1dc0ddfafaaaf5c5dfdb8e5962"
+    },
+    "parallel32": {
+      "bytes": 1028,
+      "sha256": "ed505c5b80063e04d621da89f96120a054060246a36505b207cff101ddb3470f"
+    }
+  },
+  "related_import_report": "../../docs/directcompute-import-boundaries-2026-10-07.md",
+  "payloads_published": false
+}

@@ -13,6 +13,7 @@ class PROCESS(ctypes.Structure):
     _fields_ = [('hProcess',W.HANDLE),('hThread',W.HANDLE),('dwProcessId',W.DWORD),('dwThreadId',W.DWORD)]
 K.CreateJobObjectW.argtypes = [ctypes.c_void_p,W.LPCWSTR]; K.CreateJobObjectW.restype = W.HANDLE
 K.SetInformationJobObject.argtypes = [W.HANDLE,ctypes.c_int,ctypes.c_void_p,W.DWORD]; K.SetInformationJobObject.restype = W.BOOL
+K.QueryInformationJobObject.argtypes = [W.HANDLE,ctypes.c_int,ctypes.c_void_p,W.DWORD,ctypes.c_void_p]; K.QueryInformationJobObject.restype = W.BOOL
 K.CreateProcessW.argtypes = [W.LPCWSTR,W.LPWSTR,ctypes.c_void_p,ctypes.c_void_p,W.BOOL,W.DWORD,ctypes.c_void_p,W.LPCWSTR,ctypes.POINTER(START),ctypes.POINTER(PROCESS)]; K.CreateProcessW.restype = W.BOOL
 K.AssignProcessToJobObject.argtypes = [W.HANDLE,W.HANDLE]; K.AssignProcessToJobObject.restype = W.BOOL
 K.ResumeThread.argtypes = [W.HANDLE]; K.ResumeThread.restype = W.DWORD
@@ -22,7 +23,26 @@ K.WaitForSingleObject.argtypes = [W.HANDLE,W.DWORD]; K.WaitForSingleObject.resty
 K.GetExitCodeProcess.argtypes = [W.HANDLE,ctypes.POINTER(W.DWORD)]; K.GetExitCodeProcess.restype = W.BOOL
 K.CloseHandle.argtypes = [W.HANDLE]; K.CloseHandle.restype = W.BOOL
 K.GetStdHandle.argtypes = [W.DWORD]; K.GetStdHandle.restype = W.HANDLE
+
+def configured_affinity(config):
+    affinity = config.get('job_affinity')
+    if affinity is not None and (type(affinity) is not int or affinity != 15): raise ValueError('Only explicit outer affinity mask 15 is supported')
+    return affinity
+
+def set_job_limits(job, affinity):
+    limits = LIMIT(); limits.BasicLimitInformation.LimitFlags = 0x2000 # KILL_ON_JOB_CLOSE
+    if affinity is not None:
+        limits.BasicLimitInformation.LimitFlags |= 0x10 # JOB_OBJECT_LIMIT_AFFINITY
+        limits.BasicLimitInformation.Affinity = affinity
+    if not K.SetInformationJobObject(job, 9, ctypes.byref(limits), ctypes.sizeof(limits)): raise ctypes.WinError(ctypes.get_last_error())
+    if affinity is not None:
+        observed = LIMIT()
+        if not K.QueryInformationJobObject(job, 9, ctypes.byref(observed), ctypes.sizeof(observed), None): raise ctypes.WinError(ctypes.get_last_error())
+        if observed.BasicLimitInformation.LimitFlags != limits.BasicLimitInformation.LimitFlags or observed.BasicLimitInformation.Affinity != affinity:
+            raise RuntimeError('Outer Job affinity did not take effect exactly')
+
 config = json.loads(base64.b64decode(sys.argv[1]))
+affinity = configured_affinity(config)
 lease_seconds = config.get('lease_seconds', 15)
 listener = socket.socket()
 listener.bind(('127.0.0.1', config['lease_port']))
@@ -32,8 +52,7 @@ job = K.CreateJobObjectW(None, None)
 if not job: raise ctypes.WinError(ctypes.get_last_error())
 process = PROCESS()
 try:
-    limits = LIMIT(); limits.BasicLimitInformation.LimitFlags = 0x2000 # KILL_ON_JOB_CLOSE
-    if not K.SetInformationJobObject(job, 9, ctypes.byref(limits), ctypes.sizeof(limits)): raise ctypes.WinError(ctypes.get_last_error())
+    set_job_limits(job, affinity)
     startup = START(); startup.cb = ctypes.sizeof(startup); startup.dwFlags = 0x100
     startup.hStdInput = K.GetStdHandle(-10); startup.hStdOutput = K.GetStdHandle(-11); startup.hStdError = K.GetStdHandle(-12)
     command = ctypes.create_unicode_buffer(subprocess.list2cmdline(config['argv']))

@@ -1,0 +1,271 @@
+{
+  "schema": "chandra.directcompute.native-CLI-baseline-progress.v1",
+  "recorded_date": "2026-10-09",
+  "scope": "Two original public synthetic native-PDF page captures with ordinary caller EOS and substantive content acceptance; no corpus, numerical, geometry, endpoint or performance promotion",
+  "publication": "Redacted metadata only; hashes identify owner-retained evidence without publishing its private paths or raw artifacts",
+  "model": {
+    "name": "datalab-to/chandra-ocr-2",
+    "revision": "af93b47dba1b47b6640c86ccf487ed2260ab9a09",
+    "checkpoint_bytes": 10591220088,
+    "checkpoint_sha256": "0804568be9f099d6479fad9ed77a4da4611f3c1e7bc6e009af7dce45e8aa3847",
+    "original_BF16_weights_preserved": true,
+    "authentication_scope": "Existing native held-file importer and root-authenticated capture metadata; documentation author did not load or rehash model payloads"
+  },
+  "workload": {
+    "public_fixture": "benchmarks/cli-inputs-v1/native.pdf",
+    "cases": [
+      "native-0",
+      "native-1"
+    ],
+    "decoded_RGB_dimensions": [
+      1624,
+      2100
+    ],
+    "prompt_tokens_per_page": 3617,
+    "context_limit": 16384,
+    "normal_output_allowance": 12384,
+    "diagnostic_token_cap": null,
+    "caller_stop_token_ids": [
+      248044,
+      248046
+    ],
+    "input_or_context_reduction": false
+  },
+  "execution": {
+    "device": "Intel Arc A770",
+    "API": "DirectCompute/D3D11",
+    "B1_selection": "ordered",
+    "weight_import": "DEFAULT CreateBuffer with initial data; raw SRV-only weights without UAV",
+    "full_page_CLI_options": [
+      "--execute",
+      "--import-final-head-tail-full-page",
+      "--weight-import-api",
+      "default-initial",
+      "--weight-srv-only"
+    ],
+    "experimental_source_and_builds_are_separate_from_public_code_promotion": true
+  },
+  "pages": [
+    {
+      "case": "native-0",
+      "accepted_scope": "Original complete CLI capture and expected substantive OCR content only",
+      "input_manifest_sha256": "0aa588473930f110cc359ba369623f29765a85f4e05ffcbca2ac509933b787ae",
+      "generated_tokens_including_stop": 556,
+      "natural_stop_token_id": 248046,
+      "native_duration_seconds": 784.1968698,
+      "timing_scope": "Single original instrumented native process path, including import; no repetitions, endpoint latency or speedup inference",
+      "original_exit_status": {
+        "native": 0,
+        "controller": 1,
+        "guardian": 0
+      },
+      "content": {
+        "independent_synthetic_prose_columns_equations_exact_table_cells_reading_order_and_end_marker_passed": true,
+        "retained_AMD_markup_equal_after_removing_only_data_bbox_attributes": true,
+        "retained_AMD_token_sequence_available": false,
+        "AMD_token_sequence_equality": null
+      },
+      "geometry": {
+        "exact_match": false,
+        "changed_blocks": 5,
+        "maximum_observed_coordinate_delta": 1,
+        "coordinate_scale": [
+          0,
+          1000
+        ],
+        "accepted_tolerance": null
+      },
+      "original_import": {
+        "operations_and_drains": 732,
+        "storage_bytes": 9078531072,
+        "selected_source_and_direct_tail_rows": 10,
+        "selected_tails_equal": true,
+        "all_model_bytes_independently_compared": false
+      },
+      "physical_custody": {
+        "owned_Job_owner_sampler_channel_and_local_groups_retired": true,
+        "historical_endpoint_restored_cold": true,
+        "inference_replayed": false
+      },
+      "source_and_build": {
+        "source_file_count": 137,
+        "source_total_bytes": 2531760,
+        "source_manifest": {
+          "bytes": 26094,
+          "sha256": "e9e996d34b9708048f3a733d5995ef10e4ab53a574e249615a9ea2eb09282a13"
+        },
+        "build_report": {
+          "bytes": 61772,
+          "sha256": "e736defd78e5205807ec1273d0a1612868061b13615d7fb327ad95adfdd10b98"
+        },
+        "inference_executable": {
+          "bytes": 1729024,
+          "sha256": "cd501f616b67b6b0aae2a9d6b74d678933fd6de43daa9762e235877809103b68"
+        },
+        "source_patch": {
+          "bytes": 25315,
+          "sha256": "b43ceb1a7092367b8f1a0eb5a05b689b69f6702772b4c6cae6b463fb113f18aa"
+        },
+        "source_promotion_to_public_Git_claimed": false,
+        "parallel32_selected": false
+      },
+      "evidence": {
+        "root_capture_acceptance": {
+          "bytes": 4340,
+          "sha256": "2a775e1679260a905e4b45ed1a44f7d53d540a2d3bee6a7d0ef654c2dfbee280"
+        },
+        "content_check_report": {
+          "bytes": 13399,
+          "sha256": "d4e001d625c1041382a3fb04c4f04dd29c0d95fcfb285c1c5db28246c501d4a7"
+        },
+        "native_result": {
+          "bytes": 103547,
+          "sha256": "b110665a118836e9a2f98881e130a19684501e20184881b2826a6cc7d5006e67"
+        },
+        "generated_token_journal": {
+          "bytes": 150308,
+          "sha256": "a692bb75e65bdc747c02ec411495e7222ecaa7a63a7b1c2dc38ad637c1c373be"
+        }
+      }
+    },
+    {
+      "case": "native-1",
+      "accepted_scope": "Original complete CLI capture and expected substantive OCR content only",
+      "input_manifest_sha256": "aab97d615f7e3181b9a3ef814f8784030f17fb186a31964df0a2a6063512e8d1",
+      "generated_tokens_including_stop": 560,
+      "natural_stop_token_id": 248046,
+      "native_duration_seconds": 796.9123304,
+      "timing_scope": "Single original instrumented native process path, including import; no repetitions, endpoint latency or speedup inference",
+      "original_exit_status": {
+        "native": 0,
+        "controller": 0,
+        "guardian": 0
+      },
+      "content": {
+        "independent_synthetic_prose_columns_equations_exact_table_cells_reading_order_and_end_marker_passed": true,
+        "retained_AMD_markup_equal_after_removing_only_data_bbox_attributes": true,
+        "retained_AMD_token_sequence_available": false,
+        "AMD_token_sequence_equality": null
+      },
+      "geometry": {
+        "exact_match": false,
+        "changed_blocks": 8,
+        "maximum_observed_coordinate_delta": 2,
+        "coordinate_scale": [
+          0,
+          1000
+        ],
+        "accepted_tolerance": null
+      },
+      "original_import": {
+        "operations_and_drains": 732,
+        "storage_bytes": 9078531072,
+        "selected_source_and_direct_tail_rows": 10,
+        "selected_tails_equal": true,
+        "all_model_bytes_independently_compared": false
+      },
+      "physical_custody": {
+        "owned_Job_owner_sampler_channel_and_local_groups_retired": true,
+        "historical_endpoint_restored_cold": true,
+        "inference_replayed": false
+      },
+      "source_and_build": {
+        "source_file_count": 139,
+        "source_total_bytes": 2544435,
+        "source_manifest": {
+          "bytes": 26556,
+          "sha256": "557cdaef7ac637e2d6eb81ef19af6c29090e66b606f2cc791528b1d8f8682b90"
+        },
+        "build_report": {
+          "bytes": 67639,
+          "sha256": "a5dce6798a97813912f62ca7fc4ed16cd6bfd02048feac5911fed15df221167e"
+        },
+        "inference_executable": {
+          "bytes": 1738752,
+          "sha256": "926ba92931e9bea60fc5fae9d6f2418f102e3006b2e9103ef6f4e73fc04d6c4b"
+        },
+        "source_patch": {
+          "bytes": 42139,
+          "sha256": "ef214281f7b733f6223cea5d1d9522f0445221618cab7123f0919d80212198df"
+        },
+        "source_promotion_to_public_Git_claimed": false,
+        "parallel32_selected": false
+      },
+      "evidence": {
+        "root_capture_acceptance": {
+          "bytes": 5042,
+          "sha256": "9bf444f96a137625ecf3533badd0f0008be972c5e2bea533a207942cd5df2cef"
+        },
+        "content_check_report": {
+          "bytes": 18072,
+          "sha256": "210bbeee7721596c6d2db3f9bc11044151c02443942fe6324a443c288286f73b"
+        },
+        "native_result": {
+          "bytes": 103570,
+          "sha256": "bac0d7b021e84cac8fae8276e94b75946724c128f844725565f394b33d8cc95c"
+        },
+        "generated_token_journal": {
+          "bytes": 151469,
+          "sha256": "f202f54ac78e7132cf8920f591d1765bb887c7b84df7684893a3320e1e77de51"
+        }
+      }
+    }
+  ],
+  "preserved_first_page_controller_failure": {
+    "original_status": 1,
+    "producer_field": "model_provenance_summary",
+    "validator_incorrectly_expected": "full_model_provenance_summary",
+    "independent_offline_one_key_repair_review": {
+      "bytes": 3150,
+      "sha256": "730988ce1637177467c7ffabefd44914f17fb86e840fb48f550f9957ee210525"
+    },
+    "captured_native_bytes_changed": false,
+    "original_failed_return_preserved": true,
+    "new_inference_replay_used_for_reassessment": false
+  },
+  "resident_HTTP_worker": {
+    "qualified_CLI_import_used_by_historical_worker": false,
+    "old_worker_failure_cleared_by_new_CLI_pages": false,
+    "DEFAULT_initial_SRV_only_startup_correction": "Independent source review clear; not built or executed at this cutoff",
+    "source_manifest": {
+      "bytes": 25778,
+      "sha256": "0c167f8543aa34eee83dc75aa36a46b50f477c3987030e39c000684717a8172d"
+    },
+    "source_patch": {
+      "bytes": 28448,
+      "sha256": "94b029de3384c9edce85186d5d6ea5268ed217bc8d1dd24b16ca07f4169b2b78"
+    },
+    "finished_source_review": {
+      "bytes": 8570,
+      "sha256": "0c6f74de90ef11d15f26e737fd7aa91bf4b121ab10858ecc42a0a9ec77742b88"
+    },
+    "source_file_count": 140,
+    "source_total_bytes": 2552051,
+    "loaded_ownership_and_retirement_preserved_at_source_scope": true,
+    "native_endpoint_qualified": false
+  },
+  "pending": [
+    "full-graph trained numerical validation on identical operands and carried state",
+    "remaining original public scanned pages and broader OCR corpus",
+    "explicit geometry acceptance criteria",
+    "root-owned build and actual cold-load/request/unload/cold-reload checks for the SRV-only resident worker through the supported HTTP/client route",
+    "parallel32 trained cap2 capture and independent numerical comparison",
+    "padded32/B2 Windows CPU build and later trained validation after completed combined-source and emitted-recipe reviews",
+    "repeated unprofiled sustained correctly completed pages at safe concurrency and a measured throughput ceiling after correctness"
+  ],
+  "acceptance_limits": {
+    "complete_two_page_substantive_CLI_capture": true,
+    "whole_graph_numeric_correctness": false,
+    "complete_OCR_corpus": false,
+    "scanned_page_results": false,
+    "geometry_tolerance": false,
+    "native_HTTP_or_client_acceptance": false,
+    "sustained_pages_per_second": false,
+    "speedup_claim": false,
+    "compiled_experimental_source_already_landed_in_public_Git": false,
+    "future_hardware_execution_admission": false
+  },
+  "earlier_failed_attempts_preserved": true,
+  "new_AMD_throughput_work": false,
+  "raw_personal_data_model_payloads_or_credentials_published": false
+}

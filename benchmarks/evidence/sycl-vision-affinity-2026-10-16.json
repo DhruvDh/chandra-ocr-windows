@@ -1,0 +1,94 @@
+{
+  "schema": "chandra-sycl-vision-affinity-throughput-v1",
+  "scope": "One 720-second original-image endpoint run with the vision-SDPA candidate and four-logical-CPU Job affinity. Rates include endpoint CPU image preparation, queueing, and inference; they exclude client PDF rendering, cold model loading, warmup, and offline assessment.",
+  "candidate": {
+    "backend": "SYCL",
+    "variant": "vision SDPA",
+    "ggml_sycl_dll_sha256": "90e65f3b67017a598a7fc0c467bf08b15157ee521d27f1e1921126461ae641c7"
+  },
+  "configuration_hashes": {
+    "hash_semantics": {
+      "throughput_client_configuration_file_sha256": "This run's local throughput-client configuration.json file digest.",
+      "worker_configuration_sha256": "Canonical worker configuration digest passed to the server qualification process.",
+      "worker_recipe_sha256": "Server run recipe digest recorded in the closed serve receipt."
+    },
+    "throughput_client_configuration_file_sha256": "68e2675951d39b23c48d5a3935f3b992accb94d25df81fd4ad95a4f7a0c8a173",
+    "worker_configuration_sha256": "f64d6b24c8c031d3a4104e1fb7eca3743b412b68d4932182c3e6e44ec2eb9c0f",
+    "worker_recipe_sha256": "d592b7d0e95cbbca30476c8b936a118b3c31e5f1af6c255b1068ba11b24f2697"
+  },
+  "workload_pins": {
+    "client_sha256": "f87f52dbd254af254e6b596018bfacf52fe2ab39b365811beeee0824f96ee22c",
+    "request_manifest_sha256": "34d0b43fc6c44c5c996d414171b9f9854d6ee81742075899fa71ee66bfeb8f2a"
+  },
+  "measurement": {
+    "concurrency": 4,
+    "window_seconds": 720,
+    "warmups": 4,
+    "measured_requests": 56,
+    "source_passed_responses": 60,
+    "source_assessment_passed": true,
+    "correct_pages_inside_window": 52,
+    "correct_pages_in_full_cohort": 56,
+    "fill_and_drain_seconds": 754.0725008230002,
+    "pages_per_second_inside_window": 0.07222222222222222,
+    "pages_per_second_including_drain": 0.07426341623501878
+  },
+  "affinity": {
+    "outer_job_mask": 15,
+    "inner_job_mask": 15,
+    "logical_cpu_count": 4,
+    "physical_core_count_claimed": false,
+    "workload_configuration_note": "The throughput-client configuration contains no affinity setting; mask 15 is reported for the outer and nested Windows Jobs."
+  },
+  "common_parameters": {
+    "batch_size": 128,
+    "llama_omp_threads": 1,
+    "model_template_context_and_output_limits_match_reference": true
+  },
+  "comparison": {
+    "same_duration_single_core_vision": {
+      "window_seconds": 720,
+      "pages_per_second_including_drain": 0.06774412057848882,
+      "single_run_observed_increase_percent": 9.623411745343514
+    },
+    "selected_vulkan_reference": {
+      "pages_per_second_including_drain": 0.0496514710313,
+      "remains_selected": true
+    },
+    "interpretation": "One affinity observation compared with one single-core 720-second run and one selected Vulkan reference; descriptive only, with no repeatable affinity gain or throughput ceiling established."
+  },
+  "closure": {
+    "serve_receipt_sha256": "9ce4084d3e90f8b4dff75c85acc5ffbb3daf5d2109fa23515e55249c4e5c5834",
+    "serve_child_process_exit_code": 0,
+    "fault_recorded": false,
+    "outer_and_inner_jobs_zero_active": true,
+    "handles_closed": true,
+    "descriptors_closed": true,
+    "outer_output_drain_eof": true,
+    "outer_inputs_released": 59,
+    "inner_inputs_released": 74,
+    "outer_job_user_time_100ns": 6140781250,
+    "outer_job_kernel_time_100ns": 3308593750,
+    "inner_job_user_time_100ns": 5479531250,
+    "inner_job_kernel_time_100ns": 2465781250,
+    "cpu_time_scope_note": "Outer and nested Job totals overlap; do not sum them or infer exclusive GPU work.",
+    "process_peak_private_bytes": 10795233280,
+    "outer_job_peak_private_bytes": 10870071296,
+    "inner_job_peak_private_bytes": 10796285952,
+    "peak_memory_scope_note": "Outer and nested Job private-memory scopes overlap and must not be added; none is a VRAM measurement."
+  },
+  "artifact_hashes": {
+    "summary_sha256": "985ecd8b8d8d629e3becfb7e5e577480b8835c2bdc7df22e8c82cc67008f06bc",
+    "source_assessment_sha256": "2a6821511e58a5113f6efed64d0b89d0cf3391ccc85fd4fc2b1020c3860e1c1a",
+    "throughput_client_configuration_file_sha256": "68e2675951d39b23c48d5a3935f3b992accb94d25df81fd4ad95a4f7a0c8a173",
+    "phase_commitments_sha256": "e50354412662f87179192fceae5df2238d6a6a86390245b7806eee06655d9f8d",
+    "warmup_sha256": "b7a7afe7760f7af9d756d94ebf1c2e4c77bae251008367c75091a44c1340d0b4",
+    "measurement_sha256": "fd4c661bf928da806cdf6cb325aba553044b3c8d7563892d10fd4c675e6a3e26"
+  },
+  "qualification": {
+    "numerical_equivalence_established": false,
+    "repeated_affinity_measurement_pending": true,
+    "promotion": "pending",
+    "throughput_ceiling_established": false
+  }
+}

@@ -1,0 +1,235 @@
+{
+  "schema": "chandra.directcompute.resident_worker_cpu_evidence.v1",
+  "recorded_date_utc": "2026-10-06",
+  "disposition": "source and actual Windows CPU protocol qualified; GPU/model worker execution pending",
+  "sources": {
+    "ChandraNative/runtime/build.cmd": {
+      "bytes": 1980,
+      "sha256": "172d96841ffc55869b077772e3f28baea1d579afb48dede3bbb6be2cce5cd365"
+    },
+    "ChandraNative/runtime/inference.cpp": {
+      "bytes": 16365,
+      "sha256": "e64aeb9997ee761eb1a0ff93f7d11c7b298e3d19b764c3fe7ef80b3ac68f5697"
+    },
+    "ChandraNative/runtime/inference_core.cpp": {
+      "bytes": 29505,
+      "sha256": "e6d01655e5dd892ace6a15c90da3d18929314e4c80cdb13a7c703690126ce038"
+    },
+    "ChandraNative/runtime/inference_core.h": {
+      "bytes": 7013,
+      "sha256": "8c1a63d1c3e79a987bb378370a6b356c2c364e54dda86c1a2a4177d954680834"
+    },
+    "ChandraNative/runtime/worker.cpp": {
+      "bytes": 50147,
+      "sha256": "1cb67b7b428eb154d278a8a401b82a27e0ef5697596ff4629478e118bd92e4f5"
+    },
+    "scripts/native/worker_session.py": {
+      "bytes": 5418,
+      "sha256": "2318e5f69e4328af5f429c11639a71c161704b7b48da736a595e01cb8710b290"
+    },
+    "tests/native/test_resident_worker.py": {
+      "bytes": 83612,
+      "sha256": "79dc30c8729ff44f32262e8b511bd714529592aa310bc694b7772f10da5a9a1d"
+    }
+  },
+  "source_review": {
+    "repair04_receipt": {
+      "bytes": 5671,
+      "sha256": "139c2c17167582726e856490339053025857ecd85b46fc61cca2fa17706f78bb"
+    },
+    "integration_receipt": {
+      "bytes": 12998,
+      "sha256": "2ffcc1f667dbb48a9100af47d7797cea7860af2fbf62f420ffbf01e7b59bd171"
+    }
+  },
+  "windows_review": {
+    "bytes": 44652,
+    "sha256": "a07ef6d1c786e57edf210cece3b3cdc759207b04418163852e5cdacd8a5ba6ef"
+  },
+  "MSVC_compile_returncode": 0,
+  "compiled_worker": {
+    "bytes": 990208,
+    "sha256": "2f33040cbc924adba34e99fa13d66c964367a5104908bb1d21ee38ca087e620d"
+  },
+  "points": [
+    {
+      "attempt": "build-16",
+      "scope": "actual MSVC compile; preflight wrapper failed on expected fatal stderr",
+      "state": null,
+      "wrapper_returncode": 1,
+      "elapsed_seconds": 96.15600000001723,
+      "model_loaded": false,
+      "GPU_executed": false,
+      "active_after_retirement": 0,
+      "peak_job_commit_bytes": 297934848,
+      "process_commit_limit_bytes": 1610612736,
+      "job_commit_limit_bytes": 2147483648,
+      "receipts": {
+        "result": {
+          "bytes": 3011,
+          "sha256": "2f545a3a60ff54ff194a77599e8a25be36a99502168e33380a74683ee2e219d9"
+        },
+        "job": {
+          "bytes": 400,
+          "sha256": "6c99558b4c9de3db1da917633c13b411edd813a75247720fb1698766b33c0594"
+        },
+        "source_manifest": {
+          "bytes": 15893,
+          "sha256": "6dc8167862dae57082e5093e066522379e061c614a119da052dbfc5fe2d7eec0"
+        }
+      }
+    },
+    {
+      "attempt": "worker-inactive-17",
+      "scope": "setup failed before child probe",
+      "state": null,
+      "wrapper_returncode": 1,
+      "elapsed_seconds": 0.0,
+      "model_loaded": false,
+      "GPU_executed": false,
+      "active_after_retirement": 0,
+      "peak_job_commit_bytes": 11366400,
+      "process_commit_limit_bytes": 268435456,
+      "job_commit_limit_bytes": 536870912,
+      "receipts": {
+        "result": {
+          "bytes": 390,
+          "sha256": "6f81f0c9934e62c752e18c28015a733ab148b05146999fb7c9a5804215af8342"
+        },
+        "job": {
+          "bytes": 394,
+          "sha256": "7642c5a5f8b9f6baaf4b9d7219cab96fd7c20a2ea87747bb8dc246881159cb73"
+        },
+        "source_manifest": {
+          "bytes": 15893,
+          "sha256": "6dc8167862dae57082e5093e066522379e061c614a119da052dbfc5fe2d7eec0"
+        }
+      }
+    },
+    {
+      "attempt": "worker-inactive-18",
+      "scope": "12 inactive/refusal probes; no Device",
+      "state": null,
+      "wrapper_returncode": 0,
+      "elapsed_seconds": 0.375,
+      "model_loaded": false,
+      "GPU_executed": false,
+      "active_after_retirement": 0,
+      "peak_job_commit_bytes": 12865536,
+      "process_commit_limit_bytes": 268435456,
+      "job_commit_limit_bytes": 536870912,
+      "receipts": {
+        "result": {
+          "bytes": 6815,
+          "sha256": "e067038fa127743262d7f067cc0566f25d2b45279c770af565bdf80bb8184d27"
+        },
+        "job": {
+          "bytes": 395,
+          "sha256": "67123e2bc2de2cc633e2c174f6df9918d68ee2a3be94ed4901aa9c9fb8bdf42e"
+        },
+        "source_manifest": {
+          "bytes": 15893,
+          "sha256": "b1aed9146607ad42c6a6dfc59eb91e2f851ac47e2bd00be813b853744044efb2"
+        }
+      }
+    },
+    {
+      "attempt": "worker-plan-21",
+      "scope": "seven actual Windows CPU protocol/input probes; no Device",
+      "state": "WINDOWS_CPU_PLAN_PROTOCOL_PASS",
+      "wrapper_returncode": 0,
+      "elapsed_seconds": 1.1560000000172295,
+      "model_loaded": false,
+      "GPU_executed": false,
+      "active_after_retirement": 0,
+      "peak_job_commit_bytes": 18546688,
+      "process_commit_limit_bytes": 268435456,
+      "job_commit_limit_bytes": 536870912,
+      "receipts": {
+        "result": {
+          "bytes": 597,
+          "sha256": "7253f4775f205cce0b3ebc1975365acc700286e3b2590f130bc96bdf6c71bed8"
+        },
+        "job": {
+          "bytes": 394,
+          "sha256": "e9884b9629078588049a0440a7d3120de4e94f7f5b5c36fda6826eeb690fe787"
+        },
+        "source_manifest": {
+          "bytes": 17101,
+          "sha256": "3e6ff81447661c10b5fcdcbbcede86a1a66ffe0d05f9d5f833eab224285c352a"
+        }
+      }
+    },
+    {
+      "attempt": "worker-plan-22",
+      "scope": "one exact recorded Zotero input plan; no Device",
+      "state": "WINDOWS_CPU_EXACT_ZOTERO_PLAN_PASS",
+      "wrapper_returncode": 0,
+      "elapsed_seconds": 0.28100000001722947,
+      "model_loaded": false,
+      "GPU_executed": false,
+      "active_after_retirement": 0,
+      "peak_job_commit_bytes": 87781376,
+      "process_commit_limit_bytes": 536870912,
+      "job_commit_limit_bytes": 805306368,
+      "receipts": {
+        "result": {
+          "bytes": 665,
+          "sha256": "a882c822f47e223e64071debcb7d5a28f472b0896e259b3576425034c51c37c9"
+        },
+        "job": {
+          "bytes": 394,
+          "sha256": "dea59c8886ee7001a8bd73fcfb0cc4337805263a0bcb108a71435242e210ddff"
+        },
+        "source_manifest": {
+          "bytes": 17101,
+          "sha256": "3e6ff81447661c10b5fcdcbbcede86a1a66ffe0d05f9d5f833eab224285c352a"
+        }
+      }
+    }
+  ],
+  "protocol_cases": [
+    "clean pipe EOF",
+    "16-error ceiling with buffered extra lines",
+    "sixteenth error at EOF",
+    "shutdown with open input",
+    "lease expiry with open input and read cancellation995",
+    "actual write-only stdin read failure5",
+    "authenticated original tiny plan"
+  ],
+  "recorded_Zotero_plan": {
+    "input_manifest_sha256": "0aa588473930f110cc359ba369623f29765a85f4e05ffcbca2ac509933b787ae",
+    "dimensions": [
+      1624,
+      2100
+    ],
+    "prompt_tokens": 3617,
+    "patches": 12096,
+    "context_limit": 16384,
+    "normal_output_allowance": 12384,
+    "forecast": {
+      "bytes": 21118,
+      "sha256": "4f6e1e4e3f461b706a285222416eb4decffa785cf58c4e7e4fdbb6c8b0059247"
+    },
+    "protocol": {
+      "bytes": 4851,
+      "sha256": "4ec1936d31057bed417c350dcc915de4004de7be35e176be5311a069c887f381"
+    },
+    "scope": "independently accepted exact client input authentication and source forecast only",
+    "independent_acceptance": {
+      "bytes": 3371,
+      "sha256": "41f8e8241a1f0ee11e1975c4834aaf5183926e4266517a5fae146387d9575658"
+    }
+  },
+  "limits": {
+    "native_GPU_model_execution_accepted": false,
+    "trained_numerical_accepted": false,
+    "complete_OCR_accepted": false,
+    "endpoint_deployed": false,
+    "sustained_pages_per_second_accepted": false,
+    "qualified_worker_speedup_percent": 0,
+    "regular_file_and_NUL_zero_byte_EOF_not_measured": true,
+    "native_final_exit_write_failure_not_measured": true,
+    "no_AMD_actions": true
+  }
+}

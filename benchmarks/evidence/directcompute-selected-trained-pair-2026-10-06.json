@@ -1,0 +1,133 @@
+{
+  "schema": "chandra.directcompute.selected-trained-pair.v1",
+  "reviewed_utc": "2026-10-06T01:45:32.338022+00:00",
+  "scope": "Selected trained boundaries/state and full vocabulary rows in an explicit 14-token capped original-tiny plan. Native baseline versus ordered8; equality establishes no added error for these identical prefixes.",
+  "model": "datalab-to/chandra-ocr-2",
+  "model_revision": "af93b47dba1b47b6640c86ccf487ed2260ab9a09",
+  "input_manifest_sha256": "6e5df5e8b33a7fbee2414fafab5b2212fb5a4a80b40b34b390ae829326116a36",
+  "prompt_tokens": 801,
+  "patch_rows": 832,
+  "context_limit": 16384,
+  "normal_output_allowance": 12384,
+  "diagnostic_token_cap": 14,
+  "normal_complete_page": false,
+  "native_executable": {
+    "bytes": 1050112,
+    "sha256": "bbfdf28c4caa2a7d11fa08509dd9b1b756aba1edf1eb90b790065b80fd87521e"
+  },
+  "source_manifest": {
+    "bytes": 14119,
+    "sha256": "bb1f8bd5749f3f3b6008753040f402b697cb3d6797e525b769aa9f1dc1454528"
+  },
+  "source_archive": {
+    "bytes": 365734,
+    "sha256": "fadb9c0d443c4d3e022070cdd89d4b28cbf3946f6964ff24c03aeb56e3c3ea37"
+  },
+  "independently_verified_source_members": 91,
+  "strict_parser_sha256": "f524583e00a47e84d1cf6b2fb90f74576fd2d3f337093f8c4b3d0737d20902c8",
+  "generated_token_ids": [
+    2539,
+    795,
+    1402,
+    1944,
+    420,
+    20,
+    18,
+    220,
+    20,
+    22,
+    220,
+    19,
+    17,
+    16
+  ],
+  "identical_payload_records": 639,
+  "identical_progress_and_payload_members": 640,
+  "identical_payload_bytes": 20514816,
+  "identical_F32_words": 5128704,
+  "numeric_policy": {
+    "finite_exact_BF16_records": 633,
+    "finite_exact_BF16_words": 4981248,
+    "finite_FP32_state_records": 6,
+    "finite_FP32_state_words": 147456,
+    "finite_non_BF16_state_values": 49151
+  },
+  "full_vocabulary_rows": 14,
+  "vocabulary_size": 248320,
+  "argmax_top2_margins_and_ties_independently_recomputed": true,
+  "selector_preflight": "Historical authenticated Build08 model-free executable, inactive CPU parse only; identical operators/API/ordered8 shader join to Build11. Actual forecast and trained inference use Build11.",
+  "points": [
+    {
+      "name": "trained-diagnostics-03-baseline",
+      "native_result_sha256": "2c911c7cdf35de3a44308ec9db339c09ff6cdc14639783eda6459e8edba3d455",
+      "progress_sha256": "2416e5a9181b4d4b2eec8cc064c88608254fb3c4d2a169777b53923cd96e3607",
+      "planned_records": 639,
+      "written_records": 639,
+      "payload_bytes": 20514816,
+      "consumed_rows": 814,
+      "prefix_sha256": "47b5e78f73ea3e5ae1fe114f0050a2f6520b5598c1277d076c405f6a8c162488",
+      "closed_Job": {
+        "peak_process_commit_bytes": 10564116480,
+        "peak_job_commit_bytes": 10574180352,
+        "process_commit_limit_bytes": 12884901888,
+        "job_commit_limit_bytes": 13153337344,
+        "affinity_mask": 1,
+        "priority_class": 16384,
+        "total_job_processes": 4,
+        "active_job_processes_after_wait": 0,
+        "returncode": 0,
+        "kill_on_job_close": true
+      },
+      "worker_restored_cold": true,
+      "CPU_timing": false
+    },
+    {
+      "name": "trained-diagnostics-03-ordered",
+      "native_result_sha256": "78fb32ff5cdacb199c31e71712260756fe4991d817c9915e0c320026ca00f5eb",
+      "progress_sha256": "2416e5a9181b4d4b2eec8cc064c88608254fb3c4d2a169777b53923cd96e3607",
+      "planned_records": 639,
+      "written_records": 639,
+      "payload_bytes": 20514816,
+      "consumed_rows": 814,
+      "prefix_sha256": "47b5e78f73ea3e5ae1fe114f0050a2f6520b5598c1277d076c405f6a8c162488",
+      "closed_Job": {
+        "peak_process_commit_bytes": 10584739840,
+        "peak_job_commit_bytes": 10594836480,
+        "process_commit_limit_bytes": 12884901888,
+        "job_commit_limit_bytes": 13153337344,
+        "affinity_mask": 1,
+        "priority_class": 16384,
+        "total_job_processes": 4,
+        "active_job_processes_after_wait": 0,
+        "returncode": 0,
+        "kill_on_job_close": true
+      },
+      "worker_restored_cold": true,
+      "CPU_timing": false
+    }
+  ],
+  "independent_audit": {
+    "bytes": 21155,
+    "sha256": "bb3dee7bade7ee9fa82900aef02d95257da26d64e9a7ea2d4cb73b4112892a60"
+  },
+  "root_pair_summary": {
+    "bytes": 3088,
+    "sha256": "8697cbdf91c02262374d87e3e641741993119d9301530a11b0c1e192d4a6a96e"
+  },
+  "old_refused_capture": "All663 retained files unchanged; strict loader still refuses coordinate-object metadata at line6.",
+  "automatic_replay": false,
+  "qualified_selected_baseline_relative_bit_equality": true,
+  "qualified_CPU_or_AMD_oracle_agreement": false,
+  "qualified_full395_token_vectors": false,
+  "qualified_exact_Zotero_client_OCR": false,
+  "qualified_sustained_throughput": false,
+  "deployment": false,
+  "performance_claim": false,
+  "remaining_holds": [
+    "CPU or AMD numerical oracle agreement",
+    "full395-token vectors",
+    "exact Zotero large-page OCR",
+    "performance or concurrency plateau",
+    "endpoint deployment"
+  ]
+}

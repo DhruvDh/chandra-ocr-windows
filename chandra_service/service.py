@@ -45,6 +45,7 @@ class Job:
     timed_out: bool = False
     invalid: bool = False
     output_chars: int = 0
+    response_id: str | None = None
 
 class Worker:
     def __init__(self, backend, queue_limit, inference_seconds=1800):
@@ -54,17 +55,21 @@ class Worker:
             raise ValueError("inference_seconds must be positive and finite")
         self.inference_seconds = inference_seconds
         self.backend, self.limit = backend, queue_limit + 1
-        self.lock = asyncio.Lock()
+        parallel = getattr(backend, "parallel_requests", 1)
+        if type(parallel) is not int or not 1 <= parallel <= 64:
+            raise ValueError("Backend parallel_requests must be an integer between 1 and 64")
+        self.execution_slots = parallel
+        self.lock = asyncio.Semaphore(parallel) if parallel > 1 else asyncio.Lock()
         self.jobs = set()
         self.active_jobs = []
         self.closing = False
         self.last_error = None
         self.last_activity = time.monotonic()
 
-    def submit(self, payload):
+    def submit(self, payload, response_id=None):
         if self.closing or len(self.jobs) >= self.limit:
             return None
-        job = Job(payload, deadline=time.monotonic() + self.inference_seconds)
+        job = Job(payload, deadline=time.monotonic() + self.inference_seconds, response_id=response_id)
         self.active_jobs.append(job)
         task = asyncio.create_task(self.run(job))
         self.jobs.add(task)
@@ -84,7 +89,9 @@ class Worker:
     def generate(self, job):
         try:
             self.last_error = None
-            for item in self.backend.generate(job.payload, job.cancel):
+            associated = getattr(self.backend, "generate_associated", None)
+            items = associated(job.payload, job.cancel, job.response_id) if job.response_id is not None and callable(associated) else self.backend.generate(job.payload, job.cancel)
+            for item in items:
                 if isinstance(item, dict):
                     if job.metadata:
                         raise RuntimeError("Duplicate backend completion metadata")
@@ -113,10 +120,27 @@ class Worker:
             self.last_error = "Inference failed; inspect backend logs before resubmitting."
             job.failure = True
 
+    @asynccontextmanager
+    async def _all_slots(self):
+        """Idle unload owns every execution slot; cancellation releases partial acquisitions."""
+        acquired = 0
+        try:
+            for _ in range(self.execution_slots):
+                await self.lock.acquire()
+                acquired += 1
+            yield
+        finally:
+            for _ in range(acquired):
+                self.lock.release()
+
     async def idle(self, seconds):
         while True:
             await asyncio.sleep(min(seconds, 5))
-            async with self.lock:
+            # Do not collect execution permits from a busy/backlogged service just to
+            # discover under the barrier that no idle unload was eligible.
+            if self.jobs or time.monotonic() - self.last_activity < seconds or not hasattr(self.backend, "unload"):
+                continue
+            async with self._all_slots():
                 if not self.jobs and time.monotonic() - self.last_activity >= seconds and hasattr(self.backend, "unload"):
                     try:
                         await asyncio.to_thread(self.backend.unload)
@@ -189,10 +213,10 @@ def create_app(backend, queue_limit=2, inference_seconds=1800, idle_seconds=300)
             return error(str(exc), 413, "invalid_request_error")
         except ValueError as exc:
             return error(str(exc), 400, "invalid_request_error")
-        job = worker.submit(payload)
+        ident = "chatcmpl-" + uuid.uuid4().hex
+        job = worker.submit(payload, response_id=ident)
         if job is None:
             return error("OCR queue is full or service is stopping; retry later.")
-        ident = "chatcmpl-" + uuid.uuid4().hex
         base = {"id": ident, "created": int(time.time()), "model": "chandra"}
         if payload["stream"]:
             async def stream():

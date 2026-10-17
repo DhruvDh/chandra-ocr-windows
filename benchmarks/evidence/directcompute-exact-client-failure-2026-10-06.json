@@ -1,0 +1,231 @@
+{
+  "schema": "chandra.directcompute.exact-client-failure.v1",
+  "source_cutoff": "2c441820e7b58b2641d3fa4da602c2e4146ce679",
+  "outcome": "OCR correctness rejected; native execution and resource closure accepted at their recorded scope",
+  "native_endpoint_deployed": false,
+  "qualified_completed_pages": 0,
+  "throughput_credit": false,
+  "worker_executable_sha256": "2f33040cbc924adba34e99fa13d66c964367a5104908bb1d21ee38ca087e620d",
+  "input": {
+    "manifest_sha256": "0aa588473930f110cc359ba369623f29765a85f4e05ffcbca2ac509933b787ae",
+    "synthetic_fixture": "native-0",
+    "decoded_RGB_dimensions": [
+      1624,
+      2100
+    ],
+    "prompt_tokens": 3617,
+    "grid": [
+      1,
+      126,
+      96
+    ],
+    "patches": 12096,
+    "merged_rows": 3024,
+    "context": 16384,
+    "output_allowance": 12384,
+    "diagnostic_cap": null
+  },
+  "model": {
+    "repository": "datalab-to/chandra-ocr-2",
+    "revision": "af93b47dba1b47b6640c86ccf487ed2260ab9a09",
+    "original_weight_format": "BF16",
+    "inventory_digest": "0804568be9f099d6479fad9ed77a4da4611f3c1e7bc6e009af7dce45e8aa3847"
+  },
+  "output": {
+    "generated_ids_including_stop": [
+      2539,
+      795,
+      1402,
+      1944,
+      420,
+      15,
+      220,
+      15,
+      220,
+      16,
+      15,
+      15,
+      15,
+      220,
+      16,
+      15,
+      15,
+      15,
+      1,
+      795,
+      6726,
+      420,
+      22061,
+      12,
+      2578,
+      1933,
+      596,
+      29,
+      248046
+    ],
+    "stop_token_id": 248046,
+    "decoded_text": "<div data-bbox=\"0 0 1000 1000\" data-label=\"Blank-Page\"></div>",
+    "decoded_sha256": "21aa0518460cea5fc6d889056fc06bf0ccb216e3dd6bced82b602d6e394abe98",
+    "literal_content_checks_passed": 0,
+    "literal_content_checks_total": 18,
+    "content_checks": {
+      "text": [
+        {
+          "expected": "This public fixture tests complete scientific transcription across two pages.",
+          "present": false
+        }
+      ],
+      "numbers": [
+        {
+          "expected": "12.50",
+          "present": false
+        },
+        {
+          "expected": "17",
+          "present": false
+        },
+        {
+          "expected": "203.25",
+          "present": false
+        },
+        {
+          "expected": "7.25",
+          "present": false
+        },
+        {
+          "expected": "29",
+          "present": false
+        },
+        {
+          "expected": "118.75",
+          "present": false
+        },
+        {
+          "expected": "19.75",
+          "present": false
+        },
+        {
+          "expected": "46",
+          "present": false
+        },
+        {
+          "expected": "322.00",
+          "present": false
+        }
+      ],
+      "equations": [
+        {
+          "expected": "y = 3x + 7",
+          "present": false
+        },
+        {
+          "expected": "x = 5",
+          "present": false
+        },
+        {
+          "expected": "y = 22",
+          "present": false
+        }
+      ],
+      "end_markers": [
+        {
+          "expected": "END-CLI-PAGE-1-COMPLETE",
+          "present": false
+        }
+      ],
+      "ordered_text": [
+        {
+          "expected": "Synthetic measurement - page 1",
+          "present": false
+        },
+        {
+          "expected": "COLUMN 1A",
+          "present": false
+        },
+        {
+          "expected": "COLUMN 1B",
+          "present": false
+        },
+        {
+          "expected": "END-CLI-PAGE-1-COMPLETE",
+          "present": false
+        }
+      ]
+    }
+  },
+  "timings_seconds": {
+    "wrapper": 458.765,
+    "request": 432.2888651,
+    "vision": 228.9296556,
+    "prefill": 178.3397558,
+    "decode_and_readback": 24.9093962,
+    "scope": "Incorrect output from preprepared tensors; excludes decoding/processor and establishes no OCR rate"
+  },
+  "closure": {
+    "request_retired_to_resident_bytes": 9078531072,
+    "final_shutdown_tracked_bytes": 0,
+    "job_active_processes_after_retirement": 0,
+    "process_and_channel_returncodes": 0,
+    "process_commit_peak_bytes": 10743226368,
+    "job_commit_peak_bytes": 10762686464,
+    "sampled_minimum_host_available_RAM_bytes": 19475189760,
+    "ordinary_worker_restored_cold": true,
+    "limitations": "Tracked buffers and sampled RAM do not establish physical GPU residency, continuous headroom or zero paging"
+  },
+  "prefix_comparison": {
+    "other_point": "14-token exact-input diagnostic",
+    "matching_generated_indices": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "first_divergence_index": 5,
+    "diagnostic_id": 21,
+    "normal_allowance_id": 15,
+    "input_model_binary_selector_and_observed_allocation_sizes_equal": true,
+    "cause": "Unassigned; do not infer allocation or cap causation"
+  },
+  "preparation_failures_preserved": [
+    "page01: local generator/launch failure before remote action",
+    "page02: SSH authentication failure before service stop or inference submission"
+  ],
+  "private_retained_artifact_commitments": {
+    "result.json": {
+      "bytes": 314915,
+      "sha256": "da3b30b2fe94f5263a30fb36e23b52ef5b3dc7898d14c740cd7a6fce35155ed0"
+    },
+    "generated-tokens.jsonl": {
+      "bytes": 7800,
+      "sha256": "c241228378798d6a4e495c6403983bf7bcbf684bf84005b9f1c90051a40ca371"
+    },
+    "events.jsonl": {
+      "bytes": 14780,
+      "sha256": "7404b175c78ae78f4d2636d4d008e0fab2f87800577575e0aace314845ef7240"
+    },
+    "job.json": {
+      "bytes": 404,
+      "sha256": "27619fa78c1c2f3dcdc0ba7744c84bfadc7a9bd5e3b0c87d28a207bd21f7f188"
+    },
+    "process.json": {
+      "bytes": 392,
+      "sha256": "35be57c1ee8d9d5906d6e4001a274f5c6b2afca8fc6ec8d4af06d96ac7a10f1b"
+    },
+    "content-screen.json": {
+      "bytes": 2052,
+      "sha256": "daa08314b0c74cd2925b4455a0b74be5fd4ce329201cb469e8ce99d73341e6a7"
+    },
+    "decoded-output.txt": {
+      "bytes": 61,
+      "sha256": "21aa0518460cea5fc6d889056fc06bf0ccb216e3dd6bced82b602d6e394abe98"
+    }
+  },
+  "independent_review": {
+    "receipt_checks_passed": 103,
+    "seal_sha256": "f9b6551218295999558d866b589354264ffae87019c651d5eb7834500dc568e0",
+    "failure_disposition_sha256": "090b1cbf6bb5f37dbd61590f4463e00f58a9bb25b5e7f1105c2a916898ff8090",
+    "scope": "Finished receipts/content audit; no repeated model inference"
+  },
+  "next_boundary": "Repair exact-client correctness and diagnose identical-input prefix divergence before performance promotion; fresh trained numerical reference and full OCR acceptance remain required"
+}
