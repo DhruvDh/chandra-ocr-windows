@@ -14,7 +14,7 @@ import httpx
 
 from chandra_service.validation import validate, validate_completion_metadata
 from .config import CONTEXT, validate_kv_profile
-from .memory import check_memory, observe_memory
+from .memory import check_memory, log_admission_failure, observe_memory
 from .worker import AdmissionRefused, OwnedWorker
 
 
@@ -130,9 +130,18 @@ class LlamaBackend:
                     "owned_worker_pending": session is not None and not session.worker.snapshot()["closed"]}
 
     def _admit(self):
+        snapshot, forecasts, stage = None, None, "observation"
         try:
-            check_memory(self._memory(), self.config.admission_physical_bytes, self.config.admission_commit_bytes)
+            snapshot = self._memory()
+            stage = "check"
+            forecasts = (self.config.admission_physical_bytes, self.config.admission_commit_bytes)
+            check_memory(snapshot, *forecasts)
         except Exception as error:
+            try:
+                log_admission_failure(self.config, stage, snapshot, forecasts, error)
+            except BaseException:
+                # Diagnostics must never replace the already-decided refusal or its cause.
+                pass
             raise AdmissionRefused("Windows headroom admission failed before model launch") from error
 
     def _reserve(self, cancel):
