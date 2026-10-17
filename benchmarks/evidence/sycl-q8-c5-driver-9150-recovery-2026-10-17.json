@@ -1,0 +1,89 @@
+{
+  "schema": "sycl-q8-c5-driver-recovery-evidence-v1",
+  "date": "2026-10-17",
+  "observation_cutoff_utc": "2026-10-17T19:10:59Z",
+  "cutoff_basis": "Root-reported active/unaccepted episode at the documentation cutoff; no live throughput output was inspected.",
+  "profile": "Normal eager SYCL Q8 C5/b256 under Intel driver 32.0.101.9150",
+  "qualified": false,
+  "scope": "Finite device discovery, persistent startup and two synthetic PDF CLI compatibility episodes. The separately active sustained episode has no accepted result at this documentation cutoff. Raw logs, credentials and private host paths are excluded.",
+  "identity": {
+    "selected_remote_runtime_source_commit": "96516d1125075274683cb7a51faa7bb3e531ae3c",
+    "configuration_sha256": "1e957dc21bce0a9dd2e2e0f0a6cfc168b0cf7feee8197bd08411b3206778725e",
+    "model_revision": "af93b47dba1b47b6640c86ccf487ed2260ab9a09",
+    "persistent_startup_evidence": "Opt-in private snapshot reached engine_ready",
+    "experimental_kernel_deployed": false,
+    "runtime_model_precision_context_and_output_unchanged": true
+  },
+  "recovery": {
+    "owner_reboot": "Finite post-reboot observations recovered headroom and did not reproduce the prior dominant retained container/filesystem pool signature; permanent repair is not established.",
+    "device_discovery": "Pinned normal runtime successfully enumerated the A770 under driver 9150, with owned closure; this was model-free.",
+    "prior_startup_and_transport_failures": "Preserved, unreplayed and unexplained; the successful new episodes do not identify their cause.",
+    "intermittent_ssh_banner_failure": "A pre-sustained observation timed out during banner exchange and held before inference; distinct version and memory observations passed before root renewed admission. Cause remains unexplained.",
+    "desktop_responsiveness": "Unverified; owner reported it had not been checked."
+  },
+  "cli": {
+    "fixture_family": "Client-qualification native/scanned two-page PDFs; different from the historical exact NorthStone PDF pair underlying the four throughput fixtures.",
+    "comparison_baseline": "Earlier normal C5 runs of those same client-qualification PDFs. This does not rerun the historical exact-PDF Intel/AMD comparison.",
+    "source_screen_passed": true,
+    "pdf_documents": [
+      "native",
+      "scanned"
+    ],
+    "pages_and_complete_single_posts_per_pdf": 2,
+    "client_and_assessor_exit_codes": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "application_and_sdk_retries": 0,
+    "all_four_http_statuses": 200,
+    "all_four_natural_stop": true,
+    "prompt_tokens_per_page": 3617,
+    "completion_tokens_page_order": [
+      779,
+      451
+    ],
+    "output_allowance": 12384,
+    "context_per_slot": 16384,
+    "slots": 5,
+    "total_completion_tokens_per_pdf": 1230,
+    "chunks_per_pdf": 25,
+    "extracted_images_per_pdf": 0,
+    "saved_markdown_and_metadata_byte_equal_to_prior_c5": true,
+    "all_four_response_choices_boxes_and_usage_equal_to_prior_c5": true,
+    "observed_differences": "Arrival/call order reversed; matched response envelopes differ only in id and created.",
+    "unmatched_client_seconds": {
+      "native": 233.756,
+      "scanned": 43.724
+    },
+    "timing_scope": "Finite unmatched CLI compatibility timings, not sustained throughput or a causal driver comparison.",
+    "full_ocr_acceptance": false,
+    "source_assessor_sha256": "3694f8b652b15fa71a1282d3824f7318bc0bc9ee4a6f9dac406aa18ae565b671",
+    "independent_result_sha256": "f214ee6a50d6f2281e12fe50f22484d1084648cf55d1c52aa3553691a0a1f161",
+    "native_assessment_sha256": "f2b9fd7a9181b6531457e6a2a2da6a91637a6c61c1f06a3a018db21bc89af710",
+    "scanned_assessment_sha256": "b3a9e03c5950a058a10b51cbe44ac1fba341575e4384d78dec247e3e19c8492c",
+    "markdown_sha256_each": "684cf073e2843f7cef6fbde4867a461f72e5c579fbe3caae50b715b4631d31a1",
+    "native_metadata_sha256": "c5163cb2c0ba49d2c860e42c7e0d148e8b2f429926989a1abcaef45d7145764f",
+    "scanned_metadata_sha256": "a8e407de1b7abde3035784b23838bcdf97edde90ecb5947b8ba98baf03bce1ea",
+    "limits": "Two synthetic two-page PDFs, distinct from the four sustained fixtures. Exact request/page mapping, source-content/table/metadata and saved-output correspondence pass; broad accuracy, full layout, figures and general numerical equivalence remain unqualified."
+  },
+  "sustained": {
+    "historical_driver": "32.0.101.8991",
+    "historical_correct_pages_per_second": 0.10548339857799843,
+    "historical_reference": "sycl-q8-c5-normal-service-2026-10-17.json",
+    "driver_9150_state": "One root-owned 720-second normal C5 episode active and unaccepted at this cutoff",
+    "driver_9150_accepted_rate": null
+  },
+  "next_kernel_work": {
+    "selected_comparison": "Batched F32 recurrent/SSM projection: matched instrumented parent B2 versus accepted synthetic candidate through the existing complete-PDF and concurrent C5 carrier.",
+    "candidate_leaf_sha256": "3a1c5d48ec2cb2cab688f330bf4ad73e19e8a73cf1235ca6d44049f9b8220190",
+    "synthetic_words_equal_per_arm": 2457600,
+    "parent_scope": "B2 differs from normal serving in eight native files; this is a matched-parent comparison, not normal-runtime equivalence or a measured deployed gain.",
+    "n128_only_qualification_is_prerequisite_for_c5_b256": false,
+    "n128_disposition": "Original failure and corrected unrun successor remain preserved with their own source, driver and numerical limits.",
+    "other_candidates": "Historical graph, prefill, fusion and Uvicorn evidence remains available without imposing mandatory sequencing on this selected SSM comparison.",
+    "full_model_timing_sustained_gain_and_deployment_accepted": false
+  },
+  "preservation": "Earlier accepted evidence, failed attempts, qualification limits and useful provenance remain unchanged; root owns operational admission and active process closure."
+}
