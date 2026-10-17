@@ -1,0 +1,376 @@
+{
+  "schema": "sycl-q8-normal-service-evidence-v1",
+  "date": "2026-10-17",
+  "profile": "Normal-serving eager SYCL fused-vision Q8_0 KV C5/b256",
+  "qualified": false,
+  "scope": "Finite normal-owner startup, refusal, cancellation/recovery, synthetic CLI, sustained original-endpoint throughput, dense-page regression comparison and accepted passive idle/disposition. C5/b256 is retained as the best tested eager operating setting at this cutoff, with qualified:false. Raw evidence, private configurations and host paths remain outside public Git.",
+  "identity": {
+    "source_commit": "90c00f384383e1f2c6815505dda188dba04ac9c3",
+    "source_base_commit": "e3e75d2ccefdb691d80359f7ae6db4d09a9015c8",
+    "tracked_source_archive_sha256": "35e054c214b059a18845ff5fe77e528d0aac5e505d5b1312b8ccab19237dfcfc",
+    "configuration_and_readback_sha256": "1e957dc21bce0a9dd2e2e0f0a6cfc168b0cf7feee8197bd08411b3206778725e",
+    "llama_commit": "d81235049384534c167caea52b85a694f6103d14",
+    "vision_leaf_sha256": "90e65f3b67017a598a7fc0c467bf08b15157ee521d27f1e1921126461ae641c7",
+    "model_revision": "af93b47dba1b47b6640c86ccf487ed2260ab9a09",
+    "text_sha256": "74699f738159fc227e8153e5345cc36795aa81fe726ff4746fee8f7b7efe7f6d",
+    "projector_sha256": "707545f08ecb0f4dbc7f2456b3ee21cd34e470542e9b7c885141d512116e914f",
+    "template_sha256": "0d158f349ca965f7eea9db0eb45cd177b85bb0e4ae05dcdd0f060da8f7d41812"
+  },
+  "settings": {
+    "execution_path": "Eager SYCL; graph options absent from authenticated configuration and default disabled",
+    "text_storage": "Q8_0/F32",
+    "projector_storage": "unchanged BF16/F32",
+    "kv_storage": "Q8_0 for K and V; block INT8, not FP8",
+    "parallel_requests": 5,
+    "worker_queue_limit": 4,
+    "router_capacity": 5,
+    "context_per_slot": 16384,
+    "total_context": 81920,
+    "output_allowance": 12384,
+    "batch_and_microbatch": [
+      256,
+      256
+    ],
+    "unified_kv": false,
+    "outer_and_inner_affinity_masks": [
+      15,
+      15
+    ],
+    "llama_omp_mkl_threads": 1,
+    "vision_flags": {
+      "GGML_SYCL_FA_ONEDNN_UNMASKED": "1",
+      "GGML_SYCL_FA_ONEDNN_DG2_D64": "1"
+    },
+    "persistent_compiler_cache_limit_bytes": 1073741824,
+    "idle_seconds": 300,
+    "startup_seconds": 120,
+    "request_seconds": 600,
+    "admission_physical_bytes": 5637144576,
+    "admission_commit_bytes": 13153337344,
+    "live_physical_and_commit_floors_bytes": [
+      4294967296,
+      4294967296
+    ],
+    "engine_process_cap_bytes": 11274289152,
+    "engine_job_cap_bytes": 11542724608,
+    "omitted_kv_setting_remains_bf16": true,
+    "new_kernel_optimization_deployed": false
+  },
+  "cold_admission": {
+    "initial_state": "asleep, unloaded, capacity five",
+    "overlapping_unfinished_requests": 5,
+    "observed_loaded_pending_or_active": 5,
+    "natural_http_200_completions": 5,
+    "source_checks_passed": 5,
+    "prompt_tokens_each": 3617,
+    "completion_tokens": [
+      556,
+      556,
+      560,
+      556,
+      559
+    ],
+    "completion_tokens_filename_order": ["native-0-a", "native-0-b", "native-1-a", "scanned-0-a", "scanned-1-a"],
+    "sixth_request_http_status": 503,
+    "sixth_request_elapsed_seconds": 0.004116,
+    "gate_exit_code": 0,
+    "gate_runtime_seconds": 60.097,
+    "retries": 0,
+    "root_result_sha256": "469159d27a9f8499164e30bde49aad5b2d0a93302e5a816c4a1fd12f9d52d95d"
+  },
+  "cancellation_and_recovery": {
+    "trigger": "Five unfinished loaded/busy streams with actual first content from the selected client",
+    "deliberately_interrupted_clients": 1,
+    "unfinished_peers_failed_with_error_events": 4,
+    "natural_completions": 0,
+    "replays": 0,
+    "all_five_client_exit_codes": 1,
+    "post_cancel_state": "asleep, unloaded, zero pending, no owned worker pending, no backend error; last-request error retained",
+    "gate_exit_code": 0,
+    "cancellation_root_result_sha256": "cd670a7149349a5e157d8efd6bb0dbe53add77e99f8e76071c8b27d0817013fc",
+    "fresh_explicit_recovery": {
+      "case": "scanned-0",
+      "natural_stop": true,
+      "prompt_tokens": 3617,
+      "completion_tokens": 556,
+      "source_passed": true,
+      "response_sha256": "2d97b5f9cfb36a1fbce8476032ccc64d48791cf3623b062f670b02590a4caac4",
+      "assessment_sha256": "af6c004fadca9f7fa1f6e3527b9d7b696e60bbcef8c0c0f406b6d31eccf005c0",
+      "root_result_sha256": "f477fdb229a4d88422831a3746fb5c6eeeb4fa0db8da9e1b6b0843108cdc37ac",
+      "replay_of_canceled_request": false
+    },
+    "closure_scope": "Forwarding clients joined and local forwarding ports were absent before separate Windows observations. Operational retirement is corroborated, without an independently exported empty-Job/final-handle receipt or global GPU-idle proof.",
+    "lease_loss_scope": "The unchanged ownership transport retains earlier BF16 C4 lease-loss evidence; no new C5 lease-loss episode is claimed."
+  },
+  "cli_compatibility": {
+    "client": "Pinned offline Chandra 0.2.0/journal environment, application and SDK retries disabled",
+    "command_form": "MAX_VLLM_RETRIES=0 VLLM_API_BASE=http://127.0.0.1:8002/backends/waystone/v1 VLLM_MODEL_NAME=chandra uv run --no-sync chandra INPUT OUTPUT --method vllm --no-html --batch-size 4",
+    "pages_and_single_posts_per_pdf": 2,
+    "all_four_responses_natural_stop": true,
+    "source_content_table_metadata_and_saved_response_correspondence_passed": true,
+    "prompt_tokens_per_page": 3617,
+    "completion_tokens_per_pdf_page_order": [
+      779,
+      451
+    ],
+    "metadata_reported_pages": 2,
+    "metadata_reported_token_count": 1230,
+    "metadata_chunks": 25,
+    "metadata_images": 0,
+    "page_box_metadata_pixels": [
+      1632,
+      2112
+    ],
+    "request_png_pixels": [
+      1624,
+      2100
+    ],
+    "native": {
+      "exit_code": 0,
+      "runtime_seconds": 36.108,
+      "assessment_sha256": "da257d4b60679c0b9873d681b561d3aa9f3e6b14af457cb0b4f01f1d67be7852"
+    },
+    "scanned": {
+      "exit_code": 0,
+      "runtime_seconds": 35.751,
+      "assessment_sha256": "3069b204c6357772ce25a854f18350c7411d5da01e72b0dbbb2c2e1e8bd45b88"
+    },
+    "root_result_sha256": "3de06cb0779cc0a50266aa7e6f12ea29a34e36ed72de173a6a511a08cce0561d",
+    "limits": "Two synthetic pages per PDF; distinct from the sustained corpus. No five-way CLI overlap, general OCR/layout acceptance, live Zotero assessment or new sustained rate follows."
+  },
+  "installed_throughput_repeat": {
+    "measurement_scope": "original-endpoint",
+    "cases": [
+      "native-0",
+      "native-1",
+      "scanned-0",
+      "scanned-1"
+    ],
+    "original_pixels": [
+      1624,
+      2100
+    ],
+    "prompt_tokens_per_request": 3617,
+    "warmups": 4,
+    "measured_requests_per_case": 20,
+    "correct_measured_pages_including_drain": 80,
+    "elapsed_seconds_including_drain": 758.4131823439966,
+    "correct_pages_per_second_including_drain": 0.10548339857799843,
+    "correct_pages_per_hour_including_drain": 379.74023488079433,
+    "correct_pages_inside_window": 75,
+    "window_seconds": 720,
+    "correct_pages_per_second_inside_window": 0.10416666666666667,
+    "completions_after_cutoff": 5,
+    "submitted_measurements_excluded": 0,
+    "source_checks_passed": 84,
+    "source_checks_failed": 0,
+    "natural_stop_responses": 84,
+    "block_checks_passed": 756,
+    "source_oracle_passes": 9,
+    "negative_control_passes": 11,
+    "observed_maximum_client_overlap": 5,
+    "maximum_measured_request_latency_seconds": 52.6491,
+    "request_and_drain_bounds_seconds": 180,
+    "unexhausted_measured_request_bound": 128,
+    "client_exit_code": 0,
+    "forward_exit_code": 0,
+    "summary_sha256": "84708d08c2692bac499f82bf55d0119c083d3a7e2a16d8df20cf18fa14a7d3fb",
+    "warmup_sha256": "c6ca91163482983b12ddd05eccc44cfa353720f531ae8e6cc548d78882402aba",
+    "measurement_sha256": "bf22f2aa26c887946b88b7c3d6f8fd5f8bb164a77700d5cf2f51ab6ecb11468a",
+    "source_assessment_sha256": "07463e46125e44b19ac53ca0600ce910c9e6d7290de2e65dd63ae5549da2d2fc",
+    "client_log_sha256": "82fbf82dbaa90f5cdd3608a75a492d271de6544972ede98c818741206d35034b",
+    "original_request_manifest_sha256": "34d0b43fc6c44c5c996d414171b9f9854d6ee81742075899fa71ee66bfeb8f2a",
+    "source_truth_sha256": "4e52852e25686aa6e16bc561090e2a6fa88115d90613f39b30c259a2dc928e22",
+    "source_verifier_sha256": "2d5fb83e73aa0b5c4d51c08735445185054f225cd09f1e02313b2c4b789b4ccb",
+    "client_sha256": "f87f52dbd254af254e6b596018bfacf52fe2ab39b365811beeee0824f96ee22c",
+    "source_wrapper_sha256": "df8aade39d546395bcfb180f88d7d82f442d20ac683206e3db87b5c5604e1124",
+    "result_note_sha256": "82b0aabf8c89582b00a42498b2eeb91f70e2b885e4430365804c6d41c2ea3de4",
+    "independent_finished_audit_sha256": "5036e56803cbad7c1c10a3389c63426b19ecb81ac69beebbbdfde4ee27412d33",
+    "limits": "Immediate closed-loop replacement across four repeated synthetic cases. Includes endpoint image preparation, queueing, inference and drain; excludes PDF rendering, cold loading, warmup and offline assessment. Null cache counters remain unknown. Local commitments are not independent remote execution attestation."
+  },
+  "process_memory_observation": {
+    "observer_sha256": "f9eab739cd154dd87a4c9afa4d4213eb298200b801b4c92065271a91bc82c9d0",
+    "observation_sha256": "dd13982738689cabfda9a6525a41b87a49fb0f9bc914d926a3cb827c93bc4e7d",
+    "observation_utc": "2026-10-17T02:19:39.505178Z",
+    "exit_code": 0,
+    "selection_errors": [],
+    "lifetime_peak_process_commit_bytes": 10397831168,
+    "process_cap_bytes": 11274289152,
+    "margin_below_process_cap_bytes": 876457984,
+    "current_private_commit_bytes": 9985028096,
+    "working_set_bytes": 1461129216,
+    "engine_creation_predates_sustained_run": true,
+    "unclassified_metadata_rows": 324,
+    "worker_and_router_restarts": [
+      0,
+      0
+    ],
+    "amd_inactive_at_recorded_boundary": true,
+    "limits": "Lifetime process peak includes recovery/CLI history, not the sustained interval alone. No Job peak, VRAM, interval reserve minimum, global absence, formal Job/final-handle closure or future memory bound is established; unknown foreign metadata remains unknown."
+  },
+  "dense_clean": {
+    "original_request_sha256": "ece9c604b4d7ddf6f4cac4dbce34a21c5bb7da21e687c034f71b9569e4d335d5",
+    "response_sha256": "9ebeec34faab331b13a02dc72353102f59bd2fd67dd05ce403f325e5efd7e200",
+    "source_assessment_sha256": "7e692e178eb75ffd352da43ded421c1442b5bf41d29a7120839b6f4902f08fcd",
+    "http_status": 200,
+    "elapsed_seconds": 63.381343,
+    "finish_reason": "stop",
+    "prompt_tokens": 3629,
+    "completion_tokens": 1789,
+    "response_completed_at_utc": "2026-10-17T02:22:43.154849666Z",
+    "source_passed": false,
+    "normalized_content_sha256": "cf4962154dbc0bc9702d4b803a5c3257a6e934d2fbb83351a551c9de7c751cbe",
+    "normalized_content_matches": [
+      "SYCL Q8 C6",
+      "SYCL BF16",
+      "CPU FP32",
+      "Vulkan"
+    ],
+    "source_failures": {
+      "content_or_order": 2,
+      "strict_corridor": 8,
+      "text_core_clipped": 2
+    },
+    "same_twelve_failures_as_q8_c6_and_sycl_bf16": true,
+    "shared_identifier_error": "O0-I1-l1 becomes O0-I1-I1 in zero-based blocks 4 and 20",
+    "blocks": 22,
+    "own_word_center_passes": 22,
+    "text_core_containment_passes": 20,
+    "unrelated_blocks_captured": 0,
+    "geometry_differences_from_c6": {
+      "coordinate_components": 1,
+      "maximum_normalized_difference": 1,
+      "zero_based_blocks": [
+        15
+      ]
+    },
+    "geometry_differences_from_bf16": {
+      "coordinate_components": 4,
+      "maximum_normalized_difference": 1,
+      "zero_based_blocks": [
+        11,
+        13,
+        15,
+        18
+      ]
+    },
+    "strict_geometry_equal_to_either_sycl_reference": false,
+    "counted_in_correct_throughput": false,
+    "interpretation": "Regression comparison against imperfect references, not a clean dense accuracy or general numerical pass. No new content error/source-failure classification appears against those SYCL references; raw geometry differs and the unchanged strict source predicate still fails."
+  },
+  "admission_diagnostics": {
+    "source_commit": "90c00f384383e1f2c6815505dda188dba04ac9c3",
+    "logger": "chandra.llama.admission",
+    "event_schema": "llama-admission-failure-v1",
+    "maximum_ascii_payload_bytes": 4096,
+    "scope": "One redacted event only after existing _admit failure, using exactly its single memory snapshot and actual forecasts/floor. Observation/check stage, typed numeric status and fixed cause/OS classification; no resampling, threshold changes, raw error/path/payload/credential values, altered cause/HTTP behavior or replay. Dedicated stderr handler suppresses handler-error tracebacks and does not propagate; shared logging policy unchanged.",
+    "offline_tests_passed": 115,
+    "offline_subtests_passed": 324,
+    "offline_test_seconds": 4.46,
+    "literal_pre_execution_and_independent_finished_reviews_clear": true,
+    "implementation_result_sha256": "d6feea6cb9f16a0b3dd436ee1f4021f5522bd230e61d0c2ed9819b185e00430b",
+    "genuine_windows_failure_event_exercised": false,
+    "cold_gate_failure_event_slice_empty": true,
+    "prior_five_http_502_admission_refusals_explained": false,
+    "prior_failure_scope": "The earlier five failed submissions remain failed and unreplayed. Gate-time counters/cause were unrecorded. Passing standalone memory observations and later success do not establish shortage or source bug; the real-refusal logger remains unexercised."
+  },
+  "comparisons": {
+    "basis": "Correct measured pages/s including full cohort and drain",
+    "installed_q8_c6_b128": {
+      "evidence": "sycl-q8-normal-service-2026-10-16.json",
+      "reference_pages_per_second": 0.09291388258735415,
+      "descriptive_gain_percent": 13.52813556
+    },
+    "prior_private_eager_c5_b256": {
+      "evidence": "sycl-q8-c5-b256-2026-10-16.json",
+      "reference_pages_per_second_used_by_finished_audit": 0.10557166503577724,
+      "descriptive_gain_percent": -0.08360809
+    },
+    "shorter_vulkan_c4": {
+      "evidence": "sycl-q8-kv-2026-10-16.json",
+      "reference_pages_per_second_used_by_finished_audit": 0.0496514710313,
+      "reference_window_seconds": 360,
+      "descriptive_gain_percent": 112.44768058
+    },
+    "interpretation": "C5 is the best tested source-correct eager operating setting in this retained comparison. Separate finite unpaired runs, C5/C6 concurrency and batch change together, no confidence interval, causal isolation, workload-independent ranking or global ceiling. This validates the existing operating point through normal serving, not a new kernel optimization.",
+    "graph_candidate_scope": "Separate decode-graph C5 evidence retains failed frozen-family membership for 10/89 responses and remains unpromoted; its source-check passes do not erase those failures."
+  },
+  "passive_idle_cutoff": {
+    "status": "passed",
+    "clock_anchor_elapsed_after_last_dense_response_seconds": 369.957941,
+    "later_health_models_cutoff_utc": "2026-10-17T02:28:56.739083682Z",
+    "normal_idle_policy_seconds": 300,
+    "intervening_inference": false,
+    "state": "asleep",
+    "loaded": false,
+    "capacity": 5,
+    "pending_or_active": 0,
+    "owned_worker_pending": false,
+    "accepting": true,
+    "error": null,
+    "last_error": null,
+    "qualified": false,
+    "listed_model": "chandra",
+    "normal_worker_and_router_invocations_unchanged": true,
+    "normal_worker_and_router_restarts": [0, 0],
+    "separate_process_query_exit_code": 0,
+    "visible_llama_server_processes": 0,
+    "manual_process_query_joined": true,
+    "amd_gateway_inactive_at_boundary": true,
+    "result_sha256": "d90c3652ea595d80e9362bfdfb86bfef0d17467c1c3db949ab0deef18921cfc0",
+    "limits": "Finite operational idle/retirement corroboration, not exact 300-second unload latency, exported empty-Job/final-handle closure, inaccessible-foreign-process absence, global GPU idleness or permanent state."
+  },
+  "operating_disposition": {
+    "retained_setting": "Eager SYCL Q8 C5/b256, current best tested source-correct eager operating choice in this comparison",
+    "ordinary_gateway_available_at_cutoff": true,
+    "worker_asleep_unloaded_at_cutoff": true,
+    "qualified": false,
+    "saved_c6_rollback_preserved": true,
+    "canonical_main_unchanged_at": "e3e75d2ccefdb691d80359f7ae6db4d09a9015c8",
+    "source_merge_or_publication_performed_by_episode": false,
+    "post_attempts": 101,
+    "attempts_by_phase": {
+      "cold_admitted": 5,
+      "sixth_capacity_refusal": 1,
+      "intentionally_incomplete_cancellation": 5,
+      "fresh_recovery": 1,
+      "cli": 4,
+      "sustained_warmup": 4,
+      "sustained_measured": 80,
+      "dense_with_preserved_source_errors": 1
+    },
+    "each_submitted_once": true,
+    "foreign_processes_terminated": 0,
+    "extra_forward_or_manual_windows_owner_remaining_at_cutoff": false,
+    "result_sha256": "8643736d9003de3cce9f8eb42b9c79c087e24db40b297462b0ba913d5a3fdc76",
+    "limits": "This selects an operating point without establishing a global concurrency ceiling or broader correctness. Production attribution, separately reviewed server build/profile, further optimization, broader numerical/OCR qualification and public handoff remain unfinished; no build/profile result is claimed here."
+  },
+  "network_scope": {
+    "router_port": 8002,
+    "listening_on_loopback_and_private_lan_address": true,
+    "local_get_to_lan_address_models_route": "passed",
+    "independent_lan_peer_models_get": "timed out after 10 seconds",
+    "ufw_active": true,
+    "kernel_log_corroborates_incoming_tcp_8002_block": true,
+    "tcp_8002_allow_rule_present": false,
+    "firewall_rule_changed_by_episode": false,
+    "owner_authentication_needed_for_requested_targeted_remedy": true,
+    "remote_ocr_tested": false,
+    "result_sha256": "25d7391d9be6926881fe8c57eccbb78d13d8642ba927d95caf6bd03f9792c022",
+    "limits": "The ordinary endpoint is locally validated and available at the recorded boundary. Independent remote LAN access remains blocked by the observed host firewall; listening and a local GET to the LAN address do not establish remote-client reachability. No remote inference POST was sent. This later network observation does not alter the accepted throughput or idle cutoffs."
+  },
+  "limits": {
+    "general_ocr_accuracy_or_numerical_equivalence": false,
+    "global_throughput_ceiling": false,
+    "new_kernel_gain": false,
+    "formal_job_closure": false,
+    "real_admission_failure_logging_validated": false
+  },
+  "public_links": {
+    "engine_guide": "../../docs/sycl-engine-trial.md",
+    "prior_installed_c6": "sycl-q8-normal-service-2026-10-16.json",
+    "prior_private_eager_c5": "sycl-q8-c5-b256-2026-10-16.json",
+    "separate_graph_candidate": "sycl-q8-c5-decode-graph-2026-10-16.json"
+  },
+  "privacy_and_integrity_scope": "Only curated results and SHA256 commitments are public. Raw responses, process metadata, private configurations, host paths and operational captures remain outside Git. Documentation curation uses existing finished evidence without rerunning inference or assessment; commitments bind retained local records rather than independent remote execution attestation."
+}
