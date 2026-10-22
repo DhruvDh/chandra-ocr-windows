@@ -1,0 +1,110 @@
+{
+ "schema": "chandra.directcompute.diagnostic-plan.v1",
+ "byte_limit": 67108864,
+ "vision": {
+  "rows": [
+   0,
+   641,
+   1975,
+   4050,
+   5906,
+   8082,
+   12095
+  ],
+  "blocks": "all",
+  "patch_embedding": true,
+  "position_added": true
+ },
+ "merger": {
+  "rows": [
+   0,
+   160,
+   493,
+   1012,
+   1476,
+   2020,
+   3023
+  ]
+ },
+ "embedding": {
+  "rows": [
+   0,
+   3,
+   4,
+   164,
+   497,
+   1016,
+   1480,
+   2024,
+   3027,
+   3028,
+   3616
+  ]
+ },
+ "prefill": {
+  "rows": [
+   0,
+   3,
+   4,
+   164,
+   497,
+   1016,
+   1480,
+   2024,
+   3027,
+   3028,
+   3616
+  ],
+  "layers": "all",
+  "final_norm": true,
+  "logits": true
+ },
+ "decode": {
+  "steps": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12
+  ],
+  "layers": "all",
+  "final_norm": true,
+  "logits": true
+ },
+ "gdn_state": [
+  {
+   "layer": 0,
+   "conv": true,
+   "recurrent_heads": [
+    0,
+    31
+   ],
+   "cache_lengths": [
+    64,
+    3584,
+    3617,
+    3618,
+    3622
+   ]
+  },
+  {
+   "layer": 30,
+   "conv": false,
+   "recurrent_heads": [
+    0
+   ],
+   "cache_lengths": [
+    3617,
+    3622
+   ]
+  }
+ ]
+}

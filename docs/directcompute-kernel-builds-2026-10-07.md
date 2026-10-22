@@ -1,0 +1,18 @@
+# Compiled DirectCompute experiments
+
+Two performance candidates passed real Windows compilation on October 7, 2026: a parallel reduction for single-row matrix products and a bounded fence wait that preserves the existing completion boundaries. Their CPU builds and ownership closure are qualified. GPU correctness, paired timing and whole-page throughput remain open. Neither candidate is enabled in serving.
+
+| Candidate | Compilation and CPU validation | Next measurement |
+| --- | --- | --- |
+| Parallel32 GEMV | Three strict C++ translation units, both Shader Model 5.0 shaders, and two inactive selector checks passed. All 14 retained outputs authenticate, totaling 11,699,427 bytes. | Capture the ordered and parallel variants separately, check their results against an independent exact arithmetic reference, then compare qualified timings. |
+| Fence completion | Three strict C++ translation units, the copy shader, 11 CPU ownership/deadline cases, and both inactive route plans passed. All 12 retained outputs authenticate, totaling 10,252,342 bytes. | Compare the existing query route and fence route on the same tiny copy workload, verifying copied bytes, completion counts and process closure. |
+
+Parallel32 distributes the reduction across 32 lanes and uses a fixed FP32 reduction tree. This changes arithmetic order and requires numerical qualification. Its route applies to whole linear calls with one row, including cached decoding and the vocabulary head. Multirow vision and text prefill keep their existing route. The qualification workload contains four finite phases, eight dispatches and 4,132 output words; the independent reference checks exact products and error bounds before measurement is admitted.
+
+The fence candidate uses D3D11 completion events with finite waits and retains the same drain boundaries, copy operations and arithmetic. Its planned matched workload has 51 drains and at most 512 bytes per transfer. Host waiting intervals and GPU dispatch timestamps must be reported separately. Runtime support and any reduction in waiting time require actual measurement; CPU compilation alone establishes neither.
+
+The parallel build took 28.312 seconds inside its Windows wrapper. Its measured peak process and Job commit were 225,337,344 and 280,457,216 bytes. The fence build took 24.016 seconds; its corresponding peaks were 238,645,248 and 283,164,672 bytes. Both used a 1.5 GiB process limit, a 2 GiB Job limit, one CPU core and BelowNormal priority. Commit accounting measures committed virtual memory; it is not a resident-RAM or VRAM measurement.
+
+The fence launcher's first result returned failure because its closure reader looked for `job.retired`, while the actual receipt stores `job.retirement.retired`. The original refusal remains unchanged. A separate assessment authenticated the retired Job, zero active processes, five closed handles, joined watchdog, exited exact supervisor and closed SSH channel. Independent review confirmed the reporting error and actual closure. No compiler or native request was replayed to obtain acceptance.
+
+The [evidence receipt](../benchmarks/evidence/directcompute-kernel-builds-2026-10-07.json) pins the source manifests, accepted build receipts and independent reviews. Source patches, exact commands, tool identities, logs and binary artifacts remain retained with the installation's work records. The existing [second-shard weight discrepancy](directcompute-interrupted-watch-arithmetic-2026-10-07.md) still holds whole-model progression. The performance target remains sustained correct pages per second at the concurrency plateau using Zotero's real context and normal output allowance.

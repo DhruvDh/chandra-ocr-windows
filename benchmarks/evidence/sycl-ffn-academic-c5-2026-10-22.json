@@ -1,0 +1,226 @@
+{
+  "schema": "sycl-ffn-academic-bundle-evidence-v1",
+  "date": "2026-10-22",
+  "scope": "Four finite OFF–ON–ON–OFF observations of exact runtime/launch-path bundles on six genuine academic client inputs; curated commitments identify operator-retained raw evidence.",
+  "qualified": false,
+  "performance_accepted": false,
+  "source_correctness_accepted": false,
+  "causal_ffn_or_kernel_gain_accepted": false,
+  "experimental_kernel_deployed": false,
+  "identity": {
+    "device": "Intel Arc A770",
+    "driver": "32.0.101.9150",
+    "normal_runtime_source_commit": "96516d1125075274683cb7a51faa7bb3e531ae3c",
+    "llama_cpp_commit": "d81235049384534c167caea52b85a694f6103d14",
+    "model_revision": "af93b47dba1b47b6640c86ccf487ed2260ab9a09",
+    "text_gguf_sha256": "74699f738159fc227e8153e5345cc36795aa81fe726ff4746fee8f7b7efe7f6d",
+    "projector_sha256": "707545f08ecb0f4dbc7f2456b3ee21cd34e470542e9b7c885141d512116e914f",
+    "standalone_template_sha256": "0d158f349ca965f7eea9db0eb45cd177b85bb0e4ae05dcdd0f060da8f7d41812",
+    "off_sycl_dll_sha256": "9bb696549a258ef4b02857f3abd309c15bb7588b385772c3df98952684b624fb",
+    "on_sycl_dll_sha256": "b8b78b78589838e18ce42dae7a14bc1894d8daf078829812ab0874b8483fbba1",
+    "runtime_members": 72,
+    "changed_runtime_members": [
+      "ggml-sycl.dll"
+    ]
+  },
+  "inputs": {
+    "cases": [
+      "attention-p03",
+      "attention-p06",
+      "ligo-p01",
+      "ligo-p02",
+      "dml-p02",
+      "dml-p20"
+    ],
+    "request_manifest_sha256": "3b9488095ad2eb1ed186f9acf5c2fa233d3c502feed75f387dcae9e4840e0206",
+    "request_bytes": 8791736,
+    "client_version": "0.2.0",
+    "render": "Genuine Chandra PDFium 192 DPI, Lanczos, max 6291456 pixels, 28-grid, PNG, ocr_layout",
+    "scope": "Six distinct pages repeated within each observation; historical Poppler AMD academic inputs are different."
+  },
+  "configuration": {
+    "concurrency": 5,
+    "batch_size": 256,
+    "microbatch_size": 256,
+    "context_tokens_per_slot": 16384,
+    "max_output_tokens": 12384,
+    "text_and_kv": "Q8_0",
+    "projector": "BF16/F32",
+    "opt": 1,
+    "esimd": 1,
+    "graph": 0,
+    "temperature": 0,
+    "top_p": 0.1,
+    "measurement_window_seconds": 720,
+    "drain_bound_seconds": 180,
+    "request_bound": 256,
+    "retries": 0,
+    "warmups_per_episode": 6
+  },
+  "episodes": [
+    {
+      "episode": "off01",
+      "generated_tokens": 65564,
+      "full_seconds": 803.9793592549977,
+      "generated_tokens_per_second": 81.54935726304524,
+      "source_accepted_completions_per_second": 0.0236324475016451,
+      "original_true_false_null": [
+        19,
+        13,
+        8
+      ],
+      "separate_manual_pass_fail_null": [
+        19,
+        17,
+        4
+      ],
+      "report_sha256": "28ed40a3386b5b843daeb5cf444870b5bbbab61d61fd2ef425cd39cba987dfe3",
+      "report_scope": "Separate genuine offline assessment; original module-policy failure and absent original successful report retained, no inference replay.",
+      "complete_measured_requests": 40,
+      "completions_inside_window": 35,
+      "source_accepted_completions": 19,
+      "listed_request_failures": 0
+    },
+    {
+      "episode": "on01",
+      "generated_tokens": 65594,
+      "full_seconds": 782.3391646250384,
+      "generated_tokens_per_second": 83.84343129675486,
+      "source_accepted_completions_per_second": 0.02428614194344517,
+      "original_true_false_null": [
+        19,
+        10,
+        11
+      ],
+      "separate_manual_pass_fail_null": [
+        19,
+        17,
+        4
+      ],
+      "report_sha256": "6b3bb56f6cfece7b71c987b5e0c372850c174a0178a3b50e77eb4d97db61e7c9",
+      "complete_measured_requests": 40,
+      "completions_inside_window": 35,
+      "source_accepted_completions": 19,
+      "listed_request_failures": 0
+    },
+    {
+      "episode": "on02",
+      "generated_tokens": 65592,
+      "full_seconds": 791.3275358450483,
+      "generated_tokens_per_second": 82.88856008271615,
+      "source_accepted_completions_per_second": 0.02401028542461896,
+      "original_true_false_null": [
+        19,
+        10,
+        11
+      ],
+      "separate_manual_pass_fail_null": [
+        19,
+        18,
+        3
+      ],
+      "report_sha256": "4081fe4a9debca2610ec86d2faa5ee633ecdc4ac60f3f1717ff9e55ab7f31c6c",
+      "complete_measured_requests": 40,
+      "completions_inside_window": 35,
+      "source_accepted_completions": 19,
+      "listed_request_failures": 0
+    },
+    {
+      "episode": "off02",
+      "generated_tokens": 65732,
+      "full_seconds": 811.5642058519879,
+      "generated_tokens_per_second": 80.9942078840132,
+      "source_accepted_completions_per_second": 0.023411579592835317,
+      "original_true_false_null": [
+        19,
+        12,
+        9
+      ],
+      "separate_manual_pass_fail_null": [
+        19,
+        16,
+        5
+      ],
+      "report_sha256": "00793717e1ef90147f7baef62cf75d958e5ca0183478c6b33d3affacdbcd7097",
+      "complete_measured_requests": 40,
+      "completions_inside_window": 35,
+      "source_accepted_completions": 19,
+      "listed_request_failures": 0
+    }
+  ],
+  "comparison": {
+    "estimand": "academic-runtime-and-launch-path-bundle-v1",
+    "opposite_order_on_over_off_generated_tps": [
+      1.0281311111540692,
+      1.0233887366540546
+    ],
+    "ratio_of_arithmetic_mean_on_off_generated_tps": 1.0257680224290835,
+    "mean_of_pair_ratios": 1.025759923904062,
+    "descriptive_mean_rate_difference_percent": 2.576802242908349,
+    "uncertainty_interval_established": false,
+    "timing_module_parity_accepted": false,
+    "compatibility_hooks_equivalent_proven": false,
+    "actual_model_fused_dispatch_observed": false,
+    "concurrency_ceiling_established": false,
+    "measured_hardware_roofline_established": false
+  },
+  "source_findings": {
+    "accepted_case_types": [
+      "attention-p06",
+      "dml-p02",
+      "dml-p20"
+    ],
+    "credit_scope": "19 repeated textual-pass completions per run from three case types; all incorrect/unknown work remains in the full time/token denominator. Original catalogs, nulls and credits are unchanged.",
+    "attention_p03_residual_and_crosslink_failures_per_episode": [
+      7,
+      7,
+      7,
+      7
+    ],
+    "ligo_p01_unsupported_emblem_identification_per_episode": [
+      7,
+      7,
+      7,
+      7
+    ],
+    "ligo_p02_residual_definition_failures_per_episode": [
+      3,
+      3,
+      4,
+      2
+    ],
+    "new_definite_scientific_error_type_found": false,
+    "unresolved": [
+      "Final hidden state wording ambiguity",
+      "0.42-second peak assertion",
+      "Incomplete figure coverage",
+      "Geometry",
+      "General numerical and OCR equivalence"
+    ]
+  },
+  "module_policy": {
+    "name": "academic-as-authenticated-optional-additive-tbb-v1",
+    "all_startup_module_identities_preserved_to_drain": true,
+    "sole_added_module": "mkl_tbb_thread.3.dll",
+    "added_module_sha256": "efa3a897817d8900f910417e2836797977368a6ced88766c0a039d50fb8da462",
+    "apphelp_present_at_either_snapshot": false,
+    "dependency_load_time_known": false,
+    "scope": "Prospective bundle comparison policy; original first-OFF strict-policy rejection remains preserved. Matching presence does not prove equivalent compatibility hooks or isolate kernel time."
+  },
+  "commitments": {
+    "comparison_sha256": "94edb319829877e80039cd56c876014b8379ce254a7f31e4f83ae280fafdf92b",
+    "independent_comparison_criticism_sha256": "4e590515f0c30520655b3d3f42900f83597207965bac3e79415ad680ff79bed9",
+    "accepted_comparison_observation_seal_sha256": "1dcf110b494fcb0247f93186fd96b162abff85c6d5336e6c4801eabc080796fd",
+    "human_result_sha256": "4747630b307f93d3b40807982b2862d070e3e4a3d986f930371bfc46da8273f1",
+    "matched_amd_intel_reference_audit_sha256": "571291e9cd29a8434d0c12dd411660b3dd530a6377da85270f2e6f70afd52253"
+  },
+  "disposition": {
+    "all_experimental_producers_and_jobs_closed": true,
+    "inner_engine_retirement": "Owned forced Job retirement after complete inference drain; not natural engine-process exit.",
+    "normal_serving_restored": true,
+    "worker_at_restoration": "Asleep/unloaded, pending zero, no error",
+    "amd_at_restoration": "Cold, no worker",
+    "next_work": "Qualify actual fused-model dispatch and acquire six AMD baseline completions on the identical genuine client requests before broader academic E2E claims. Then calibrate safe neighboring concurrency; no C15 or roofline claim."
+  },
+  "limits": "The small positive timing difference is exploratory. Four serial observations and repeated pages do not establish a confidence interval, equal error probabilities, broad OCR correctness, isolated kernel effect or optimal concurrency. Historical synthetic 0.1081860491 pages/s uses different inputs and source criteria and is not a matched academic baseline. Only this curated record and commitments are public; raw logs, local paths, credentials and process identities remain outside Git."
+}

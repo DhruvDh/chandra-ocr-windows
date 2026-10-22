@@ -1,0 +1,496 @@
+{
+  "schema": "chandra.directcompute.native-http-observations.v1",
+  "recorded_date_UTC": "2026-10-10",
+  "publication": "Redacted aggregate metadata and owner-retained evidence commitments; no private paths, host identities, credentials or raw artifacts",
+  "scope": "Page-specific finite experimental HTTP observations; original workflow flags remain unchanged and are separate from the finished reviews",
+  "model": {
+    "name": "datalab-to/chandra-ocr-2",
+    "revision": "af93b47dba1b47b6640c86ccf487ed2260ab9a09",
+    "original_BF16_preserved": true
+  },
+  "workload": {
+    "decoded_RGB_dimensions": [
+      1624,
+      2100
+    ],
+    "prompt_tokens_per_page": 3617,
+    "context_limit": 16384,
+    "normal_output_allowance": 12384,
+    "diagnostic_token_cap": null,
+    "natural_EOS": 248046
+  },
+  "singleton_current2252": {
+    "review_status": "CLEAR_PAGE_SPECIFIC_LOCAL_ASSESSMENT",
+    "finished_review": {
+      "bytes": 20997,
+      "sha256": "9cf245702e9e37b1899d535c88f16da87362435b3e7a3fc583ce6033ea2655a4"
+    },
+    "case": "native-0",
+    "ID_counts": {
+      "prompt": 3617,
+      "generated_including_EOS": 556,
+      "history": 4173
+    },
+    "prompt_generated_history_IDs_exact_to_current144": true,
+    "retained_nine_field_numerical_journal_byte_exact": true,
+    "complete_substantive_content_passed": true,
+    "cache_policy": "original_eager_full_context_FP32",
+    "attention_capacity_tokens_per_layer": [
+      16384,
+      16384,
+      16384,
+      16384,
+      16384,
+      16384,
+      16384,
+      16384
+    ],
+    "actual_B2_dispatches": 0,
+    "cold_timings_seconds": {
+      "native_seconds": 391.4132109,
+      "HTTP_seconds": 426.84608540299814,
+      "root_seconds": 445.64287176200014
+    },
+    "original_statuses": {
+      "outcome": "completed",
+      "child_returncode": 0,
+      "supervisor_returncode": 0,
+      "supervisor_success": true,
+      "failed_observations": [],
+      "channel_return": 0,
+      "control_process_return": 0
+    },
+    "physical_retirement_verified": true,
+    "evidence": {
+      "candidate_current_build_identity": {
+        "bytes": 9160,
+        "sha256": "66ba2430332b705bf5361e5daed6549b7c492071325a55d1956bc6dc677473ee"
+      },
+      "source_manifest_identity": {
+        "bytes": 27121,
+        "sha256": "51a23adf11c6aa7d1cacd27ebdd55434556e9ca2261702fa47121d826d9e2438"
+      },
+      "actual_worker_identity": {
+        "bytes": 1498624,
+        "sha256": "47e86a990209845fda786faf94feea326e4953919f84a1ef88da3ccdc4582d38"
+      },
+      "stage_manifest_identity": {
+        "bytes": 17056,
+        "sha256": "a05ce8bcd7fe9eea397b96a97783e5a7f93b27b68a731f0a3d9a409fc8aaee67"
+      },
+      "actual_native_result_identity": {
+        "bytes": 333230,
+        "sha256": "41669a516c4a3f40d0a929fe638e12e10551a4f70bee32a46b87e14b7c440851"
+      },
+      "actual_native_journal_identity": {
+        "bytes": 150308,
+        "sha256": "a692bb75e65bdc747c02ec411495e7222ecaa7a63a7b1c2dc38ad637c1c373be"
+      },
+      "raw_HTTP_response_identity": {
+        "bytes": 1675,
+        "sha256": "5659d9d45ea2e0b730ac2b545a8c6a14ff4b0595140018571c3114b7b9b97c2f"
+      },
+      "root_physical_retirement_identity": {
+        "bytes": 3127,
+        "sha256": "a7ed882b28fb8376b92fa6feeb5506153484c91afb12455bfa2cc6b7d5497d59"
+      }
+    },
+    "limits": {
+      "whole_graph_accepted": false,
+      "demand_grown_pair_cache_exercised": false,
+      "sustained_PPS_accepted": false,
+      "deployment_accepted": false
+    }
+  },
+  "complete_pairs_current2252": [
+    {
+      "review_status": "CLEAR_RETAINED_COMPLETE_PAIR_ONLY",
+      "finished_review": {
+        "bytes": 21502,
+        "sha256": "ba93b1afdfcf9e21e6eaef4fc449d583042aeae8dab82dfa286e753d456a1eea"
+      },
+      "episode": "2508",
+      "cases": {
+        "native-0": {
+          "prompt_IDs_exact": true,
+          "generated_IDs_exact": true,
+          "numerical_journal_byte_exact": true,
+          "journal_rows": 556,
+          "per_field_differences": {
+            "argmax_tie_policy": 0,
+            "best_logit": 0,
+            "generated_index": 0,
+            "logit_storage": 0,
+            "maximum_tie_count": 0,
+            "runner_up_logit": 0,
+            "stop": 0,
+            "token_id": 0,
+            "top_margin": 0
+          },
+          "complete_text_exact": true
+        },
+        "native-1": {
+          "prompt_IDs_exact": true,
+          "generated_IDs_exact": true,
+          "numerical_journal_byte_exact": true,
+          "journal_rows": 560,
+          "per_field_differences": {
+            "argmax_tie_policy": 0,
+            "best_logit": 0,
+            "generated_index": 0,
+            "logit_storage": 0,
+            "maximum_tie_count": 0,
+            "runner_up_logit": 0,
+            "stop": 0,
+            "token_id": 0,
+            "top_margin": 0
+          },
+          "complete_text_exact": true
+        }
+      },
+      "natural_EOS": 248046,
+      "generated_tokens_including_EOS": {
+        "native-0": 556,
+        "native-1": 560
+      },
+      "logical_two_active_cached_advances": 555,
+      "logical_survivor_cached_advances": 4,
+      "survivor_case": "native-1",
+      "survivor_slot": 1,
+      "cache_backing": {
+        "native-1": {
+          "policy": "demand_grown_per_slot_FP32",
+          "final_attention_layer_capacity_tokens": [
+            4352,
+            4352,
+            4352,
+            4352,
+            4352,
+            4352,
+            4352,
+            4352
+          ],
+          "scope": "Final backing only; no per-layer transition history inferred."
+        },
+        "native-0": {
+          "policy": "demand_grown_per_slot_FP32",
+          "final_attention_layer_capacity_tokens": [
+            4352,
+            4352,
+            4352,
+            4352,
+            4352,
+            4352,
+            4352,
+            4352
+          ],
+          "scope": "Final backing only; no per-layer transition history inferred."
+        }
+      },
+      "growth_transition_history_available": false,
+      "cold_root_elapsed_seconds": 628.1465962560032,
+      "timing_scope": "One cold pair; phase intervals overlap/include preparation and cohort waiting, with no sustained-PPS or occupancy inference",
+      "evidence": {
+        "source_stage_seal": {
+          "bytes": 7356,
+          "sha256": "3fa5df4e9d00b938a0983bda8849a3d357390666e08013e3e7a0e30fed1d0389"
+        },
+        "physical_retirement": {
+          "bytes": 5264,
+          "sha256": "bf6e0c927859a26d84b1391882f5fd1839506311b285704f49d888a158a0cda8"
+        },
+        "native_results": {
+          "native-1": {
+            "bytes": 333256,
+            "sha256": "f65ebfe2325839d7d110128bd0f2ebada3e8572dfcdf7deb789028c55f74ce48"
+          },
+          "native-0": {
+            "bytes": 333224,
+            "sha256": "7092129b4341dc6bfe437b75fe572121c1433f59477a337eaadb760d63bf18ff"
+          }
+        },
+        "numerical_journals": {
+          "native-1": {
+            "bytes": 151469,
+            "sha256": "f202f54ac78e7132cf8920f591d1765bb887c7b84df7684893a3320e1e77de51"
+          },
+          "native-0": {
+            "bytes": 150308,
+            "sha256": "a692bb75e65bdc747c02ec411495e7222ecaa7a63a7b1c2dc38ad637c1c373be"
+          }
+        }
+      },
+      "original_root_flags_preserved": true,
+      "generalized_later_stage_survivor_admission_granted": false,
+      "whole_graph_accepted": false,
+      "sustained_PPS_accepted": false,
+      "deployment_accepted": false
+    },
+    {
+      "review_status": "CLEAR_RETAINED_COMPLETE_PAIR_ONLY",
+      "finished_review": {
+        "bytes": 20027,
+        "sha256": "5fe5cf0b780b10a115a570017ceb2832963ff8cae85b80817add15206941a6d7"
+      },
+      "episode": "2555",
+      "cases": {
+        "native-0": {
+          "prompt_IDs_exact": true,
+          "generated_IDs_exact": true,
+          "numerical_journal_byte_exact": true,
+          "journal_rows": 556,
+          "per_field_differences": {
+            "argmax_tie_policy": 0,
+            "best_logit": 0,
+            "generated_index": 0,
+            "logit_storage": 0,
+            "maximum_tie_count": 0,
+            "runner_up_logit": 0,
+            "stop": 0,
+            "token_id": 0,
+            "top_margin": 0
+          },
+          "complete_text_exact": true
+        },
+        "native-1": {
+          "prompt_IDs_exact": true,
+          "generated_IDs_exact": true,
+          "numerical_journal_byte_exact": true,
+          "journal_rows": 560,
+          "per_field_differences": {
+            "argmax_tie_policy": 0,
+            "best_logit": 0,
+            "generated_index": 0,
+            "logit_storage": 0,
+            "maximum_tie_count": 0,
+            "runner_up_logit": 0,
+            "stop": 0,
+            "token_id": 0,
+            "top_margin": 0
+          },
+          "complete_text_exact": true
+        }
+      },
+      "natural_EOS": 248046,
+      "generated_tokens_including_EOS": {
+        "native-0": 556,
+        "native-1": 560
+      },
+      "logical_two_active_cached_advances": 555,
+      "logical_survivor_cached_advances": 4,
+      "survivor_case": "native-1",
+      "survivor_slot": 0,
+      "cache_backing": {
+        "native-0": {
+          "policy": "demand_grown_per_slot_FP32",
+          "final_attention_layer_capacity_tokens": [
+            4352,
+            4352,
+            4352,
+            4352,
+            4352,
+            4352,
+            4352,
+            4352
+          ],
+          "scope": "Final backing only; no per-layer transition history inferred."
+        },
+        "native-1": {
+          "policy": "demand_grown_per_slot_FP32",
+          "final_attention_layer_capacity_tokens": [
+            4352,
+            4352,
+            4352,
+            4352,
+            4352,
+            4352,
+            4352,
+            4352
+          ],
+          "scope": "Final backing only; no per-layer transition history inferred."
+        }
+      },
+      "growth_transition_history_available": false,
+      "cold_root_elapsed_seconds": 627.0778887699998,
+      "timing_scope": "One cold pair; phase intervals overlap/include preparation and cohort waiting, with no sustained-PPS or occupancy inference",
+      "evidence": {
+        "source_stage_seal": {
+          "bytes": 8219,
+          "sha256": "4616c7d6907ee452d589f566169071712d017625014ab0fb5d6a5cc71dc531af"
+        },
+        "physical_retirement": {
+          "bytes": 5041,
+          "sha256": "9370a699ed99bbdc47ff7a1aaada8ca62837f21c72031f00c01378faccb2b6b2"
+        },
+        "native_results": {
+          "native-0": {
+            "bytes": 333237,
+            "sha256": "43c3c1c5969d4bd16bc4bab55e8be8ab65ad6591453b92b822f83c7bbaaf8cf3"
+          },
+          "native-1": {
+            "bytes": 333244,
+            "sha256": "d29dac2656ded9dfd10eb72505820dfe8d101fe140a164ccb169c633aaf14c5f"
+          }
+        },
+        "numerical_journals": {
+          "native-0": {
+            "bytes": 150308,
+            "sha256": "a692bb75e65bdc747c02ec411495e7222ecaa7a63a7b1c2dc38ad637c1c373be"
+          },
+          "native-1": {
+            "bytes": 151469,
+            "sha256": "f202f54ac78e7132cf8920f591d1765bb887c7b84df7684893a3320e1e77de51"
+          }
+        }
+      },
+      "original_root_flags_preserved": true,
+      "generalized_later_stage_survivor_admission_granted": false,
+      "whole_graph_accepted": false,
+      "sustained_PPS_accepted": false,
+      "deployment_accepted": false
+    }
+  ],
+  "unified_current2415_singleton": {
+    "review_status": "COMPLETE_RUNTIME_AND_SUBSTANTIVE_SINGLETON_WITH_REFERENCE_DIVERGENCE",
+    "finished_review": {
+      "bytes": 34887,
+      "sha256": "8b85661847af13c36646a14a0da005b5e7abd83781dd5d6be945c5b22efe7f34"
+    },
+    "case": "native-0",
+    "generated_tokens_including_EOS": 556,
+    "complete_prompt_IDs_exact": true,
+    "complete_generated_IDs_exact": false,
+    "nine_field_journal_exact": false,
+    "full_markup_exact": false,
+    "complete_substantive_content_and_non_geometry_markup_exact": true,
+    "exact_current144_page_accepted": false,
+    "first_generated_ID_difference": {
+      "generated_index": 16,
+      "reference_token": 20,
+      "actual_token": 19,
+      "first_heading_bbox_bottom_reference": 65,
+      "first_heading_bbox_bottom_actual": 64
+    },
+    "first_same_history_logit_divergence": {
+      "index": 1,
+      "actual": {
+        "argmax_tie_policy": "first vocabulary index",
+        "best_logit": 29.125,
+        "generated_index": 1,
+        "logit_storage": "full 248320-value FP32 readback; graph cast boundaries remain explicit",
+        "maximum_tie_count": 1,
+        "runner_up_logit": 19.625,
+        "stop": false,
+        "token_id": 795,
+        "top_margin": 9.5
+      },
+      "reference": {
+        "argmax_tie_policy": "first vocabulary index",
+        "best_logit": 29.25,
+        "generated_index": 1,
+        "logit_storage": "full 248320-value FP32 readback; graph cast boundaries remain explicit",
+        "maximum_tie_count": 1,
+        "runner_up_logit": 19.625,
+        "stop": false,
+        "token_id": 795,
+        "top_margin": 9.625
+      }
+    },
+    "same_history_interpretation": "Logit differences precede the changed token; later rows include changed history and supply no same-history whole-vocabulary error bound",
+    "actual_B2_dispatches": 0,
+    "cache_policy": "original_eager_full_context_FP32",
+    "attention_capacity_tokens_per_layer": [
+      16384,
+      16384,
+      16384,
+      16384,
+      16384,
+      16384,
+      16384,
+      16384
+    ],
+    "demand_growth_exercised": false,
+    "cold_timing_comparison_seconds": {
+      "matched2389_native_seconds": 391.4132109,
+      "actual_native_seconds": 297.4076725,
+      "matched2389_root_seconds": 445.64287176200014,
+      "actual_root_seconds": 351.71969498299586
+    },
+    "timing_scope": "Two descriptive cold singleton observations with one changed bbox token; no accepted repeated-speed or sustained-throughput gain",
+    "original_statuses": {
+      "outcome": "completed",
+      "child_returncode": 0,
+      "supervisor_returncode": 0,
+      "supervisor_success": true,
+      "failed_observations": [],
+      "channel_return": 0,
+      "control_process_return": 0
+    },
+    "physical_retirement_verified": true,
+    "evidence": {
+      "actual_native_result": {
+        "bytes": 333621,
+        "sha256": "ee263fd3584f4dfe6aee6f25f0f7f25d14709a25918e0e47aeeec3f432226aca"
+      },
+      "actual_native_journal": {
+        "bytes": 150386,
+        "sha256": "98432211cb56f3600dc857f62d708cf198e6b875d8dac21184c7dcd18b3e704f"
+      },
+      "own_current144_reference_result": {
+        "bytes": 224817,
+        "sha256": "fe120a6854f194fffcb0125c68842a044b8ce4f768423bf744753e7a5944a934"
+      },
+      "own_current144_reference_journal": {
+        "bytes": 150308,
+        "sha256": "a692bb75e65bdc747c02ec411495e7222ecaa7a63a7b1c2dc38ad637c1c373be"
+      },
+      "physical_retirement": {
+        "bytes": 2827,
+        "sha256": "8a3452754a83cdd6128bfc105f160f02f069ebb0aab68c25a470e4c0b95fb6a0"
+      },
+      "stage_manifest": {
+        "bytes": 17222,
+        "sha256": "caffbc7abe41e5371c48f05f8628ee22d984c864ef287d11420d76c259d7d86b"
+      },
+      "candidate_current_build": {
+        "bytes": 10537,
+        "sha256": "3cd62cc27461e8522c0e812312271092d97c5aae47ffd0091d4b6cb966bef969"
+      }
+    },
+    "limits": {
+      "whole_graph_numerical_accepted": false,
+      "B2_runtime_accepted_by_this_singleton": false,
+      "geometry_tolerance_accepted": false,
+      "sustained_PPS_accepted": false,
+      "deployment_accepted": false
+    }
+  },
+  "retained_failures": {
+    "earlier_public_scope_record": "directcompute-current144-2026-10-10.json",
+    "pre_HTTP_quota_failure": {
+      "status": "STATUS_QUOTA_EXCEEDED",
+      "peak_process_and_Job_commit_bytes": 328056832,
+      "specific_quota_cause_at_original_cutoff": "Unresolved",
+      "original_failure_replaced_by_later_success": false
+    },
+    "earlier_pair2420_failure_preserved": true,
+    "scanned0_original_Guardian_exit": 2
+  },
+  "overall_limits": {
+    "independent_full_vocabulary_or_whole_graph_accuracy": false,
+    "numerical_tolerance": null,
+    "geometry_tolerance": null,
+    "arbitrary_document_OCR_accepted": false,
+    "general_client_lifecycle_conformance_accepted": false,
+    "repeated_speed_accepted": false,
+    "sustained_PPS_accepted": false,
+    "permanent_deployment_accepted": false,
+    "source_publication_attests_installed_executable": false,
+    "finite_profile_or_source_only_wait_removal_is_measured_page_speed": false
+  },
+  "documentation_activity": {
+    "new_inference_or_replay_or_hardware_actions": false,
+    "source_math_or_Git_changes": false
+  },
+  "both_survivor_slots_observed_across_distinct_successful_episodes": true
+}

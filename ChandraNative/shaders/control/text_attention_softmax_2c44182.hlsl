@@ -1,0 +1,5 @@
+RWByteAddressBuffer scores:register(u0);
+cbuffer Params:register(b0){uint rows,width,offset,stride,base,count,mode,pad;}
+float bf(float x){uint u=asuint(x);if((u&0x7f800000)==0x7f800000&&(u&0x007fffff)!=0)return asfloat(u|0x00400000);return asfloat((u+0x7fff+((u>>16)&1))&0xffff0000);}
+float wt(ByteAddressBuffer w,uint i){return asfloat(((w.Load((i>>1)*4)>>((i&1)*16))&65535)<<16);}
+groupshared float tmp[128];[numthreads(128,1,1)]void main(uint3 group:SV_GroupID,uint lane:SV_GroupIndex){uint row=group.x;float m=-3.402823466e38;for(uint k=lane;k<count;k+=128)m=max(m,asfloat(scores.Load((row*count+k)*4)));tmp[lane]=m;GroupMemoryBarrierWithGroupSync();for(uint s=64;s;s>>=1){if(lane<s)tmp[lane]=max(tmp[lane],tmp[lane+s]);GroupMemoryBarrierWithGroupSync();}m=tmp[0];float total=0;for(uint k=lane;k<count;k+=128)total+=exp(asfloat(scores.Load((row*count+k)*4))-m);tmp[lane]=total;GroupMemoryBarrierWithGroupSync();for(uint s=64;s;s>>=1){if(lane<s)tmp[lane]+=tmp[lane+s];GroupMemoryBarrierWithGroupSync();}total=tmp[0];for(uint k=lane;k<count;k+=128)scores.Store((row*count+k)*4,asuint(bf(exp(asfloat(scores.Load((row*count+k)*4))-m)/total)));}

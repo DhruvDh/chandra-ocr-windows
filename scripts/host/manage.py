@@ -7,7 +7,7 @@ import ipaddress
 import hashlib
 import json
 import os
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 import re
 import signal
 import secrets
@@ -52,11 +52,143 @@ def ps_quote(value):
     return "'" + value.replace("'", "''") + "'"
 
 
-def remote_command(args, lease_token):
-    argv = [args.remote_python, "-m", "chandra_service", "waystone", "--model-path", args.model_path,
+def worker_argv(args):
+    """Select one explicit route; configured launchers authenticate before listening."""
+    backend = getattr(args, "worker_backend", "waystone")
+    diagnostic = getattr(args, "llama_startup_diagnostic", False)
+    if diagnostic and backend != "llama":
+        raise ValueError("--llama-startup-diagnostic requires --worker-backend llama")
+    native_config = getattr(args, "native_config", None)
+    native_hash = getattr(args, "native_config_sha256", None)
+    llama_config = getattr(args, "llama_config", None)
+    llama_hash = getattr(args, "llama_config_sha256", None)
+    llama_copy = getattr(args, "llama_config_copy", None)
+    if backend != "llama" and any(value is not None for value in (llama_config, llama_hash, llama_copy)):
+        raise ValueError("--llama-config, --llama-config-sha256 and --llama-config-copy require --worker-backend llama")
+    if backend == "llama":
+        if native_config is not None or native_hash is not None or args.model_path is not None or args.normalization != "original":
+            raise ValueError("llama takes its model, limits and normalization only from --llama-config")
+        if not isinstance(llama_config, str) or not llama_config or len(llama_config) > 1024 or any(c in llama_config for c in '\r\n\0"'):
+            raise ValueError("llama requires an absolute normalized Windows --llama-config path")
+        path = PureWindowsPath(llama_config)
+        if not path.is_absolute() or str(path) != llama_config or ".." in path.parts or not path.name:
+            raise ValueError("llama requires an absolute normalized Windows --llama-config path")
+        slots = llama_slots(args)
+        return [args.remote_python, "-m", "chandra_service", "llama",
+                "--llama-config", llama_config, "--llama-config-sha256", llama_hash,
+                *(["--llama-startup-diagnostic"] if diagnostic else []),
+                "--host", "127.0.0.1", "--port", str(args.worker_port),
+                "--queue-limit", str(slots - 1), "--idle-seconds", "300"]
+    if backend == "native":
+        if args.model_path is not None or args.normalization != "original":
+            raise ValueError("native takes its model, limits and normalization only from --native-config")
+        if not isinstance(native_config, str) or not native_config or len(native_config) > 1024 or any(c in native_config for c in "\r\n\0"):
+            raise ValueError("native requires an absolute normalized Windows --native-config path")
+        path = PureWindowsPath(native_config)
+        if not path.is_absolute() or str(path) != native_config or ".." in path.parts or not path.name:
+            raise ValueError("native requires an absolute normalized Windows --native-config path")
+        if not isinstance(native_hash, str) or not re.fullmatch(r"[0-9a-f]{64}", native_hash):
+            raise ValueError("native requires --native-config-sha256 for the exact remote configuration bytes")
+        return [args.remote_python, "-m", "chandra_service", "native",
+                "--native-config", native_config, "--native-config-sha256", native_hash,
+                "--host", "127.0.0.1", "--port", str(args.worker_port),
+                "--max-input-tokens", "16384", "--max-output-tokens", "12384"]
+    if backend != "waystone":
+        raise ValueError("worker backend must be waystone, native or llama")
+    if native_config is not None or native_hash is not None:
+        raise ValueError("--native-config and --native-config-sha256 require --worker-backend native")
+    if not args.model_path:
+        raise ValueError("waystone requires --model-path")
+    return [args.remote_python, "-m", "chandra_service", "waystone", "--model-path", args.model_path,
             "--host", "127.0.0.1", "--port", str(args.worker_port), "--max-input-tokens", "16384",
             "--max-output-tokens", "12384", "--attention", "hybrid", "--normalization", args.normalization]
-    settings = base64.b64encode(json.dumps({"argv": argv, "cwd": args.remote_root, "lease_port": args.lease_port, "lease_token": lease_token}).encode()).decode()
+
+
+def llama_profile(args):
+    """Derive admission and optional outer affinity from the authenticated remote config copy."""
+    digest = getattr(args, "llama_config_sha256", None)
+    copy = getattr(args, "llama_config_copy", None)
+    if not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest) or copy is None:
+        raise ValueError("llama requires --llama-config-sha256 and --llama-config-copy")
+    try:
+        with Path(copy).open("rb") as stream:
+            data = stream.read(65537)
+    except OSError as error:
+        raise ValueError("Cannot read the local --llama-config-copy") from error
+    if len(data) > 65536 or hashlib.sha256(data).hexdigest() != digest:
+        raise ValueError("Local llama configuration size or SHA-256 differs")
+    def pairs(items):
+        result = {}
+        for key, value in items:
+            if key in result:
+                raise ValueError("Duplicate llama configuration field")
+            result[key] = value
+        return result
+    raw = json.loads(data.decode("utf-8"), object_pairs_hook=pairs)
+    if not isinstance(raw, dict) or raw.get("activate") not in ("evaluate-llama-b11429-vulkan", "evaluate-llama-b11429-sycl"):
+        raise ValueError("Explicit llama candidate configuration is required")
+    slots = raw.get("parallel_requests")
+    if type(slots) is not int or slots not in (1, 2, 4, 5, 6):
+        raise ValueError("llama parallel_requests must be 1, 2, 4 or conditional 5/6")
+    kv_type = raw.get('sycl_kv_cache_type', 'bf16')
+    if (not isinstance(kv_type, str) or kv_type not in ('bf16', 'q8_0')
+            or ('sycl_kv_cache_type' in raw and raw['activate'] != 'evaluate-llama-b11429-sycl')):
+        raise ValueError("sycl_kv_cache_type requires explicit SYCL and bf16 or q8_0")
+    decode_graph = raw.get('sycl_decode_graph', False)
+    if (type(decode_graph) is not bool
+            or ('sycl_decode_graph' in raw and raw['activate'] != 'evaluate-llama-b11429-sycl')):
+        raise ValueError("sycl_decode_graph requires explicit SYCL and a boolean")
+    batch_size = raw.get('sycl_batch_size', 128)
+    if (type(batch_size) is not int or batch_size not in (128, 256)
+            or ('sycl_batch_size' in raw and raw['activate'] != 'evaluate-llama-b11429-sycl')
+            or (batch_size == 256 and slots != 5)):
+        raise ValueError("sycl_batch_size requires SYCL and batch 256 is limited to the explicit Q8 five-slot profile")
+    if slots in (5, 6):
+        physical, commit = raw.get('admission_physical_bytes'), raw.get('admission_commit_bytes')
+        if (raw['activate'] != 'evaluate-llama-b11429-sycl' or kv_type != 'q8_0'
+                or type(physical) is not int or not 21 * (1 << 28) <= physical <= 32 * (1 << 30)
+                or type(commit) is not int or not 49 * (1 << 28) <= commit <= 32 * (1 << 30)):
+            raise ValueError("Five or six slots require explicit SYCL Q8 KV and admission forecasts >= 5.25 GiB physical and 12.25 GiB commit")
+    if slots == 5:
+        if (batch_size != 256 or type(raw.get('sycl_host_cpu_count')) is not int or raw['sycl_host_cpu_count'] != 4
+                or type(raw.get('worker_cpu')) is not int or raw['worker_cpu'] != 0
+                or not isinstance(raw.get('sycl_vision_leaf_sha256'), str)
+                or not re.fullmatch(r'[0-9a-f]{64}', raw['sycl_vision_leaf_sha256'])
+                or not isinstance(raw.get('sycl_cache_dir'), str) or not raw['sycl_cache_dir']):
+            raise ValueError("Five slots require explicit batch 256, four CPUs, fused vision and persistent cache")
+    if 'sycl_host_cpu_count' in raw:
+        if (raw['activate'] != 'evaluate-llama-b11429-sycl'
+                or type(raw['sycl_host_cpu_count']) is not int or raw['sycl_host_cpu_count'] != 4
+                or type(raw.get('worker_cpu')) is not int or raw['worker_cpu'] != 0):
+            raise ValueError("SYCL host CPU profile requires count 4 and worker_cpu 0")
+    if decode_graph:
+        graph_leaf = '4e4445190ab5b7686a0990c11aa8faf8f0c27bbf2b9f445430193b0aaa446234'
+        graph_model = '74699f738159fc227e8153e5345cc36795aa81fe726ff4746fee8f7b7efe7f6d'
+        allowed = {'activate', 'runtime_dir', 'runtime_files', 'model', 'projector', 'template', 'sycl_device_index',
+                   'worker_cpu', 'startup_seconds', 'request_seconds', 'max_image_pixels', 'parallel_requests',
+                   'admission_physical_bytes', 'admission_commit_bytes', 'sycl_cache_dir', 'sycl_vision_leaf_sha256',
+                   'sycl_host_cpu_count', 'sycl_kv_cache_type', 'sycl_batch_size', 'sycl_decode_graph'}
+        if (slots != 5 or batch_size != 256 or kv_type != 'q8_0' or not set(raw) <= allowed
+                or raw.get('sycl_vision_leaf_sha256') != graph_leaf
+                or not isinstance(raw.get('model'), dict) or raw['model'].get('sha256') != graph_model
+                or not isinstance(raw.get('runtime_files'), list)
+                or not any(isinstance(item, dict) and isinstance(item.get('path'), str)
+                           and PureWindowsPath(item['path']).name.casefold() == 'ggml-sycl.dll'
+                           and item.get('sha256') == graph_leaf for item in raw['runtime_files'])):
+            raise ValueError("Decode graph requires the pinned graph leaf and Q8 text in the explicit SYCL Q8 five-slot batch-256 profile")
+    return raw
+
+
+def llama_slots(args):
+    return llama_profile(args)['parallel_requests']
+
+
+def remote_command(args, lease_token):
+    argv = worker_argv(args)
+    values = {"argv": argv, "cwd": args.remote_root, "lease_port": args.lease_port, "lease_token": lease_token}
+    if getattr(args, "worker_backend", "waystone") == "llama" and 'sycl_host_cpu_count' in llama_profile(args):
+        values['job_affinity'] = 15
+    settings = base64.b64encode(json.dumps(values).encode()).decode()
     source = base64.b64encode(zlib.compress(REMOTE_SUPERVISOR.encode())).decode()
     # Invoke native Python directly: PowerShell encoded commands exceed the
     # Windows SSH shell command-length limit once the supervisor is embedded.
@@ -74,14 +206,29 @@ def remote_command(args, lease_token):
             args.ssh_host, remote]
 
 
-def read_exact(connection, count):
+def read_exact(connection, count, *, deadline=None, stop=None, process=None):
     data = bytearray()
-    while len(data) < count:
-        chunk = connection.recv(count - len(data))
+    while True:
+        if (stop is not None and stop.is_set()) or (process is not None and process.poll() is not None):
+            raise InterruptedError("Lease startup stopped before ownership acknowledgement")
+        if deadline is not None:
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise TimeoutError("Lease ownership acknowledgement deadline exceeded")
+        if len(data) >= count:
+            return bytes(data)
+        if deadline is not None:
+            connection.settimeout(min(.2, remaining))
+        try:
+            chunk = connection.recv(count - len(data))
+        except socket.timeout as error:
+            if deadline is None or error.errno is not None:
+                raise
+            # A receive poll is not lease loss; keep this socket and every ACK byte.
+            continue
         if not chunk:
             raise OSError("Lease closed before ownership acknowledgement")
         data.extend(chunk)
-    return bytes(data)
 
 
 def run_channel(argv, lease_port, lease_token, stop=None):
@@ -96,8 +243,9 @@ def run_channel(argv, lease_port, lease_token, stop=None):
                 try:
                     connection = socket.create_connection(("127.0.0.1", lease_port), timeout=1)
                     connection.sendall(lease_token.encode() + b"\n")
-                    if read_exact(connection, 6) != b"owned\n":
+                    if read_exact(connection, 6, deadline=deadline, stop=stop, process=process) != b"owned\n":
                         raise OSError("Lease ownership acknowledgement missing")
+                    connection.settimeout(1)
                 except OSError:
                     if connection is not None:
                         connection.close()
@@ -167,6 +315,8 @@ def check_unit_ownership(unit_dir, name):
 
 
 def install(args):
+    worker_argv(args)  # Refuse incomplete or mixed routes before checking or changing installed state.
+    slots = llama_slots(args) if getattr(args, "worker_backend", "waystone") == "llama" else None
     if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]*", args.ssh_host):
         raise ValueError("Use a configured SSH host alias")
     if not all(1024 <= port <= 65535 for port in (args.worker_port, args.router_port, args.lease_port)) or len({args.worker_port, args.router_port, args.lease_port}) != 3:
@@ -186,10 +336,6 @@ def install(args):
     config = {"backends": {"northstone": {"url": args.northstone_url, "capacity": 2, "queue_limit": 0, "expected_page_seconds": args.northstone_page_seconds},
                             "waystone": {"url": f"http://127.0.0.1:{args.worker_port}", "capacity": 1, "queue_limit": 2, "expected_page_seconds": args.waystone_page_seconds}},
               "cooldown_seconds": 15, "inference_seconds": 1800}
-    sys.path.insert(0, str(ROOT))
-    from chandra_service.router import Endpoint
-    for name, settings in config["backends"].items():
-        Endpoint(name, **settings)
     config_path = LOCAL / "router.json"
     channel_path = LOCAL / "channel.json"
     receipt_path = LOCAL / "installation.json"
@@ -199,6 +345,27 @@ def install(args):
         previous = json.loads(receipt_path.read_text())
         if previous.get("source_root") != str(ROOT) or previous.get("units") != list(UNITS):
             raise ValueError("Existing installation receipt belongs to another owner")
+    router_text = None
+    if getattr(args, "worker_backend", "waystone") in ("native", "llama") and config_path.exists():
+        with config_path.open("r", newline="") as stream:
+            router_text = stream.read()
+        config = json.loads(router_text)
+        if not isinstance(config, dict) or not isinstance(config.get("backends"), dict) or not isinstance(config["backends"].get("waystone"), dict):
+            raise ValueError("Existing owned router configuration must name the Windows waystone backend")
+        wanted_url = f"http://127.0.0.1:{args.worker_port}"
+        if config["backends"]["waystone"].get("url") != wanted_url:
+            config["backends"]["waystone"]["url"] = wanted_url
+            router_text = None
+    if slots is not None:
+        # Worker queue_limit is total admission minus one; router queue_limit is waiting beyond capacity.
+        wanted = {"capacity": slots, "queue_limit": 0, "auto_queue_limit": 0}
+        if any(config["backends"]["waystone"].get(key) != value for key, value in wanted.items()):
+            config["backends"]["waystone"].update(wanted)
+            router_text = None
+    sys.path.insert(0, str(ROOT))
+    from chandra_service.router import Endpoint
+    for name, settings in config["backends"].items():
+        Endpoint(name, **settings)
     base = MARKER + "\n[Unit]\nDescription={description}\nAfter=network-online.target\n\n[Service]\nType=simple\nWorkingDirectory=" + directory_value(ROOT) + "\nExecStart={exec_start}\nRestart=on-failure\nRestartSec=15\nTimeoutStopSec=35\nKillMode=control-group\n\n[Install]\nWantedBy=default.target\n"
     router_args = [python, "-m", "chandra_service", "router", "--config", config_path, "--port", args.router_port]
     for host in hosts:
@@ -209,10 +376,17 @@ def install(args):
     receipt = {"schema_version": 2, "source_root": str(ROOT), "units": list(UNITS), "hosts": hosts,
                "router_port": args.router_port, "worker_port": args.worker_port, "ssh_host": args.ssh_host,
                "remote_root": args.remote_root, "remote_python": args.remote_python, "model_path": args.model_path, "normalization": args.normalization,
+               "worker_backend": getattr(args, "worker_backend", "waystone"),
+               "native_config": getattr(args, "native_config", None), "native_config_sha256": getattr(args, "native_config_sha256", None),
+               "llama_config": getattr(args, "llama_config", None), "llama_config_sha256": getattr(args, "llama_config_sha256", None),
+               "llama_parallel_requests": slots,
+               "llama_job_affinity": 15 if slots is not None and 'sycl_host_cpu_count' in llama_profile(args) else None,
                "lease_port": args.lease_port, "remote_ownership": "unnamed Windows Job Object; authenticated loopback TCP lease; kill on job close",
                "unit_sha256": {name: hashlib.sha256(text.encode()).hexdigest() for name, text in zip(UNITS, content)}}
+    if getattr(args, "llama_startup_diagnostic", False):
+        receipt["llama_startup_diagnostic"] = True
     lease_token = secrets.token_urlsafe(32)
-    files = {config_path: json.dumps(config, indent=2) + "\n",
+    files = {config_path: router_text if router_text is not None else json.dumps(config, indent=2) + "\n",
              channel_path: json.dumps({"ssh_argv": remote_command(args, lease_token), "lease_port": args.lease_port, "lease_token": lease_token}, indent=2) + "\n",
              receipt_path: json.dumps(receipt, indent=2) + "\n"}
     files.update({unit_dir / name: text for name, text in zip(UNITS, content)})
@@ -267,7 +441,14 @@ def main():
     install_parser.add_argument("--ssh-host", default="waystone")
     install_parser.add_argument("--remote-root", required=True)
     install_parser.add_argument("--remote-python", required=True)
-    install_parser.add_argument("--model-path", required=True)
+    install_parser.add_argument("--worker-backend", choices=["waystone", "native", "llama"], default="waystone", help="Explicit native/llama opt-in; waystone preserves the historical XPU route")
+    install_parser.add_argument("--model-path", help="waystone: verified remote model directory")
+    install_parser.add_argument("--native-config", help="native: absolute normalized Windows config path")
+    install_parser.add_argument("--native-config-sha256", help="native: lowercase SHA-256 of the exact remote config bytes")
+    install_parser.add_argument("--llama-config", help="llama: absolute normalized Windows config path")
+    install_parser.add_argument("--llama-config-sha256", help="llama: lowercase SHA-256 shared by remote config and local copy")
+    install_parser.add_argument("--llama-config-copy", type=Path, help="llama: private local copy of the remote config, used to derive admission")
+    install_parser.add_argument("--llama-startup-diagnostic", action="store_true", help="llama: retain bounded private startup evidence beside the authenticated config")
     install_parser.add_argument("--normalization", choices=["original", "gain-only"], default="original")
     install_parser.add_argument("--northstone-url", default="http://127.0.0.1:8000")
     install_parser.add_argument("--worker-port", type=int, default=18001)
@@ -291,6 +472,10 @@ def main():
         return_code = run_channel(settings["ssh_argv"], settings["lease_port"], settings["lease_token"], stop)
         raise SystemExit(0 if stop.is_set() else return_code)
     if args.action == "install":
+        try:
+            worker_argv(args)
+        except ValueError as error:
+            parser.error(str(error))
         install(args)
     elif args.action == "logs":
         subprocess.run(["journalctl", "--user", "-u", UNITS[0], "-u", UNITS[1], "-n", "100", "--no-pager"], check=True)

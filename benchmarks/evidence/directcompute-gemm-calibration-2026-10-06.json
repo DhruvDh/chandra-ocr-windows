@@ -1,0 +1,245 @@
+{
+  "schema": "chandra.directcompute.gemm_calibration_evidence.v1",
+  "recorded_date_utc": "2026-10-06",
+  "disposition": "synthetic correctness and dispatch timing pass; padded32 nominee, unselectable by model",
+  "sources": {
+    "ChandraNative/runtime/gemm_candidate_calibration.cpp": {
+      "bytes": 10140,
+      "sha256": "7391d4e6d17bfef5b3f966d973e7090dc9d242e82643e29601c5080d5229a01f"
+    },
+    "ChandraNative/runtime/gemm_candidate_fixture.h": {
+      "bytes": 51719,
+      "sha256": "628818b3456142b5dcb7fda636860d8f1b9dd353a6c772cb3dbb9239a14de444"
+    },
+    "ChandraNative/shaders/runtime/linear.hlsl": {
+      "bytes": 2444,
+      "sha256": "8fa9fb68f69b35a812f4a5821db11148e665611b0b5f560a5a0186ac13343d5f"
+    },
+    "ChandraNative/shaders/runtime/linear_gemm_padded32.hlsl": {
+      "bytes": 3356,
+      "sha256": "93206bb0eae75929f86a81775360245705f6e3655639c054f912b4247f2a4d75"
+    },
+    "ChandraNative/shaders/runtime/linear_gemm_padded64.hlsl": {
+      "bytes": 3363,
+      "sha256": "da8933bca58d8fbd24445944a2474aab371a992f6730c1662da98bdcb16cad47"
+    },
+    "ChandraNative/runtime/device.cpp": {
+      "bytes": 17439,
+      "sha256": "0fff6aa94cfe41f0738682718b1fedec5ef547a9fbfeab470114554e12e36d73"
+    }
+  },
+  "windows_build": {
+    "source_manifest": {
+      "bytes": 15442,
+      "sha256": "07663f5e971502c359340c1e259d5ec2e3fbeca60e238bd377e7cf89d1527490"
+    },
+    "build_result": {
+      "bytes": 8488,
+      "sha256": "578aed9ca5fd1ea4be87271169ad98b25e90518c89bd0952263f457a14848269"
+    },
+    "job_receipt": {
+      "bytes": 400,
+      "sha256": "a36d49ba77abadff4dd0387e9fe922c1295891f13c57d0d90b7b8c898bf8c141"
+    },
+    "full_native_compile": true,
+    "standalone_calibration_strict_W4_WX": true,
+    "fxc_cs_5_0_O3_Gis": true,
+    "inactive_refusal_cases": 10,
+    "no_device_or_model": true
+  },
+  "device": {
+    "description": "Intel(R) Arc(TM) A770 Graphics",
+    "vendor_id": 32902,
+    "device_id": 22176,
+    "dedicated_bytes": 17047748608
+  },
+  "points": [
+    {
+      "scope": "model-free public operands; no model loaded",
+      "plan": "correctness",
+      "state": "GEMM_CANDIDATE_CORRECTNESS_PASS",
+      "passed": true,
+      "dispatches": 66,
+      "elapsed_seconds": 21.5755641,
+      "output_and_guard_words": 1994304,
+      "maximum_dispatch_ms": 6.446822916666667,
+      "tracked_device_bytes_after": 0,
+      "tracked_device_bytes_peak": 50200580,
+      "process_commit_peak_bytes": 272400384,
+      "job_commit_peak_bytes": 280727552,
+      "job_active_after_retirement": 0,
+      "ordinary_worker_restored_cold": true,
+      "receipts": {
+        "native": {
+          "bytes": 160890,
+          "sha256": "e88a90a0e9e3ec46d2059d314e9cea11aaa8f45284d50d53c35b4610a4a4dd94"
+        },
+        "process": {
+          "bytes": 279,
+          "sha256": "0f530f38b5dcf44b99a889d336e3b0c48b44c4d1195cb9395d2aa44f24a0cac0"
+        },
+        "job": {
+          "bytes": 397,
+          "sha256": "b1c63c0652e703c384075afc039ddb0a868f7933174ff5fb87e39afd4ca94863"
+        },
+        "restoration": {
+          "bytes": 634,
+          "sha256": "24e94e294414d49594e82c5eafe89eaaa7487ef5741c74c44956e0fb9f9ac47e"
+        }
+      }
+    },
+    {
+      "scope": "model-free public operands; no model loaded",
+      "plan": "correctness-then-timing",
+      "state": "GEMM_CANDIDATE_CORRECTNESS_AND_TIMING_PASS",
+      "passed": true,
+      "dispatches": 174,
+      "elapsed_seconds": 29.991309,
+      "output_and_guard_words": 11784558,
+      "maximum_dispatch_ms": 6.4190625,
+      "tracked_device_bytes_after": 0,
+      "tracked_device_bytes_peak": 69789908,
+      "process_commit_peak_bytes": 274432000,
+      "job_commit_peak_bytes": 282718208,
+      "job_active_after_retirement": 0,
+      "ordinary_worker_restored_cold": true,
+      "receipts": {
+        "native": {
+          "bytes": 323455,
+          "sha256": "525d5c7994c3a4215965f6a5294325553753d4c99f43ccc844d9b3331782dc07"
+        },
+        "process": {
+          "bytes": 278,
+          "sha256": "17ee315d462be6cafda2347f150cafcf2d8962e29054cb9fb9d56cc9a7f0505b"
+        },
+        "job": {
+          "bytes": 397,
+          "sha256": "b8f4d15ea488421693b4b33e09eaea441b6cf346b324960b7b1a36bd6a8b61d0"
+        },
+        "restoration": {
+          "bytes": 634,
+          "sha256": "99e9c2be4b93708f3aa43a96ce1761772a08c5dd0b6698534591a4535995e417"
+        }
+      }
+    }
+  ],
+  "timing": {
+    "sample_count": 108,
+    "samples_per_kernel_per_shape": 18,
+    "kernel_orders": 6,
+    "rounds": 3,
+    "shapes": [
+      {
+        "kernels": [
+          {
+            "maximum_ms": 3.8643229166666666,
+            "mean_ms": 3.186018518518519,
+            "median_ms": 3.0538020833333333,
+            "median_ratio_to_predecessor": 1.0,
+            "minimum_ms": 3.0481770833333335,
+            "samples": 18,
+            "shader": "runtime/linear.hlsl"
+          },
+          {
+            "maximum_ms": 2.6636979166666666,
+            "mean_ms": 1.9270486111111107,
+            "median_ms": 1.8352604166666666,
+            "median_ratio_to_predecessor": 0.6009755598383163,
+            "minimum_ms": 1.8329166666666667,
+            "samples": 18,
+            "shader": "runtime/linear_gemm_padded32.hlsl"
+          },
+          {
+            "maximum_ms": 3.07171875,
+            "mean_ms": 2.300002893518519,
+            "median_ms": 2.2546614583333335,
+            "median_ratio_to_predecessor": 0.7383128954684223,
+            "minimum_ms": 2.252083333333333,
+            "samples": 18,
+            "shader": "runtime/linear_gemm_padded64.hlsl"
+          }
+        ],
+        "shape": "k9216_n1024_r16"
+      },
+      {
+        "kernels": [
+          {
+            "maximum_ms": 6.2759375,
+            "mean_ms": 5.494189814814816,
+            "median_ms": 5.30953125,
+            "median_ratio_to_predecessor": 1.0,
+            "minimum_ms": 5.238958333333334,
+            "samples": 18,
+            "shader": "runtime/linear.hlsl"
+          },
+          {
+            "maximum_ms": 2.1094270833333333,
+            "mean_ms": 2.0987442129629637,
+            "median_ms": 2.1000520833333334,
+            "median_ratio_to_predecessor": 0.3955249502172783,
+            "minimum_ms": 2.09140625,
+            "samples": 18,
+            "shader": "runtime/linear_gemm_padded32.hlsl"
+          },
+          {
+            "maximum_ms": 4.1033333333333335,
+            "mean_ms": 3.279236111111111,
+            "median_ms": 3.2307812499999997,
+            "median_ratio_to_predecessor": 0.6084870957299667,
+            "minimum_ms": 3.228125,
+            "samples": 18,
+            "shader": "runtime/linear_gemm_padded64.hlsl"
+          }
+        ],
+        "shape": "k9216_n1024_r32_second_chunks"
+      }
+    ],
+    "all_samples_retained": true,
+    "GPU_queue_timestamps_exclude_host_compilation_drain_and_readback": true
+  },
+  "resource_policy": {
+    "maximum_owned_device_plus_readback_bytes": 70515112,
+    "maximum_dispatch_ms_exclusive": 100,
+    "source_deadline_seconds": 120,
+    "external_deadline_seconds": 180,
+    "authenticated_lease_seconds": 15,
+    "process_commit_cap_bytes": 805306368,
+    "job_commit_cap_bytes": 1073741824,
+    "maximum_job_processes": 2,
+    "CPU": "one core, below-normal priority",
+    "preadmission_available_RAM_floor_bytes": 8589934592,
+    "AMD_actions": [],
+    "external_deadline_qualification": "180 seconds is authenticated intent and root timer; retained remote lease independently proves heartbeat/EOF safety, not a separate absolute wall timer."
+  },
+  "qualification": {
+    "trained_activations_accepted": false,
+    "complete_OCR_accepted": false,
+    "exact_Zotero_workload_accepted": false,
+    "sustained_pages_per_second_accepted": false,
+    "serving_deployed": false,
+    "runtime_shader_bytecode_and_driver_ISA_retained": false
+  },
+  "independent_hardware_review": {
+    "disposition": "CLEAR",
+    "seal": {
+      "bytes": 3706,
+      "sha256": "029a5c04a24f002c3554133f065c2e5209534befcc91f0885bfb63a9451263e6"
+    },
+    "reviewed_draft_sha256": "01fa360e78035b7ee6678234c7fce7f02708345b70e1734ca83164cb88f637a8",
+    "checks": [
+      "240 dispatches",
+      "13778862 regenerated words",
+      "108 timing samples",
+      "source and build bindings",
+      "allocation and Job closure",
+      "public scalar privacy"
+    ]
+  },
+  "remaining": [
+    "explicit experimental padded32 selector",
+    "trained predecessor equality",
+    "complete OCR and exact Zotero pixels/context",
+    "native endpoint lifecycle",
+    "sustained throughput at safe concurrency plateau"
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "schema": "chandra.directcompute.diagnostic-producer-refusal.v1",
+  "cutoff_utc": "2026-10-06T00:47:09.010624+00:00",
+  "scope": "Actual Windows trained diagnostic producer failed strict v2 metadata validation; original dump retained unchanged",
+  "build": {
+    "source_manifest": {
+      "bytes": 13177,
+      "sha256": "1dee6f43965ae40b9f0ada1d3e40d6f222893bb920051438513fd530d86563b0"
+    },
+    "source_archive": {
+      "bytes": 321348,
+      "sha256": "6e4ad5d30b7fdad6775d5bc38206c19d3a13a149f2556b622fb8180ade669846"
+    },
+    "source_members": 85,
+    "native_compile_returncode": 0,
+    "portable_MSVC_returncode": 0,
+    "native_executable": {
+      "bytes": 1010688,
+      "sha256": "1004e5e7e03b834b58512370d5e9822fe67738bd39d2a4ad185abb1317804920"
+    }
+  },
+  "input_manifest_sha256": "6e5df5e8b33a7fbee2414fafab5b2212fb5a4a80b40b34b390ae829326116a36",
+  "model_revision": "af93b47dba1b47b6640c86ccf487ed2260ab9a09",
+  "explicit_diagnostic_token_cap": 14,
+  "normal_output_allowance": 12384,
+  "generated_tokens": 14,
+  "stop_reason": "explicit_diagnostic_token_cap",
+  "native_result": {
+    "bytes": 263330,
+    "sha256": "96c7cd7ad5f292d2b1830e8e10e1ed6c71c6b20bd9259f8582d332a76cba8a8f"
+  },
+  "native_execution_returncode": 0,
+  "owned_buffer_zero": true,
+  "Job_active_processes_after_wait": 0,
+  "Job_receipt": {
+    "bytes": 350,
+    "sha256": "22ff97d862a80c822d044fe3bae00e8d3db697551164c25bc6e1d5d7d0ca73b6"
+  },
+  "ordinary_cold_restoration_receipt": {
+    "bytes": 634,
+    "sha256": "8ac2b17c3d19a702d93aba55d50fc1253e2f5e37494d280521557ebcf9a9321a"
+  },
+  "host_controller_failed_after_native_success": true,
+  "artifact_collection_recovery": {
+    "report": {
+      "bytes": 942,
+      "sha256": "faec41715adeb524ac4519e0a3069c120c294f6d8961614eab636a6cdb95e175"
+    },
+    "GPU_execution": false,
+    "inference_replay": false,
+    "original_dump_modified": false
+  },
+  "raw_diagnostic_output": {
+    "progress": {
+      "bytes": 1683118,
+      "sha256": "f48b50bd0920b450210a253f6dfdd0930fe5f3106db8074a28fb5088bbfa2963"
+    },
+    "payload_manifest": {
+      "bytes": 100618,
+      "sha256": "1eb100622386b8def106e5102f73a175635e4d0cbce0c8fb22516bd5324211eb"
+    },
+    "reported_planned_and_written_records": 639,
+    "reported_payload_bytes": 20514816,
+    "strict_parser_accepted": false
+  },
+  "first_refusal": {
+    "line": 6,
+    "message": "one coordinate object per record required",
+    "stage": "vision.patch_embedding",
+    "observed_coordinates": {
+      "frame": 0,
+      "grid_col": 0,
+      "grid_row": 0,
+      "merged_row": 0,
+      "patch_row": 0
+    },
+    "observed_type": "object",
+    "required_type": "single-element array containing coordinate object"
+  },
+  "underlying_cross_compiler_cause_established": false,
+  "next_required_work": [
+    "Repair producer without weakening strict schema or rewriting original dump",
+    "Sol review finished change",
+    "MSVC CPU serialization regression",
+    "Fresh bounded trained captures"
+  ],
+  "qualification": {
+    "full_vector_numerics": false,
+    "complete_OCR": false,
+    "endpoint_deployment": false,
+    "throughput": false
+  },
+  "AMD_service_actions": []
+}

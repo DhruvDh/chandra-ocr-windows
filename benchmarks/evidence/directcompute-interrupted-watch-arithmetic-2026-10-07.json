@@ -1,0 +1,173 @@
+{
+  "schema": "chandra.directcompute.interrupted-watched-import-cap2.v1",
+  "recorded_utc": "2026-10-07T15:09:16.914166+00:00",
+  "node": "Waystone",
+  "outcome": "interrupted_lease_transport_failed",
+  "source_family": "watched_import_cap2",
+  "workload": {
+    "width": 1624,
+    "height": 2100,
+    "prompt_tokens": 3617,
+    "patch_rows": 12096,
+    "image_grid": [
+      1,
+      126,
+      96
+    ],
+    "context_limit": 16384,
+    "normal_output_allowance": 12384,
+    "diagnostic_token_cap": 2,
+    "full_OCR": false
+  },
+  "model": {
+    "name": "datalab-to/chandra-ocr-2",
+    "revision": "af93b47dba1b47b6640c86ccf487ed2260ab9a09",
+    "safetensors_bytes": 10591220088,
+    "safetensors_sha256": "0804568be9f099d6479fad9ed77a4da4611f3c1e7bc6e009af7dce45e8aa3847"
+  },
+  "producer": {
+    "source_manifest": {
+      "bytes": 23407,
+      "sha256": "009bac020693c728d38d30f651533536e08e5be542a015d58935e94ea840edff"
+    },
+    "executable": {
+      "bytes": 1370624,
+      "sha256": "8447261d4a328a75f56b63e36dc2a322fcf6338c55a843562331c16b916c25c3"
+    },
+    "shader_source_tree": {
+      "files": 38,
+      "sha256": "5438acdb33fbc1ba2d3a19b31d328e2ab3d05df011b42811108b26434cab89c1",
+      "source_only": true
+    },
+    "runtime_DXBC_captured": false,
+    "runtime_packet_sha256": "412d3301939f1fe18f954b348d7b61caf76605adc6e0bc29936e70a5a38b5a74",
+    "input_manifest_sha256": "0aa588473930f110cc359ba369623f29765a85f4e05ffcbca2ac509933b787ae",
+    "root_launcher_sha256": "f41534e69ccee37f2bf06bf58bd2f71141b1672efb6e79b750923ad4df2181ba"
+  },
+  "resources": {
+    "startup_available_physical_floor_bytes": 17179869184,
+    "startup_system_commit_headroom_floor_bytes": 21743271936,
+    "live_available_physical_floor_bytes": 8589934592,
+    "live_system_commit_headroom_floor_bytes": 8589934592,
+    "process_commit_cap_bytes": 12884901888,
+    "Job_commit_cap_bytes": 13153337344,
+    "native_wall_limit_seconds": 650,
+    "active_process_limit": 2,
+    "affinity_mask": 1,
+    "priority_class": 16384,
+    "peak_process_commit_bytes": 10793193472,
+    "peak_Job_commit_bytes": 10811015168,
+    "guardian": {
+      "samples": 484,
+      "minimum_physical_available_bytes": 18318581760,
+      "minimum_system_commit_headroom_bytes": 17514729472,
+      "maximum_completed_sample_gap_seconds": 4.779601180998725,
+      "outcome": "live_observation_or_guard_failure",
+      "original_unknown_error_preserved": true
+    },
+    "limits_are_reservations": false,
+    "sampling_is_continuous_observation": false
+  },
+  "interruption": {
+    "channel_returncode": 255,
+    "channel_elapsed_seconds": 468.142528715005,
+    "Windows_Job_outcome": "lease_transport_failed",
+    "Windows_Job_elapsed_seconds": 467.7820000000065,
+    "native_wall_expired": false,
+    "first_recorded_lease_failure_class": "ConnectionResetError",
+    "later_diagnostic_stderr_write_failure_class": "OSError",
+    "native_intrinsic_failure_established": false,
+    "reset_initiator_or_cause_established": false,
+    "child_code_observed_after_terminate_Job": 1,
+    "native_result_process_and_logit_payloads_absent": true,
+    "automatic_replay": false
+  },
+  "partial_evidence": {
+    "retained_files": 15,
+    "retained_bytes": 2879210,
+    "all_collected_file_hashes_and_extents_checked": true,
+    "qualification_independently_reproduced": true,
+    "watch_journal": {
+      "records": 1467,
+      "reported_samples": 733,
+      "reported_uploads": 732,
+      "reported_upload_bytes": 9078531072,
+      "all_reported_sample_hashes_match": true,
+      "six_retained_original_rows_match": true,
+      "plan_and_counter_sequence_validated": true,
+      "complete_native_report_absent": true,
+      "completed_native_watch_qualification": false,
+      "production_fix": false
+    },
+    "retained_original_row_bytes": 5120,
+    "retained_original_row_sha256": "e696b6bda9b22dba3ad2a49132d6353302f5b20ad2627909ae5474586a46c07f",
+    "complete_native_report_qualification": false,
+    "direct_byte_equality_proves_full_model_correctness": false
+  },
+  "later_offline_row_comparison": {
+    "recorded_utc": "2026-10-07T15:49:57.791015+00:00",
+    "source_sha256": "475f088507deae1fbe3508c641e74beb85b475bfeace937457b17dbf5264cc8e",
+    "checkpoint_fresh_full_file_hash_checked": true,
+    "checkpoint_head_and_embedding_rows_equal": true,
+    "rows": [
+      {
+        "row": 26213,
+        "capture_route": "direct_resource_copy",
+        "bytes": 5120,
+        "checkpoint_row_sha256": "e696b6bda9b22dba3ad2a49132d6353302f5b20ad2627909ae5474586a46c07f",
+        "capture_sha256": "e696b6bda9b22dba3ad2a49132d6353302f5b20ad2627909ae5474586a46c07f",
+        "BF16_word_mismatches": 0,
+        "byte_equal": true
+      },
+      {
+        "row": 52427,
+        "capture_route": "SRV_word_copy",
+        "bytes": 5120,
+        "checkpoint_row_sha256": "0575f9588d644d6b669a29517b1dda97ea56b4831b5578edffb99913df8e4ab7",
+        "capture_sha256": "4a5af26c4281200de3dab495a919f6233e106f9b86ae636425f14116f4347283",
+        "BF16_word_mismatches": 128,
+        "first_mismatching_BF16_word": 1536,
+        "last_mismatching_BF16_word": 1663,
+        "byte_equal": false,
+        "direct_copy_counterpart_available": false
+      }
+    ],
+    "GPU_inference_or_replay": false,
+    "whole_model_byte_integrity": false,
+    "resident_byte_or_SRV_read_cause_established": false,
+    "earlier_second_page_cause_established": false
+  },
+  "closure": {
+    "Windows_Job_retired": true,
+    "Windows_Job_active_processes_after_retirement": 0,
+    "Windows_Job_termination_succeeded": true,
+    "exact_original_supervisor_exited": true,
+    "local_SSH_forward_absent": true,
+    "root_controller_and_guardian_closed": true,
+    "guardian_failed_state_preserved": true,
+    "historical_bridge_restored_cold": true,
+    "root_disposition": {
+      "bytes": 5267,
+      "sha256": "15ef434969fe5a8f2a713bb5b4b308c1d3edc140eaf393638415245511be9887"
+    },
+    "root_physical_closure": {
+      "bytes": 1966,
+      "sha256": "47edae69fb716073b505f47688be9bb7541778277d7dc08edfb9e342bdeace26"
+    }
+  },
+  "host_observation": {
+    "Windows_uptime_milliseconds": 353646703,
+    "CIM_query_outcome": "access_denied",
+    "GPU_or_network_event_cause_established": false
+  },
+  "acceptance": {
+    "native_numerical": false,
+    "complete_OCR": false,
+    "native_endpoint": false,
+    "sustained_pages_per_second": false,
+    "performance_gain": false,
+    "production_fix_or_promotion": false
+  },
+  "AMD_actions": [],
+  "Claude_actions": []
+}

@@ -1,0 +1,97 @@
+{
+  "schema": "sycl-vision-affinity-repeat-evidence-v1",
+  "date": "2026-10-16",
+  "candidate": "SYCL vision attention C4 affinity observation",
+  "measurement_scope": "original-endpoint",
+  "run": {
+    "window_seconds": 720,
+    "concurrency": 4,
+    "logical_cpu_affinity_mask": 15,
+    "warmup_requests": 4,
+    "warmup_source_checks_passed": 4,
+    "measured_requests": 56,
+    "measured_source_checks_passed": 56,
+    "source_checks_total": 60,
+    "source_checks_failed": 0,
+    "correct_measured_in_window": 52,
+    "correct_measured_fill_and_drain": 56,
+    "fill_and_drain_seconds": 753.971273561001,
+    "correct_pages_per_second_fill_and_drain": 0.07427338675054873,
+    "correct_pages_per_second_in_window": 0.07222222222222222,
+    "scope_note": "Original endpoint timing includes endpoint CPU image preparation, queuing and inference; excludes client PDF rendering, cold load, warmup and offline assessment. The source predicate covers a finite four-case synthetic corpus and does not establish numerical equivalence, general OCR accuracy or production qualification."
+  },
+  "comparison": {
+    "previous_four_logical_cpu_long_run": {
+      "correct_pages": 56,
+      "fill_and_drain_seconds": 754.072500823,
+      "correct_pages_per_second": 0.07426341623501878,
+      "observations": 1
+    },
+    "repeat_rate_difference_percent_approximately": 0.014,
+    "single_logical_cpu_long_run_pages_per_second": 0.06774412057848882,
+    "selected_vulkan_original_endpoint_pages_per_second": 0.0496514710313,
+    "interpretation": "The two four-logical-CPU long-run observations are nearly flat; this small descriptive difference does not establish a distinct gain, confidence interval, throughput ceiling or deployment qualification."
+  },
+  "pins": {
+    "recipe_sha256": "d592b7d0e95cbbca30476c8b936a118b3c31e5f1af6c255b1068ba11b24f2697",
+    "worker_configuration_sha256": "f64d6b24c8c031d3a4104e1fb7eca3743b412b68d4932182c3e6e44ec2eb9c0f",
+    "input_manifest_sha256": "34d0b43fc6c44c5c996d414171b9f9854d6ee81742075899fa71ee66bfeb8f2a",
+    "throughput_client_configuration_sha256": "2fd8d95f85d9dca2982880c254c12d9681e2c57be9f6b1d4836c853ea9c21b27",
+    "client_sha256": "f87f52dbd254af254e6b596018bfacf52fe2ab39b365811beeee0824f96ee22c",
+    "throughput_assessor_sha256": "fd751d5a484b969f70cdb86dbcda92fe75b98f31597c918850e5180b346e300a",
+    "source_assessment_sha256": "a8ba90496563f363a0444301d3a83291855f62343e74c9e8a48062ccc5ad99b2",
+    "source_assessor_wrapper_sha256": "df8aade39d546395bcfb180f88d7d82f442d20ac683206e3db87b5c5604e1124",
+    "source_verifier_sha256": "2d5fb83e73aa0b5c4d51c08735445185054f225cd09f1e02313b2c4b789b4ccb",
+    "source_truth_sha256": "4e52852e25686aa6e16bc561090e2a6fa88115d90613f39b30c259a2dc928e22",
+    "run_summary_sha256": "08a6357780891e7038f13a9d3197fb8d5a84878110c30fa0a44a3798a36b2f5b",
+    "phase_commitments_sha256": "5fee5e8a410120dc74effedb7ba3ac0bdbd5ba48b138f093987c72f2300f534b",
+    "warmup_phase_sha256": "82129366e5e67628a99f07188879411e00d98274e2c97177e1d54b8eeb710fba",
+    "measurement_phase_sha256": "b70d9af5f70897da986db00a59c03d2d2fc56cf0cd2735e89b1c3cb4df23031b",
+    "owner_receipt_sha256": "edd21131aabb720e32e4d2a3a30359f04d90e7a191a2668f5372fad20b056552",
+    "qualification_stdout_sha256": "8b1fcd7dd2056c0b62e9a4587fc245ab49c4308e3acb54f81a2934b3c1d7661d"
+  },
+  "closure": {
+    "outer_runner": {
+      "exit_code": 0,
+      "fault": null,
+      "job_active_processes": 0,
+      "handles_closed": true,
+      "descriptors_closed": true,
+      "stdout_eof": true,
+      "stderr_eof": true,
+      "held_inputs": 59,
+      "released_inputs": 59,
+      "all_inputs_released": true,
+      "job_affinity_mask": 15,
+      "peak_process_memory_bytes": 10772258816,
+      "peak_job_memory_bytes": 10847608832,
+      "job_user_time_100ns": 6117500000,
+      "job_kernel_time_100ns": 3273750000
+    },
+    "owned_nested_worker": {
+      "exit_code": 3235774465,
+      "termination_was_deliberate": true,
+      "fault": null,
+      "job_active_processes": 0,
+      "handles_closed": true,
+      "descriptors_closed": true,
+      "held_inputs": 74,
+      "released_inputs": 74,
+      "all_inputs_released": true,
+      "job_affinity_mask": 15,
+      "peak_process_memory_bytes": 10772258816,
+      "peak_job_memory_bytes": 10773348352,
+      "job_user_time_100ns": 5470625000,
+      "job_kernel_time_100ns": 2444375000
+    },
+    "final_owned_state": "Candidate worker asleep and unloaded with no worker pending after deliberate closure; this does not establish ordinary Vulkan restoration.",
+    "cpu_time_note": "Outer and nested Job CPU-time counters include overlapping work and must not be added.",
+    "memory_scope_note": "Recorded process and Job memory peaks; these are not VRAM measurements."
+  },
+  "deployment": {
+    "new_deployment_claimed": false,
+    "throughput_ceiling_established": false,
+    "confidence_interval_established": false,
+    "restoration_note": "Root verified around 02:17 UTC that ordinary Vulkan was restored, both services were running with NRestarts=0, passive health was asleep at capacity four with no pending work or error, AMD was inactive, and five configuration hashes were unchanged. Subsequent root confirmation files were saved; both units were later deliberately stopped for qualification preparation, so this evidence makes no current active-service assertion. No aggregate restoration receipt is claimed, and normal-service qualification remains in progress."
+  }
+}

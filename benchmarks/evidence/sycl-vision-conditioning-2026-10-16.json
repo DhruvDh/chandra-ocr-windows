@@ -1,0 +1,188 @@
+{
+  "schema": "chandra-sycl-vision-conditioning-pair-v1",
+  "scope": "One paired capture of the final image-conditioning tensor for one native-0 request with the same candidate leaf and serving configuration, changing only the two oneDNN DG2 D64/unmasked attention flags. This is not a timing measurement, gold-reference comparison, or whole-model equivalence result.",
+  "pins": {
+    "candidate_leaf_sha256": "90e65f3b67017a598a7fc0c467bf08b15157ee521d27f1e1921126461ae641c7",
+    "candidate_leaf_bytes": 65078272,
+    "client_sha256": "f178f6476ab962c651fef99fe5d90a74fe4d2fc7a575b03f9965f81a7c8bf453",
+    "config_sha256": "3f05697ffa919aea6ea2c82a7d5c24aa2702ea706c5da866cfe8467e39088b1c",
+    "manifest_sha256": "34d0b43fc6c44c5c996d414171b9f9854d6ee81742075899fa71ee66bfeb8f2a",
+    "original_request_sha256": "d0211057d831ec3ad4566ff52bd3f1d3ec7efb8892e93a6213e7fd3ff6190833",
+    "request_sha256": "f7587b190320b4737b2ff0b75c31b747fe1596bf14cb3cb7d64dac862026b5e2",
+    "request_bytes": 323137,
+    "parent_recipe_sha256": "26b6dd4f0d92035626941bbd191971705c8ef17375da0d1cf48e762af52349cb",
+    "case": "native-0"
+  },
+  "arms": {
+    "off": {
+      "flags": {
+        "GGML_SYCL_FA_ONEDNN_DG2_D64": "0",
+        "GGML_SYCL_FA_ONEDNN_UNMASKED": "0"
+      },
+      "outer_serve_recipe_sha256": "547a3f1418f13c76c4dd1580096b9a4cb45c56d265e3d8dd0195b0c8f82a44ed",
+      "outer_receipt_success": true,
+      "outer_controller_exit_code": 0,
+      "outer_job_active_processes_at_close": 0,
+      "outer_handles_descriptors_closed": true,
+      "outer_drains_eof": true,
+      "outer_held_inputs_released": 62,
+      "inner_capture_receipt_success": true,
+      "accepted_captures": 1,
+      "completed_captures": 1,
+      "rejected_captures": 0,
+      "inner_worker_exit_code": 3235774465,
+      "inner_worker_fault_recorded": false,
+      "inner_job_active_processes_at_close": 0,
+      "inner_handles_descriptors_closed": true,
+      "inner_inputs_released": 74,
+      "page": {
+        "natural_stop": true,
+        "finish_reason": "stop",
+        "prompt_tokens": 3617,
+        "completion_tokens": 556,
+        "total_tokens": 4173,
+        "source_assessment_passed": true,
+        "amd_non_geometric_content_screen_passed": true,
+        "amd_geometry_difference_boxes": 3,
+        "request_sha256": "f7587b190320b4737b2ff0b75c31b747fe1596bf14cb3cb7d64dac862026b5e2",
+        "response_sha256": "0d231d5b8165774478c9a851e1d690b7da3ab51a562a235ecc9b7bafba8b543b",
+        "raw_response_sha256": "a79978a691f2136167cc7bac260933bc3fb0359e3e18119a2760c7e12af2af0f"
+      },
+      "capture": {
+        "reported_shape": [2560, 3024],
+        "tokens": 3024,
+        "width": 2560,
+        "finite": true,
+        "bytes": 30965768,
+        "sha256": "0f202428e8ee11c738c7c2c0a3d85727e33b1854e02f333f4c8280076af4f272"
+      },
+      "artifact_hashes": {
+        "serve_receipt_sha256": "f3ba3651b48f9bf9d1257ea87153bd30443d180d3d47a82181b5242c6775767c",
+        "embedding_receipt_sha256": "9ce6852e022fa1e6405dab7e6a04e3d9b98ee96bc08cd165c2d9ec976b643d51",
+        "controller_record_sha256": "fde6fd48a56d81859428e05b6b07c63099c7b5147185bf1bf3a5ff9aa727d0ed",
+      "controller_stdout_sha256": "d5567c8a5e8161154482551b960086b404a250761bc7a01da1d3f6d0d97c2793",
+      "controller_stderr_sha256": "048e2ba89ae430962e02f5341cf60c694fb7e131cb417790075a56b32ca09992",
+      "qualification_stdout_sha256": "13679cc3481353c8f9054e42cea474876627f17ecc52d73c95db2d225e1618e8",
+      "qualification_stderr_sha256": "07e7bddcc2df7a46782bcc234358b797b1587fc2ee093156f6ee814c6b020772",
+        "page_result_sha256": "9bd737cd5dfa55c02dbee89a7057bef42073e01bb5eed4e6415d19b3cb31b2cd",
+        "source_assessment_sha256": "c8e87ebf1afe2d18ef2807c9b46d3281cb5320ab41844d8e2db70fb672e8c3d7",
+        "amd_assessment_sha256": "ed6da0b8037cd223e8574a9b2fca89701aecb833463bd5ac6034f9122a3f0fef",
+        "response_commitments_file_sha256": "0f630ca2725eb66da40c37c9983340ddf384ad63ab077e9d99b4c8db1f1f3bdd",
+        "response_sse_sha256": "a79978a691f2136167cc7bac260933bc3fb0359e3e18119a2760c7e12af2af0f",
+        "response_json_sha256": "0d231d5b8165774478c9a851e1d690b7da3ab51a562a235ecc9b7bafba8b543b"
+      }
+    },
+    "on": {
+      "flags": {
+        "GGML_SYCL_FA_ONEDNN_DG2_D64": "1",
+        "GGML_SYCL_FA_ONEDNN_UNMASKED": "1"
+      },
+      "outer_serve_recipe_sha256": "b161d51d7d44a37b234d342a5e6a82e2bfa3d673011432885c9e1367e078d321",
+      "outer_receipt_success": true,
+      "outer_controller_exit_code": 0,
+      "outer_job_active_processes_at_close": 0,
+      "outer_handles_descriptors_closed": true,
+      "outer_drains_eof": true,
+      "outer_held_inputs_released": 62,
+      "inner_capture_receipt_success": true,
+      "accepted_captures": 1,
+      "completed_captures": 1,
+      "rejected_captures": 0,
+      "inner_worker_exit_code": 3235774465,
+      "inner_worker_fault_recorded": false,
+      "inner_job_active_processes_at_close": 0,
+      "inner_handles_descriptors_closed": true,
+      "inner_inputs_released": 74,
+      "page": {
+        "natural_stop": true,
+        "finish_reason": "stop",
+        "prompt_tokens": 3617,
+        "completion_tokens": 556,
+        "total_tokens": 4173,
+        "source_assessment_passed": true,
+        "amd_non_geometric_content_screen_passed": true,
+        "amd_geometry_difference_boxes": 2,
+        "request_sha256": "f7587b190320b4737b2ff0b75c31b747fe1596bf14cb3cb7d64dac862026b5e2",
+        "response_sha256": "8deda7c0248ee1558452ccfbb72293151d2d77dd8e4a12090e341dd5ea4c1649",
+        "raw_response_sha256": "121e293ba040a4b66f90dfc7fc36902d89fcec0cf2d945bd574edb784e615e49"
+      },
+      "capture": {
+        "reported_shape": [2560, 3024],
+        "tokens": 3024,
+        "width": 2560,
+        "finite": true,
+        "bytes": 30965768,
+        "sha256": "b7b6d676ba4a8f135f34e691dff6e47061f2125550efe4af669698b686da0626"
+      },
+      "artifact_hashes": {
+        "serve_receipt_sha256": "9b0ff59cea7656715d063a28aedfa77753093c5f417c43cfff1bf21468570dd3",
+        "embedding_receipt_sha256": "5fba4ddc772a1e5cdf2f2b145354987453a340fe597c6e97ee6ed6cabeba5da1",
+        "controller_record_sha256": "294c5c9e0d97f1004be39602f632571dd2ae68494a47187c50b0396bed5be2ff",
+      "controller_stdout_sha256": "9277fc295b42fc0c904028c7a9e4e68547448178fd3bbfa9f9f95a8db873ce36",
+      "controller_stderr_sha256": "048e2ba89ae430962e02f5341cf60c694fb7e131cb417790075a56b32ca09992",
+      "qualification_stdout_sha256": "310acb560691f18f1ff76a449d435b8f102bddb09cd966baaa57166bf853378b",
+      "qualification_stderr_sha256": "35f2789abd9c1fd9cdeb6d7e7bed70e55a5513c75576e15c6cc95ce6c8c123f4",
+        "page_result_sha256": "770bd10836d7b99d2d22b50f7371bfd10a06e9cad5a665b640ddd1670426d897",
+        "source_assessment_sha256": "12b74dc5de60b5487177b00f954e1d6177d4f8c3a13734bf614341965fd61ee7",
+        "amd_assessment_sha256": "95350694f8e3a39310ea3a531a2ee87db44db8228d9b578c15f67250a67548c0",
+        "response_commitments_file_sha256": "822de4d063cc11355c0a2ee60e09f455d22e6fe88f836dae7ef5dbe49b45ea56",
+        "response_sse_sha256": "121e293ba040a4b66f90dfc7fc36902d89fcec0cf2d945bd574edb784e615e49",
+        "response_json_sha256": "8deda7c0248ee1558452ccfbb72293151d2d77dd8e4a12090e341dd5ea4c1649"
+      }
+    }
+  },
+  "comparison": {
+    "comparison_json_sha256": "ad7270280e40e05c60a9f54efe5abe1b7fb710dca43f0109beff9b89bfd890be",
+    "integrity_verified": true,
+    "numerical_acceptance": null,
+    "relative_l2_on_vs_off": 0.12575369887837992,
+    "nmse_reference_energy": 0.015813992781594254,
+    "squared_error": 2478.559956530495,
+    "off_reference_energy": 156732.07840433987,
+    "max_absolute_error": 2.8184218406677246,
+    "undefined_relative_l2_tokens": 0,
+    "near_zero_energy_floor": 5.182939100672615e-11,
+    "relative_l2_percentiles": {
+      "p50": 0.11568709936929335,
+      "p95": 0.4308247550462083,
+      "p99": 0.7155353451556606,
+      "max": 3.029139577792033
+    },
+    "global_normalized_error_percentiles": {
+      "p50": 0.06486798547135768,
+      "p95": 0.24174937244569084,
+      "p99": 0.3956793614266029,
+      "max": 1.1125626193505942
+    },
+    "angle_degrees_percentiles": {
+      "p50": 5.508634503545262,
+      "p95": 17.459422289002948,
+      "p99": 30.08413639601541,
+      "max": 57.40294056370949
+    },
+    "reduction_definitions": {
+      "payload": "Each capture uses a float32 payload; the comparator verifies an 8-byte little-endian int32 [token_count,width] header and unpacks width float32 values per token.",
+      "fp64_accumulation": "Python math.fsum reductions over float32 values for per-token squared error, OFF reference energy, ON energy, dot product, and aggregate token sums.",
+      "per_token_relative_l2": "sqrt(sum((on-off)^2)/sum(off^2)) for each token using math.fsum.",
+      "global_relative_l2": "sqrt(total squared error / total OFF reference energy), equal to sqrt(NMSE).",
+      "nmse": "sum((on-off)^2)/sum(off^2), not variance-normalized.",
+      "percentiles": "Nearest-rank over defined per-token relative-L2 values.",
+      "near_zero": "Per-token relative L2 and cosine/angle are suppressed when reference-token energy is <= 1e-12 times mean OFF reference-token energy; this is a denominator interpretation guard, not an acceptance tolerance.",
+      "global_normalized_error": "sqrt(token squared error / mean OFF reference-token energy), retained for near-zero tokens unless the full OFF reference tensor is zero.",
+      "angle_degrees": "acos(cosine) in degrees, clamping cosine to [-1,1] only for roundoff."
+    }
+  },
+  "diagnostic_history": {
+    "failed_attempts_01_02_accepted": false,
+    "verbosity_3_effect": "The common logging callback maps INFO to TRACE level 4, which verbosity 3 filters; this suppressed observable embedding markers.",
+    "revision_03_change": "Only a fixed log-verbosity 4 argv pair was added to each arm; capture, marker, binary, owner, source, and comparison acceptance requirements were unchanged."
+  },
+  "evaluation": {
+    "off_arm_is_gold_reference": false,
+    "numerical_correctness_established": false,
+    "deployment": "held",
+    "reason": "The paired output shows substantial numerical drift; an independent CPU-reference investigation is pending.",
+    "timing_claim": false,
+    "whole_model_equivalence_claim": false
+  }
+}

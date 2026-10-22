@@ -1,0 +1,99 @@
+{
+  "schema": "chandra.directcompute.cpu-timing-msvc.v1",
+  "observed_utc": "2026-10-06T01:40:46.280978+00:00",
+  "scope": "Real strict MSVC compile and fake-clock/helper tests; no GPU/model/service actions. Production Device/helper binding is separately authenticated to Build11.",
+  "compiler_flags": "/nologo /std:c++17 /O2 /fp:strict /EHsc /W4 /WX",
+  "compile_returncode": 0,
+  "test_source": {
+    "bytes": 24496,
+    "sha256": "04af495ba65ff1a8678fd97342cf1281124d88575d9375fa83eb6c6c0ee6b0fb"
+  },
+  "production_device": {
+    "bytes": 17439,
+    "sha256": "0fff6aa94cfe41f0738682718b1fedec5ef547a9fbfeab470114554e12e36d73"
+  },
+  "production_helper": {
+    "bytes": 15672,
+    "sha256": "f0f9cdec96ae240445671fa2c12f0f806783ce15cf2d8988578d2eaa6bfdc340"
+  },
+  "executable": {
+    "bytes": 513024,
+    "sha256": "cd7b4ca2382fbd9f607a5fe7c6a0a90366e7e1371acf789fc452cd12fccf7880"
+  },
+  "runs": [
+    {
+      "inherited_setting": null,
+      "returncode": 0,
+      "test": {
+        "test": "directcompute_cpu_timing_accounting",
+        "checks_passed": 10,
+        "cpu_fakes_only": true,
+        "d3d11_driver_or_gpu_exercised": false,
+        "environment_route": "msvc_dupenv_s",
+        "empty_environment_value": "not_encodable_putenv_s_removes",
+        "preexisting_variable": "absent"
+      }
+    },
+    {
+      "inherited_setting": "0",
+      "returncode": 0,
+      "test": {
+        "test": "directcompute_cpu_timing_accounting",
+        "checks_passed": 10,
+        "cpu_fakes_only": true,
+        "d3d11_driver_or_gpu_exercised": false,
+        "environment_route": "msvc_dupenv_s",
+        "empty_environment_value": "not_encodable_putenv_s_removes",
+        "preexisting_variable": "present"
+      }
+    },
+    {
+      "inherited_setting": "1",
+      "returncode": 0,
+      "test": {
+        "test": "directcompute_cpu_timing_accounting",
+        "checks_passed": 10,
+        "cpu_fakes_only": true,
+        "d3d11_driver_or_gpu_exercised": false,
+        "environment_route": "msvc_dupenv_s",
+        "empty_environment_value": "not_encodable_putenv_s_removes",
+        "preexisting_variable": "present"
+      }
+    },
+    {
+      "inherited_setting": "yes",
+      "returncode": 0,
+      "test": {
+        "test": "directcompute_cpu_timing_accounting",
+        "checks_passed": 10,
+        "cpu_fakes_only": true,
+        "d3d11_driver_or_gpu_exercised": false,
+        "environment_route": "msvc_dupenv_s",
+        "empty_environment_value": "not_encodable_putenv_s_removes",
+        "preexisting_variable": "present"
+      }
+    }
+  ],
+  "strict_compile_and_four_inherited_states_passed": true,
+  "production_rebuilt": false,
+  "job_receipt": {
+    "peak_process_commit_bytes": 171630592,
+    "peak_job_commit_bytes": 239546368,
+    "process_commit_limit_bytes": 1610612736,
+    "job_commit_limit_bytes": 2147483648,
+    "affinity_mask": 1,
+    "priority_class": 16384,
+    "total_job_processes": 65,
+    "active_job_processes_after_wait": 3,
+    "returncode": 0,
+    "kill_on_job_close": true
+  },
+  "observed_post_handle_close_active_processes": null,
+  "closure_limit": "Three active descendants were observed after the compile wrapper finished, before finally closed the sole non-inheritable unnamed KILL_ON_JOB_CLOSE Job handle. Contractual retirement is supported; post-close zero was not observed and is not claimed.",
+  "independent_audit": {
+    "bytes": 8623,
+    "sha256": "c290151619c835213189180a967b4340d5f535dee97e58485c2cc28628ce053f"
+  },
+  "native_gpu_execution": false,
+  "performance_claim": false
+}

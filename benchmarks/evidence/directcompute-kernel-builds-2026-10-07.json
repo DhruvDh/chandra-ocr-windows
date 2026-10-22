@@ -1,0 +1,75 @@
+{
+  "schema": "chandra.directcompute.experimental-kernel-builds.v1",
+  "date": "2026-10-07",
+  "scope": "actual Windows CPU builds, artifact authentication and ownership closure",
+  "parallel32": {
+    "source_files": 16,
+    "source_bytes": 1071567,
+    "source_manifest_sha256": "f507a7d3e8d520695881e809fcaf347f3227f392c47adbbab8b800378f0a2710",
+    "actual_CPU_build_passed": true,
+    "strict_Cxx_translation_units": 3,
+    "FXC_shader_builds": 2,
+    "inactive_no_Device_controls": 2,
+    "Windows_wrapper_seconds": 28.312,
+    "retained_output_files": 14,
+    "retained_output_bytes": 11699427,
+    "all_retained_bytes_authenticated": true,
+    "peak_process_commit_bytes": 225337344,
+    "peak_Job_commit_bytes": 280457216,
+    "accepted_CPU_build": {
+      "bytes": 5880,
+      "sha256": "d499ee4b60845365bca03d303fcd94db0c12521f34de9dfd4b1aac84c8cccdc7"
+    },
+    "independent_actual_build_review": {
+      "bytes": 25200,
+      "sha256": "b941ea171447d2a754a8b26c5806434de1794b760f3c0042e57a5223c9b80036"
+    },
+    "final_preparation_writer_unit_confirmed": false,
+    "actual_GPU_numerical_pair_passed": false,
+    "actual_paired_timing": null
+  },
+  "fence_wait": {
+    "source_files": 134,
+    "source_bytes": 2430556,
+    "source_manifest_sha256": "12a2dd3bafe4652ffe222890cd54b14f9a22ed7624ddb49edd4d51cbfdb196d7",
+    "actual_CPU_build_passed": true,
+    "strict_Cxx_translation_units": 3,
+    "FXC_shader_builds": 1,
+    "CPU_ownership_deadline_cases": 11,
+    "inactive_no_Device_plans": 2,
+    "Windows_wrapper_seconds": 24.016,
+    "retained_output_files": 12,
+    "retained_output_bytes": 10252342,
+    "all_retained_bytes_authenticated": true,
+    "peak_process_commit_bytes": 238645248,
+    "peak_Job_commit_bytes": 283164672,
+    "original_launcher_exit": 1,
+    "original_launcher_closed": false,
+    "original_false_refusal_preserved": true,
+    "reporting_error": "top-level job.retired read instead of job.retirement.retired",
+    "accepted_CPU_build": {
+      "bytes": 5703,
+      "sha256": "c3a5265e90a5e6876d8feea743ace756380ad46a9e597f1e88c1648355c65b98"
+    },
+    "independent_actual_build_review": {
+      "bytes": 6473,
+      "sha256": "995d977583665068dfc0b6a33c6c6a090602dd654686e94b02aed2899df92050"
+    },
+    "actual_fence_runtime_support": null,
+    "actual_matched_timing": null
+  },
+  "observed_build_caps": {
+    "process_commit_bytes": 1610612736,
+    "Job_commit_bytes": 2147483648,
+    "active_processes": 8,
+    "CPU_affinity_mask": 1,
+    "Windows_priority_class": 16384
+  },
+  "actual_Job_exact_owner_channel_closure_confirmed": true,
+  "automatic_replay": false,
+  "whole_model_numerical_acceptance": false,
+  "complete_OCR_acceptance": false,
+  "native_endpoint_acceptance": false,
+  "sustained_pages_per_second": null,
+  "deployed": false
+}

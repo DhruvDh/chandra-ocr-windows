@@ -1,0 +1,185 @@
+{
+  "schema": "sycl-normal-service-lease-loss-evidence-v1",
+  "date": "2026-10-16",
+  "profile": {
+    "name": "normal SYCL profile",
+    "configuration_sha256": "0cbd81641b95218b5d33e7acb1ba801f0c8854f2905f7a24ca42c29be863562b",
+    "selected_leaf_sha256": "90e65f3b67017a598a7fc0c467bf08b15157ee521d27f1e1921126461ae641c7"
+  },
+  "episode": {
+    "kind": "one explicitly authorized C4 lease-loss observation",
+    "coordinator_success": true,
+    "coordinator_success_meaning": "The guarded stop, four-client join and expected interruption classification succeeded; this is not OCR completion success.",
+    "capacity": 4,
+    "trigger_health": {
+      "backend": "llama-sycl-candidate",
+      "state": "awake",
+      "phase": "busy",
+      "loaded": true,
+      "accepting": false,
+      "capacity": 4,
+      "pending_or_active": 4,
+      "owned_worker_pending": true,
+      "qualified": false,
+      "error": null,
+      "last_error": null
+    },
+    "trigger": {
+      "first_content_marker_age_seconds": 0.020702838897705078,
+      "unfinished_clients": 4,
+      "stop_attempted_once": true,
+      "stop_return_code": 0,
+      "stop_timed_out": false,
+      "stop_output_truncated": false
+    },
+    "clients": [
+      {
+        "case": "native-0",
+        "return_code": 1,
+        "post_attempted": true,
+        "http_status": 200,
+        "first_content_seen": true,
+        "first_content_elapsed_seconds": 43.199348918002215,
+        "elapsed_seconds": 44.90122373399936,
+        "protocol_error": "ValueError: HTTP EOF before terminal chunk",
+        "error_event_seen": false,
+        "done_seen": false,
+        "finish_reason": null,
+        "protocol_complete": false,
+        "sse_events": 4,
+        "raw_bytes": 809,
+        "request_sha256": "f7587b190320b4737b2ff0b75c31b747fe1596bf14cb3cb7d64dac862026b5e2",
+        "raw_response_sha256": "f38f2dec0dbc4112f56cf6e8aa3e40ae36a3f4f07a8906bae32d822250ad1f38",
+        "result_sha256": "a5c7ec2fbc3f85a95195a5c59d2fe50514595608414d4829738f7b91eb0ed8f4"
+      },
+      {
+        "case": "native-1",
+        "return_code": 1,
+        "post_attempted": true,
+        "http_status": 200,
+        "first_content_seen": true,
+        "first_content_elapsed_seconds": 30.174275717996352,
+        "elapsed_seconds": 44.902382234999095,
+        "protocol_error": "ValueError: HTTP EOF before terminal chunk",
+        "error_event_seen": false,
+        "done_seen": false,
+        "finish_reason": null,
+        "protocol_complete": false,
+        "sse_events": 13,
+        "raw_bytes": 2604,
+        "request_sha256": "d3cd79050d3ca9682f52ddca719d9f1533daf55eb8f243dcaf178e0fd9436a2b",
+        "raw_response_sha256": "641bd58bdab9008334c9270eb5023810ba4d9adac7cf085a697a7da448d76793",
+        "result_sha256": "554527274dda5b3a28107bd19e8dd4d3877c34708620cbeee05a6c8634074810"
+      },
+      {
+        "case": "scanned-0",
+        "return_code": 1,
+        "post_attempted": true,
+        "http_status": 200,
+        "first_content_seen": true,
+        "first_content_elapsed_seconds": 31.258077382997726,
+        "elapsed_seconds": 44.90184751000197,
+        "protocol_error": "ValueError: HTTP EOF before terminal chunk",
+        "error_event_seen": false,
+        "done_seen": false,
+        "finish_reason": null,
+        "protocol_complete": false,
+        "sse_events": 9,
+        "raw_bytes": 1808,
+        "request_sha256": "89cc044dad86280a973d4e4bfe9000605e57e0dfa8f33b9f8f8c4b12cd5a817c",
+        "raw_response_sha256": "83b3965d9106af3d7ff9fb41eb3c2c28e463fd1eac640f440d2e3b93c73d19d2",
+        "result_sha256": "a928eec67220673ae2b6571713851a1c32dc6fc47f6465bccd40052714537aa5"
+      },
+      {
+        "case": "scanned-1",
+        "return_code": 1,
+        "post_attempted": true,
+        "http_status": 200,
+        "first_content_seen": false,
+        "first_content_elapsed_seconds": null,
+        "elapsed_seconds": 44.9014343020026,
+        "protocol_error": "ValueError: HTTP EOF before terminal chunk",
+        "error_event_seen": false,
+        "done_seen": false,
+        "finish_reason": null,
+        "protocol_complete": false,
+        "sse_events": 1,
+        "raw_bytes": 204,
+        "request_sha256": "05d421f1610f845592e6119547d1cd88e5ade23a3ff14bad47262134d72dd791",
+        "raw_response_sha256": "95a308c8c1d374bcfa5f38dfe37ccdc15b87b51a9d9198c16b712a1d3e16a0ba",
+        "result_sha256": "914ba5fb6110bfc79af5f6219248c3fa0819c56bf51e444d2c552d6bf0f41d42"
+      }
+    ],
+    "post_stop_to_coordinator_finish_seconds": 14.7305798,
+    "all_clients_natural_completion": false,
+    "requests_replayed": false,
+    "join_completed": true,
+    "client_cleanup_escalated": []
+  },
+  "coordinator_runtime": {
+    "exit_code": 0,
+    "unit_runtime_seconds_reported": 45.0,
+    "memory_peak_reported": "56M",
+    "swap_peak_reported": "0B"
+  },
+  "retirement_and_restore": {
+    "post_episode_process_query": {
+      "visible_llama_server": false,
+      "normal_worker_pid_lookup_result": "absent",
+      "normal_worker_pid_lookup_exit_code": 1,
+      "normal_worker_pid_lookup_output_empty": true,
+      "forwarding_tunnel_exit_code": 0,
+      "forwarding_tunnel_closed": true
+    },
+    "manager_restart_exit_code": 0,
+    "restoration_checkpoint": {
+      "normal_worker_active": true,
+      "router_active": true,
+      "normal_worker_restarts": 0,
+      "router_restarts": 0,
+      "backend": "llama-sycl-candidate",
+      "health_state": "asleep",
+      "accepting": true,
+      "loaded": false,
+      "capacity": 4,
+      "pending_or_active": 0,
+      "owned_worker_pending": false,
+      "error": null,
+      "last_error": null,
+      "qualified": false,
+      "amd_gateway_active": false,
+      "five_configuration_and_unit_hashes_unchanged": true,
+      "checkpoint_is_permanent_current_state": false,
+      "subsequent_isolated_q8_trial_may_stop_owner": true
+    }
+  },
+  "evidence_sha256": {
+    "coordinator": "627a074040b8b6235d0ba96f562001316c04745916be73d1c592c005fdef3403",
+    "trigger": "2bdaf484bd280b0c356b21aeb1238e4f3c10f97438a110c5b4d6b2c4f1c4b5c7",
+    "stop_intent": "65456b90bf4685653f4d06547c8e100d5043b77772a5cc3b63ec7e184fc22b79",
+    "root_run_log": "17aa62b6d2785627b694a5de22d991dee33d2601682441d9545c1a6d3e47523e",
+    "root_exit_record": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "remote_service_journal": "240f6515aca36b461e39fad71be60f751753a6be1a4f51b13315877166e98832",
+    "restored_health": "8285345638ca264c9bc653615dbbb573e1096ff87c496eccbc51b57494d92c5a",
+    "restored_service_state": "ce88b822de133cee35bf98da8aba7ec4a45a294db540be4e34eaef7ed2141448",
+    "restored_configuration_check": "b57add85a1e037796cac0a16510e1fc807f5d11b75c4b18f130e69b5c11a180b"
+  },
+  "historical_context": {
+    "prior_normal_service_checks": "Cold C4, four-request overlap, fifth-request refusal, idle unload, cancellation and recovery remain in the retained normal-service qualification record.",
+    "prior_manual_lease_loss": "Inconclusive: natural completion arrived about four seconds after service stop, inside the 15-second heartbeat fallback.",
+    "followup_01": "Pre-request refusal caused by zlib-dependent compressed command bytes; no client POST or stop occurred.",
+    "cli_compatibility_evidence": {
+      "file": "sycl-cli-compatibility-2026-10-16.json",
+      "sha256": "10ff4e9ca81e41cd113298f9348cd1f7c5fe49ffb4e378935b04a23a5a681b0a"
+    }
+  },
+  "interpretation": {
+    "expected_lease_loss_classification_observed": true,
+    "new_throughput_measurement": false,
+    "numerical_result": false,
+    "finite_installed_profile_lifecycle_and_cli_accepted": true,
+    "acceptance_basis": "Independent finished-evidence review found no material blocker across cold startup, admission, idle unload, cancellation and recovery, active lease loss, restoration and the separate exact CLI checks. Process retirement includes the operator's recorded query and exit observations; empty saved output alone does not establish it.",
+    "general_ocr_accuracy_or_numerical_equivalence_accepted": false,
+    "full_promotion_claimed": false
+  }
+}

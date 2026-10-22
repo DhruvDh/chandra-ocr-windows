@@ -1,0 +1,164 @@
+{
+  "schema": "chandra.native-reviewed-source-integration.v1",
+  "recorded_date_UTC": "2026-10-11",
+  "public_base_commit": "19a96abf1851c01a86be78c0748b53cac14885bf",
+  "scope": "Source integration of 15 production native leaves and 5 endpoint product leaves; every implementation leaf is byte-exact to its reviewed snapshot. This curated public tree is not the complete 154-file historical source package.",
+  "source_files": {
+    "ChandraNative/runtime/api.h": {
+      "bytes": 6556,
+      "sha256": "292e1d28a209813dc261d74a01c955d96a449eedec7fcceed7002090ebcb7870"
+    },
+    "ChandraNative/runtime/attention_values_grid.h": {
+      "bytes": 2673,
+      "sha256": "abb4d8415382e9f7ff6323a8b1c7da795653fa442a24bdc4d65c39f53d34b02c"
+    },
+    "ChandraNative/runtime/device.cpp": {
+      "bytes": 35089,
+      "sha256": "e2467ef9f137e654277cbcce75ad9d83ce7f10e63e832313e765c9dff682aa6a"
+    },
+    "ChandraNative/runtime/inference.cpp": {
+      "bytes": 94504,
+      "sha256": "12a3dcfdc93f42d0ca870bbbfcf0114b9d1d3e70ee419571f0a0a8ca6ae84b98"
+    },
+    "ChandraNative/runtime/inference_core.cpp": {
+      "bytes": 39820,
+      "sha256": "d10c37f5ae5a7bc493c03353d60b633227a019e9c60f349977e61d269ec6c582"
+    },
+    "ChandraNative/runtime/inference_core.h": {
+      "bytes": 7895,
+      "sha256": "0e751e74eceafc0b4e75e3b5931cbe1e566626efa9b98baa513f7a958e4f40a9"
+    },
+    "ChandraNative/runtime/operators.cpp": {
+      "bytes": 16818,
+      "sha256": "56c033ce0c9f22419761567292746c86505c03a0258729109c47bc46aaa9f9a1"
+    },
+    "ChandraNative/runtime/ordered2_opt_in.h": {
+      "bytes": 956,
+      "sha256": "b70600d552d2d871d453edcd842eefeccd9014d81a9005859c6ea726804ae7d2"
+    },
+    "ChandraNative/runtime/text_model.cpp": {
+      "bytes": 25897,
+      "sha256": "64b205987ac93cd79832f0bc10d656bb2f1036fca0135715cd9f24f7766ce38f"
+    },
+    "ChandraNative/runtime/text_model.h": {
+      "bytes": 4767,
+      "sha256": "d48ffd85a68e511c41be85a5e5832a9edbf218563a297b039574efbfbd855d04"
+    },
+    "ChandraNative/runtime/unified_parallel32_opt_in.h": {
+      "bytes": 1444,
+      "sha256": "89840f273ac6bfdc2805c5648b7874e4c74d6b9eaedb48774c9609534bc569ec"
+    },
+    "ChandraNative/runtime/worker.cpp": {
+      "bytes": 91866,
+      "sha256": "05b863c28ad8737ae9e1ef8a9fe543165d16a7bf234f23ee9cc96d213ba0d751"
+    },
+    "ChandraNative/shaders/runtime/linear_gemm_ordered2.hlsl": {
+      "bytes": 5212,
+      "sha256": "df14d59cbea50c41f150e259d9453b92486637d0b589354b88527c9ab8448ea2"
+    },
+    "ChandraNative/shaders/runtime/linear_gemm_parallel32_b2.hlsl": {
+      "bytes": 5670,
+      "sha256": "57d88c96ea7e913e374fb830d0b84788d23a34471f27cbc7f13f770a35c3f97e"
+    },
+    "ChandraNative/shaders/runtime/text_attention_values_tile_grid.hlsl": {
+      "bytes": 783,
+      "sha256": "bd9a31e1e09c264ec34684dfb592e679383d5e55073fd0242568081773acbe5e"
+    },
+    "chandra_service/service.py": {
+      "bytes": 11920,
+      "sha256": "64de1460b30e708a1d862e3a4373f2f7d973897cea8cf91cf1b55f156e754e06"
+    },
+    "runtime/native/backend.py": {
+      "bytes": 74306,
+      "sha256": "9f6341073bc299444ac5d35900525f14dc481345ba2602bb760750a18b2875ad"
+    },
+    "runtime/native/cohort.py": {
+      "bytes": 14678,
+      "sha256": "9735f2edbf719971897bb3183119b08ce47f16900c124f891151c298d43402df"
+    },
+    "runtime/native/config.py": {
+      "bytes": 18009,
+      "sha256": "491dce634b1fdbafe28afcca83f1458f00830ce1fd0db282ac18f32efd319278"
+    },
+    "runtime/native/protocol.py": {
+      "bytes": 32106,
+      "sha256": "dfce4c5e5c7751b7a6ad304ba9c102169240c279002ec08a03eb62cf4fb3b2f8"
+    }
+  },
+  "completed_evidence": {
+    "native154_manifest": {
+      "bytes": 27919,
+      "sha256": "6a6f669b624e8bcf0d8756009a9524998b999b00e2c3a94ccb7da2c48cd0f38a"
+    },
+    "native154_seal": {
+      "bytes": 26849,
+      "sha256": "49b4d8b8c85eaa60a93a6312eebcc8a484c5f1faf89c4a056c1aef36e462a0dc"
+    },
+    "native_source_review": {
+      "bytes": 2147,
+      "sha256": "3847668e7fa804f3ddf1ce17351600811efbd5604526030b319672a212c93e99"
+    },
+    "current3036": {
+      "bytes": 10533,
+      "sha256": "43bc44fc6cee19c93b5abc5af01e65a5ce9ef6ffecdba9274aaa57c06f375c55"
+    },
+    "compiled_worker": {
+      "bytes": 1529344,
+      "sha256": "c60f54dbadefd15ccb3001842c429165304eee5499b9c724b3f0d45253a9408a"
+    },
+    "actual_CPU_report": {
+      "bytes": 75523,
+      "sha256": "fb92f2723c5412f20115c20c4855e7710242b182790dd83e01a645c0a568b4f6"
+    },
+    "actual_CPU_review": {
+      "bytes": 20006,
+      "sha256": "8dadcfd6b012e1763bd26ac11a298d0f73e28233387ded0b85abe02430d3a065"
+    },
+    "trained_capture3104_review": {
+      "bytes": 19756,
+      "sha256": "bbf67b7547038f66c31b1c1127a941c6384d63fa631153b2ddd2b1e7b4415fcc"
+    },
+    "endpoint02_source_review": {
+      "bytes": 11143,
+      "sha256": "b5cfac8a485b663aa14bde200ef827c53f48c1bb6dab585f11d0227726052cb5"
+    },
+    "endpoint02_seal": {
+      "bytes": 37669,
+      "sha256": "0cc1ed69bee02ed453ecdf8bf0fb1e3ce9ff9f22db5223ec4d9d02c906b3e0bc"
+    },
+    "endpoint02_runtime38_map": {
+      "bytes": 5085,
+      "sha256": "6079c5133d71d74050cafb90cb6a5cc94905ca67f83645cc9f02340c006cf0e6"
+    },
+    "endpoint18_product_map": {
+      "bytes": 5568,
+      "sha256": "6b9e45fb07004fd45119e2a3bccb9370c6ee950703075196c53a91a2ec63c622"
+    },
+    "native0_HTTP3151_review": {
+      "bytes": 20630,
+      "sha256": "d19634243c9ba12ccd5bf6170b64469a4ea3a0f251f6362dbe598b851f05faf5"
+    }
+  },
+  "native_snapshot_files": 154,
+  "endpoint_product_closure_files": 18,
+  "unchanged_endpoint_product_members": 13,
+  "excluded_snapshot_differences": [
+    "ChandraNative/README.md",
+    "ChandraNative/runtime/attention_values_grid_calibration.cpp",
+    "ChandraNative/runtime/gemm_candidate_fixture.h",
+    "ChandraNative/runtime/ordered2_candidate_calibration.cpp",
+    "ChandraNative/runtime/unified_parallel32_calibration.cpp",
+    "ChandraNative/runtime/unified_parallel32_fixture.h"
+  ],
+  "qualified_observations": [
+    "Actual CPU artifact current3036 and short eager two-owner capture3104 retain their reviewed scope: 20 saved payloads/eight causal-state joins exact to ff0a2790, three persisted own-B1 differentials exact; CPU249 descriptive and native847 unequal.",
+    "Completed HTTP3151 is a native0 singleton only: 556 IDs through natural EOS, actual B2 dispatches 0; no B2 complete-page acceptance is inferred from it."
+  ],
+  "limits": [
+    "All experimental selectors remain explicit and default off. Original source/precision/reduction order is copied, not rewritten.",
+    "A fresh build from this public tree has a fresh executable identity and needs its own operational admission. Historical current3036 identity does not authenticate a rebuilt binary.",
+    "No sustained PPS improvement, permanent endpoint, whole-graph numerical tolerance or arbitrary-document/layout acceptance.",
+    "Private owner/launch/materialization/evidence harness, deferred-wait, DirectML and unfinished vision work are excluded."
+  ],
+  "future_execution_authority": false
+}

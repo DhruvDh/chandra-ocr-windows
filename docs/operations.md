@@ -1,6 +1,10 @@
 # Run and manage the endpoints
 
-The installed Windows and ROCm endpoints have passed the synthetic OCR and CLI checks recorded in the [acceptance measurements](../benchmarks/evidence/README.md). Consult that record and the [work record](work-record.md) for the tested lifecycle and numerical boundaries before changing the deployment.
+The normal Windows endpoint selects the maintained SYCL Q8_0-KV C6 profile through the existing Waystone lease and router. Use the [maintained-engine deployment guide](llama-deployment.md) for its authenticated source/configuration, capacity, admission and rollback instructions, and the [installed Q8 record](../benchmarks/evidence/sycl-q8-normal-service-2026-10-16.json) for finite lifecycle, CLI and four-case throughput evidence. The profile retains `qualified:false`; broader numerical/OCR qualification remains open. Inspect local operational state before changing services; a selected configuration does not imply that its processes are currently active. The older Windows XPU and ROCm observations remain in the [evidence index](../benchmarks/evidence/README.md).
+
+## Historical XPU endpoint and shared router
+
+The following XPU setup, one-slot admission and PyTorch memory descriptions preserve the earlier deployment. They do not configure the selected llama.cpp SYCL profile; the router API and ownership principles remain shared.
 
 Clone this repository on both hosts and install the [Windows inference environment](../runtime/waystone/README.md). Download and verify the pinned checkpoint with `scripts/download_model.py` and `scripts/model_inventory.py`; run `scripts/waystone/xpu_probe.py` with the Windows environment's interpreter before loading a model. On the Linux host, `uv sync --locked --group test --group benchmark` installs the separate service/client environment.
 
@@ -57,9 +61,21 @@ The worker requests cooperative cancellation at its total inference deadline and
 
 The deployment uses an SSH channel to Waystone with loopback forwards for the worker and an authenticated heartbeat lease, keeping its worker private and avoiding Windows firewall or administrator changes. The Windows supervisor assigns a suspended child to a Job Object before it can execute; lease EOF, expiry or supervisor exit closes the owned process tree. A separate NorthStone user service owns the router. Repeated `--host` arguments bind loopback and a specific LAN interface in the same process, sharing one scheduling pool. Existing ROCm listeners remain independent. The [work record](work-record.md) records exercised deployment and supervisor checks. Deployed checks passed for router cancellation with retained capacity, automatic crash recovery, and two five-minute idle-unload cycles with correct OCR after reload. Their measured scope is recorded in [lifecycle evidence](../benchmarks/evidence/2026-10-04-lifecycle.json).
 
-## Install and control the user services
+## Optional native DirectCompute worker
 
-Run these commands from the Linux checkout. Set `SSH_ALIAS` to an existing key-authenticated SSH alias, `WINDOWS_PROJECT` to the remote checkout, `WINDOWS_PYTHON` to its installed inference interpreter, and `WINDOWS_MODEL` to the verified model directory. The source synchronization command preserves replaced remote files and verifies their hashes; it does not update Git, environments or model weights. Stop task-owned inference before replacing serving source.
+The host manager can explicitly launch the [native DirectCompute endpoint](directcompute-native-endpoint.md) with `--worker-backend native`. Supply an absolute normalized Windows `WINDOWS_NATIVE_CONFIG` path and `WINDOWS_NATIVE_CONFIG_SHA256` from the exact separately reviewed private configuration bytes; the Windows native launcher authenticates that file before listening. Model, device, shader, worker build and limits come from that configuration. The native route refuses a model-path or gain-only normalization override and never substitutes the historical XPU route.
+
+```bash
+uv run --no-sync python scripts/host/manage.py install --worker-backend native --ssh-host "$SSH_ALIAS" --remote-root "$WINDOWS_PROJECT" --remote-python "$WINDOWS_NATIVE_PYTHON" --native-config "$WINDOWS_NATIVE_CONFIG" --native-config-sha256 "$WINDOWS_NATIVE_CONFIG_SHA256"
+```
+
+This source capability needs root's later installation and Windows acceptance. Preserve the owner's existing services, private configuration, NorthStone policy and concurrent RAM priority. Native reinstallation retains an existing owned router configuration byte-for-byte when its Windows URL is unchanged; an explicit worker-port change updates that URL and serializes the preserved policy as indented JSON with LF line endings. Fresh installations retain the historical router defaults, so root must reconcile execution capacity, queue limits and measured page costs explicitly before enabling optional balancing. The unchanged `waystone` router label identifies the Windows node, and its historical one-slot policy does not exercise a native two-slot endpoint at saturation.
+
+Use the direct forwarded node base `http://127.0.0.1:18001/v1` (or the explicitly chosen worker port), with model alias `chandra`, for native concurrent-page qualification. Retain the exact 1,624 × 2,100 decoded request pixels, 3,617 prompt tokens, 16,384 context and 12,384 output allowance. Health and model listings must remain passive; verify idle worker unload, cancellation ownership without replay, safe shutdown, nested native/lease Jobs and lease-loss retirement on Windows before accepting this control route. Source tests and unit installation establish no deployment, new numerical acceptance or sustained pages-per-second improvement.
+
+## Historical XPU installation and shared service controls
+
+The following source synchronization and default installation commands target the historical XPU package; use the [maintained-engine deployment guide](llama-deployment.md) when selecting SYCL. The status, logs, stop and start commands act on the owned units under their installed configuration. Run from the Linux checkout. Set `SSH_ALIAS` to an existing key-authenticated SSH alias, `WINDOWS_PROJECT` to the remote checkout, `WINDOWS_PYTHON` to its installed inference interpreter, and `WINDOWS_MODEL` to the verified model directory. The historical source synchronization preserves replaced remote files and verifies their hashes; it does not update Git, environments or model weights. Stop task-owned inference before replacing serving source.
 
 ```bash
 uv run --no-sync python scripts/waystone/deploy_source.py --ssh-host "$SSH_ALIAS" --remote-root "$WINDOWS_PROJECT"

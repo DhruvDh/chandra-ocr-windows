@@ -1,0 +1,228 @@
+--- a/ggml/src/ggml-sycl/common.hpp
++++ b/ggml/src/ggml-sycl/common.hpp
+@@ -450,6 +450,7 @@
+     std::vector<uint64_t> decode_graph_desc;
+     uint64_t decode_graph_pool_epoch = 0;
+     uint64_t decode_graph_warm = 0, decode_graph_capture = 0, decode_graph_replay = 0, decode_graph_invalidate = 0;
++    uint64_t decode_graph_last_replay_capture = 0;
+     bool decode_graph_recording = false;
+ #endif
+ 
+--- a/ggml/src/ggml-sycl/decode-graph.hpp
++++ b/ggml/src/ggml-sycl/decode-graph.hpp
+@@ -43,8 +43,12 @@
+ }
+ 
+ static bool ggml_sycl_decode_graph_desc(ggml_backend_sycl_context & ctx, ggml_cgraph * graph,
+-                                      std::vector<uint64_t> & desc, bool & reordered) {
+-    if (ggml_sycl_info().device_count != 1 || graph->uid == 0 || graph->n_nodes <= 0 || graph->n_nodes > GGML_SYCL_MAX_NODES ||
++                                      std::vector<uint64_t> & desc, bool & reordered, int64_t & n_kv) {
++    const bool q8_decode = g_ggml_sycl_decode_graph == 2 || g_ggml_sycl_decode_graph == 3;
++    const int n_seqs = g_ggml_sycl_decode_graph == 3 ? 5 : q8_decode ? 6 : 4;
++    n_kv = 0;
++    if ((g_ggml_sycl_decode_graph != 1 && !q8_decode) ||
++        ggml_sycl_info().device_count != 1 || graph->uid == 0 || graph->n_nodes <= 0 || graph->n_nodes > GGML_SYCL_MAX_NODES ||
+         graph->n_leafs < 0 || graph->n_leafs > GGML_SYCL_MAX_NODES ||
+         g_ggml_sycl_debug || g_ggml_sycl_dev_debug || g_ggml_sycl_memtrace || g_ggml_sycl_enable_sparse_fa ||
+         !g_ggml_sycl_use_async_mem_op ||
+@@ -52,6 +56,7 @@
+         return false;
+     }
+     reordered = true;
++    desc.push_back(g_ggml_sycl_decode_graph);
+     desc.push_back(graph->uid);
+     desc.push_back(graph->order);
+     desc.push_back(g_decode_graph_storage_epoch.load());
+@@ -63,7 +68,7 @@
+     desc.push_back(g_ggml_sycl_mmvq_wide);
+     desc.push_back(g_ggml_sycl_prioritize_dmmv);
+     desc.push_back(ctx.opt_feature.reorder);
+-    int gdn = 0, fa = 0, concat = 0;
++    int gdn = 0, fa = 0, concat = 0, rot64 = 0, rot256 = 0;
+     for (int i = 0; i < graph->n_nodes; ++i) {
+         ggml_tensor * node = graph->nodes[i];
+         if (!ggml_sycl_decode_tensor_desc(ctx, node, desc)) {
+@@ -83,35 +88,54 @@
+         switch (node->op) {
+             case GGML_OP_GATED_DELTA_NET:
+                 if (node->type != GGML_TYPE_F32 || !node->src[2] || !node->src[5] ||
+-                    x->ne[0] != 128 || x->ne[2] != 1 || x->ne[3] != 4 ||
++                    x->ne[0] != 128 || x->ne[2] != 1 || x->ne[3] != n_seqs ||
+                     node->src[2]->ne[0] != 128 || node->src[2]->ne[1] != 32 ||
+-                    node->src[2]->ne[2] != 1 || node->src[2]->ne[3] != 4 ||
++                    node->src[2]->ne[2] != 1 || node->src[2]->ne[3] != n_seqs ||
+                     ggml_get_op_params_i32(node, 0) != 1) {
+                     return false;
+                 }
+                 ++gdn;
+                 break;
+             case GGML_OP_FLASH_ATTN_EXT:
+-                if (!ggml_sycl_flash_attn_decode_graph_supported(ctx.device, node) ||
+-                    x->ne[0] != 256 || x->ne[2] != 16 || y->ne[2] != 4 || y->ne[3] != 4) {
++                if (!ggml_sycl_flash_attn_decode_graph_supported(ctx.device, node, g_ggml_sycl_decode_graph) ||
++                    x->ne[0] != 256 || x->ne[2] != 16 || y->ne[2] != 4 || y->ne[3] != n_seqs ||
++                    (q8_decode && n_kv != 0 && n_kv != y->ne[1])) {
+                     return false;
+                 }
++                n_kv = y->ne[1];
+                 ++fa;
+                 break;
+             case GGML_OP_CONCAT:
+                 if (!x || !y || node->type != GGML_TYPE_F32 || x->type != GGML_TYPE_F32 || y->type != GGML_TYPE_F32 ||
+                     ggml_get_op_params_i32(node, 0) != 0 || x->ne[0] != 3 || y->ne[0] != 1 ||
+-                    node->ne[2] != 4 || node->ne[3] != 1) {
++                    node->ne[2] != n_seqs || node->ne[3] != 1) {
+                     return false;
+                 }
+                 ++concat;
+                 break;
+             case GGML_OP_MUL_MAT:
+-                // These Q8 shapes dispatch only to MMVQ or DMMV, including the four GDN output slices.
++                if (q8_decode && ggml_get_op_params_i32(node, 1) == GGML_HINT_SRC0_IS_HADAMARD) {
++                    // Match the native FWHT dispatch completely; never fall through to GEMM.
++                    if (!x || !y || x->type != GGML_TYPE_F32 || y->type != GGML_TYPE_F32 || node->type != GGML_TYPE_F32 ||
++                        !ggml_is_contiguous(x) || !ggml_is_contiguous(y) || !ggml_is_contiguous(node) ||
++                        x->ne[0] != x->ne[1] || x->ne[2] != 1 || x->ne[3] != 1 ||
++                        y->ne[0] != x->ne[0] || y->ne[2] != 1 || y->ne[3] != 1 || !ggml_are_same_shape(y, node)) {
++                        return false;
++                    }
++                    if (y->ne[0] == 64 && (y->ne[1] == 16*n_seqs || y->ne[1] == 64*n_seqs)) {
++                        ++rot64;
++                    } else if (y->ne[0] == 256 && (y->ne[1] == 4*n_seqs || y->ne[1] == 16*n_seqs)) {
++                        ++rot256;
++                    } else {
++                        return false;
++                    }
++                    break;
++                }
++                // These Q8 shapes dispatch only to MMVQ or DMMV, including the GDN output slices.
+                 if (!x || !y || x->type != GGML_TYPE_Q8_0 || y->type != GGML_TYPE_F32 || node->type != GGML_TYPE_F32 ||
+                     !ggml_is_contiguous(x) || !ggml_is_contiguous(y) || !ggml_is_contiguous(node) ||
+                     x->ne[2] != 1 || x->ne[3] != 1 || y->ne[3] != 1 ||
+-                    !((y->ne[1] == 4 && y->ne[2] == 1) || (y->ne[1] == 1 && y->ne[2] == 4)) ||
++                    !((y->ne[1] == n_seqs && y->ne[2] == 1) || (y->ne[1] == 1 && y->ne[2] == n_seqs)) ||
+                     ggml_get_op_params_i32(node, 1) == GGML_HINT_SRC0_IS_HADAMARD ||
+                     !can_use_mul_mat_vec_q(x, y, node)) {
+                     return false;
+@@ -122,7 +146,7 @@
+                 }
+                 break;
+             case GGML_OP_SET_ROWS:
+-                if (!x || !y || x->type != GGML_TYPE_F32 || node->type != GGML_TYPE_BF16 ||
++                if (!x || !y || x->type != GGML_TYPE_F32 || node->type != (q8_decode ? GGML_TYPE_Q8_0 : GGML_TYPE_BF16) ||
+                     (y->type != GGML_TYPE_I64 && y->type != GGML_TYPE_I32)) {
+                     return false;
+                 }
+@@ -165,7 +189,7 @@
+             return false;
+         }
+     }
+-    return gdn == 24 && fa == 8 && concat == 24;
++    return gdn == 24 && fa == 8 && concat == 24 && (!q8_decode || (rot64 == 16 && rot256 == 16));
+ }
+ 
+ static void ggml_sycl_decode_graph_discard(ggml_backend_sycl_context & ctx) {
+@@ -178,21 +202,33 @@
+ }
+ 
+ static ggml_status ggml_sycl_decode_graph_compute(ggml_backend_sycl_context & ctx, ggml_cgraph * graph) try {
++    const bool q8_decode = g_ggml_sycl_decode_graph == 2 || g_ggml_sycl_decode_graph == 3;
++    const int n_seqs = g_ggml_sycl_decode_graph == 3 ? 5 : 6;
+     std::vector<uint64_t> desc;
+     bool reordered = false;
+-    const bool eligible = ggml_sycl_decode_graph_desc(ctx, graph, desc, reordered);
++    int64_t n_kv = 0;
++    const bool eligible = ggml_sycl_decode_graph_desc(ctx, graph, desc, reordered, n_kv);
+     auto & pool = ctx.pool();
+     if (!eligible || desc != ctx.decode_graph_desc || pool.use_epoch != ctx.decode_graph_pool_epoch) {
++        if (q8_decode && !ctx.decode_graph_desc.empty()) {
++            GGML_LOG_INFO("[SYCL-DECODE-GRAPH] invalidate profile=%d eligible=%d descriptor_changed=%d scratch_changed=%d\n",
++                          g_ggml_sycl_decode_graph, int(eligible), int(desc != ctx.decode_graph_desc), int(pool.use_epoch != ctx.decode_graph_pool_epoch));
++        }
+         ggml_sycl_decode_graph_discard(ctx);
+         ggml_backend_sycl_graph_compute_impl(&ctx, graph);
+         if (eligible) {
+             ctx.stream()->wait_and_throw();
+             desc.clear();
+-            if (ggml_sycl_decode_graph_desc(ctx, graph, desc, reordered) && reordered) {
++            if (ggml_sycl_decode_graph_desc(ctx, graph, desc, reordered, n_kv) && reordered) {
+                 ctx.decode_graph_desc = std::move(desc);
+                 ctx.decode_graph_pool_epoch = pool.use_epoch;
+                 ++ctx.decode_graph_warm;
+-                GGML_LOG_INFO("[SYCL-DECODE-GRAPH] warm gdn=24 fa=8\n");
++                if (q8_decode) {
++                    GGML_LOG_INFO("[SYCL-DECODE-GRAPH] warm profile=%d seqs=%d kv=q8_0 kernel=vec rot64=16 rot256=16 n_kv=%" PRId64 "\n",
++                                  g_ggml_sycl_decode_graph, n_seqs, n_kv);
++                } else {
++                    GGML_LOG_INFO("[SYCL-DECODE-GRAPH] warm gdn=24 fa=8\n");
++                }
+             }
+         }
+         return GGML_STATUS_SUCCESS;
+@@ -201,7 +237,11 @@
+         // Input copies and all replays use the same in-order queue; no scratch user intervened.
+         ctx.stream()->ext_oneapi_graph(*ctx.exec_graph);
+         ++ctx.decode_graph_replay;
+-        if (ctx.decode_graph_replay <= 2) {
++        if (q8_decode && ctx.decode_graph_last_replay_capture != ctx.decode_graph_capture) {
++            ctx.decode_graph_last_replay_capture = ctx.decode_graph_capture;
++            GGML_LOG_INFO("[SYCL-DECODE-GRAPH] replay profile=%d capture=%" PRIu64 " count=%" PRIu64 " n_kv=%" PRId64 "\n",
++                          g_ggml_sycl_decode_graph, ctx.decode_graph_capture, ctx.decode_graph_replay, n_kv);
++        } else if (!q8_decode && ctx.decode_graph_replay <= 2) {
+             GGML_LOG_INFO("[SYCL-DECODE-GRAPH] replay count=%" PRIu64 "\n", ctx.decode_graph_replay);
+         }
+         return GGML_STATUS_SUCCESS;
+@@ -220,7 +260,12 @@
+         ctx.decode_graph_pool_epoch = pool.use_epoch;
+         ctx.stream()->ext_oneapi_graph(*ctx.exec_graph);
+         ++ctx.decode_graph_capture;
+-        GGML_LOG_INFO("[SYCL-DECODE-GRAPH] capture gdn=24 fa=8\n");
++        if (q8_decode) {
++            GGML_LOG_INFO("[SYCL-DECODE-GRAPH] capture profile=%d seqs=%d n_kv=%" PRId64 " count=%" PRIu64 "\n",
++                          g_ggml_sycl_decode_graph, n_seqs, n_kv, ctx.decode_graph_capture);
++        } else {
++            GGML_LOG_INFO("[SYCL-DECODE-GRAPH] capture gdn=24 fa=8\n");
++        }
+     } catch (...) {
+         if (ctx.decode_graph_recording) {
+             try { capture.end_recording(); } catch (...) {}
+--- a/ggml/src/ggml-sycl/fattn.cpp
++++ b/ggml/src/ggml-sycl/fattn.cpp
+@@ -273,11 +273,23 @@
+     return BEST_FATTN_KERNEL_TILE;
+ }
+ 
+-bool ggml_sycl_flash_attn_decode_graph_supported(int device, const ggml_tensor * dst) {
++bool ggml_sycl_flash_attn_decode_graph_supported(int device, const ggml_tensor * dst, int profile) {
+     if (!dst->src[0] || !dst->src[1] || !dst->src[2] || !dst->src[3] || dst->src[4] ||
+-        dst->src[0]->ne[1] != 1 || dst->src[0]->ne[3] != 4 ||
++        dst->src[0]->ne[1] != 1 ||
++        ggml_sycl_get_env("GGML_SYCL_MKL_FA_DIAG", 0) || ggml_sycl_get_env("GGML_SYCL_MKL_FA_DEBUG", 0)) {
++        return false;
++    }
++    if (profile == 2 || profile == 3) {
++        const int n_seqs = profile == 3 ? 5 : 6;
++        return ggml_sycl_info().devices[device].hw_info.arch == gpu_arch::intel_gpu_acm_g10 &&
++            dst->src[0]->type == GGML_TYPE_F32 && dst->type == GGML_TYPE_F32 && dst->src[3]->type == GGML_TYPE_F16 &&
++            dst->src[0]->ne[3] == n_seqs && dst->src[1]->ne[3] == n_seqs && dst->src[2]->ne[3] == n_seqs &&
++            dst->src[1]->type == GGML_TYPE_Q8_0 && dst->src[2]->type == GGML_TYPE_Q8_0 &&
++            dst->src[1]->ne[0] == 256 && dst->src[2]->ne[0] == 256 && dst->src[2]->ne[2] == 4 &&
++            ggml_sycl_get_best_fattn_kernel(device, dst) == BEST_FATTN_KERNEL_VEC;
++    }
++    if (profile != 1 || dst->src[0]->ne[3] != 4 ||
+         dst->src[1]->type != GGML_TYPE_BF16 || dst->src[2]->type != GGML_TYPE_BF16 ||
+-        ggml_sycl_get_env("GGML_SYCL_MKL_FA_DIAG", 0) || ggml_sycl_get_env("GGML_SYCL_MKL_FA_DEBUG", 0) ||
+         ggml_sycl_get_best_fattn_kernel(device, dst) != BEST_FATTN_KERNEL_TILE) {
+         return false;
+     }
+--- a/ggml/src/ggml-sycl/fattn.hpp
++++ b/ggml/src/ggml-sycl/fattn.hpp
+@@ -18,7 +18,7 @@
+ void ggml_sycl_flash_attn_ext(ggml_backend_sycl_context & ctx, ggml_tensor * dst);
+ 
+ bool ggml_sycl_flash_attn_ext_supported(int device, const ggml_tensor * dst);
+-bool ggml_sycl_flash_attn_decode_graph_supported(int device, const ggml_tensor * dst);
++bool ggml_sycl_flash_attn_decode_graph_supported(int device, const ggml_tensor * dst, int profile);
+ 
+ // Scratch that flash attention needs beyond the output tensor
+ struct ggml_sycl_fattn_extra {

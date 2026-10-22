@@ -27,8 +27,8 @@ def test_persistent_state_and_kv_dimensions():
     result = build(MODEL, 3, 801, 12096, 395)
     capacity = result['capacity_terms']
     assert capacity['recurrent_state_bytes_per_page']['value'] == 50331648
-    assert capacity['kv_bytes_per_page_per_token']['value'] == 32768
-    assert capacity['recurrent_plus_final_kv_bytes']['value'] == 3 * (50331648 + 32768 * 1196)
+    assert capacity['kv_bytes_per_page_per_token']['value'] == 65536
+    assert capacity['recurrent_plus_final_kv_bytes']['value'] == 3 * (50331648 + 65536 * 1195)
     assert result['phases']['decode_step']['projection_flops']['value'] == 3 * 8409579520
 
 
@@ -74,7 +74,7 @@ def test_cached_decode_closed_form_matches_explicit_forward_sum(batch, prefix, c
     scenario = result['conditional_cached_decode_dram_scenario']
     weights = 2 * sum(model['projection_elements'][name] for name in (
         'text_mlp', 'text_linear_attention', 'text_full_attention', 'vocabulary_head'))
-    kv = 2 * 2 * 2 * 3 * 2
+    kv = 2 * 2 * 2 * 3 * 4
     recurrent = 2 * 3 * 2 * 3 * 4
     expected = dict(shared_projection_weight_reads=0, attention_kv_reads=0,
                     new_kv_writes=0, recurrent_matrix_reads_and_writes=0)
@@ -106,7 +106,7 @@ def test_batch_amortizes_only_shared_decode_weights_per_page():
     assert fifteen['bytes_per_completed_page']['shared_projection_weight_reads'] * 15 == one['bytes_per_completed_page']['shared_projection_weight_reads']
     for term in ('attention_kv_reads', 'new_kv_writes', 'recurrent_matrix_reads_and_writes'):
         assert fifteen['bytes_per_completed_page'][term] == one['bytes_per_completed_page'][term]
-    assert fifteen['bytes_per_completed_page']['subtotal'] == 311398957056
+    assert fifteen['bytes_per_completed_page']['subtotal'] == 360922349568
 
 
 @pytest.mark.parametrize('field', ['batch', 'prefix', 'patches', 'completion'])

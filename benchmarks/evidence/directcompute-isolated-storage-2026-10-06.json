@@ -1,0 +1,77 @@
+{
+  "schema": "chandra.directcompute.isolated-storage-diagnosis.v1",
+  "recorded_date": "2026-10-06",
+  "backend": "DirectCompute/D3D11",
+  "device": "Intel Arc A770",
+  "model_revision": "af93b47dba1b47b6640c86ccf487ed2260ab9a09",
+  "scope": "Finite model-free storage diagnostics; trained full-model corruption remains unresolved",
+  "native_observer": {
+    "logical_source_bytes": 134215680,
+    "SRV_uint32_elements": 33553920,
+    "last_row_bytes": 5120,
+    "last_row_source_sha256": "e696b6bda9b22dba3ad2a49132d6353302f5b20ad2627909ae5474586a46c07f",
+    "source_layout": "Original logical buffer and views with authenticated retained final-row bytes spliced into synthetic input",
+    "probe_layouts": [
+      "A: original raw-copy offsets",
+      "B: final row copied from original tail to destination word zero",
+      "C: near-tail SRV range with final row relocated inside destination"
+    ],
+    "operation_count": 12,
+    "capture_files": 26,
+    "binary_capture_files": 22,
+    "binary_capture_bytes": 2142824,
+    "expected_observed_pairs": 10,
+    "all_expected_observed_pairs_byte_identical": true,
+    "direct_staging_and_shader_reads_match": true,
+    "child_elapsed_seconds": 4.64100000000326,
+    "peak_process_commit_bytes": 447336448,
+    "peak_Job_commit_bytes": 459517952,
+    "process_commit_limit_bytes": 805306368,
+    "Job_commit_limit_bytes": 1073741824,
+    "primary_Job_supervisor_local_group_retired": true,
+    "existing_worker_restored_cold": true,
+    "independent_inspection": {
+      "bytes": 3245,
+      "sha256": "98d7a929330fd81fd364dd1e0e3242c4a37127e3acbac10f0de62cf360c81bd8"
+    },
+    "root_unit_closure": {
+      "bytes": 552,
+      "sha256": "c83524449dde641d16fa2210b60068f0b5d097884972c3d259fd01cbff0f994a"
+    }
+  },
+  "failed_padding_CPU_build": {
+    "compiler_phase": "Runtime objects then intermediate static library",
+    "runtime_objects_produced": 6,
+    "library_extent_guard_tripped": true,
+    "transient_library_extent_bytes": null,
+    "library_bytes_after_closure": 20410804,
+    "runtime_build_complete": false,
+    "CPU_only": true,
+    "closed": true,
+    "peak_process_commit_bytes": 222068736,
+    "peak_Job_commit_bytes": 268161024,
+    "retained_output_files": 13,
+    "retained_output_bytes": 37379365,
+    "driver_result": {
+      "bytes": 32093,
+      "sha256": "1499cb257fcedb85e600eb3369a86eea764e82badfeaca93244a6fe99d89676e"
+    },
+    "build_replayed": false,
+    "next_recipe_under_review": "Link the unchanged runtime objects directly; retain RAM, time and aggregate output caps"
+  },
+  "acceptance": {
+    "isolated_native_observer": true,
+    "trained_model": false,
+    "complete_OCR": false,
+    "native_endpoint": false,
+    "sustained_throughput": false
+  },
+  "limits": [
+    "Matching isolated reads do not establish full-model storage integrity or the temporal origin of corruption.",
+    "The point did not run full-model import, production GEMV inference or full-model memory pressure.",
+    "There is no new numerical, complete-page or throughput qualification.",
+    "The failed build preserves only the final library extent; its transient extent and guard-time file bytes were not retained."
+  ],
+  "automatic_inference_replay": false,
+  "AMD_actions": []
+}

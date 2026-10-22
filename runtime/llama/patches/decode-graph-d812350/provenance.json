@@ -1,0 +1,250 @@
+{
+  "schema": "chandra-llama-decode-graph-source-experiment-v1",
+  "status": "Experimental source/build and finite Q3 page evidence; no sustained-throughput or normal-service acceptance claim",
+  "default_enabled": false,
+  "upstream": {
+    "repository": "https://github.com/ggml-org/llama.cpp",
+    "commit": "d81235049384534c167caea52b85a694f6103d14",
+    "release": "b11429",
+    "source_archive": {
+      "size": 37887730,
+      "sha256": "6b58785f0a82898f4c3442417ff962e2d4b231b1bee5d033902ad90b27901e14"
+    },
+    "license_notice": "LICENSE.llama.cpp"
+  },
+  "vision_dependency": {
+    "provenance": "../vision-sdpa-d812350/provenance.json",
+    "provenance_sha256": "da9c61cd1999a695b5988845a5e248625ccbb6532b5134d3625bbbd7527eb143",
+    "patch": "../vision-sdpa-d812350/candidate.patch",
+    "patch_size": 17832,
+    "patch_sha256": "497141a724763b5ffa9f42e637c2b794f6e05c5c02551b133056ca92ebe844ec",
+    "shared_sections": ["sdk", "host_tools", "build.environment", "build.sdk_cmake_paths", "build.cmake_cache"],
+    "scope": "Exact shared SDK/tool/environment/base-CMake inputs; historical build/operator/runtime outcomes in the dependency do not describe this graph build",
+    "changed_source_files": 2,
+    "final_source_bytes": 30666,
+    "files": [
+      {"path": "ggml/src/ggml-sycl/fattn-onednn.cpp", "size": 24506, "sha256": "19722fe620ce64b196ca59359555d69ffc8df384fa662bf81c23d7997bf78784"},
+      {"path": "ggml/src/ggml-sycl/fattn-onednn-vision.hpp", "size": 6160, "sha256": "fcafb45591ee57f96288c70282ed610d915e8aefd58ea072943cb51aa6f27fce"}
+    ]
+  },
+  "patches": {
+    "order": ["candidate.patch", "extension.patch"],
+    "strip_components": 1,
+    "total_patch_bytes": 32208,
+    "files": [
+      {"file": "candidate.patch", "size": 19488, "sha256": "c9c5d552bae6679a709f87cf8696a73651ca69bceda999506974049e4a064515", "input": "Pinned upstream graph files; decode-graph.hpp absent"},
+      {"file": "extension.patch", "size": 12720, "sha256": "f0d82e05a73e475d3b42b483408e77d95799cec19d51f01d6325656615959303", "input": "Exact candidate.patch outputs; extends fixed profiles to Q8 C6 and C5"}
+    ],
+    "actual_build_application_method": "Authenticated full-file overlays into a fresh pinned source archive extraction; the patch pair is retained separately and final source hashes bind the build inputs",
+    "graph_changed_source_files": 5,
+    "graph_final_source_bytes": 373153,
+    "total_changed_source_files_with_vision": 7,
+    "total_changed_source_bytes_with_vision": 403819,
+    "source_files": [
+      {
+        "path": "ggml/src/ggml-sycl/common.hpp",
+        "before_size": 34072,
+        "before_sha256": "6b084e56405b6a999d8b4fd079d0a582b55149aef0ca08e95001d651d7dd5bc9",
+        "candidate_size": 34383,
+        "candidate_sha256": "5f6c1d1ad74bdb6c4fd938d6caa4be364607edf949ef769226ca502cb7644d83",
+        "after_size": 34434,
+        "after_sha256": "f45495562d3e946ccd77e3ea9967cccb30aa487a635cd5f869ad8a7334eef167"
+      },
+      {
+        "path": "ggml/src/ggml-sycl/decode-graph.hpp",
+        "before": "absent",
+        "candidate_size": 10459,
+        "candidate_sha256": "64b056fe66e83e3f088f8419e43d071a5792f2339eb101dc1880126623af1a8c",
+        "after_size": 13607,
+        "after_sha256": "243899f472d68dc34946dfccfe83e9a50a1f63481b9497c8ea0e1e8d60fd5128"
+      },
+      {
+        "path": "ggml/src/ggml-sycl/fattn.cpp",
+        "before_size": 18750,
+        "before_sha256": "704b29a431cc841bb03074ee3e79b328dfba8961ca0c18feeeb1ee71411cf909",
+        "candidate_size": 19401,
+        "candidate_sha256": "8603d1a4c54bcd9c5afedf52fdea12c5c4be4f6e7dfdfbc8045fbfc10082b45e",
+        "after_size": 20152,
+        "after_sha256": "7626883721c25e54c59727851eb4e99b6a18b2f3a0c9a4d54f144b4cbb1605e2"
+      },
+      {
+        "path": "ggml/src/ggml-sycl/fattn.hpp",
+        "before_size": 1717,
+        "before_sha256": "d553ec91b5413e5c0890743c5246bf90e685322f3b800beb0242b98d9e02c7b8",
+        "candidate_size": 1804,
+        "candidate_sha256": "74cdcbcc5bb8b9744f74f4cab243676cc3d4d4a9a8ea34f7c09120fd12654bc8",
+        "after_size": 1817,
+        "after_sha256": "09e2e4e0c09b7cd58bfbd94176765d129b269d81225551057385dd17722f7d0d"
+      },
+      {
+        "path": "ggml/src/ggml-sycl/ggml-sycl.cpp",
+        "before_size": 301235,
+        "before_sha256": "72d27c58508ab470e96586c5270e67a0f2369f0e6af08963ec176bef91241eb9",
+        "candidate_size": 303143,
+        "candidate_sha256": "b2621276feaaa8b852a63769e7af0397bc07fd9e728f6c8c4d7c0547eb4a2c92",
+        "after_size": 303143,
+        "after_sha256": "b2621276feaaa8b852a63769e7af0397bc07fd9e728f6c8c4d7c0547eb4a2c92"
+      }
+    ],
+    "source_review": {
+      "command": "codex --no-daemon review",
+      "model": "gpt-6.1-sol",
+      "reasoning_effort": "xhigh",
+      "scope": "Retained source/profile/pin/containment review before offline controls and build; publication commands require their own review before execution",
+      "source_review_log_sha256": "0542e07d92c1153d0bdfe74cf2117c8ac022be1cec24552c91b567f9a0a31f3e",
+      "corrected_runbook_review_log_sha256": "27cf86ebe530b723f33b38361c11111deb4acde2118b6a77d3bef95f2481a64d",
+      "source_and_patch_verification_log_sha256": "68e876edb3a862042b719281d9e9b6488f0f21a6976559cdc06bd8d01148ddcb"
+    }
+  },
+  "build": {
+    "settings_dependency": "vision_dependency.shared_sections",
+    "cmake_cache_overrides": {"GGML_SYCL_GRAPH": "ON"},
+    "target": "ggml-sycl",
+    "generator": "Ninja",
+    "parallel_jobs": 1,
+    "cxx_and_module_link_flag": "-fsycl-max-parallel-link-jobs=1",
+    "exceptions": "/EHsc retained; do not replace CMAKE_CXX_FLAGS",
+    "graph_source_integration_files": 5,
+    "source_files_after_both_overlays": 3689,
+    "sdk_files": 4115,
+    "sdk_bytes": 4880529788,
+    "recipe_input_files": 21,
+    "recipe_input_bytes": 2277663972,
+    "observed": {
+      "success": true,
+      "available_backends": "ggml-sycl",
+      "base_cpp_translation_units": 6,
+      "sycl_translation_units": 105,
+      "ggml_sycl_dnnl": 1,
+      "ggml_sycl_f16": true,
+      "ggml_sycl_graph": true,
+      "direct_level_zero_api": false,
+      "cxx_exceptions": true,
+      "one_job_option_in_actual_module_link": true,
+      "intelsycl_compiler_version": "20260101",
+      "sycl_language_version": "202012",
+      "dnnl_gpu_runtime": "SYCL",
+      "dnnl_gpu_vendor": "INTEL",
+      "smoke_executables_compiled_and_linked": true,
+      "smoke_executables_run": false,
+      "upstream_host_only_intelsycl_language_check_run": true,
+      "leaf_ninja_seconds": 1529.78199999989,
+      "owned_episode_seconds_rounded": 1599.963,
+      "exit_code": 0,
+      "job_active_processes_at_closure": 0,
+      "job_terminated_processes": 0,
+      "stdout_stderr_eof": true,
+      "handles_descriptors_closed": true,
+      "held_inputs_released": 27,
+      "peak_process_private_bytes": 930852864,
+      "peak_job_private_bytes": 1029914624,
+      "embedded_commit": "Unknown; Git unavailable during CMake; source archive and overlays are authoritative"
+    },
+    "resource_envelope": {
+      "cpu_count": 1,
+      "priority": "below-normal",
+      "active_process_limit": 16,
+      "work_seconds": 2400,
+      "process_private_cap_bytes": 4294967296,
+      "job_private_cap_bytes": 4294967296,
+      "live_physical_floor_bytes": 4294967296,
+      "live_reported_commit_floor_bytes": 4294967296,
+      "additional_physical_forecast_bytes": 4831838208,
+      "additional_reported_commit_forecast_bytes": 4831838208,
+      "additional_free_disk_bytes_required_exclusive": 12884901888,
+      "log_cap_bytes": 16777216,
+      "lease_seconds": 15,
+      "commit_metric": "Outer supervisor GlobalMemoryStatusEx.ullAvailPageFile; not an independent machine-wide low-water mark"
+    },
+    "retained_private_evidence_sha256": {
+      "recipe.json": "a9838f8209f0bc8ab55c0b4e1b6b8d9f6611bb5ca311a61c2b6b5cecf89db519",
+      "build.py": "8553013f59c8a48a7f40b0e53233a5e148f9c3a4850af2b5eacdfb30c3f0e460",
+      "receipt.json": "efa99c79bee348b3e911df2d5848132b6bbe8ceae535872c8c21d98c312d5744",
+      "build-result.json": "f3f641c96dc5cc64a18d33a044a18e66e250f9203e8ffbb100c699a8252fea15",
+      "stdout.log": "8b7af70165058df3d4f88642cc4d71fc6097e55bf70fdc60bdb2800e6aedd1aa",
+      "stderr.log": "64e82af896ddbbd1468c368e72747a0ec49dceefd39688c8d48f26818da6fada",
+      "CMakeCache.txt": "a238b124705a607b76c60e5d19777e2f0e95ceb860f16798ef148175d5cb4c8f",
+      "compile_commands.json": "ddadc6bb3dd64968ffc3f9fcb2f23c256c22317985c06eb9af012229cedc6230",
+      "build.ninja": "4048354e66f3dbbc7b67a270b5e561d05b7343b10419f93bfb1e0fbfd59cc93b",
+      "rules.ninja": "cf31601a3d77aa29439dd568bc1fd464dd6f7fb92835737226611c7117e8c214"
+    }
+  },
+  "runtime": {
+    "official_archive": {
+      "filename": "llama-b11429-bin-win-sycl-x64.zip",
+      "url": "https://github.com/ggml-org/llama.cpp/releases/download/b11429/llama-b11429-bin-win-sycl-x64.zip",
+      "size": 147963744,
+      "sha256": "4968340c18e7b34f67b7805b7198e71b24ed043728b4864931be926675af9542"
+    },
+    "only_changed_runtime_file": {"name": "ggml-sycl.dll", "size": 65091072, "sha256": "4e4445190ab5b7686a0990c11aa8faf8f0c27bbf2b9f445430193b0aaa446234"},
+    "official_file_count": 72,
+    "candidate_file_count": 72,
+    "candidate_matches_official_except_leaf": true,
+    "named_exports_and_base_import_availability_checked": true,
+    "sdk_sycl_onednn_mkl_dlls_match_official": true,
+    "static_check_proves_full_abi_compatibility": false,
+    "binary_redistributed": false
+  },
+  "activation": {
+    "default_decode_graph": 0,
+    "profiles": {"1": "Exactly four BF16 attention sequences", "2": "Exactly six Q8 attention sequences", "3": "Exactly five Q8 attention sequences"},
+    "observed_q3_child_environment": {"GGML_SYCL_ENABLE_GRAPH": "0", "GGML_SYCL_DECODE_GRAPH": "3", "GGML_SYCL_FA_ONEDNN_UNMASKED": "1", "GGML_SYCL_FA_ONEDNN_DG2_D64": "1"},
+    "inherited_environment_overrides_scrubbed": true,
+    "debug_exclusions_zero_or_absent": ["GGML_SYCL_DEBUG", "GGML_SYCL_DEV_DEBUG", "GGML_SYCL_MEMTRACE", "GGML_SYCL_SPARSE_FA", "GGML_SYCL_MKL_FA_DIAG", "GGML_SYCL_MKL_FA_DEBUG"],
+    "requires": ["One visible SYCL device", "Intel DG2/ACM-G10 for Q8 VEC attention", "Asynchronous memory operations", "ext_oneapi_limited_graph", "One serial submitting context", "Warmed retained scratch and storage", "Exact checked topology, types, shapes and dispatch settings"],
+    "topology": {"gdn": 24, "attention": 8, "concat": 24, "q8_rot64": 16, "q8_rot256": 16},
+    "ineligible_work": "Prefill, reduced active width and unsupported shapes execute eagerly before submission",
+    "failure_policy": "Abort on capture/submission/execution failure; no eager retry of a potentially state-mutating invocation",
+    "q3_logging": "--log-verbosity 4 is the first engine option before device initialization; bounded complete stderr forwarding is separate qualification instrumentation"
+  },
+  "finite_q3_page_evidence": {
+    "profile": "Q8 C5, batch/microbatch 256, mode 3; compiled Q8 C6 mode has no runtime qualification in this record",
+    "cohorts": 2,
+    "requests_per_cohort": 5,
+    "distinct_cases": 4,
+    "natural_complete_responses": 10,
+    "source_checks_passed": 10,
+    "context_per_slot": 16384,
+    "total_context": 81920,
+    "output_allowance": 12384,
+    "outer_inner_affinity_masks": [15, 15],
+    "llama_omp_mkl_threads": 1,
+    "captured_replayed_padded_kv_per_cohort": [[3840, 4096, 4352], [3840, 4096, 4352]],
+    "captures": 6,
+    "first_replay_markers": 6,
+    "invalidations": 6,
+    "full_width_overlap_and_slot_turnover": true,
+    "strict_single_eager_reference_equal": false,
+    "strict_mismatch": "One scanned-0 table x2 edge changes from 925 to 926; it exactly matches historical eager measure-0030",
+    "exact_complete_content_and_full_usage_historical_membership": true,
+    "prefrozen_historical_variant_count": 9,
+    "historical_family_exhaustive": false,
+    "streaming_and_historical_scheduling_matched": false,
+    "qualified": false,
+    "general_numerical_qualification": false,
+    "sustained_throughput_measured_by_q3_gate": false,
+    "normal_service_deployment_accepted": false,
+    "retirement": "Inner and outer Jobs zero, closed resources and all inputs released; inner 74/74, outer 125/125. No inner fault; parent-requested engine status 3235774465, outer service exit 0 and outer drains EOF.",
+    "retained_private_evidence_sha256": {
+      "recipe.json": "89876ef0f81dab15fcc97b6e7e1221d64eb5333f0abf4ce449c7e337d1f04a63",
+      "configuration.json": "e892b799471c86bd351169159dbba574d37fc515a8af6bb45809bd71beabcc46",
+      "instrumented_config_source.py": "31bfc46448fc7b73e7f7e4635057ab7af81095ddf9a9669dcb707d3225af3289",
+      "implementation.patch": "e3f554334ead869e8375cb36b31596d08617b30560f398873f0a40a6e3cda8b9",
+      "gate-assessment.json": "c136534139219b2053c7b5ee3f0f1df048b9fb35d226d4ce6df4815b64a72249",
+      "receipt.json": "ff3265d585fbaa718f073fae81286754b5ca653f765f723bc7de30d771d810f9",
+      "stdout.log": "6cf46a4dd137222a1e395037a72dccdb669286f49b491183d2a58399c2589513",
+      "stderr.log": "e119cbb1b03410918d515f359c30ba7a907d3c6636f66bdbbfadd061f37615ce",
+      "historical_eager_baseline_note": "ca23fe90bb75a2df26c33ccb66eaed7ed754dd71851d71b3e58637c0535b7085"
+    }
+  },
+  "reproducibility_limits": [
+    "The published patches preserve exact retained bytes; the actual builder used authenticated final full-file overlays. This publication has not rerun application, compilation or inference.",
+    "The pinned vision dependency supplies shared SDK/tool/build settings; its historical build/operator observations remain separate.",
+    "Private smoke, extraction, containment, service and assessment helpers are not redistributed; this is not a portable automated installer or complete experimental harness.",
+    "No recursively complete VS/Windows SDK or machine environment inventory and no bit-identical rebuild guarantee.",
+    "Source identities and static ABI checks do not establish general numerical equivalence, broader OCR accuracy, output-distribution equality, graph speedup or normal-service acceptance.",
+    "Finite historical-variant membership retains the strict mismatch and supplies no state/logit oracle; it does not make the historical family exhaustive.",
+    "Build/page peaks are overlapping process/Job commit observations, not VRAM, physical-residency limits, measured reserve minima or future allocation bounds.",
+    "Raw captures, SDK/runtime binaries, weights and machine-private paths remain private. Hash commitments identify retained local evidence, not independent remote attestation."
+  ]
+}

@@ -1,0 +1,436 @@
+{
+  "schema": "chandra.directcompute.native-checkpoint.v1",
+  "cutoff_utc": "2026-10-05T23:39:00Z",
+  "scope": "Experimental complete graph and closed tiny token diagnostic; not deployed native OCR or a sustained page-throughput result",
+  "model_revision": "af93b47dba1b47b6640c86ccf487ed2260ab9a09",
+  "source_build": {
+    "manifest": {
+      "bytes": 11137,
+      "sha256": "0651fb3fba12dfe5058014b492b8f834a1ae59d80ed980a5dd5631a13b5b97cd"
+    },
+    "archive": {
+      "bytes": 256749,
+      "sha256": "a83beb74c96cd3d4301a4de17a6d492105014a02fda99aecec52b099dad982e6"
+    },
+    "source_members": 72,
+    "runtime_files": {
+      "ChandraNative/adapter_identity.h": {
+        "bytes": 3858,
+        "sha256": "f4356d0ec2161761ee4b768be10a215b19f9af4ac38622ce5c8d31bfad30eb00"
+      },
+      "ChandraNative/runtime/api.h": {
+        "bytes": 3008,
+        "sha256": "563c7555da0b5c06c7a17cadc0722b8e252b7c9b867283dfe1a684e14bf5f9d1"
+      },
+      "ChandraNative/runtime/build.cmd": {
+        "bytes": 1601,
+        "sha256": "8d31ee5f8edf1a69d5a955e7a029c1d68b54642e38b9e289a84e641312c2ca4e"
+      },
+      "ChandraNative/runtime/device.cpp": {
+        "bytes": 14113,
+        "sha256": "dbd6487e407b9ec2694f5e4d6d1cfdf980e945a906c204d09b9ae19db83dd538"
+      },
+      "ChandraNative/runtime/dispatch_calibration.cpp": {
+        "bytes": 16362,
+        "sha256": "b75a41910eadcba3f849254e10cfc4ec7835347d890056ec6b1524820de4ae85"
+      },
+      "ChandraNative/runtime/inference.cpp": {
+        "bytes": 37454,
+        "sha256": "041214fd0c6e42b64e60307c706337594545e22af10443581fdc08e23f34df8a"
+      },
+      "ChandraNative/runtime/model_weights.cpp": {
+        "bytes": 25066,
+        "sha256": "9a676a21c0c800dcafa4937c06f97f34afbe6f294367eb99bcc28fff4cbc7ceb"
+      },
+      "ChandraNative/runtime/model_weights_fixture_test.cpp": {
+        "bytes": 6380,
+        "sha256": "9262d8349706e62fcd33fc1b65e761435fd1af2732f7360af5c2bed39ac25c04"
+      },
+      "ChandraNative/runtime/operator_fixture.cpp": {
+        "bytes": 13886,
+        "sha256": "05b64d0d7e7cddaef5a062f4853cf64923ec43e0522bfeefff996ce2bf7ccb8b"
+      },
+      "ChandraNative/runtime/operators.cpp": {
+        "bytes": 8750,
+        "sha256": "0770ea75e9155ae784a5b8804179dc615a1133211d3c543781b0b6e8ed410daf"
+      },
+      "ChandraNative/runtime/shader_compile.cpp": {
+        "bytes": 1591,
+        "sha256": "76db610999723d36cff06c559390f3a58898f4b93eb192fe5ab601826b91e44c"
+      },
+      "ChandraNative/runtime/text_model.cpp": {
+        "bytes": 9098,
+        "sha256": "d62ca247b3009e11a9fa263d319a40243f417968c9936872b6c5d5c1a65e7462"
+      },
+      "ChandraNative/runtime/text_model.h": {
+        "bytes": 1529,
+        "sha256": "7dfaaf0705788b67080824e1d0dd8e2d70c5b72a34cd3073425aa0fb57c9f455"
+      },
+      "ChandraNative/runtime/vision_model.cpp": {
+        "bytes": 19669,
+        "sha256": "4788f468b8805f6a41d36d08ba313a2fa89194f6431d6b33c4bd63be79b4d78a"
+      },
+      "ChandraNative/runtime/vision_model.h": {
+        "bytes": 2525,
+        "sha256": "0334090294a8d2269f6106c8119de2485e44bb1581225db979441abd2f472f07"
+      },
+      "ChandraNative/shaders/runtime/elementwise.hlsl": {
+        "bytes": 4122,
+        "sha256": "f7de9cf1474341c12c1e49941b7cf5ca47515d185835c93f640fb2a44cdde99c"
+      },
+      "ChandraNative/shaders/runtime/embedding.hlsl": {
+        "bytes": 1019,
+        "sha256": "d55a980acff530d0d28c257ca9830d7fc79461cfff6354a6b9de393a7aef1f37"
+      },
+      "ChandraNative/shaders/runtime/linear.hlsl": {
+        "bytes": 2444,
+        "sha256": "8fa9fb68f69b35a812f4a5821db11148e665611b0b5f560a5a0186ac13343d5f"
+      },
+      "ChandraNative/shaders/runtime/multimodal_merge.hlsl": {
+        "bytes": 1244,
+        "sha256": "130d82898f2cc86166c1ba21147a00eed389a7d9d543d43c5ea31290271d0472"
+      },
+      "ChandraNative/shaders/runtime/norm.hlsl": {
+        "bytes": 3072,
+        "sha256": "a00a575b33f455748d424757b71c0af339bdcf67305a1cb2cc85215fdcc39fa4"
+      },
+      "ChandraNative/shaders/runtime/text_attention_reduce.hlsl": {
+        "bytes": 527,
+        "sha256": "f0548298b831ab6d47adf4d0ebde9f6209d49134ca1aaddfbf60102db9c99e26"
+      },
+      "ChandraNative/shaders/runtime/text_attention_scores.hlsl": {
+        "bytes": 836,
+        "sha256": "c500f3dd38165b443af2d5cbb92a18c06577ff4ebd53a02ea4bc2b8cb91322ee"
+      },
+      "ChandraNative/shaders/runtime/text_attention_softmax.hlsl": {
+        "bytes": 1146,
+        "sha256": "5b6c0445dcebe2acdc8104bf1c0fd2b37e1c05665d30d960ca4a0e83d6432369"
+      },
+      "ChandraNative/shaders/runtime/text_attention_values.hlsl": {
+        "bytes": 746,
+        "sha256": "32128314fc79d6b1fb9f37bb2097c004aa754ad1c905cda35366a3c51427f8b6"
+      },
+      "ChandraNative/shaders/runtime/text_cache.hlsl": {
+        "bytes": 438,
+        "sha256": "9a3f8461142ef4915ca1354f0eac7cef18a55fde6969aa1d70a2533a9a104cc3"
+      },
+      "ChandraNative/shaders/runtime/text_conv.hlsl": {
+        "bytes": 1102,
+        "sha256": "c9db5053eef172a87741b86b01523f915d8b6198fe08b662b104db308a00c3fe"
+      },
+      "ChandraNative/shaders/runtime/text_copy.hlsl": {
+        "bytes": 295,
+        "sha256": "dc6223a7d93c7a9e635ef9bbdd64c872989ca2f8d87e95b17f39cf82e4320bab"
+      },
+      "ChandraNative/shaders/runtime/text_delta.hlsl": {
+        "bytes": 1976,
+        "sha256": "9d6d54b42757beeb5246093eb1aecdf3322a8c1294bc3e1e77b13f6bf7ce89f4"
+      },
+      "ChandraNative/shaders/runtime/text_gdn_gate.hlsl": {
+        "bytes": 988,
+        "sha256": "33f5422cba801fad02d46b799ce0107801f9da9f5db35d223cfd9be052d08d16"
+      },
+      "ChandraNative/shaders/runtime/text_gdn_prepare.hlsl": {
+        "bytes": 1495,
+        "sha256": "3179286d36ecc2d7d1cac2ead04a2da91350fca911354ae7bea28c577fc179da"
+      },
+      "ChandraNative/shaders/runtime/text_rope.hlsl": {
+        "bytes": 1118,
+        "sha256": "cfcbad4cbd5e45caf5d15316fc81e2b6552cc15219b446309212bbc7149ad978"
+      },
+      "ChandraNative/shaders/runtime/text_slice.hlsl": {
+        "bytes": 314,
+        "sha256": "5c54ba970f261ca2a72a9bc3001343e838b6d89dc9030c5281a628c7cef13f09"
+      },
+      "ChandraNative/shaders/runtime/vision_attention_reduce.hlsl": {
+        "bytes": 528,
+        "sha256": "368516015a95d2e6196d2672a5f9ed6510545aa7d5a0fde72df423524ef383e1"
+      },
+      "ChandraNative/shaders/runtime/vision_attention_scores.hlsl": {
+        "bytes": 992,
+        "sha256": "a3fd9a786a69f12882ecebd528becb66fa4fb89d8deb9592f2eb0e3b0e519e30"
+      },
+      "ChandraNative/shaders/runtime/vision_attention_softmax.hlsl": {
+        "bytes": 1420,
+        "sha256": "257c2c1105db27c85f9f7fc8238e66793b11ac37379d2f599819a53b0c95f2dc"
+      },
+      "ChandraNative/shaders/runtime/vision_attention_values.hlsl": {
+        "bytes": 875,
+        "sha256": "3ae108c8bef2d17dcbb214ef1ef5dd684e791d5dc35a468dc47c666da434183c"
+      },
+      "ChandraNative/shaders/runtime/vision_common.hlsl": {
+        "bytes": 410,
+        "sha256": "442da3bfcebe567fdb1f5f97b392557ceba0b9f71505435012dc615e565988c5"
+      },
+      "ChandraNative/shaders/runtime/vision_position.hlsl": {
+        "bytes": 1389,
+        "sha256": "bfd640a4197034dbeb39cfc0cf294b1a668bfd070c5c2c1411f6ef052542bd7b"
+      },
+      "ChandraNative/shaders/runtime/vision_rope.hlsl": {
+        "bytes": 1165,
+        "sha256": "44ea1de09f4668534502d9c1c3b3a1a5ffea082d16b7e69f79490545583658e8"
+      },
+      "ChandraNative/shaders/runtime/vision_rope_frequency.hlsl": {
+        "bytes": 313,
+        "sha256": "6e94e6957caf3d63b4bf9ae794f72b8c297ff1532d38f5d62b13abfc1af7c40b"
+      },
+      "ChandraNative/shaders/runtime/vision_rope_positions.hlsl": {
+        "bytes": 757,
+        "sha256": "f16860a4606f2f782d0daec0196a6e008ec459711fcce5cda8eb65c9b96465ca"
+      },
+      "ChandraNative/shaders/runtime/vision_rows.hlsl": {
+        "bytes": 385,
+        "sha256": "6fcd8428c1d9d0a9eedc43967b9b7cccabe8fa38988d02bd9a360c95e0d9a440"
+      }
+    },
+    "elapsed_seconds": 69.01600000000326,
+    "native_GPU_execution_during_build": false,
+    "native_executable": {
+      "bytes": 780288,
+      "sha256": "2097e2f344a4f83e95152751ce4ae1d39a3ed24854a1e50bc3c0425c991ee986"
+    },
+    "strict_compile": "MSVC /fp:strict; cs_5_0 D3DCompile IEEE_STRICTNESS with optimization level 3"
+  },
+  "synthetic_operator_point": {
+    "check_count": 13,
+    "passed": true,
+    "scope": "small synthetic projection, BF16 ties/nonfinite casts, RMSNorm, carried GDN and attention",
+    "receipt": {
+      "bytes": 296465,
+      "sha256": "4682c69739b0e053137bda9b20ce2e0501713df56e1a86a24c7c3909934a7f10"
+    }
+  },
+  "dyadic_calibration": {
+    "passed": true,
+    "model_loaded": false,
+    "maximum_tensors_plus_readback_bytes": 20447232,
+    "phases": [
+      {
+        "rows": 1,
+        "exact_FP32": true,
+        "exact_BF16": true,
+        "dispatch_ms": [
+          3.5608333333333335,
+          3.5602604166666665
+        ]
+      },
+      {
+        "rows": 16,
+        "exact_FP32": true,
+        "exact_BF16": true,
+        "dispatch_ms": [
+          3.0761458333333334,
+          3.05375
+        ]
+      },
+      {
+        "rows": 32,
+        "exact_FP32": true,
+        "exact_BF16": true,
+        "dispatch_ms": [
+          6.458125,
+          6.4365625
+        ]
+      }
+    ],
+    "receipt": {
+      "bytes": 4419499,
+      "sha256": "9734adc7a61d64fd0283a181790ed7e68e64ea323e52782c03602653f87ac16e"
+    }
+  },
+  "tiny_graph": {
+    "input_manifest_sha256": "6e5df5e8b33a7fbee2414fafab5b2212fb5a4a80b40b34b390ae829326116a36",
+    "original_image_dimensions": [
+      408,
+      528
+    ],
+    "image_sha256": "c30916f2dbba48b58e588de752371ac81155edb21f553588ec756cf649c268e9",
+    "pixel_sha256": "6b2583894bcde7745f785fe341add84d72d7051f1a7516db5c9b9fd0506f8cec",
+    "processor_profile": "northstone-serving",
+    "prompt_tokens": 801,
+    "patch_rows": 832,
+    "image_grid": [
+      [
+        1,
+        32,
+        26
+      ]
+    ],
+    "context_limit": 16384,
+    "normal_output_allowance": 12384,
+    "explicit_diagnostic_cap": 9,
+    "generated_ids": [
+      2539,
+      795,
+      1402,
+      1944,
+      420,
+      20,
+      18,
+      220,
+      20
+    ],
+    "CPU_expected_ids": [
+      2539,
+      795,
+      1402,
+      1944,
+      420,
+      20,
+      18,
+      220,
+      20
+    ],
+    "categorical_token_match": true,
+    "stop_reason": "explicit_diagnostic_token_cap",
+    "actual_EOS_observed": false,
+    "cache_tokens_before_retirement": 809,
+    "cached_advances": 8,
+    "full_model_uploaded_bytes": 9078531072,
+    "device": {
+      "dedicated_bytes": 17047748608,
+      "description": "Intel(R) Arc(TM) A770 Graphics",
+      "device_id": 22176,
+      "dxgi_index": 1,
+      "luid": "00000000:000102d9",
+      "pci_bdf": "0c:00.0",
+      "pci_bus": 12,
+      "pci_device": 0,
+      "pci_function": 0,
+      "revision": 8,
+      "subsystem_id": 948441125,
+      "vendor_id": 32902
+    },
+    "native_duration_seconds": 92.6682034,
+    "phases": [
+      {
+        "name": "device_creation",
+        "wall_seconds": 0.0762699
+      },
+      {
+        "name": "authenticated_model_import_upload",
+        "wall_seconds": 25.5737819
+      },
+      {
+        "name": "complete_vision_forward",
+        "wall_seconds": 15.942259
+      },
+      {
+        "name": "text_embedding",
+        "wall_seconds": 0.0046028
+      },
+      {
+        "name": "ordered_multimodal_merge",
+        "wall_seconds": 0.0429923
+      },
+      {
+        "name": "text_request_cache_creation",
+        "wall_seconds": 0.0352929
+      },
+      {
+        "name": "text_prefill",
+        "wall_seconds": 38.1142726
+      },
+      {
+        "name": "greedy_cached_decode_and_token_readback",
+        "wall_seconds": 12.7608281
+      },
+      {
+        "name": "request_retirement_and_drain",
+        "wall_seconds": 0.0101001
+      },
+      {
+        "name": "model_buffer_release_and_drain",
+        "wall_seconds": 0.1076623
+      }
+    ],
+    "memory": {
+      "tracked_GPU_payload_peak_bytes": 10247911168,
+      "owned_tracked_payload_after_retirement_bytes": 0,
+      "maximum_observed_WDDM_local_process_usage_bytes": 9630056448,
+      "WDDM_scope": "Per-process observations, not global free/resident VRAM",
+      "minimum_available_host_RAM_bytes": 19764445184,
+      "peak_process_commit_bytes": 10567622656,
+      "peak_job_commit_bytes": 10576400384,
+      "process_commit_cap_bytes": 12884901888,
+      "job_commit_cap_bytes": 13153337344
+    },
+    "closed_native_process": true,
+    "active_job_processes_after_wait": 0,
+    "ordinary_worker_restored_cold": true,
+    "receipt": {
+      "bytes": 261457,
+      "sha256": "300efb644cc96754fbca593396a2e062484c7f07d00f1be8591864d635bedf9f"
+    },
+    "token_trace": {
+      "bytes": 2418,
+      "sha256": "8e60b207f51edf862af8e0880e15f23d69ee0a85a09cbb504c085c1aa21156e7"
+    },
+    "independent_closed_assessment": {
+      "bytes": 11106,
+      "sha256": "879361969ab95c0735b09e4be887498c82d15dc4c1437423234977f462cd065f"
+    }
+  },
+  "acceptance": {
+    "closed_tiny_graph_diagnostic": true,
+    "full_vector_numerics": false,
+    "complete_OCR": false,
+    "AMD_OCR_equivalence": false,
+    "native_endpoint": false,
+    "sustained_pages_per_second": null,
+    "qualified_speedup_percent": 0
+  },
+  "root_controller_refusals": [
+    {
+      "point": "calibration-01",
+      "stage": "preflight",
+      "GPU_execution": false,
+      "cause": "Windows CMD argument limit; next fresh point authenticated source manifest by hash instead of embedding it"
+    },
+    {
+      "point": "forecast-01",
+      "stage": "channel closure",
+      "GPU_execution": false,
+      "native_forecast_succeeded": true,
+      "cause": "short CPU child exited before lease authentication; original successful report collected without replay; later private lease authenticates before child resume"
+    }
+  ],
+  "normal_tiny_page_attempt": {
+    "passed": false,
+    "scope": "Original tiny image with normal free generation and no diagnostic cap",
+    "normal_output_allowance": 12384,
+    "diagnostic_cap": null,
+    "generated_tokens_before_failure": 40,
+    "error": "Map completed readback HRESULT=2289696778",
+    "HRESULT_hex": "0x887a000a",
+    "HRESULT_name": "DXGI_ERROR_WAS_STILL_DRAWING",
+    "failure_stage": "nonblocking staging-readback Map after already-submitted work",
+    "automatic_replay": false,
+    "native_seconds": 137.9727087,
+    "request_failed": true,
+    "request_retired": true,
+    "final_drain_completed": true,
+    "tracked_payload_after_final_drain": 0,
+    "native_exit_code": 1,
+    "minimum_available_host_RAM_bytes": 19731234816,
+    "active_job_processes_after_wait": 0,
+    "ordinary_worker_restored_cold": true,
+    "complete_OCR": false,
+    "actual_EOS_observed": false,
+    "receipt": {
+      "bytes": 259993,
+      "sha256": "bd025d571f137c7bd52cbacbee3f951d035e0a32aa17228a5140395b46ca227b"
+    },
+    "token_trace": {
+      "bytes": 10774,
+      "sha256": "f8e95e0f44bbb313d2040f0eaf809128257bff2662973d08e3bbbb2be4881229"
+    },
+    "source_fix_status": "Claude Code owns bounded same-readback retry candidate in isolated checkout; no change deployed",
+    "reference": "https://learn.microsoft.com/en-us/windows/win32/api/d3d11/nf-d3d11-id3d11devicecontext-map",
+    "independent_failed_point_audit": {
+      "bytes": 6732,
+      "sha256": "f04137e825458dfe87a5d939f7c50fce01475a4a3897cecb4e3d0d4380561554"
+    },
+    "CPU_reference_prefix_observation": "One bounding-box digit differs (421 versus 420); same-history vector comparison is unavailable and later forced rows are not paired after divergence."
+  }
+}
